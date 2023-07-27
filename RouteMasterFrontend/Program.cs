@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Infra.DapperRepositories;
+using RouteMasterFrontend.Models.Interfaces;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,9 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("RouteMaster"));
 });
+
+
+
 
 
 

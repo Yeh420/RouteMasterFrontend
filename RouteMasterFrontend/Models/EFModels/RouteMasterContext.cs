@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using RouteMasterFrontend.Models.ViewModels.Activities;
 
 namespace RouteMasterFrontend.EFModels
 {
@@ -82,24 +83,24 @@ namespace RouteMasterFrontend.EFModels
         /// for SignalR 
         /// </summary>
         /// <param name="optionsBuilder"></param>
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			if (!optionsBuilder.IsConfigured)
-			{
-				IConfigurationRoot config = new ConfigurationBuilder()
-					.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-					.AddJsonFile("appsettings")
-					.Build();
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                IConfigurationRoot config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings")
+                    .Build();
 
-				optionsBuilder.UseSqlServer(config.GetConnectionString("RouteMaster"));
-			}
-		}
-
-
+                optionsBuilder.UseSqlServer(config.GetConnectionString("RouteMaster"));
+            }
+        }
 
 
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Accommodation>(entity =>
             {
@@ -1214,5 +1215,7 @@ namespace RouteMasterFrontend.EFModels
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public DbSet<RouteMasterFrontend.Models.ViewModels.Activities.ActivityListVM>? ActivityListVM { get; set; }
     }
 }

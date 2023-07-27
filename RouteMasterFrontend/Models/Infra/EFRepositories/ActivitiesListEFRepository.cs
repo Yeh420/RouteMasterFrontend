@@ -8,12 +8,12 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RouteMasterFrontend.Models.Infra.EFRepositories
 {
-	public class ActivitesListEFRepository : IActivityRepository
+	public class ActivitiesListEFRepository : IActivityRepository
 	{
-		private readonly RouteMasterContext _context;
-        public ActivitesListEFRepository()
+		private readonly RouteMasterContext _context;	
+        public ActivitiesListEFRepository(RouteMasterContext context)
         {
-			_context = new RouteMasterContext();
+			_context = context;
         }
         public IEnumerable<ActivityListDto> Search(ActivityListCriteria criteria)
 		{

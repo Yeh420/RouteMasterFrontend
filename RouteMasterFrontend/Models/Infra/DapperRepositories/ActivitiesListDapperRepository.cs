@@ -10,13 +10,18 @@ namespace RouteMasterFrontend.Models.Infra.DapperRepositories
 	public class ActivitiesListDapperRepository:IActivityRepository
 	{
 		private readonly string _connstr;
-        private readonly IConfiguration _configuration;
+       
 
-        public ActivitiesListDapperRepository(IConfiguration configuration )
+
+        public ActivitiesListDapperRepository()
         {
-            _configuration = configuration;
-			_connstr = _configuration.GetConnectionString("RouteMaster");
-		}
+            IConfigurationRoot config = new ConfigurationBuilder()
+                           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                           .AddJsonFile("appsettings.json")
+                           .Build();
+
+            _connstr = config.GetConnectionString("RouteMaster");
+        }
 
 		public IEnumerable<ActivityListDto> Search(ActivityListCriteria criteria)
 		{
@@ -36,7 +41,7 @@ ON AC.RegionId=Regions.Id
 JOIN Attractions as ATT
 ON AC.AttractionId=ATT.Id
 ";
-				return conn.Query<ActivityListDto>(sql);
+				return conn.Query <ActivityListDto>(sql);
 			}
 		}
 	}

@@ -1,19 +1,20 @@
-﻿@model IEnumerable<RouteMasterFrontend.EFModels.Activity>
+﻿@model IEnumerable<RouteMasterFrontend.Models.ViewModels.Activities.ActivityListVM>
 
-@{
-    ViewData["Title"] = "Index";
-}
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.ActivityCategoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegionName)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AttractionName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -24,15 +25,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Image)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ActivityCategory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Attraction)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Region)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -40,7 +32,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.ActivityCategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegionName)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AttractionName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
@@ -50,15 +51,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActivityCategory.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Attraction.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Region.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
