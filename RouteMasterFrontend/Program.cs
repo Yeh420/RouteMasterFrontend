@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Infra.DapperRepositories;
@@ -11,6 +14,30 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("RouteMaster"));
 });
+
+
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+	options.Lockout.MaxFailedAccessAttempts = 2;
+
+});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+	options.LoginPath = new PathString("/Members/MemberLogin");
+
+	//options.LogoutPath = "Members/Logout";
+	//options.AccessDeniedPath = "/"; 存取失敗的路徑
+});
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+	options.MinimumSameSitePolicy = SameSiteMode.Lax;
+	options.HttpOnly = HttpOnlyPolicy.Always;
+	options.Secure = (CookieSecurePolicy)SameSiteMode.None; // 設置 Secure 屬性為 None
+});
+
+
 
 
 
