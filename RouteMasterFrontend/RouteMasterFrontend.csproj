@@ -17,7 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Uploads\" />
+    <Folder Include="Models\EFModels\" />
+    <Folder Include="wwwroot\ActivityImages\" />
+    <Folder Include="wwwroot\AccomodationImages\" />
+    <Folder Include="wwwroot\MemberUploads\" />
+    <Folder Include="wwwroot\AttractionImages\" />
+    <Folder Include="wwwroot\SystemImages\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>

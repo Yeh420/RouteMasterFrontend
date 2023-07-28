@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using RouteMasterFrontend.Models.ViewModels.Activities;
 
 namespace RouteMasterFrontend.EFModels
 {
@@ -49,6 +48,7 @@ namespace RouteMasterFrontend.EFModels
         public virtual DbSet<ExtraServiceProduct> ExtraServiceProducts { get; set; }
         public virtual DbSet<Faq> Faqs { get; set; }
         public virtual DbSet<Faqcategory> Faqcategories { get; set; }
+        public virtual DbSet<FavoriteAttraction> FavoriteAttractions { get; set; }
         public virtual DbSet<Member> Members { get; set; }
         public virtual DbSet<MemberImage> MemberImages { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
@@ -76,29 +76,6 @@ namespace RouteMasterFrontend.EFModels
         public virtual DbSet<Town> Towns { get; set; }
         public virtual DbSet<Transportation> Transportations { get; set; }
         public virtual DbSet<TravelPlan> TravelPlans { get; set; }
-
-
-
-        /// <summary>
-        /// for SignalR 
-        /// </summary>
-        /// <param name="optionsBuilder"></param>
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                IConfigurationRoot config = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("appsettings")
-                    .Build();
-
-                optionsBuilder.UseSqlServer(config.GetConnectionString("RouteMaster"));
-            }
-        }
-
-
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -665,6 +642,21 @@ namespace RouteMasterFrontend.EFModels
                     .HasMaxLength(30);
             });
 
+            modelBuilder.Entity<FavoriteAttraction>(entity =>
+            {
+                entity.HasOne(d => d.Attraction)
+                    .WithMany(p => p.FavoriteAttractions)
+                    .HasForeignKey(d => d.AttractionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__FavoriteA__Attra__00DF2177");
+
+                entity.HasOne(d => d.Member)
+                    .WithMany(p => p.FavoriteAttractions)
+                    .HasForeignKey(d => d.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__FavoriteA__Membe__7FEAFD3E");
+            });
+
             modelBuilder.Entity<Member>(entity =>
             {
                 entity.HasIndex(e => e.Email, "UQ__Members__A9D1053423C89568")
@@ -1215,7 +1207,5 @@ namespace RouteMasterFrontend.EFModels
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Activities.ActivityListVM>? ActivityListVM { get; set; }
     }
 }

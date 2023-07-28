@@ -136,6 +136,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[FavoriteAttractions]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[MemberImages]",
          "ObjectType": 0
       },

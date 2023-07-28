@@ -1,4 +1,4 @@
-﻿@model RouteMasterFrontend.EFModels.Activity
+﻿@model RouteMasterFrontend.EFModels.ExtraService
 
 @{
     ViewData["Title"] = "Create";
@@ -6,23 +6,12 @@
 
 <h1>Create</h1>
 
-
-
-<h4>Activity</h4>
+<h4>ExtraService</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ActivityCategoryId" class="control-label"></label>
-                <select asp-for="ActivityCategoryId" class ="form-control" asp-items="ViewBag.ActivityCategoryId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="RegionId" class="control-label"></label>
                 <select asp-for="RegionId" class ="form-control" asp-items="ViewBag.RegionId"></select>
@@ -30,6 +19,11 @@
             <div class="form-group">
                 <label asp-for="AttractionId" class="control-label"></label>
                 <select asp-for="AttractionId" class ="form-control" asp-items="ViewBag.AttractionId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
@@ -43,7 +37,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Image" class="control-label"></label>
-                <input type="file" name="file" asp-for="Image" class="form-control" />
+                <input asp-for="Image" class="form-control" />
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
             <div class="form-group">

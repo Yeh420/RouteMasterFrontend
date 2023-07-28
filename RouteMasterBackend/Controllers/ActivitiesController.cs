@@ -25,5 +25,10 @@ namespace RouteMasterBackend.Controllers
 			//todo無法完全非同步?
 			return  _context.Activities.Where(a=>a.AttractionId==attractionId);
 		}
+
+
+
+
+
     }
 }
