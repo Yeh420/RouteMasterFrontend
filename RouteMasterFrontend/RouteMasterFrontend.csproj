@@ -22,6 +22,7 @@
     <Folder Include="wwwroot\AccomodationImages\" />
     <Folder Include="wwwroot\MemberUploads\" />
     <Folder Include="wwwroot\AttractionImages\" />
+    <Folder Include="wwwroot\ExtraServiceImages\" />
     <Folder Include="wwwroot\SystemImages\" />
   </ItemGroup>
 

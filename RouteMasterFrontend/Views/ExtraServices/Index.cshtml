@@ -55,9 +55,11 @@
                 @Html.DisplayFor(modelItem => item.Region.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>|
+                    <a asp-action="UploadExtraServicesImages" asp-route-id="@item.Id">上傳圖片</a>|
+                    <a asp-action="CreateExtraServiceProduct" asp-route-id="@item.Id">新增產品</a>
             </td>
         </tr>
 }

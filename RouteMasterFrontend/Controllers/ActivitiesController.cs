@@ -107,11 +107,8 @@ namespace RouteMasterFrontend.Controllers
 				if (file != null && file.Length > 0)
 				{
 					string path = Path.Combine(_environment.WebRootPath, "ActivityImages");
-
 					string fileName = SaveUploadFile(path, file);
-
 					activity.Image = fileName;
-
 					_context.Add(activity);
 					await _context.SaveChangesAsync();
 					return RedirectToAction(nameof(Index));
@@ -148,22 +145,14 @@ namespace RouteMasterFrontend.Controllers
             {
                 foreach (var file in files)
                 {
-                    string path = Path.Combine(_environment.WebRootPath, "Uploads");
-
+                    string path = Path.Combine(_environment.WebRootPath, "ActivityImages");
                     string fileName = SaveUploadFile(path, file);
-
-
-
-
                     ActivityImage img = new ActivityImage();
                     img.ActivityId = activity.Id;
                     img.Image = fileName;
-
-
                     _context.ActivityImages.Add(img);
                     _context.SaveChanges();
                 }
-
             }
             return RedirectToAction(nameof(Index));
         }
@@ -177,11 +166,6 @@ namespace RouteMasterFrontend.Controllers
         {
             ActivityProduct product = new ActivityProduct();
             product.ActivityId = Id;
-
-
-
-
-
             ViewBag.CurrentDate = DateTime.Today;
             ViewData["ActivityId"] = new SelectList(_context.Activities, "Id", "Name");
             return View(product);
@@ -197,8 +181,6 @@ namespace RouteMasterFrontend.Controllers
             //一次新增多筆產品資料
             for (int i = 0; i < interValDays; i++)
             {
-
-
                 ActivityProduct product = new ActivityProduct();
                 product.Date = activityProduct.Date.AddDays(i).Date;
                 product.ActivityId = activityProduct.ActivityId;
@@ -206,14 +188,9 @@ namespace RouteMasterFrontend.Controllers
                 product.EndTime = activityProduct.EndTime;
                 product.Quantity = activityProduct.Quantity;
                 product.Price = activityProduct.Price;
-
-
                 _context.ActivityProducts.Add(product);
                 _context.SaveChanges();
             }
-
-
-
             return RedirectToAction(nameof(Index));
         }
 

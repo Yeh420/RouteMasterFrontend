@@ -83,9 +83,36 @@ namespace RouteMasterFrontend.Controllers
 
 
 
+        [HttpGet]
+		//上船系統圖片
+        public IActionResult UploadSystemImages()
+		{
+			return View();
+		}
 
 
-		[HttpGet]
+		[HttpPost]
+		public IActionResult UploadSystemImages(IFormFile[] files)
+		{
+            if (files != null && files.Length > 0)
+            {
+                foreach (var file in files)
+                {
+                    string path = Path.Combine(_environment.WebRootPath, "SystemImages");
+                    string fileName = SaveUploadFile(path, file);
+					SystemImage img = new SystemImage();                    
+                    img.Image = fileName;
+                    _context.SystemImages.Add(img);
+                    _context.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index", "Home");
+        }
+		
+
+
+
+        [HttpGet]
 		public IActionResult MemberRegister()
 		{
 			return View();
