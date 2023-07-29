@@ -60,4 +60,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.getElementById("dateInput").valueAsDate = new Date('@ViewBag.CurrentDate.ToString("yyyy-MM-dd")');
+    </script>
 }

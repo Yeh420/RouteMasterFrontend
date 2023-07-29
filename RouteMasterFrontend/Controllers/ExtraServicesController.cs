@@ -50,7 +50,7 @@ namespace RouteMasterFrontend.Controllers
         // GET: ExtraServices/Create
         public IActionResult Create()
         {
-            ViewData["AttractionId"] = new SelectList(_context.Attractions, "Id", "Address");
+            ViewData["AttractionId"] = new SelectList(_context.Attractions, "Id", "Name");
             ViewData["RegionId"] = new SelectList(_context.Regions, "Id", "Name");
             return View();
         }
@@ -75,7 +75,7 @@ namespace RouteMasterFrontend.Controllers
                     return RedirectToAction(nameof(Index));
                 }            
             }
-            ViewData["AttractionId"] = new SelectList(_context.Attractions, "Id", "Address", extraService.AttractionId);
+            ViewData["AttractionId"] = new SelectList(_context.Attractions, "Id", "Name", extraService.AttractionId);
             ViewData["RegionId"] = new SelectList(_context.Regions, "Id", "Name", extraService.RegionId);
             return View(extraService);
         }
