@@ -1,0 +1,311 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "RouteMasterContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "EFModels",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "RouteMasterFrontend",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[AccommodationImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Accommodations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AccommodationServiceInfos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AccommodationServiceInfos_Accommodations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AcommodationCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Activities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ActivityCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ActivityImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ActivityProducts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Administrators]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AttractionCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AttractionClick]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AttractionImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Attractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AttractionTags]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Cart_AccommodationDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Cart_ActivitiesDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Cart_ExtraServicesDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Carts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Comment_Accommodation_Likes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Comments_AccommodationImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Comments_Accommodations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Comments_AttractionImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Comments_Attractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CommentStatuses]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Coupons]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ExtraServiceImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ExtraServiceProducts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ExtraServices]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FAQCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FAQs]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FavoriteAttractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MemberImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Members]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[OrderAccommodationDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[OrderActivitiesDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[OrderExtraServicesDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[OrderHandleStatuses]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Orders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PackageActivities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PackageAttractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PackageCoupons]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PackageExtraServices]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PackageTours]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Partners]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PaymentMethods]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PaymentStatuses]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Permissions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PlanActivities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PlanAttractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PlanExtraServices]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Regions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ReportedAttractionComments]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ReportReasons]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoomImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoomProducts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Rooms]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoomServiceInfos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoomServiceInfos_Rooms]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoomTypes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Schedules]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ServiceInfoCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SystemImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SystemMessages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Tags_Attractions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Towns]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Transportation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TravelPlans]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "laptop-cduhr4vv\\yeh420sql.RouteMaster.dbo",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
