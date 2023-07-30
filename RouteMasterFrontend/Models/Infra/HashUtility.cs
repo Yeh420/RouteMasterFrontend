@@ -22,7 +22,8 @@ namespace RouteMasterFrontend.Models.Infra
 
 		public static string GetSalt()
 		{
-			return System.Configuration.ConfigurationManager.AppSettings["Salt"];
+			return "";
+			//return System.Configuration.ConfigurationManager.AppSettings["Salt"];
 		}
 	}
 }

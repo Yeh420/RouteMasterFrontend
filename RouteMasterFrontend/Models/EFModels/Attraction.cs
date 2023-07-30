@@ -12,7 +12,7 @@ namespace RouteMasterFrontend.EFModels
             Activities = new HashSet<Activity>();
             AttractionClicks = new HashSet<AttractionClick>();
             AttractionImages = new HashSet<AttractionImage>();
-            CommentsAttractions = new HashSet<CommentsAttraction>();
+            Comments_Attractions = new HashSet<Comments_Attraction>();
             ExtraServices = new HashSet<ExtraService>();
             FavoriteAttractions = new HashSet<FavoriteAttraction>();
             PackageTours = new HashSet<PackageTour>();
@@ -38,7 +38,7 @@ namespace RouteMasterFrontend.EFModels
         public virtual ICollection<Activity> Activities { get; set; }
         public virtual ICollection<AttractionClick> AttractionClicks { get; set; }
         public virtual ICollection<AttractionImage> AttractionImages { get; set; }
-        public virtual ICollection<CommentsAttraction> CommentsAttractions { get; set; }
+        public virtual ICollection<Comments_Attraction> Comments_Attractions { get; set; }
         public virtual ICollection<ExtraService> ExtraServices { get; set; }
         public virtual ICollection<FavoriteAttraction> FavoriteAttractions { get; set; }
 

@@ -9,7 +9,7 @@ namespace RouteMasterFrontend.EFModels
     {
         public RoomProduct()
         {
-            CartAccommodationDetails = new HashSet<CartAccommodationDetail>();
+            Cart_AccommodationDetails = new HashSet<Cart_AccommodationDetail>();
             OrderAccommodationDetails = new HashSet<OrderAccommodationDetail>();
         }
 
@@ -20,7 +20,7 @@ namespace RouteMasterFrontend.EFModels
         public int Quantity { get; set; }
 
         public virtual Room Room { get; set; }
-        public virtual ICollection<CartAccommodationDetail> CartAccommodationDetails { get; set; }
+        public virtual ICollection<Cart_AccommodationDetail> Cart_AccommodationDetails { get; set; }
         public virtual ICollection<OrderAccommodationDetail> OrderAccommodationDetails { get; set; }
     }
 }

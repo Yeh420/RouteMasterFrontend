@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class CommentAccommodationLike
+    public partial class Comment_Accommodation_Like
     {
         public int Id { get; set; }
         public int MemberId { get; set; }
-        public int CommentsAccommodationId { get; set; }
+        public int Comments_AccommodationId { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public virtual CommentsAccommodation CommentsAccommodation { get; set; }
+        public virtual Comments_Accommodation Comments_Accommodation { get; set; }
         public virtual Member Member { get; set; }
     }
 }

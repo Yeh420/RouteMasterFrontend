@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class CommentsAttractionImage
+    public partial class Comments_AccommodationImage
     {
         public int Id { get; set; }
-        public int CommentsAttractionId { get; set; }
+        public int Comments_AccommodationId { get; set; }
         public string Image { get; set; }
 
-        public virtual CommentsAttraction CommentsAttraction { get; set; }
+        public virtual Comments_Accommodation Comments_Accommodation { get; set; }
     }
 }

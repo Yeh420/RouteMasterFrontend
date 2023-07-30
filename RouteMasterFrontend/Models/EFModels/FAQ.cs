@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class Faq
+    public partial class FAQ
     {
         public int Id { get; set; }
-        public int FaqcategoryId { get; set; }
+        public int FAQCategoryId { get; set; }
         public string Question { get; set; }
         public string Answer { get; set; }
         public int Helpful { get; set; }
@@ -16,6 +16,6 @@ namespace RouteMasterFrontend.EFModels
         public string Image { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-        public virtual Faqcategory Faqcategory { get; set; }
+        public virtual FAQCategory FAQCategory { get; set; }
     }
 }

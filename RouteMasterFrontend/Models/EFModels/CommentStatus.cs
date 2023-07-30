@@ -5,16 +5,16 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class Faqcategory
+    public partial class CommentStatus
     {
-        public Faqcategory()
+        public CommentStatus()
         {
-            Faqs = new HashSet<Faq>();
+            Comments_Accommodations = new HashSet<Comments_Accommodation>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public virtual ICollection<Faq> Faqs { get; set; }
+        public virtual ICollection<Comments_Accommodation> Comments_Accommodations { get; set; }
     }
 }

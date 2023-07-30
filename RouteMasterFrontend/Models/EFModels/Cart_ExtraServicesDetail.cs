@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class CartExtraServicesDetail
+    public partial class Cart_ExtraServicesDetail
     {
         public int Id { get; set; }
         public int CartId { get; set; }

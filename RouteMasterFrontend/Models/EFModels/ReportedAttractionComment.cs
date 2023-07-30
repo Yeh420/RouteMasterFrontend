@@ -12,7 +12,7 @@ namespace RouteMasterFrontend.EFModels
         public int ReportReasonId { get; set; }
         public bool IsHandled { get; set; }
 
-        public virtual CommentsAttraction CommentAttraction { get; set; }
+        public virtual Comments_Attraction CommentAttraction { get; set; }
         public virtual ReportReason ReportReason { get; set; }
     }
 }

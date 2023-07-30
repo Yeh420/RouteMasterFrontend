@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Microsoft.Data.SqlClient;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.Infra.Criterias;

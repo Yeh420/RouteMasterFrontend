@@ -10,7 +10,7 @@ namespace RouteMasterFrontend.EFModels
         public Accommodation()
         {
             AccommodationImages = new HashSet<AccommodationImage>();
-            CommentsAccommodations = new HashSet<CommentsAccommodation>();
+            Comments_Accommodations = new HashSet<Comments_Accommodation>();
             OrderAccommodationDetails = new HashSet<OrderAccommodationDetail>();
             Rooms = new HashSet<Room>();
             AccommodationServiceInfos = new HashSet<AccommodationServiceInfo>();
@@ -42,7 +42,7 @@ namespace RouteMasterFrontend.EFModels
         public virtual Region Region { get; set; }
         public virtual Town Town { get; set; }
         public virtual ICollection<AccommodationImage> AccommodationImages { get; set; }
-        public virtual ICollection<CommentsAccommodation> CommentsAccommodations { get; set; }
+        public virtual ICollection<Comments_Accommodation> Comments_Accommodations { get; set; }
         public virtual ICollection<OrderAccommodationDetail> OrderAccommodationDetails { get; set; }
         public virtual ICollection<Room> Rooms { get; set; }
 

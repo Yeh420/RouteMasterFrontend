@@ -10,9 +10,9 @@ namespace RouteMasterFrontend.EFModels
         public Member()
         {
             Carts = new HashSet<Cart>();
-            CommentAccommodationLikes = new HashSet<CommentAccommodationLike>();
-            CommentsAccommodations = new HashSet<CommentsAccommodation>();
-            CommentsAttractions = new HashSet<CommentsAttraction>();
+            Comment_Accommodation_Likes = new HashSet<Comment_Accommodation_Like>();
+            Comments_Accommodations = new HashSet<Comments_Accommodation>();
+            Comments_Attractions = new HashSet<Comments_Attraction>();
             FavoriteAttractions = new HashSet<FavoriteAttraction>();
             MemberImages = new HashSet<MemberImage>();
             Orders = new HashSet<Order>();
@@ -43,9 +43,9 @@ namespace RouteMasterFrontend.EFModels
         public bool IsSuscribe { get; set; }
 
         public virtual ICollection<Cart> Carts { get; set; }
-        public virtual ICollection<CommentAccommodationLike> CommentAccommodationLikes { get; set; }
-        public virtual ICollection<CommentsAccommodation> CommentsAccommodations { get; set; }
-        public virtual ICollection<CommentsAttraction> CommentsAttractions { get; set; }
+        public virtual ICollection<Comment_Accommodation_Like> Comment_Accommodation_Likes { get; set; }
+        public virtual ICollection<Comments_Accommodation> Comments_Accommodations { get; set; }
+        public virtual ICollection<Comments_Attraction> Comments_Attractions { get; set; }
         public virtual ICollection<FavoriteAttraction> FavoriteAttractions { get; set; }
         public virtual ICollection<MemberImage> MemberImages { get; set; }
         public virtual ICollection<Order> Orders { get; set; }

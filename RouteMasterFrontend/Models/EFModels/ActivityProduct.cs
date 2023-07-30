@@ -9,7 +9,7 @@ namespace RouteMasterFrontend.EFModels
     {
         public ActivityProduct()
         {
-            CartActivitiesDetails = new HashSet<CartActivitiesDetail>();
+            Cart_ActivitiesDetails = new HashSet<Cart_ActivitiesDetail>();
             OrderActivitiesDetails = new HashSet<OrderActivitiesDetail>();
             TravelPlans = new HashSet<TravelPlan>();
         }
@@ -23,7 +23,7 @@ namespace RouteMasterFrontend.EFModels
         public int Quantity { get; set; }
 
         public virtual Activity Activity { get; set; }
-        public virtual ICollection<CartActivitiesDetail> CartActivitiesDetails { get; set; }
+        public virtual ICollection<Cart_ActivitiesDetail> Cart_ActivitiesDetails { get; set; }
         public virtual ICollection<OrderActivitiesDetail> OrderActivitiesDetails { get; set; }
 
         public virtual ICollection<TravelPlan> TravelPlans { get; set; }

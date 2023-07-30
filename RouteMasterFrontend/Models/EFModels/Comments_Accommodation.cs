@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class CommentsAccommodation
+    public partial class Comments_Accommodation
     {
-        public CommentsAccommodation()
+        public Comments_Accommodation()
         {
-            CommentAccommodationLikes = new HashSet<CommentAccommodationLike>();
-            CommentsAccommodationImages = new HashSet<CommentsAccommodationImage>();
+            Comment_Accommodation_Likes = new HashSet<Comment_Accommodation_Like>();
+            Comments_AccommodationImages = new HashSet<Comments_AccommodationImage>();
         }
 
         public int Id { get; set; }
@@ -28,7 +28,7 @@ namespace RouteMasterFrontend.EFModels
         public virtual Accommodation Accommodation { get; set; }
         public virtual CommentStatus CommentStatus { get; set; }
         public virtual Member Member { get; set; }
-        public virtual ICollection<CommentAccommodationLike> CommentAccommodationLikes { get; set; }
-        public virtual ICollection<CommentsAccommodationImage> CommentsAccommodationImages { get; set; }
+        public virtual ICollection<Comment_Accommodation_Like> Comment_Accommodation_Likes { get; set; }
+        public virtual ICollection<Comments_AccommodationImage> Comments_AccommodationImages { get; set; }
     }
 }

@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace RouteMasterFrontend.EFModels
 {
-    public partial class CommentsAttraction
+    public partial class Comments_Attraction
     {
-        public CommentsAttraction()
+        public Comments_Attraction()
         {
-            CommentsAttractionImages = new HashSet<CommentsAttractionImage>();
+            Comments_AttractionImages = new HashSet<Comments_AttractionImage>();
             ReportedAttractionComments = new HashSet<ReportedAttractionComment>();
         }
 
@@ -25,7 +25,7 @@ namespace RouteMasterFrontend.EFModels
 
         public virtual Attraction Attraction { get; set; }
         public virtual Member Member { get; set; }
-        public virtual ICollection<CommentsAttractionImage> CommentsAttractionImages { get; set; }
+        public virtual ICollection<Comments_AttractionImage> Comments_AttractionImages { get; set; }
         public virtual ICollection<ReportedAttractionComment> ReportedAttractionComments { get; set; }
     }
 }
