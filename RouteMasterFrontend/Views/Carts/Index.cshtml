@@ -1,12 +1,36 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
-
+<head>
+  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+    <style>
+        .partial-view-container {
+            display: inline-block; 
+            width: 900px; 
+            height: 100px;
+            margin: 10px; 
+            text-align: center; 
+        }
 
-<p>
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+    </style>
+
+
+
+
+<h1>購物車</h1>
+
+
+@*<p>
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
@@ -32,4 +56,17 @@
         </tr>
 }
     </tbody>
-</table>
+</table>*@
+<div class="container">
+    <div class="flex-container">
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("ExtraServicesDetails", new { cartid = 1 })
+        </div>
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
+        </div>
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
+        </div>
+    </div>
+</div>
