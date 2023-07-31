@@ -32,6 +32,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a>
                         </li>
+                        @{
+                            if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
+                                </li>
+                            }
+                            else{
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
+                                </li>
+                            }
+                        }
+                        
+
                     </ul>
                 </div>
             </div>
