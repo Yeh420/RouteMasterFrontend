@@ -11,23 +11,24 @@ using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Infra;
 using RouteMasterFrontend.Models.ViewModels.Members;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RouteMasterFrontend.Controllers
 {
+	
+	
     public class MembersController : Controller
     {
         private readonly RouteMasterContext _context;
 		private readonly IWebHostEnvironment _environment;
+		private readonly HashUtility _hashUtility;
 
-		public MembersController(RouteMasterContext context, IWebHostEnvironment environment)
+		public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
 			_environment = environment;
+			_hashUtility = new HashUtility(configuration);
 		}
-
-
-
-
 
         // GET: Members/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -80,17 +81,50 @@ namespace RouteMasterFrontend.Controllers
             return View(member);
         }
 
+		//會員資料頁
+		[HttpGet]
+		public IActionResult MyMemberIndex()
+		{
+			//抓會員登入資訊
+			ClaimsPrincipal user = HttpContext.User;
 
+			//列出與登入符合資料
+			if (user.Identity.IsAuthenticated)
+			{
+				string userName = user.Identity.Name;
+				IEnumerable<MemberIndexVM> members;
+				members = (IEnumerable<MemberIndexVM>)_context.Members
+					.Where(m=>m.Account==userName)
+					.Select(m => new MemberIndexVM
+					{
+						FirstName = m.FirstName,
+						LastName= m.LastName,
+						Account= m.Account,
+						Email = m.Email,
+						CellPhoneNumber = m.CellPhoneNumber,
+						Address = m.Address,
+						Gender = m.Gender,
+						Birthday = m.Birthday,
+						CreateDate = m.CreateDate,
+						Image= m.Image,
+						LoginTime = m.LoginTime,
+						IsConfirmed = m.IsConfirmed,
+						IsSuscribe = m.IsSuscribe,
 
+					}).ToList();
+				return View(members);
+			}
+			return RedirectToAction("MemberLogin", "Members");
+		}
 
         [HttpGet]
-		//上船系統圖片
+		//上傳系統圖片 -- 有空時應該改去後台管理系統
         public IActionResult UploadSystemImages()
 		{
 			return View();
 		}
 
-
+		//上傳系統內建大頭貼
 		[HttpPost]
 		public IActionResult UploadSystemImages(IFormFile[] files)
 		{
@@ -109,15 +143,14 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("Index", "Home");
         }
 		
-
-
-
+		//註冊會員
         [HttpGet]
 		public IActionResult MemberRegister()
 		{
 			return View();
 		}
 
+		//註冊會員
 		[HttpPost]
 		public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto)
 		{
@@ -147,121 +180,114 @@ namespace RouteMasterFrontend.Controllers
 
 		}
 
-		private Result IsMemberExist(MemberRegisterVM vm)
-		{
-			if (_context.Members.Any(m => m.Account == vm.Account))
-			{
-				// 丟出異常,或者傳回 Result
-				return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
-			}
-
-			// 將密碼進行雜湊
-			var salt = HashUtility.GetSalt();
-			var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
-			string EncryptedPassword = hashPassword;
-
-			// 填入 isConfirmed, ConfirmCode
-			//vm.IsConfirmed = false;
-			//vm.ConfirmCode = Guid.NewGuid().ToString("N");
-
-			Member member = new Member
-			{
-				FirstName = vm.FirstName,
-				LastName = vm.LastName,
-				Account = vm.Account,
-				EncryptedPassword = EncryptedPassword,
-				Email = vm.Email,
-				CellPhoneNumber = vm.CellPhoneNumber,
-				Address = vm.Address,
-				Birthday = DateTime.Now,
-				Gender = vm.Gender,
-				ConfirmCode = Guid.NewGuid().ToString("N"),
-				IsConfirmed = false,
-				IsSuspended = false,
-				IsSuscribe = vm.IsSuscribe
-			};
-
-			// 將它存到db
-			_context.Members.Add(member);
-			_context.SaveChanges();
-			return Result.Success();
-		}
-
+		//會員普通登入
 		[HttpGet]
 		public async Task<IActionResult> MemberLogin()
 		{
 			return View();
 		}
 
-		[HttpPost]
+        //會員普通登入
 		public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
 		{
-			if (ModelState.IsValid == false)
-			{
-				return View(vm);
-			}
+            if (ModelState.IsValid == false) return View(vm);
+
+            Result result = ValidLogin(vm);
+
+            if (result.IsSuccess != true)
+            {
+                ModelState.AddModelError("", result.ErrorMessage); return View(vm);
+            }
+
+            const bool rememberMe = false;
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, vm.Account),
+
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = rememberMe,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                authProperties);
+
+            return RedirectToAction("MyMemberIndex", "Members");
+        }
 
 
-
-			Result result = ValidLogin(vm);
-
-			if (result.IsSuccess != true)
-			{
-				ModelState.AddModelError("", result.ErrorMessage); return View(vm);
-			}
-
-			const bool rememberMe = false;
-
-
-			var claims = new List<Claim>
-			{
-				new Claim(ClaimTypes.Name, vm.Account),
-
-			};
-
-			var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-			var authProperties = new AuthenticationProperties
-			{
-				IsPersistent = rememberMe,
-				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
-			};
-
-			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-				authProperties);
-
-
-			return RedirectToAction("Index", "Members");
-
+		//Google登入的會員頁面
+		public async Task<IActionResult> GoogleMember()
+		{
+			return View();
 		}
 
-
-
-
-
-
-
-
-
-
-		[HttpDelete]
-		public void Logout()
+        //會員登出
+        [HttpGet]
+		public async Task<IActionResult> Logout()
 		{
 			HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+			return View("Logout","Members");
 		}
 
+        //會員是否存在,密碼雜湊,存進資料庫
+        private Result IsMemberExist(MemberRegisterVM vm)
+        {
+            if (_context.Members.Any(m => m.Account == vm.Account))
+            {
+                // 丟出異常,或者傳回 Result
+                return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
+            }
 
+            // 將密碼進行雜湊
+            var salt = _hashUtility.GetSalt();
+            var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
+            string EncryptedPassword = hashPassword;
 
+            // 填入 isConfirmed, ConfirmCode
+            //vm.IsConfirmed = false;
+            //vm.ConfirmCode = Guid.NewGuid().ToString("N");
 
+            Member member = new Member
+            {
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                Account = vm.Account,
+                EncryptedPassword = EncryptedPassword,
+                Email = vm.Email,
+                CellPhoneNumber = vm.CellPhoneNumber,
+                Address = vm.Address,
+                Birthday = DateTime.Now,
+                Gender = vm.Gender,
+                ConfirmCode = Guid.NewGuid().ToString("N"),
+                IsConfirmed = false,
+                IsSuspended = false,
+                IsSuscribe = vm.IsSuscribe
+            };
 
-		private Result ValidLogin(MemberLoginVM vm)
+            // 將它存到db
+            _context.Members.Add(member);
+            _context.SaveChanges();
+            return Result.Success();
+        }
+
+		//有效登入
+        private Result ValidLogin(MemberLoginVM vm)
 		{
 			var db = new RouteMasterContext();
+			
 			//Result resultAttempt = LockAccountIfFailedAttemptsExceeded(vm.Account);
 			//if (resultAttempt.IsSuccess)
 			//{
 			//    return resultAttempt; // 帳號已鎖定，返回錯誤結果
 			//}
+			
 
 			var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
 			int failedAttempts = 0;
@@ -277,13 +303,13 @@ namespace RouteMasterFrontend.Controllers
 					new Claim(ClaimTypes.Name, member.Account);
 					new Claim("LastName", member.LastName);
 				};
-				var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-				HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-			}
+            }
 			//if(member.IsSuspended)  --有沒有停權
 
-			var salt = HashUtility.GetSalt();
+			var salt = _hashUtility.GetSalt();
 			var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
 			if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
@@ -298,8 +324,7 @@ namespace RouteMasterFrontend.Controllers
 			}
 		}
 
-
-
+		//上傳圖片
 		private string SaveUploadFile(string filePath, IFormFile file)
 		{
 			if (file == null || file.Length == 0) return string.Empty;
@@ -322,7 +347,7 @@ namespace RouteMasterFrontend.Controllers
 
 		}
 
-
+		//會員是否存在
 		private bool MemberExists(int id)
         {
           return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
