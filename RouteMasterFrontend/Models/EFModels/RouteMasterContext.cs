@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using RouteMasterFrontend.Models.ViewModels.Carts;
 
 namespace RouteMasterFrontend.EFModels
 {
@@ -1203,5 +1204,9 @@ namespace RouteMasterFrontend.EFModels
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
+
+      
     }
 }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.ViewModels.Carts;
+using static RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -24,9 +26,104 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
+		public IActionResult Info()
+		{
+			var customerAccount = User.Identity.Name;
+			int memberId = GetMemberIdByAccount(customerAccount);
+			Cart cart = GetCartInfo(memberId);
+			return View(cart);
+		}
 
-        // GET: Carts/Details/5
-        public async Task<IActionResult> Details(int? id)
+
+		public Cart GetCartInfo(int memberId)
+		{
+			var cart = _context.Carts
+				.Include(c => c.Cart_ExtraServicesDetails)
+				.Include(c => c.Cart_ActivitiesDetails)
+				.Include(c => c.Cart_AccommodationDetails)
+				.Where(c => c.MemberId == memberId)
+				.FirstOrDefault();
+			return cart;
+
+		}
+        public IActionResult ExtraServicesDetailsPartialView(int memberId)
+        {
+            var extraServicesDetails = _context.Cart_ExtraServicesDetails
+                   //.Where(c => c.CartId == memberId)
+                   .Include(c => c.ExtraServiceProduct) // Load the ExtraServiceProduct
+                   .Include(c => c.ExtraServiceProduct.ExtraService) // Load the ExtraService within ExtraServiceProduct
+                   .ToList();
+
+            //List<Cart_ExtraServiceDetailsVM> viewModelList = extraServicesDetails.Select(cartExtraServiceDetail => new Cart_ExtraServiceDetailsVM
+            //{
+            //    Id = cartExtraServiceDetail.Id,
+            //    CartId = cartExtraServiceDetail.CartId,
+            //    ExtraServiceProductId = cartExtraServiceDetail.ExtraServiceProductId,
+            //    Quantity = cartExtraServiceDetail.Quantity,
+            //    ExtraServicePrice= cartExtraServiceDetail.ExtraServiceProduct.Price,
+            //    ExtraServiceName = cartExtraServiceDetail.ExtraServiceProduct.ExtraService.Name // Assuming you have ExtraServiceName property in Cart_ExtraServicesDetail entity   
+            //}).ToList();
+
+            return PartialView("ExtraServicesDetailsPartialView");
+        }
+        public List<Cart_ExtraServicesDetail> GetCartExtraServicesDetails(int memberId)
+		{
+
+
+			// 使用 EF Core 的資料庫上下文查詢 Cart_ExtraServicesDetails 資料
+			var extraServicesDetails = _context.Cart_ExtraServicesDetails
+				.Where(c => c.Cart.MemberId == memberId)
+				.ToList();
+
+			return extraServicesDetails;
+		}
+        public IActionResult ActivitiesDetailsPartialView(int memberId)
+        {
+            var activitiesServicesDetails = _context.Cart_ActivitiesDetails
+                .Include(c => c.ActivityProduct)
+                .Include(c => c.ActivityProduct.Activity)
+                .ToList();
+            return PartialView("ActivitiesDetailsPartialView");
+        }
+        public List<Cart_ActivitiesDetail>GetCartActivities(int memberId)
+        {
+            var activitiesDetails= _context.Cart_ActivitiesDetails
+                .Where(c=>c.Cart.MemberId==memberId)
+                .ToList() ;
+            return activitiesDetails;
+        }
+
+        public IActionResult AccommodationDetailsPartialView(int memberId)
+        {
+            var accommodationDetails = _context.Cart_AccommodationDetails
+                .Include(c => c.RoomProduct)
+                .Include(c => c.RoomProduct.Room.Accommodation)
+                .ToList();
+            return PartialView("AccommodationDetailsPartialView");
+        }
+        public List<Cart_AccommodationDetail>GetCartAccommodationDetails(int memberId)
+        {
+            var accomodationDetails = _context.Cart_AccommodationDetails
+                .Where(c => c.CartId == memberId)
+                .ToList();
+            return accomodationDetails;
+        }
+		private int GetMemberIdByAccount(string customerAccount)
+		{
+			var member = _context.Members
+				.Where(m => m.Account == customerAccount)
+				.FirstOrDefault();
+			if (member != null)
+			{
+				return member.Id;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		// GET: Carts/Details/5
+		public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Carts == null)
             {
