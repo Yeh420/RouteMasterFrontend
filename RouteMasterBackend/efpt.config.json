@@ -4,7 +4,7 @@
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
    "FilterSchemas": false,
-   "IncludeConnectionString": false,
+   "IncludeConnectionString": true,
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "Models",
@@ -25,6 +25,10 @@
       },
       {
          "Name": "[dbo].[AccommodationServiceInfos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AccommodationServiceInfos_Accommodations]",
          "ObjectType": 0
       },
       {
@@ -133,6 +137,10 @@
       },
       {
          "Name": "[dbo].[FAQs]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FavoriteAttractions]",
          "ObjectType": 0
       },
       {
@@ -252,7 +260,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[ServiceInfos_Accommodations]",
+         "Name": "[dbo].[ServiceInfoCategories]",
          "ObjectType": 0
       },
       {
@@ -280,7 +288,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "desktop-75hkbk8.RouteMaster.dbo",
+   "UiHint": "laptop-cduhr4vv\\yeh420sql.RouteMaster.dbo",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
