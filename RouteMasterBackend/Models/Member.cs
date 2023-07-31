@@ -13,6 +13,7 @@ namespace RouteMasterBackend.Models
             CommentAccommodationLikes = new HashSet<CommentAccommodationLike>();
             CommentsAccommodations = new HashSet<CommentsAccommodation>();
             CommentsAttractions = new HashSet<CommentsAttraction>();
+            FavoriteAttractions = new HashSet<FavoriteAttraction>();
             MemberImages = new HashSet<MemberImage>();
             Orders = new HashSet<Order>();
             Schedules = new HashSet<Schedule>();
@@ -45,6 +46,7 @@ namespace RouteMasterBackend.Models
         public virtual ICollection<CommentAccommodationLike> CommentAccommodationLikes { get; set; }
         public virtual ICollection<CommentsAccommodation> CommentsAccommodations { get; set; }
         public virtual ICollection<CommentsAttraction> CommentsAttractions { get; set; }
+        public virtual ICollection<FavoriteAttraction> FavoriteAttractions { get; set; }
         public virtual ICollection<MemberImage> MemberImages { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }

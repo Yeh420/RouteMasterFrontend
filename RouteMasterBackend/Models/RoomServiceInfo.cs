@@ -14,6 +14,9 @@ namespace RouteMasterBackend.Models
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public int? ServiceInfoCategoryId { get; set; }
+
+        public virtual ServiceInfoCategory ServiceInfoCategory { get; set; }
 
         public virtual ICollection<Room> Rooms { get; set; }
     }
