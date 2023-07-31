@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RouteMasterFrontend.EFModels;
 
 namespace RouteMasterFrontend.Controllers
 {
     public class RoomProductsController : Controller
     {
+        public RouteMasterContext db { get; set; }
+        public RoomProductsController(RouteMasterContext context)
+        {
+            db = context;
+        }
         // GET: RoomProductsController
         public ActionResult Index()
         {
@@ -14,7 +20,8 @@ namespace RouteMasterFrontend.Controllers
         // GET: RoomProductsController
         public ActionResult ShowCalendar()
         {
-            return View();
+            var products = db.RoomProducts.Where(rp=>rp.RoomId ==1);
+            return View(products);
         }
 
         // GET: RoomProductsController/Details/5
