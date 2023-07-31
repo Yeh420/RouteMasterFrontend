@@ -7,6 +7,8 @@ namespace RouteMasterFrontend.EFModels
 {
     public partial class Cart_ActivitiesDetail
     {
+        internal readonly int SubTotal;
+
         public int Id { get; set; }
         public int CartId { get; set; }
         public int ActivityProductId { get; set; }

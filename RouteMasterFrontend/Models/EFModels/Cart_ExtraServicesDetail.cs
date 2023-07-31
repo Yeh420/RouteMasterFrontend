@@ -7,6 +7,8 @@ namespace RouteMasterFrontend.EFModels
 {
     public partial class Cart_ExtraServicesDetail
     {
+       
+
         public int Id { get; set; }
         public int CartId { get; set; }
         public int ExtraServiceProductId { get; set; }
@@ -14,5 +16,7 @@ namespace RouteMasterFrontend.EFModels
 
         public virtual Cart Cart { get; set; }
         public virtual ExtraServiceProduct ExtraServiceProduct { get; set; }
+      
+        public virtual ICollection<ExtraServiceImage> ExtraServiceImages { get; set; }
     }
 }
