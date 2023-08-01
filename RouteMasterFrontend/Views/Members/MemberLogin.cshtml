@@ -25,6 +25,9 @@
             <div class="form-group">
                 <input type="submit" value="登入" class="btn btn-primary" />
             </div>
+            <div class="form-group">
+            <a asp-action="MemberRegister">註冊會員</a>
+            </div>
             <script src="https://accounts.google.com/gsi/client" async defer></script>
             <div id="g_id_onload"
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
@@ -43,9 +46,9 @@
     </div>
 </div>
 
-<div>
+@*<div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div>*@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

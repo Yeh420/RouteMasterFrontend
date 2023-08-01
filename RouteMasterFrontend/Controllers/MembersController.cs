@@ -156,10 +156,17 @@ namespace RouteMasterFrontend.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				string path = Path.GetFullPath("Uploads");
-				string fileName = SaveUploadFile(path, facePhoto);
+                if (facePhoto != null && facePhoto.Length > 0)
+                {
+                    string path = Path.Combine(_environment.WebRootPath, "ActivityImages");
+                    string fileName = SaveUploadFile(path, facePhoto);
+					MemberImage img = new MemberImage();
+					img.Image = fileName;
+                    img.Name = "未命名";
+                    _context.MemberImages.Add(img);
+                    _context.SaveChanges();
+                }
 
-				vm.Image = fileName;
 			}
 			else
 			{
@@ -324,31 +331,30 @@ namespace RouteMasterFrontend.Controllers
 			}
 		}
 
-		//上傳圖片
-		private string SaveUploadFile(string filePath, IFormFile file)
-		{
-			if (file == null || file.Length == 0) return string.Empty;
+        //上傳圖片
+        private string SaveUploadFile(string filePath, IFormFile file)
+        {
+            if (file == null || file.Length == 0) return string.Empty;
 
-			string ext = Path.GetExtension(file.FileName);
+            string ext = Path.GetExtension(file.FileName);
 
-			string[] allowExts = new string[] { ".jpg", ".jpeg", ".png", ".tif" };
+            string[] allowExts = new string[] { ".jpg", ".jpeg", ".png", ".tif" };
 
-			if (allowExts.Contains(ext.ToLower()) == false)
-			{
-				return string.Empty;
-			}
-			string newFileName = Guid.NewGuid().ToString("N") + ext;
-			string fullName = Path.Combine(filePath, newFileName);
-			using (var fileStream = new FileStream(fullName, FileMode.Create))
-			{
-				file.CopyTo(fileStream);
-			}
-			return newFileName;
+            if (allowExts.Contains(ext.ToLower()) == false)
+            {
+                return string.Empty;
+            }
+            string newFileName = Guid.NewGuid().ToString("N") + ext;
+            string fullName = Path.Combine(filePath, newFileName);
+            using (var fileStream = new FileStream(fullName, FileMode.Create))
+            {
+                file.CopyTo(fileStream);
+            }
+            return newFileName;
+        }
 
-		}
-
-		//會員是否存在
-		private bool MemberExists(int id)
+        //會員是否存在
+        private bool MemberExists(int id)
         {
           return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
         }
