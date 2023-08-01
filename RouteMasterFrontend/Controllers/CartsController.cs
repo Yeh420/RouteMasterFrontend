@@ -108,6 +108,7 @@ namespace RouteMasterFrontend.Controllers
                 .ToList();
             return accomodationDetails;
         }
+        
         public IActionResult AddActivitiesDetail2Cart(int activitiesId)
         {
             try
@@ -175,6 +176,37 @@ namespace RouteMasterFrontend.Controllers
             }
         }
 
+       
+        public IActionResult RemoveExtraServiceFromCart(int extraserviceId)
+        {
+            try
+            {
+                var CartItem = _context.Cart_ExtraServicesDetails.FirstOrDefault(p => p.Id == extraserviceId);
+                if (CartItem != null)
+                {
+                    _context.Cart_ExtraServicesDetails.Remove(CartItem);
+                    _context.SaveChanges();
+
+                    // 刪除成功後，重新查詢並返回更新後的購物車內容
+                    var memberId = 1; // 假設您有會員 ID
+                    var cartItems = GetCartExtraServicesDetails(memberId);
+
+                    // 使用 PartialView 來渲染購物車內容的表格，並返回 HTML 字串
+                    string cartTableHtml = PartialView("_CartTablePartial", cartItems).ToString();
+
+                    return Json(new { success = true, message = "Successfully removed from cart.", cartTableHtml = cartTableHtml });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Item not found in cart." });
+                }
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Failed to remove from the cart." });
+            }
+        }
+      
         public IActionResult AddAccomodation2Cart(int accomodationId)
         {
 
@@ -318,43 +350,43 @@ namespace RouteMasterFrontend.Controllers
             return View(cart);
         }
 
-        // GET: Carts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Carts == null)
-            {
-                return NotFound();
-            }
+        //// GET: Carts/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null || _context.Carts == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var cart = await _context.Carts
-                .Include(c => c.Member)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (cart == null)
-            {
-                return NotFound();
-            }
+        //    var cart = await _context.Carts
+        //        .Include(c => c.Member)
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (cart == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(cart);
-        }
+        //    return View(cart);
+        //}
 
-        // POST: Carts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Carts == null)
-            {
-                return Problem("Entity set 'RouteMasterContext.Carts'  is null.");
-            }
-            var cart = await _context.Carts.FindAsync(id);
-            if (cart != null)
-            {
-                _context.Carts.Remove(cart);
-            }
+        //// POST: Carts/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    if (_context.Carts == null)
+        //    {
+        //        return Problem("Entity set 'RouteMasterContext.Carts'  is null.");
+        //    }
+        //    var cart = await _context.Carts.FindAsync(id);
+        //    if (cart != null)
+        //    {
+        //        _context.Carts.Remove(cart);
+        //    }
             
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         private bool CartExists(int id)
         {
