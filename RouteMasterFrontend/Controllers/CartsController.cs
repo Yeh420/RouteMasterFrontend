@@ -108,7 +108,107 @@ namespace RouteMasterFrontend.Controllers
                 .ToList();
             return accomodationDetails;
         }
-		private int GetMemberIdByAccount(string customerAccount)
+        public IActionResult AddActivitiesDetail2Cart(int activitiesId)
+        {
+            try
+            {
+                var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == activitiesId);
+                if (activitiesProduct != null)
+                {
+                    var cartItem = new Cart_ActivitiesDetail
+                    {
+                        CartId = 1,
+                        ActivityProductId = activitiesProduct.Id,
+                        Quantity = 1
+                    };
+                    _context.Cart_ActivitiesDetails.Add(cartItem);
+                    _context.SaveChanges();
+                    return Json(new { success = true, message = "Successfully added to cart." });
+                }
+                else
+                {
+                    return Json(new { succes = false, message = "Product not found." });
+                }
+            }
+            catch
+            {
+                // 加入購物車失敗時回傳 JSON 物件
+                return Json(new { success = false, message = "Failed to add to cart." });
+            }
+
+		
+        }
+        public IActionResult AddExtraService2Cart (int extraserviceId)
+        {
+            try
+            {
+                // 查詢對應的 ExtraServiceProduct
+                var extraServiceProduct = _context.ExtraServiceProducts
+                    .FirstOrDefault(p => p.Id == extraserviceId);
+
+                if (extraServiceProduct != null)
+                {
+                    // 建立新的 CartItem
+                    var cartItem = new Cart_ExtraServicesDetail
+                    {
+                        CartId = 1, // 假設 cartId 為 1
+                        ExtraServiceProductId = extraserviceId,
+                        Quantity = 1
+                    };
+
+                   _context.Cart_ExtraServicesDetails.Add(cartItem);
+                    _context.SaveChanges();
+
+                    // 加入購物車成功後回傳 JSON 物件
+                    return Json(new { success = true, message = "Successfully added to cart." });
+                }
+                else
+                {
+                    // 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
+                    return Json(new { success = false, message = "Product not found." });
+                }
+            }
+            catch
+            {
+                // 加入購物車失敗時回傳 JSON 物件
+                return Json(new { success = false, message = "Failed to add to cart." });
+            }
+        }
+
+        public IActionResult AddAccomodation2Cart(int accomodationId)
+        {
+
+            try
+            {
+                var RoomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == accomodationId);
+                if(RoomProduct!= null)
+                {
+                    var cartItem = new Cart_AccommodationDetail
+                    {
+                        CartId = 1,
+                        RoomProductId = RoomProduct.Id,
+                        Quantity = 1
+                    };
+                    _context.Cart_AccommodationDetails.Add(cartItem);
+                    _context.SaveChanges();
+					// 加入購物車成功後回傳 JSON 物件
+					return Json(new { success = true, message = "Successfully added to cart." });
+				}
+				else
+				{
+					// 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
+					return Json(new { success = false, message = "Product not found." });
+				}
+			}
+			catch
+			{
+				// 加入購物車失敗時回傳 JSON 物件
+				return Json(new { success = false, message = "Failed to add to cart." });
+			}
+		
+            
+        }
+        private int GetMemberIdByAccount(string customerAccount)
 		{
 			var member = _context.Members
 				.Where(m => m.Account == customerAccount)
