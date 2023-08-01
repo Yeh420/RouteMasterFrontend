@@ -14,6 +14,7 @@ namespace RouteMasterBackend.Models
             AttractionImages = new HashSet<AttractionImage>();
             CommentsAttractions = new HashSet<CommentsAttraction>();
             ExtraServices = new HashSet<ExtraService>();
+            FavoriteAttractions = new HashSet<FavoriteAttraction>();
             PackageTours = new HashSet<PackageTour>();
             Tags = new HashSet<AttractionTag>();
             TravelPlans = new HashSet<TravelPlan>();
@@ -39,6 +40,7 @@ namespace RouteMasterBackend.Models
         public virtual ICollection<AttractionImage> AttractionImages { get; set; }
         public virtual ICollection<CommentsAttraction> CommentsAttractions { get; set; }
         public virtual ICollection<ExtraService> ExtraServices { get; set; }
+        public virtual ICollection<FavoriteAttraction> FavoriteAttractions { get; set; }
 
         public virtual ICollection<PackageTour> PackageTours { get; set; }
         public virtual ICollection<AttractionTag> Tags { get; set; }

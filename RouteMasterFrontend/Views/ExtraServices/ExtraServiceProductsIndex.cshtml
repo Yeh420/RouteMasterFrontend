@@ -1,0 +1,75 @@
+﻿@model IEnumerable<RouteMasterFrontend.EFModels.ExtraServiceProduct>
+
+@{
+    ViewData["Title"] = "ExtraServiceProductsIndex";
+}
+
+<h1>ExtraServiceProductsIndex</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraService)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraService.Description)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<script>
+    function addToCart(extraserviceId) {
+        $.ajax({
+            url: '/Carts/AddExtraService2Cart',
+            type: 'Post',
+            data: { extraserviceId: extraserviceId },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred while adding to cart.');
+            }
+
+        });
+    }
+</script>
+

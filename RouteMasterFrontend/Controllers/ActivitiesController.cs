@@ -199,7 +199,12 @@ namespace RouteMasterFrontend.Controllers
 
 
 
+        public IActionResult ActivityProductIndex()
+        {
 
+            
+            return View(_context.ActivityProducts); 
+        }
 
 
 

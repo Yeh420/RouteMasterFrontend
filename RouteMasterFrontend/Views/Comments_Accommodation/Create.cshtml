@@ -1,0 +1,67 @@
+﻿@model RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Comments_AccommodationCreateVM</h4>
+<hr />
+<div class="container">
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+            <div class="form-group mb-3">
+                <label asp-for="MemberId" class="control-label"></label>
+                <select asp-for="MemberId" class="form-select" asp-items="ViewBag.MemberId"></select>
+                @*<span asp-validation-for="MemberId" class="text-danger"></span>*@
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="AccommodationId" class="control-label"></label>
+                    <select asp-for="MemberId" class="form-select" asp-items="ViewBag.AccommodationId"></select>
+                    @*<span asp-validation-for="AccommodationId" class="text-danger"></span>*@
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Score" class="control-label"></label>
+                <input asp-for="Score" class="form-control" />
+                <span asp-validation-for="Score" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Pros" class="control-label"></label>
+                <input asp-for="Pros" class="form-control" />
+                <span asp-validation-for="Pros" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Cons" class="control-label"></label>
+                <input asp-for="Cons" class="form-control" />
+                <span asp-validation-for="Cons" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Images" class="control-label"></label>
+                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" />
+                <span asp-validation-for="Images" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <input type="submit" value="建立" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<div>
+    <a asp-action="Index">返回清單頁</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
