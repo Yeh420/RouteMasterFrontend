@@ -3,15 +3,100 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RouteMasterFrontend</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/RouteMasterFrontend.styles.css" asp-append-version="true" />
+	<title>@ViewData["Title"] - RouteMasterFrontend</title>
+	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="~/css/font-awesome.css" rel="stylesheet" />
+	<link href="~/css/owl-carousel.css" rel="stylesheet" />
+	<link href="~/css/site.css" rel="stylesheet" />
+	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <!-- ***** Preloader Start ***** -->
+    <div id="js-preloader" class="js-preloader">
+        <div class="preloader-inner">
+            <span class="dot"></span>
+            <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Preloader End ***** -->
+    <!-- ***** Pre HEader ***** -->
+    <div class="pre-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-sm-6">
+                    <span>Ready for your new adventure?</span>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <div class="text-button">
+                        <a href="rent-venue.html">Contact Us Now! <i class="fa fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .header-area .main-nav .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-area .main-nav .logo img {
+            width: 200px; /* 设置Logo图像的宽度 */
+            height: 90px; /* 设置Logo图像的高度 */
+            margin-right: 30px; /* 设置Logo图像与"Menu"文本之间的间距 */
+        }
+
+    </style>
+    <!-- ***** Pre HEader End ***** -->
+    <header class ="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="index.html" class="logo">
+                            <img src="~/images/Route-master-logo.png" />
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+                            @{
+                                if (User.Identity.IsAuthenticated)
+                                {
+                                    <li>
+                                       <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                    </li>
+                                    <li >
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
+                                    </li>
+                                }
+                            }
+
+                        </ul>
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+        @*<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RouteMasterFrontend</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -53,19 +138,135 @@
                     </ul>
                 </div>
             </div>
-        </nav>
+        </nav>*@
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container-fluid" style="padding:0px;" >
+        <main role="main" class="" style="margin:0px;">
             @RenderBody()
+            <!-- jQuery -->
+			<script src="~/js/jquery-2.1.0.min.js"></script>
+            <script src="~/js/jquery.min.js"></script>
+			<script src="~/js/jquery.counterup.min.js"></script>
+          
+            <!-- Bootstrap -->
+            <script src="~/js/popper.js"></script>
+            <script src="~/js/bootstrap.min.js"></script>
+
+            <!-- Plugins -->
+            <script src="~/js/scrollreveal.min.js"></script>
+            <script src="~/js/waypoints.min.js"></script>
+            <script src="~/js/jquery.counterup.min.js"></script>
+            <script src="~/js/imgfix.min.js"></script>
+            <script src="~/js/mixitup.js"></script>
+            <script src="~/js/accordions.js"></script>
+            <script src="~/js/owl-carousel.js"></script>
+
+            <!-- Global Init -->
+            <script src="~/js/custom.js"></script>
+            <script>
+                $(document).ready(function () {
+                    $('.owl-show-events').owlCarousel({
+                        items: 4, 
+                        loop: true, 
+                        autoplay: true, 
+                        autoplayTimeout: 3000,
+                        responsiveClass: true,
+                        responsive: {
+                            0: {
+                                items: 1
+                            },
+                            600: {
+                                items: 3
+                            },
+                            1000: {
+                                items: 4
+                            }
+                        }
+                    });
+                });
+            </script>
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
+    <!-- *** Footer *** -->
+    <footer>
         <div class="container">
-            &copy; 2023 - RouteMasterFrontend - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="address">
+                        <h4>Fuen28</h4>
+                        <span>Group 5 <br>Group 5<br>Taiwan</span>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><a href="#">Info</a></li> 
+                            <li><a href="#">Guides</a></li>
+                            <li><a href="#">Videos</a></li>
+                            <li><a href="#">Outreach</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="hours">
+                        <h4>Open Hours</h4>
+                        <ul>
+                            <li>Mon to Fri: 10:00 AM to 8:00 PM</li>
+                            <li>Sat - Sun: 11:00 AM to 4:00 PM</li>
+                            <li>Holidays: Closed</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-6">
+                          
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                                <p class="copyright">
+                                    Copyright 2023 Route Master
+
+                                    @*<br>Design: <a rel="nofollow" href="https://www.tooplate.com" target="_parent">Tooplate</a>*@
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="sub-footer">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="logo"><span>Route<em>Master</em></span></div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="menu">
+                                    <ul>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="social-links">
+                                    <ul>
+                                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                        <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                                        <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
