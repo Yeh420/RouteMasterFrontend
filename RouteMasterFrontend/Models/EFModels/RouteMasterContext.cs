@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using RouteMasterFrontend.Models.ViewModels.Members;
 
 using RouteMasterFrontend.Models.ViewModels.Carts;
+using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
 
 
 namespace RouteMasterFrontend.EFModels
@@ -1221,6 +1222,8 @@ namespace RouteMasterFrontend.EFModels
         public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
 
         public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM>? MemberRegisterVM { get; set; }
+
+        public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM>? Comments_AccommodationCreateVM { get; set; }
 
       
 
