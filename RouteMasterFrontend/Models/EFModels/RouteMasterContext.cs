@@ -1220,6 +1220,8 @@ namespace RouteMasterFrontend.EFModels
 
         public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
 
+        public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM>? MemberRegisterVM { get; set; }
+
       
 
     }
