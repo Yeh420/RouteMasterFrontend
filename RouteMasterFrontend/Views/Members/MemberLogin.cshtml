@@ -1,0 +1,52 @@
+﻿@model RouteMasterFrontend.Models.ViewModels.Members.MemberLoginVM
+
+@{
+    ViewData["Title"] = "MemberLogin";
+}
+
+<h1>MemberLogin</h1>
+
+<h4>MemberLoginVM</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="MemberLogin">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Account" class="control-label"></label>
+                <input asp-for="Account" class="form-control" />
+                <span asp-validation-for="Account" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="登入" class="btn btn-primary" />
+            </div>
+            <script src="https://accounts.google.com/gsi/client" async defer></script>
+            <div id="g_id_onload"
+                 data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
+                 data-login_uri="https://localhost:7145/Home"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
