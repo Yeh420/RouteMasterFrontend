@@ -1,11 +1,18 @@
-﻿using System.Security.Cryptography;
+﻿using RouteMasterFrontend.Controllers;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace RouteMasterFrontend.Models.Infra
 {
-	//直接貼，版本有差異可能需要修正
+	//已修正
 	public class HashUtility
 	{
+		private readonly IConfiguration _configuration;
+
+		public HashUtility(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
 		public static string ToSHA256(string plainText, string salt)
 		{
 			// ref https://docs.microsoft.com/zh-tw/dotnet/api/system.security.cryptography.sha256?view=net-6.0
@@ -20,10 +27,9 @@ namespace RouteMasterFrontend.Models.Infra
 			}
 		}
 
-		public static string GetSalt()
+		public string GetSalt()
 		{
-			return "";
-			//return System.Configuration.ConfigurationManager.AppSettings["Salt"];
+			return _configuration["salt"];
 		}
 	}
 }

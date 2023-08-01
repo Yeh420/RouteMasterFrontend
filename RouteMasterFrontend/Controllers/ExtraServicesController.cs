@@ -147,7 +147,10 @@ namespace RouteMasterFrontend.Controllers
 
 
 
-
+        public IActionResult ExtraServiceProductsIndex()
+        {
+            return View(_context.ExtraServiceProducts);
+        }
 
 
 

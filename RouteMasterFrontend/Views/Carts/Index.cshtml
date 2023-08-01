@@ -1,0 +1,72 @@
+﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
+<head>
+  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+@{
+    ViewData["Title"] = "Index";
+}
+
+    <style>
+        .partial-view-container {
+            display: inline-block; 
+            width: 900px; 
+            height: 100px;
+            margin: 10px; 
+            text-align: center; 
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+    </style>
+
+
+
+
+<h1>購物車</h1>
+
+
+@*<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Member)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Member.Account)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>*@
+<div class="container">
+    <div class="flex-container">
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("ExtraServicesDetails", new { cartid = 1 })
+        </div>
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
+        </div>
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
+        </div>
+    </div>
+</div>
