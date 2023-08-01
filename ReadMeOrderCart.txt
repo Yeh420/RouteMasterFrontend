@@ -6,7 +6,10 @@
 [v]layout- header & footer design
 [v]Home Index design
 [v]Added extraservice/activities/accomodation to cart
+[v]Deleted extraservice
 
+8/2 Todo
+[.]update extraservice
 Todo:
 Add product to cart
 Delete product from cart
