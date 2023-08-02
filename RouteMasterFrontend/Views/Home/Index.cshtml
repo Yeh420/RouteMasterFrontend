@@ -1,21 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<html>
-<head>
-    <title>@ViewData["Title"] - RouteMasterFrontend</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link href="~/css/owl-carousel.css" rel="stylesheet" />
-	<link href="~/css/style.css" rel="stylesheet" />
-	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
-</head>
-<style>
-    .owl-show-events .item img {
-        width: 270px; /* 設置您希望的圖片寬度 */
-        height: 200px; /* 設置您希望的圖片高度 */
-    }
-</style>
+@section Styles{
+
+    <style>
+        .owl-show-events .item img {
+            width: 270px; /* 設置您希望的圖片寬度 */
+            height: 200px; /* 設置您希望的圖片高度 */
+        }
+    </style>
+}
 
 <!-- ***** Main Banner Area Start ***** -->
 <div class="main-banner">
@@ -23,7 +17,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="main-content">
-                  
+
                     <h6>準備好開啟您的旅程了嗎?</h6>
                     <h2>開始建立行程表吧</h2>
 
@@ -35,48 +29,41 @@
         </div>
     </div>
 </div>
-<body>
-    <!-- *** Owl Carousel Items ***-->
-    <div class="show-events-carousel">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="owl-show-events owl-carousel">
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/carousel1.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/carousel2.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/carousel3.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/carousel4.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                        </div>
-                        <div class="item">
-                            <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                        </div>
+<!-- *** Owl Carousel Items ***-->
+<div class="show-events-carousel">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="owl-show-events owl-carousel">
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/carousel1.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/carousel2.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/carousel3.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/carousel4.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+                    </div>
+                    <div class="item">
+                        <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @*    <main role="main" class="container">
-    @RenderBody()
-    </main>*@
-    
+</div>
 
-   
-   
-</body>
-</html>
+
+
