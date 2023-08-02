@@ -1,8 +1,5 @@
-﻿@{
-    var EXModel = ViewData["EX"] as IEnumerable<RouteMasterFrontend.EFModels.Cart_ExtraServicesDetail>;
-}
-@{  
-}
+﻿
+
 @*<div class="dropdown">
     <a id="CartDropDown" class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <span>購物車</span>
@@ -25,6 +22,7 @@
         購物車
     </button>
     <ul class="dropdown-menu">
-        <li>@await Component.InvokeAsync("ExtraServicesDetails", new { cartid = 1 })</li>
+       @* <li>@await Component.InvokeAsync("ExtraServicesDetails", new { cartid = ViewBag.CartId })</li>*@
+        <li><a class="dropdown-item" href="#">結帳</a></li>
     </ul>
 </div>

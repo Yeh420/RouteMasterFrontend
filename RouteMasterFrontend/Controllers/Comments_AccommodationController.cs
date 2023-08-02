@@ -29,7 +29,7 @@ namespace RouteMasterFrontend.Controllers
             var commentDb = _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
-                  //.Include(c=>c.Comments_AccommodationImages)
+                  .Include(c=>c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
                  
 
