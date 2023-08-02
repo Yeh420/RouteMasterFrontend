@@ -84,9 +84,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.CreateDate)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
+                <td>
+                    <div class="image-container">
+                        <img src="~/MemberUploads/@item.Image" alt="圖片">
+                    </div>
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IsConfirmed)
             </td>
