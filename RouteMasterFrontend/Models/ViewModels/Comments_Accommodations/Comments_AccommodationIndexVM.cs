@@ -30,7 +30,13 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 		[DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
 		public DateTime CreateDate { get; set; }
 
-		public IEnumerable<Comments_AccommodationImage>? ImageList { get; set; }
+        public string Status { get; set; }	
+
+        public string? ReplyMesssage { get; set; }
+
+        public DateTime? ReplyDate { get; set; }	
+
+        public IEnumerable<Comments_AccommodationImage>? ImageList { get; set; }
 
 
 	}
