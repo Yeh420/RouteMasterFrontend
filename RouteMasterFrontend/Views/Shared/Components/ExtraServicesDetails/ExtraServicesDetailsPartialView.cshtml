@@ -39,7 +39,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr data-extraserviceid="@item.Id">
             <td>
                 @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Name)
             </td>
@@ -56,12 +56,11 @@
            @* <td>
                 @Html.DisplayFor(modelItem => item.Cart.Id)
             </td>*@
-
-                    <td>
-                        <a href="#" onclick="removeFromCart(@item.Id)">
-                            <i class="fas fa-trash-can"></i>
-                        </a>
-                    </td>
+            <td>
+                <a href="#" onclick="removeFromCart(@item.Id)">
+                    <i class="fas fa-trash-can"></i>
+                </a>
+            </td>
                   
 
         </tr>
@@ -70,30 +69,7 @@
 </table>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function removeFromCart(extraserviceId) {
-        // 發送 AJAX 請求
-        $.ajax({
-            url: '/Carts/RemoveExtraServiceFromCart',
-            type: 'POST',
-            data: { extraserviceId: extraserviceId },
-            success: function (result) {
-                if (result.success) {
-                    // 成功刪除時的處理
-                    alert(result.message);
-                    $('#cartTable').load('/Carts/GetCartTable');
-                } else {
-                    // 失敗時的處理
-                    alert(result.message);
-                }
-            },
-            error: function () {
-                // 發生錯誤時的處理
-                alert('發生錯誤，無法刪除項目。');
-            }
-        });
-    }
-</script>
+
 <script>
     function removeFromCart(extraserviceId) {
         // 發送 AJAX 請求
@@ -106,7 +82,7 @@
                     // 成功刪除時的處理
                     alert(result.message);
                     // 更新購物車內容的表格
-                     $('#cartTable').load('/Carts/GetCartTable');
+                    $('#cartTable').find('tr[data-extraserviceid="' + result.extraserviceId + '"]').remove();
                 } else {
                     // 失敗時的處理
                     alert(result.message);

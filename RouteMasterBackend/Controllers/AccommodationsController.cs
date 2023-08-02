@@ -28,6 +28,7 @@ namespace RouteMasterBackend.Controllers
           {
               return NotFound();
           }
+          
             return await _context.Accommodations.ToListAsync();
         }
 

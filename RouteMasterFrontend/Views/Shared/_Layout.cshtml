@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] - RouteMasterFrontend</title>
-	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
+	
+	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+	<link href="~/lib/bootstrap/dist/css/bootstrap.rtl.css" rel="stylesheet" />
+	<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 	<link href="~/css/font-awesome.css" rel="stylesheet" />
 	<link href="~/css/owl-carousel.css" rel="stylesheet" />
 	<link href="~/css/site.css" rel="stylesheet" />
@@ -69,6 +73,8 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="Index">評論</a></li>
+                           
                             @{
                                 if (User.Identity.IsAuthenticated)
                                 {
@@ -86,6 +92,9 @@
                                     </li>
                                 }
                             }
+                            <li id="Cart">
+                                @Html.Partial("_CartPartial")
+                            </li>
 
                         </ul>
                         <a class='menu-trigger'>
