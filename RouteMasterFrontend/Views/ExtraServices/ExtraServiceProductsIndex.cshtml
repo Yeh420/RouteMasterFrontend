@@ -9,6 +9,8 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<button id="refresh">刷新</button>
 <table class="table" id="cartTable2">
     <thead>
         <tr>
@@ -64,10 +66,8 @@
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
-                    reloadCartItems();
-                    refreshExtraServicesDetails();
 
-                  
+                    reloadCartItems();
 
                 } 
             },
@@ -77,16 +77,21 @@
 
         });
     }
-    function reloadCartItems() {
-       
+
+
+
+
+
+    function reloadCartItems() {       
         $.ajax({
-            url: '/Carts/GetCartExtraServicesDetails', 
+            url: '/Carts/RefreshCart',
             type: 'GET',
-            success: function (cartItemsHtml) {
+            success: function (data) {
               
-                $('#cartItemsContainer').html(cartItemsHtml);
-             
+                $('#Cart').html(data);             
             },
+
+
             error: function () {
                 alert('Failed to reload cart items.');
             }

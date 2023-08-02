@@ -95,8 +95,8 @@
                                     </li>
                                 }
                             }
-                            <li id="Cart">
-                                @Html.view("_CartPartial")
+                            <li id="Cart">                               
+                                @await Component.InvokeAsync("CartPartial")
                             </li>
 
                         </ul>

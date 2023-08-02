@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -179,10 +180,13 @@ namespace RouteMasterFrontend.Controllers
 
         public IActionResult RefreshCart()
         {
-            var model = _context.Cart_ExtraServicesDetails;
-
-            return View("ExtraServicesDetailsPartialView", model);
+            ViewData["EX"] = _context.Cart_ExtraServicesDetails; 
+            return ViewComponent("CartPartial");
         }
+
+
+
+
         public IActionResult RemoveExtraServiceFromCart(int extraserviceId)
         {
             try
