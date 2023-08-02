@@ -2,8 +2,7 @@
 {
     public class RoomProductsDTO
     {
-		public DateTime Date { get; set; }
-		public decimal NewPrice { get; set; }
-		public int Quantity { get; set; }
-	}
+        public List<RoomProductDTOItem> Items { get; set; }
+        public List<string> DisableDate { get; set; }
+    }
 }
