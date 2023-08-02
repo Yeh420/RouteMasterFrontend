@@ -24,6 +24,7 @@
     <Content Remove="wwwroot\js\fecha.js" />
     <Content Remove="wwwroot\js\fecha.js.map" />
     <Content Remove="wwwroot\js\hotel-datepicker.min.js" />
+    <Content Remove="wwwroot\js\jquery-2.1.0.min.js" />
   </ItemGroup>
 
   <ItemGroup>
