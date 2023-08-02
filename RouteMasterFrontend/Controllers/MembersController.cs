@@ -14,22 +14,24 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.RegularExpressions;
 
+using Microsoft.AspNetCore.Http;
+using System.Security.Principal;
+using System.Runtime.Intrinsics.X86;
+
 namespace RouteMasterFrontend.Controllers
 {
-	
-	
     public class MembersController : Controller
     {
         private readonly RouteMasterContext _context;
-		private readonly IWebHostEnvironment _environment;
-		private readonly HashUtility _hashUtility;
+        private readonly IWebHostEnvironment _environment;
+        private readonly HashUtility _hashUtility;
 
-		public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
+        public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
-			_environment = environment;
-			_hashUtility = new HashUtility(configuration);
-		}
+            _environment = environment;
+            _hashUtility = new HashUtility(configuration);
+        }
 
         // GET: Members/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -82,60 +84,60 @@ namespace RouteMasterFrontend.Controllers
             return View(member);
         }
 
-		//會員資料頁
-		[HttpGet]
-		public IActionResult MyMemberIndex()
-		{
-			//抓會員登入資訊
-			ClaimsPrincipal user = HttpContext.User;
+        //會員資料頁
+        [HttpGet]
+        public IActionResult MyMemberIndex()
+        {
+            //抓會員登入資訊
+            ClaimsPrincipal user = HttpContext.User;
 
-			//列出與登入符合資料
-			if (user.Identity.IsAuthenticated)
-			{
-				string userName = user.Identity.Name;
-				IEnumerable<MemberIndexVM> members;
-				members = (IEnumerable<MemberIndexVM>)_context.Members
-					.Where(m=>m.Account==userName)
-					.Select(m => new MemberIndexVM
-					{
-						FirstName = m.FirstName,
-						LastName= m.LastName,
-						Account= m.Account,
-						Email = m.Email,
-						CellPhoneNumber = m.CellPhoneNumber,
-						Address = m.Address,
-						Gender = m.Gender,
-						Birthday = m.Birthday,
-						CreateDate = m.CreateDate,
-						Image= m.Image,
-						LoginTime = m.LoginTime,
-						IsConfirmed = m.IsConfirmed,
-						IsSuscribe = m.IsSuscribe,
+            //列出與登入符合資料
+            if (user.Identity.IsAuthenticated)
+            {
+                string userName = user.Identity.Name;
+                IEnumerable<MemberIndexVM> members;
+                members = (IEnumerable<MemberIndexVM>)_context.Members
+                    .Where(m => m.Account == userName)
+                    .Select(m => new MemberIndexVM
+                    {
+                        FirstName = m.FirstName,
+                        LastName = m.LastName,
+                        Account = m.Account,
+                        Email = m.Email,
+                        CellPhoneNumber = m.CellPhoneNumber,
+                        Address = m.Address,
+                        Gender = m.Gender,
+                        Birthday = m.Birthday,
+                        CreateDate = m.CreateDate,
+                        Image = m.Image,
+                        LoginTime = m.LoginTime,
+                        IsConfirmed = m.IsConfirmed,
+                        IsSuscribe = m.IsSuscribe,
 
-					}).ToList();
-				return View(members);
-			}
-			return RedirectToAction("MemberLogin", "Members");
-		}
+                    }).ToList();
+                return View(members);
+            }
+            return RedirectToAction("MemberLogin", "Members");
+        }
 
         [HttpGet]
-		//上傳系統圖片 -- 有空時應該改去後台管理系統
+        //上傳系統圖片 -- 有空時應該改去後台管理系統
         public IActionResult UploadSystemImages()
-		{
-			return View();
-		}
+        {
+            return View();
+        }
 
-		//上傳系統內建大頭貼
-		[HttpPost]
-		public IActionResult UploadSystemImages(IFormFile[] files)
-		{
+        //上傳系統內建大頭貼
+        [HttpPost]
+        public IActionResult UploadSystemImages(IFormFile[] files)
+        {
             if (files != null && files.Length > 0)
             {
                 foreach (var file in files)
                 {
                     string path = Path.Combine(_environment.WebRootPath, "SystemImages");
                     string fileName = SaveUploadFile(path, file);
-					SystemImage img = new SystemImage();                    
+                    SystemImage img = new SystemImage();
                     img.Image = fileName;
                     _context.SystemImages.Add(img);
                     _context.SaveChanges();
@@ -143,38 +145,38 @@ namespace RouteMasterFrontend.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
-		
-		//註冊會員
-        [HttpGet]
-		public IActionResult MemberRegister()
-		{
-			return View();
-		}
 
-		//註冊會員
-		[HttpPost]
-		public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto)
-		{
+        //註冊會員
+        [HttpGet]
+        public IActionResult MemberRegister()
+        {
+            return View();
+        }
+
+        //註冊會員
+        [HttpPost]
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto,  int value)
+        {
             MemberImage img = new MemberImage();
             if (ModelState.IsValid)
-			{
+            {
                 if (facePhoto != null && facePhoto.Length > 0)
                 {
                     string path = Path.Combine(_environment.WebRootPath, "MemberUploads");
-                    string fileName = SaveUploadFile(path, facePhoto);	
-					img.Image = fileName;
+                    string fileName = SaveUploadFile(path, facePhoto);
+                    img.Image = fileName;
                     img.Name = "未命名";
                     vm.Image = fileName;
                 }
-			}
-			else
-			{
-				return View(vm);
+            }
+            else
+            {
+                return View(vm);
             }
 
 
-            Result result = RegisterMember(vm,img);
-            
+            Result result = RegisterMember(vm, img);
+
             if (result.IsSuccess)
             {
                 return View("MyMemberIndex");
@@ -187,16 +189,16 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
-		//會員普通登入
-		[HttpGet]
-		public async Task<IActionResult> MemberLogin()
-		{
-			return View();
-		}
+        //會員普通登入
+        [HttpGet]
+        public async Task<IActionResult> MemberLogin()
+        {
+            return View();
+        }
 
         //會員普通登入
-		public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
-		{
+        public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
+        {
             if (ModelState.IsValid == false) return View(vm);
 
             Result result = ValidLogin(vm);
@@ -229,19 +231,132 @@ namespace RouteMasterFrontend.Controllers
         }
 
 
-		//Google登入的會員頁面
-		public async Task<IActionResult> GoogleMember()
-		{
-			return View();
-		}
+        //Google登入的會員頁面
+        public async Task<IActionResult> GoogleMember()
+        {
+            return View();
+        }
 
         //會員登出
         [HttpGet]
-		public async Task<IActionResult> Logout()
-		{
-			HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-			return View("Logout","Members");
-		}
+        public async Task<IActionResult> Logout()
+        {
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return View("Logout", "Members");
+        }
+
+        //忘記密碼並寄信
+        public IActionResult MemberForgetPassword()
+        {
+            return View();
+        }
+
+        //忘記密碼並寄信
+        [HttpPost]
+        public IActionResult MemberForgetPassword(MemberForgetPasswordVM vm)
+        {
+            if (ModelState.IsValid == false) return View(vm);
+
+            //var myAccount = _context.Members.FirstOrDefault(m=>m.Account == vm.Account);
+
+            //// 生成email裡的連結
+            //var urlTemplate = $"{Request.Scheme}://{Request.Host.Value}/Members/MemberResetPassword?Account={myAccount}&confirmCode={0}";
+            
+
+            Result result = ProcessResetPassword(vm.Account, vm.Email);
+
+            if (result.IsFalse)
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(vm);
+            }
+
+            return View("MemberLogin");
+        }
+
+        //更改密碼       
+        public IActionResult MemberResetPassword()
+        {
+            return View();
+        }
+        
+        //更改密碼 
+        [HttpPost]
+        public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
+        {
+            if (ModelState.IsValid == false) return View(vm);
+            
+            Result result = ProcessChangePassword(account, confirmCode, vm.Password);
+
+            //if (result.IsSuccess == false) { }
+            //if (!result.IsSuccess) { }
+            if (result.IsFalse)
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(vm);
+            }
+
+            return View("MemberLogin");
+        }
+
+        public IActionResult EditPassword()
+        {
+            return View();
+        }
+
+        
+        [HttpPost]
+        public ActionResult EditPassword(MemberEditPasswordVM vm)
+        {
+            if (ModelState.IsValid == false) return View(vm);
+
+            var currentUserAccount = User.Identity.Name;
+            Result result = ChangePassword(currentUserAccount, vm);
+
+            if (result.IsSuccess == false)
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(vm);
+            }
+            return RedirectToAction("MyMemberIndex");
+        }
+
+        private Result ChangePassword(string account, MemberEditPasswordVM vm)
+        {
+            var salt = _hashUtility.GetSalt();
+            var hashOrigPassword = HashUtility.ToSHA256(vm.OldPassword, salt);
+
+            var memberInDb = _context.Members.FirstOrDefault(m => m.Account == account && m.EncryptedPassword == hashOrigPassword);
+            if (memberInDb == null) return Result.Failure("找不到要修改的會員記錄");
+
+            var hashPassword = HashUtility.ToSHA256(vm.NewPassword, salt);
+
+
+            // 更新密碼
+            memberInDb.EncryptedPassword = hashPassword;
+            _context.SaveChanges();
+
+            return Result.Success();
+        }
+
+        private Result ProcessChangePassword(string account, string confirmCode, string password)
+        {
+
+            // 驗證 memberId, confirmCode是否正確
+            var memberInDb = _context.Members.FirstOrDefault(m => m.Account == account && m.ConfirmCode == confirmCode);
+            if (memberInDb == null) return Result.Failure("找不到對應的會員記錄");
+
+            // 更新密碼,並將 confirmCode清空
+            var salt = _hashUtility.GetSalt();
+            var encryptedPassword = HashUtility.ToSHA256(password, salt);
+
+            memberInDb.EncryptedPassword = encryptedPassword;
+            memberInDb.ConfirmCode = null;
+
+            _context.SaveChanges();
+
+            return Result.Success();
+        }
 
         //會員是否存在,密碼雜湊,存進資料庫
         private Result IsMemberExist(MemberRegisterVM vm)
@@ -284,52 +399,53 @@ namespace RouteMasterFrontend.Controllers
             return Result.Success();
         }
 
-		//有效登入
+        //有效登入
         private Result ValidLogin(MemberLoginVM vm)
-		{
-			var db = new RouteMasterContext();
-			
-			//Result resultAttempt = LockAccountIfFailedAttemptsExceeded(vm.Account);
-			//if (resultAttempt.IsSuccess)
-			//{
-			//    return resultAttempt; // 帳號已鎖定，返回錯誤結果
-			//}
-			
+        {
+            var db = new RouteMasterContext();
 
-			var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
-			int failedAttempts = 0;
-			if (member == null)
-			{
+            //Result resultAttempt = LockAccountIfFailedAttemptsExceeded(vm.Account);
+            //if (resultAttempt.IsSuccess)
+            //{
+            //    return resultAttempt; // 帳號已鎖定，返回錯誤結果m
+            //}
 
-				return Result.Failure("帳密有錯");
-			}
-			else
-			{
-				var claims = new List<Claim>();
-				{
-					new Claim(ClaimTypes.Name, member.Account);
-					new Claim("LastName", member.LastName);
-				};
+
+            var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
+            int failedAttempts = 0;
+            if (member == null)
+            {
+
+                return Result.Failure("帳密有錯");
+            }
+            else
+            {
+                var claims = new List<Claim>();
+                {
+                    new Claim(ClaimTypes.Name, member.Account);
+                    new Claim("LastName", member.LastName);
+                    
+                };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             }
-			//if(member.IsSuspended)  --有沒有停權
+            //if(member.IsSuspended)  --有沒有停權
 
-			var salt = _hashUtility.GetSalt();
-			var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
+            var salt = _hashUtility.GetSalt();
+            var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
-			if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
-			{
-				return Result.Success();
+            if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
+            {
+                return Result.Success();
 
-			}
-			else
-			{
+            }
+            else
+            {
 
-				return Result.Failure("帳密有誤");
-			}
-		}
+                return Result.Failure("帳密有誤");
+            }
+        }
 
         //上傳圖片
         private string SaveUploadFile(string filePath, IFormFile file)
@@ -356,7 +472,7 @@ namespace RouteMasterFrontend.Controllers
         //會員是否存在
         private bool MemberExists(int id)
         {
-          return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
         //會員存進DB
@@ -398,7 +514,7 @@ namespace RouteMasterFrontend.Controllers
                 Address = vm.Address,
                 Birthday = DateTime.Now,
                 Gender = vm.Gender,
-                Image=vm.Image,
+                Image = vm.Image,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = false,
                 IsSuspended = false,
@@ -411,6 +527,35 @@ namespace RouteMasterFrontend.Controllers
             img.MemberId = member.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
+
+            return Result.Success();
+        }
+
+        //確認帳號發送更改密碼信件
+        private Result ProcessResetPassword(string account, string email)
+        {
+
+            // 檢查account,email正確性
+            var memberInDb = _context.Members.FirstOrDefault(m => m.Account == account);
+            var myAccount = memberInDb.Account;
+
+            if (memberInDb == null) return Result.Failure("帳號或 Email 錯誤"); // 故意不告知確切錯誤原因
+
+            if (string.Compare(email, memberInDb.Email, StringComparison.CurrentCultureIgnoreCase) != 0) return Result.Failure("帳號或 Email 錯誤");
+
+            // 檢查 IsConfirmed必需是true, 因為只有已啟用的帳號才能重設密碼
+            if (memberInDb.IsConfirmed == false) return Result.Failure("您還沒有啟用本帳號, 請先完成才能重設密碼");
+
+            // 更新記錄, 填入 confirmCode
+            var confirmCode = Guid.NewGuid().ToString("N");
+            memberInDb.ConfirmCode = confirmCode;
+            _context.SaveChanges();
+
+            var urlTemplate = $"{Request.Scheme}://{Request.Host.Value}/Members/MemberResetPassword?Account={myAccount}&confirmCode={confirmCode}";
+
+            // 發email
+            var url = string.Format(urlTemplate, memberInDb.Account, confirmCode);
+            new EmailHelper().SendForgetPasswordEmail(url, memberInDb.FirstName, email);
 
             return Result.Success();
         }

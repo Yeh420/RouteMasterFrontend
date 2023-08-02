@@ -7,6 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
+    <Compile Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <Content Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
+    <Content Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <EmbeddedResource Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
+    <EmbeddedResource Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <None Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
+    <None Remove="wwwroot\hotel-datepicker-main\src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\css\hotel-datepicker.css" />
+    <Content Remove="wwwroot\hotel-datepicker-main\dist\js\hotel-datepicker.esm.js" />
+    <Content Remove="wwwroot\hotel-datepicker-main\dist\js\hotel-datepicker.min.js" />
+    <Content Remove="wwwroot\js\fecha.js" />
+    <Content Remove="wwwroot\js\fecha.js.map" />
+    <Content Remove="wwwroot\js\hotel-datepicker.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.20">
@@ -22,7 +42,7 @@
     <Folder Include="wwwroot\MemberUploads\" />
     <Folder Include="wwwroot\AttractionImages\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />
-    <Folder Include="wwwroot\SystemImages\" />
+    <Folder Include="wwwroot\CommentAccomodationUploads\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/appsettings.json" wwwroot_4lib_4bootstrap_4dist_4css_4bootstrap-reboot_1css_1map__JsonSchema="" /></VisualStudio></ProjectExtensions>
