@@ -61,7 +61,7 @@
                 return {
                     indexVM: [],
                     selected: 0,
-                    hotelId: 2 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
+                    hotelId: 1 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                 }
             },
             mounted: function () {
@@ -82,6 +82,7 @@
                         console.log(_this.indexVM);
                         for (let i = 0; i < _this.indexVM.length; i++) {
                             let item = _this.indexVM[i];
+                        
                         }
 
                     }).catch(err => {

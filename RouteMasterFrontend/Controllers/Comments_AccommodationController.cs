@@ -9,6 +9,7 @@ using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.Infra.ExtenSions;
 using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
+using static Dapper.SqlMapper;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -28,6 +29,7 @@ namespace RouteMasterFrontend.Controllers
             var commentDb = _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
+                  //.Include(c=>c.Comments_AccommodationImages)
                   .Where(c => c.AccommodationId == input.HotelId);
                  
 
@@ -46,13 +48,18 @@ namespace RouteMasterFrontend.Controllers
 					commentDb = commentDb.OrderBy(c => c.Score);
 					break;
 			}
+            //commentDb.ToListAsync().Wait();
+           
 
             var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
-
-			return Json(vm);
+         
+            //for (var i = 0; i < v.Count; i++)
+            //{
+            //    v[i].ImageList = commentDb.ToList()[i].Comments_AccommodationImages;
+            //};
+            return Json(vm);
 		}
-
-        public IActionResult PartialPage()
+        public IActionResult PartialPage()  
         {
             return View();
         }
@@ -81,7 +88,7 @@ namespace RouteMasterFrontend.Controllers
         // GET: Comments_Accommodation/Create
         public IActionResult Create()
         {
-           ViewBag.AccommodationId = new SelectList(_context.Accommodations, "Id", "Name");
+            ViewBag.AccommodationId = new SelectList(_context.Accommodations, "Id", "Name");
             //ViewData["CommentStatusId"] = new SelectList(_context.CommentStatuses, "Id", "Name");
             ViewBag.MemberId = new SelectList(_context.Members, "Id", "Account");
             return View();
@@ -115,7 +122,7 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 string webRootPath = _environment.WebRootPath;
-                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
+                string path = Path.Combine(webRootPath, "CommentsUploads");
 
                 foreach (IFormFile i in file1)
                 {
@@ -130,7 +137,7 @@ namespace RouteMasterFrontend.Controllers
                     }
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(PartialPage));
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);

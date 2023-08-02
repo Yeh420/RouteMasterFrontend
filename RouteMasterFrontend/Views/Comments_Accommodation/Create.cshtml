@@ -4,6 +4,50 @@
     ViewData["Title"] = "Create";
 }
 
+@section Styles{
+    <style>
+    /*    .panel {
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }*/
+
+            .panel ul {
+                display: flex;
+               /* justify-content: center;
+                padding: 0;
+                margin: 0;*/
+                list-style: none;
+            }
+
+            .panel li {
+                cursor: pointer;
+            }
+
+                /*請注意, 這三個css 撰寫順序不能亂調整, active最後寫,所以會覆蓋前面二個*/
+                .panel li.blank {
+                    color: #ccc;
+                }
+
+                .panel li.hover {
+                color: #f90;
+                }
+
+                .panel li.active {
+                color: #ff0;
+                }
+
+        .tip,
+        .result {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+    </style>
+}
+
 <h1>Create</h1>
 
 <h4>Comments_AccommodationCreateVM</h4>
@@ -13,7 +57,22 @@
     <div class="col-md-4">
         <form asp-action="Create" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+                <div class="panel mb-3">
+                    <div class="tip">請點選分數</div>
+                    <div class="result"></div>
+                    <ul>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                        <li><i class="fa fa-star fa-fw"></i></li>
+                    </ul>
+                </div>
 
             <div class="form-group mb-3">
                 <label asp-for="MemberId" class="control-label"></label>
@@ -25,9 +84,9 @@
                     <select asp-for="MemberId" class="form-select" asp-items="ViewBag.AccommodationId"></select>
                     @*<span asp-validation-for="AccommodationId" class="text-danger"></span>*@
             </div>
-            <div class="form-group mb-3">
+            <div class="form-group mb-3 d-none">
                 <label asp-for="Score" class="control-label"></label>
-                <input asp-for="Score" class="form-control" />
+                    <input asp-for="Score" class="form-control" id="starValue" />
                 <span asp-validation-for="Score" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -63,5 +122,56 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $(".panel .result").hide();
+            // 重設 start class
+            $(".panel li")
+                // .removeClass("active hover blank")
+                .addClass("blank")
+                .mouseover(function () {
+                    var current = $(this);
+                    $(".panel li").each(function (index) {
+                        if (index <= current.index()) {
+                            $(this).removeClass("blank").addClass("hover");
+                        } else {
+                            $(this).removeClass("hover").addClass("blank");
+                        }
+                    });
+                })
+                .mouseout(function () {
+                    $(".panel li").removeClass("hover").addClass("blank");
+                })
+                .click(function () {
+                    var current = $(this);
+                    console.log("current.index", current.index());
+                    $(".panel li").each(function (index) {
+                        if (index <= current.index()) {
+                            $(this).removeClass("blank").addClass("active");
+                        } else {
+                            $(this).removeClass("hover active").addClass("blank");
+                        }
+                    });
+                    $(".panel .tip").hide();
+                    var points = current.index() + 1;
+                    $(".panel .result").show().text(`您選擇了 ${points} 分`);
+                    var rating = $("#starValue").val(points);
+
+
+
+
+                })
+
+
+
+
+
+
+        });
+    </script>
+
+
 }
