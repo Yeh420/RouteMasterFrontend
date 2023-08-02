@@ -82,7 +82,7 @@
                                 if (User.Identity.IsAuthenticated)
                                 {
                                     <li>
-                                       <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
                                     </li>
                                     <li >
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
@@ -96,7 +96,7 @@
                                 }
                             }
                             <li id="Cart">                               
-                                @await Component.InvokeAsync("CartPartial")
+                                @await Component.InvokeAsync("CartPartial",new {id=2})
                             </li>
 
                         </ul>

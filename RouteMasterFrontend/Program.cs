@@ -40,10 +40,6 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 
 
-
-
-
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
