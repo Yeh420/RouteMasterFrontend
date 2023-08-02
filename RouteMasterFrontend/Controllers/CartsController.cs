@@ -35,7 +35,22 @@ namespace RouteMasterFrontend.Controllers
 			return View(cart);
 		}
 
+        public IActionResult Add2Cart(int extraserviceId, string customerAccount)
+        {
+            var memberId = GetMemberIdByAccount(customerAccount);
+            var cart = _context.Carts.SingleOrDefault(c=>c.MemberId == memberId);
+            if (cart == null)
+            {
+                cart = new Cart { MemberId = memberId };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+            ViewBag.cartid = cart.Id;
 
+
+            return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
+        
+        }
 		public Cart GetCartInfo(int memberId)
 		{
 			var cart = _context.Carts
@@ -44,7 +59,13 @@ namespace RouteMasterFrontend.Controllers
 				.Include(c => c.Cart_AccommodationDetails)
 				.Where(c => c.MemberId == memberId)
 				.FirstOrDefault();
-			return cart;
+            if (cart == null)
+            {
+                cart = new Cart { MemberId = memberId };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+            return cart;
 
 		}
         public IActionResult ExtraServicesDetailsPartialView(int memberId)
@@ -140,7 +161,15 @@ namespace RouteMasterFrontend.Controllers
 
 		
         }
-        public IActionResult AddExtraService2Cart (int extraserviceId)
+        private int GetCartId()
+        {
+           
+            var memberId = GetMemberIdByAccount(User.Identity.Name);
+            var cart = GetCartInfo(memberId);
+
+            return cart.Id;
+        }
+        public IActionResult AddExtraService2Cart (int extraserviceId)  
         {
             try
             {
@@ -178,9 +207,11 @@ namespace RouteMasterFrontend.Controllers
         }
 
 
-        public IActionResult RefreshCart()
+        public IActionResult RefreshCart(int memberId)
         {
-            ViewData["EX"] = _context.Cart_ExtraServicesDetails; 
+
+
+            ViewData["CartId"] = _context.Carts.Where(s => s.MemberId == memberId).First().Id;
             return ViewComponent("CartPartial");
         }
 
