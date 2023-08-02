@@ -6,7 +6,7 @@
 	<title>@ViewData["Title"] - RouteMasterFrontend</title>
 	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
 	<link href="~/css/font-awesome.css" rel="stylesheet" />
-	<link href="~/css/owl-carousel.css" rel="stylesheet" />
+	@*<link href="~/css/owl-carousel.css" rel="stylesheet" />*@
 	<link href="~/css/site.css" rel="stylesheet" />
 	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
@@ -69,7 +69,7 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="Index">評論</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
                             @{
                                 if (User.Identity.IsAuthenticated)
                                 {
