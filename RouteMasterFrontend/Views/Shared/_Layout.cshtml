@@ -1,14 +1,25 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="zh-tw">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] - RouteMasterFrontend</title>
-	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
 	<link href="~/css/font-awesome.css" rel="stylesheet" />
 	<link href="~/css/owl-carousel.css" rel="stylesheet" />
-	<link href="~/css/site.css" rel="stylesheet" />
 	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
+    <style>
+        .header-area .main-nav .logo {
+            display: flex;
+            align-items: center;
+        }
+
+            .header-area .main-nav .logo img {
+                width: 200px; /* 设置Logo图像的宽度 */
+                height: 90px; /* 设置Logo图像的高度 */
+                margin-right: 30px; /* 设置Logo图像与"Menu"文本之间的间距 */
+            }
+
+    </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -39,19 +50,7 @@
             </div>
         </div>
     </div>
-    <style>
-        .header-area .main-nav .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-area .main-nav .logo img {
-            width: 200px; /* 设置Logo图像的宽度 */
-            height: 90px; /* 设置Logo图像的高度 */
-            margin-right: 30px; /* 设置Logo图像与"Menu"文本之间的间距 */
-        }
-
-    </style>
+  
     <!-- ***** Pre HEader End ***** -->
     <header class ="header-area header-sticky">
         <div class="container">
@@ -59,7 +58,7 @@
                 <div class="col-12">
                     <nav class="main-nav">
                         <!-- ***** Logo Start ***** -->
-                        <a href="index.html" class="logo">
+                        <a href="/Home/index" class="logo">
                             <img src="~/images/Route-master-logo.png" />
                         </a>
                         <!-- ***** Logo End ***** -->
@@ -150,48 +149,6 @@
     <div class="container-fluid" style="padding:0px;" >
         <main role="main" class="" style="margin:0px;">
             @RenderBody()
-            <!-- jQuery -->
-			<script src="~/js/jquery-2.1.0.min.js"></script>
-            <script src="~/js/jquery.min.js"></script>
-			<script src="~/js/jquery.counterup.min.js"></script>
-          
-            <!-- Bootstrap -->
-            <script src="~/js/popper.js"></script>
-            <script src="~/js/bootstrap.min.js"></script>
-
-            <!-- Plugins -->
-            <script src="~/js/scrollreveal.min.js"></script>
-            <script src="~/js/waypoints.min.js"></script>
-            <script src="~/js/jquery.counterup.min.js"></script>
-            <script src="~/js/imgfix.min.js"></script>
-            <script src="~/js/mixitup.js"></script>
-            <script src="~/js/accordions.js"></script>
-            <script src="~/js/owl-carousel.js"></script>
-
-            <!-- Global Init -->
-            <script src="~/js/custom.js"></script>
-            <script>
-                $(document).ready(function () {
-                    $('.owl-show-events').owlCarousel({
-                        items: 4, 
-                        loop: true, 
-                        autoplay: true, 
-                        autoplayTimeout: 3000,
-                        responsiveClass: true,
-                        responsive: {
-                            0: {
-                                items: 1
-                            },
-                            600: {
-                                items: 3
-                            },
-                            1000: {
-                                items: 4
-                            }
-                        }
-                    });
-                });
-            </script>
         </main>
     </div>
     <!-- *** Footer *** -->
@@ -243,7 +200,7 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="sub-footer">
-                        <div class="row">
+                        <div class="row">js/bootstrap.min.js.map
                             <div class="col-lg-3">
                                 <div class="logo"><span>Route<em>Master</em></span></div>
                             </div>
@@ -276,8 +233,21 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
+
+    <!-- Plugins -->
+    <script src="~/js/scrollreveal.min.js"></script>
+    <script src="~/js/waypoints.min.js"></script>
+    <script src="~/js/imgfix.min.js"></script>
+    <script src="~/js/mixitup.js"></script>
+    <script src="~/js/accordions.js"></script>
+    <script src="~/js/owl-carousel.js"></script>
+
+    <!-- Global Init -->
+    <script src="~/js/custom.js"></script>
+    <script>
+       
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
