@@ -29,6 +29,9 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 				Cons = entity.Cons,
 				Title = entity.Title,
 				CreateDate = entity.CreateDate,
+				Status=entity.CommentStatus.Name,
+				ReplyMesssage=entity.Reply,
+				ReplyDate=entity.ReplyAt,
 				ImageList = entity.Comments_AccommodationImages.ToList()
 			};
 		}
