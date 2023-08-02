@@ -36,30 +36,35 @@ namespace RouteMasterBackend.Controllers
 
         // GET: api/RoomProducts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<RoomProductsDTO>>> GetRoomProduct(int id)
+        public async Task<ActionResult<RoomProductsDTO>> GetRoomProduct(int id)
         {
           if (_db.RoomProducts == null)
           {
               return NotFound();
           }
-            var roomProduct = _db.RoomProducts.Where(rp => rp.Date > DateTime.Now.AddDays(-1) && rp.RoomId == 1);
-
+            var roomProduct = _db.RoomProducts.Where(rp => rp.Date > DateTime.Now.AddDays(-1) && rp.RoomId == id);
 			if (roomProduct == null)
             {
                 return NotFound();
             }
-            roomProduct = roomProduct.FirstOrDefault().Date.AddHours(18) < DateTime.Now ? roomProduct.Skip(1) : roomProduct;
 
-            var dto = await roomProduct.Select(rp => new RoomProductsDTO
+            roomProduct = roomProduct.FirstOrDefault().Date.AddHours(18) < DateTime.Now ? roomProduct.Skip(1) : roomProduct;
+            var ablerp = roomProduct.Where(rp => rp.Quantity > 0);
+            var disablerp = roomProduct.Where(rp => rp.Quantity == 0);
+
+
+            var dto  = new RoomProductsDTO();
+            dto.Items = await ablerp.Select(rp => new RoomProductDTOItem
 			{
-				Date = rp.Date,
+				Date = new string($"{rp.Date.Year}-{rp.Date.Month:D2}-{rp.Date.Day:D2}"),
 				NewPrice = rp.NewPrice,
 				Quantity = rp.Quantity,
 			}).ToListAsync();
+            dto.DisableDate = await disablerp.Select(drp=> new string($"{drp.Date.Year}-{drp.Date.Month:D2}-{drp.Date.Day:D2}")).ToListAsync();
 
             var data = new JsonResult(dto);
 
-			return data;
+			return dto;
         }
 
         // PUT: api/RoomProducts/5
