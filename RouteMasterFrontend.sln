@@ -7,15 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteMasterFrontend", "Rout
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteMasterBackend", "RouteMasterBackend\RouteMasterBackend.csproj", "{12103C10-55B7-4E5A-B239-461120646FBE}"
 EndProject
-
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Readme", "Readme", "{230E675C-085A-4C50-B296-87AAAA7B33E6}"
-	ProjectSection(SolutionItems) = preProject
-		10ReadMe.txt = 10ReadMe.txt
-
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{43DA6DCC-AC3B-4E8A-813C-9BFCB8499BDE}"
 	ProjectSection(SolutionItems) = preProject
 		ReadMeOrderCart.txt = ReadMeOrderCart.txt
-
 	EndProjectSection
 EndProject
 Global
