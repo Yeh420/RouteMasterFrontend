@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Dto;
+using RouteMasterFrontend.Models.Infra.ExtenSions;
 using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
 
 namespace RouteMasterFrontend.Controllers
@@ -21,13 +23,41 @@ namespace RouteMasterFrontend.Controllers
         }
 
         // GET: Comments_Accommodation
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult<IEnumerable<Comments_AccommodationIndexVM>>> Index([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var routeMasterContext = _context.Comments_Accommodations.Include(c => c.Accommodation).Include(c => c.CommentStatus).Include(c => c.Member);
-            return View(await routeMasterContext.ToListAsync());
+            var commentDb = _context.Comments_Accommodations
+                  .Include(c => c.Member)
+                  .Include(c => c.Accommodation)
+                  .Where(c => c.AccommodationId == input.HotelId);
+                 
+
+			switch (input.Manner)
+			{
+				case 0:
+					commentDb = commentDb.OrderBy(c => c.Id);
+					break;
+				case 1:
+					commentDb = commentDb.OrderByDescending(c => c.CreateDate);
+					break;
+				case 2:
+					commentDb = commentDb.OrderByDescending(c => c.Score);
+					break;
+				case 3:
+					commentDb = commentDb.OrderBy(c => c.Score);
+					break;
+			}
+
+            var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
+
+			return Json(vm);
+		}
+
+        public IActionResult PartialPage()
+        {
+            return View();
         }
 
-        // GET: Comments_Accommodation/Details/5
+        // GET: Comments_Accommodation/Details/5    
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Comments_Accommodations == null)
