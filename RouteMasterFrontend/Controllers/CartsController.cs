@@ -176,25 +176,24 @@ namespace RouteMasterFrontend.Controllers
             }
         }
 
-       
+
+        public IActionResult RefreshCart()
+        {
+            var model = _context.Cart_ExtraServicesDetails;
+
+            return View("ExtraServicesDetailsPartialView", model);
+        }
         public IActionResult RemoveExtraServiceFromCart(int extraserviceId)
         {
             try
             {
-                var CartItem = _context.Cart_ExtraServicesDetails.FirstOrDefault(p => p.Id == extraserviceId);
-                if (CartItem != null)
+                var cartItem = _context.Cart_ExtraServicesDetails.FirstOrDefault(p => p.Id == extraserviceId);
+                if (cartItem != null)
                 {
-                    _context.Cart_ExtraServicesDetails.Remove(CartItem);
+                    _context.Cart_ExtraServicesDetails.Remove(cartItem);
                     _context.SaveChanges();
 
-                    // 刪除成功後，重新查詢並返回更新後的購物車內容
-                    var memberId = 1; // 假設您有會員 ID
-                    var cartItems = GetCartExtraServicesDetails(memberId);
-
-                    // 使用 PartialView 來渲染購物車內容的表格，並返回 HTML 字串
-                    string cartTableHtml = PartialView("_CartTablePartial", cartItems).ToString();
-
-                    return Json(new { success = true, message = "Successfully removed from cart.", cartTableHtml = cartTableHtml });
+                    return Json(new { success = true, message = "Successfully removed from cart.", extraserviceId = extraserviceId });
                 }
                 else
                 {
@@ -205,6 +204,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 return Json(new { success = false, message = "Failed to remove from the cart." });
             }
+        
         }
       
         public IActionResult AddAccomodation2Cart(int accomodationId)
@@ -392,5 +392,8 @@ namespace RouteMasterFrontend.Controllers
         {
           return (_context.Carts?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+       
     }
 }
