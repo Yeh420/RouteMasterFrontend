@@ -12,6 +12,7 @@ using RouteMasterFrontend.Models.Infra;
 using RouteMasterFrontend.Models.ViewModels.Members;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.RegularExpressions;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -154,38 +155,37 @@ namespace RouteMasterFrontend.Controllers
 		[HttpPost]
 		public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto)
 		{
-			if (ModelState.IsValid)
+            MemberImage img = new MemberImage();
+            if (ModelState.IsValid)
 			{
                 if (facePhoto != null && facePhoto.Length > 0)
                 {
-                    string path = Path.Combine(_environment.WebRootPath, "ActivityImages");
-                    string fileName = SaveUploadFile(path, facePhoto);
-					MemberImage img = new MemberImage();
+                    string path = Path.Combine(_environment.WebRootPath, "MemberUploads");
+                    string fileName = SaveUploadFile(path, facePhoto);	
 					img.Image = fileName;
                     img.Name = "未命名";
-                    _context.MemberImages.Add(img);
-                    _context.SaveChanges();
+                    vm.Image = fileName;
                 }
-
 			}
 			else
 			{
 				return View(vm);
-			}
+            }
 
 
-			Result result = IsMemberExist(vm);
-			if (result.IsSuccess)
-			{
-				return View("ConfirmRegister");
-			}
-			else
-			{
-				ModelState.AddModelError(string.Empty, result.ErrorMessage);
-				return View(vm);
-			}
+            Result result = RegisterMember(vm,img);
+            
+            if (result.IsSuccess)
+            {
+                return View("MyMemberIndex");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(vm);
+            }
 
-		}
+        }
 
 		//會員普通登入
 		[HttpGet]
@@ -358,5 +358,62 @@ namespace RouteMasterFrontend.Controllers
         {
           return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        //會員存進DB
+        private Result RegisterMember(MemberRegisterVM vm, MemberImage img)
+        {
+            if (_context.Members.Any(m => m.Account == vm.Account))
+            {
+                // 丟出異常,或者傳回 Result
+                return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
+            }
+
+            Regex PasswordRegex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
+            string[] CommonPasswords = new string[]
+            {
+        "password",
+        "123456",
+        "qwerty",
+                // 添加其他常見密碼
+            };
+
+            // 將密碼進行雜湊
+
+            var salt = _hashUtility.GetSalt();
+            var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
+            string EncryptedPassword = hashPassword;
+
+            // 填入 isConfirmed, ConfirmCode
+            //vm.IsConfirmed = false;
+            //vm.ConfirmCode = Guid.NewGuid().ToString("N");
+
+            Member member = new Member
+            {
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                Account = vm.Account,
+                EncryptedPassword = EncryptedPassword,
+                Email = vm.Email,
+                CellPhoneNumber = vm.CellPhoneNumber,
+                Address = vm.Address,
+                Birthday = DateTime.Now,
+                Gender = vm.Gender,
+                Image=vm.Image,
+                ConfirmCode = Guid.NewGuid().ToString("N"),
+                IsConfirmed = false,
+                IsSuspended = false,
+                IsSuscribe = vm.IsSuscribe
+            };
+
+            // 將它存到db
+            _context.Members.Add(member);
+            _context.SaveChanges();
+            img.MemberId = member.Id;
+            _context.MemberImages.Add(img);
+            _context.SaveChanges();
+
+            return Result.Success();
+        }
+
     }
 }
