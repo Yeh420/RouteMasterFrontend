@@ -1225,6 +1225,8 @@ namespace RouteMasterFrontend.EFModels
 
         public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM>? Comments_AccommodationCreateVM { get; set; }
 
+        public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationIndexVM>? Comments_AccommodationIndexVM { get; set; }
+
       
 
     }

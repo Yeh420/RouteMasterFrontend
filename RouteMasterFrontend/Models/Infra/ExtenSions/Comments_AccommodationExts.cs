@@ -5,8 +5,20 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 {
 	public static class Comments_AccommodationExts
 	{
+		public static Comments_AccommodationIndexImgVM ToImgList(this Comments_AccommodationImage entity)
+		{
+			return new Comments_AccommodationIndexImgVM
+			{
+				Id = entity.Id,
+				CommentId = entity.Comments_AccommodationId,
+				Image = entity.Image,
+
+			};
+		}
+
 		public static Comments_AccommodationIndexVM ToIndexVM(this Comments_Accommodation entity)
 		{
+			
 			return new Comments_AccommodationIndexVM
 			{
 				Id = entity.Id,
@@ -16,7 +28,8 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 				Pros = entity.Pros,
 				Cons = entity.Cons,
 				Title = entity.Title,
-				CreateDate = entity.CreateDate
+				CreateDate = entity.CreateDate,
+				ImageList = entity.Comments_AccommodationImages.ToList()
 			};
 		}
 	}
