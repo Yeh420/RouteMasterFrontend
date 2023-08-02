@@ -116,6 +116,8 @@ datepicker__buttons {
   color: #333;
   padding: 9px 7px;
   border: 1px solid transparent;
+  width:50px;
+  height:50px
 }
 
 .datepicker__month-day:focus {
@@ -398,7 +400,7 @@ datepicker__buttons {
 
 @media (min-width: 768px) {
   .datepicker {
-    width: 560px;
+    width: 720px;
   }
   .datepicker__month {
     width: 240px;
