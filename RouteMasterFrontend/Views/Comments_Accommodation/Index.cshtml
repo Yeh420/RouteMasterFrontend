@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RouteMasterFrontend.EFModels.Comments_Accommodation>
+﻿@model IEnumerable<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationIndexVM>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,6 +12,12 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotelName)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Score)
             </th>
@@ -27,21 +33,18 @@
             <th>
                 @Html.DisplayNameFor(model => model.CreateDate)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Accommodation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommentStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member)
-            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Account)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HotelName)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Score)
             </td>
@@ -56,15 +59,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreateDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Accommodation.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CommentStatus.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Member.Account)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
