@@ -9,6 +9,8 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<button id="refresh">刷新</button>
 <table class="table" id="cartTable2">
     <thead>
         <tr>
@@ -46,7 +48,7 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
+                <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
             </td>
         </tr>
 }
@@ -64,9 +66,9 @@
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
+
                     reloadCartItems();
-                   
-                 
+
                 } 
             },
             error: function () {
@@ -75,36 +77,26 @@
 
         });
     }
-    $(document).ready(function () {
-        $('#CartDropDown').click(function () {
-            $.ajax({
-                url: '/Carts/GetCartExtraServicesDetails',
-                type: 'GET',
-                success: function (ExtraServicesDetails) {
-                    $('#cartItemsContainer').html(ExtraServicesDetails);
-                },
-                error: function () {
-                    alert('Failed to reload cart items.');
-                }
-            });
-        });
-    });
-    function reloadCartItems() {
-       
-        $.ajax({
-            url: '/Carts/GetCartExtraServicesDetails', 
-            type: 'GET',
-            success: function (ExtraServicesDetails) {
-              
-                $('#cartItemsContainer').html(ExtraServicesDetails);
 
+
+
+
+
+    function reloadCartItems() {       
+        $.ajax({
+            url: '/Carts/RefreshCart',
+            type: 'GET',
+            success: function (data) {
+              
+                $('#Cart').html(data);             
             },
+
+
             error: function () {
                 alert('Failed to reload cart items.');
             }
         });
     }
-   
    
 
 </script>
