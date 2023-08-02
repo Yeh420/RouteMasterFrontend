@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "hotel-datepicker": "^4.6.1",
+    "vue": "^3.3.4",
+    "vue-hotel-datepicker": "^4.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.46.0"
+  }
+}
