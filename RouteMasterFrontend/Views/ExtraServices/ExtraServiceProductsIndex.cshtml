@@ -46,7 +46,7 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
+                <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
             </td>
         </tr>
 }
@@ -65,8 +65,10 @@
                 if (response.success) {
                     alert(response.message);
                     reloadCartItems();
-                   
-                 
+                    refreshExtraServicesDetails();
+
+                  
+
                 } 
             },
             error: function () {
@@ -75,36 +77,21 @@
 
         });
     }
-    $(document).ready(function () {
-        $('#CartDropDown').click(function () {
-            $.ajax({
-                url: '/Carts/GetCartExtraServicesDetails',
-                type: 'GET',
-                success: function (ExtraServicesDetails) {
-                    $('#cartItemsContainer').html(ExtraServicesDetails);
-                },
-                error: function () {
-                    alert('Failed to reload cart items.');
-                }
-            });
-        });
-    });
     function reloadCartItems() {
        
         $.ajax({
             url: '/Carts/GetCartExtraServicesDetails', 
             type: 'GET',
-            success: function (ExtraServicesDetails) {
+            success: function (cartItemsHtml) {
               
-                $('#cartItemsContainer').html(ExtraServicesDetails);
-
+                $('#cartItemsContainer').html(cartItemsHtml);
+             
             },
             error: function () {
                 alert('Failed to reload cart items.');
             }
         });
     }
-   
    
 
 </script>
