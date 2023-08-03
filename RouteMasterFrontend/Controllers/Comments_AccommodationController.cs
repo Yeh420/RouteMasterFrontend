@@ -59,6 +59,16 @@ namespace RouteMasterFrontend.Controllers
             //};
             return Json(vm);
 		}
+
+        public async Task<ActionResult<IEnumerable<Comments_AccommodationIndexImgVM>>> ImgSearch()
+        {
+            var img = await _context.Comments_AccommodationImages
+                .Select(i => i.ToImgList())
+                .AsNoTracking()
+                .ToListAsync();
+
+            return Json(img);
+        }
         public IActionResult PartialPage()  
         {
             return View();
@@ -122,7 +132,7 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 string webRootPath = _environment.WebRootPath;
-                string path = Path.Combine(webRootPath, "CommentsUploads");
+                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
 
                 foreach (IFormFile i in file1)
                 {
