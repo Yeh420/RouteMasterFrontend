@@ -6,7 +6,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 {
 	public class Comments_AccommodationIndexVM
 	{
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		[Display(Name = "用戶帳號")]
 		public string Account { get; set; }
