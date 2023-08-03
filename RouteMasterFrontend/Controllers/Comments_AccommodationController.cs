@@ -60,12 +60,10 @@ namespace RouteMasterFrontend.Controllers
             return Json(vm);
 		}
 
-        public async Task<ActionResult<IEnumerable<Comments_AccommodationIndexImgVM>>> ImgSearch()
+        public IActionResult ImgSearch()
         {
-            var img = await _context.Comments_AccommodationImages
-                .Select(i => i.ToImgList())
-                .AsNoTracking()
-                .ToListAsync();
+            var img =  _context.Comments_AccommodationImages;
+         
 
             return Json(img);
         }
