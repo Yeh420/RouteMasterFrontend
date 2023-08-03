@@ -13,7 +13,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 				CommentId = entity.Comments_AccommodationId,
 				Image = entity.Image,
 
-			};
+			};	
 		}
 
 		public static Comments_AccommodationIndexVM ToIndexVM(this Comments_Accommodation entity)
