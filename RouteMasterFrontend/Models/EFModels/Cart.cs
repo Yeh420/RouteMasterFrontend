@@ -21,6 +21,6 @@ namespace RouteMasterFrontend.EFModels
         public virtual ICollection<Cart_AccommodationDetail> Cart_AccommodationDetails { get; set; }
         public virtual ICollection<Cart_ActivitiesDetail> Cart_ActivitiesDetails { get; set; }
         public virtual ICollection<Cart_ExtraServicesDetail> Cart_ExtraServicesDetails { get; set; }
-
+        //public bool AllowCheckout { get; internal set; }
     }
 }
