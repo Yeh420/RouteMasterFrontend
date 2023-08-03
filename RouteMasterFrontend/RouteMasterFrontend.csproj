@@ -7,15 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\AccomodationImages\**" />
     <Compile Remove="wwwroot\CommentAccomodationUploads\**" />
     <Compile Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
     <Compile Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <Content Remove="wwwroot\AccomodationImages\**" />
     <Content Remove="wwwroot\CommentAccomodationUploads\**" />
     <Content Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
     <Content Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <EmbeddedResource Remove="wwwroot\AccomodationImages\**" />
     <EmbeddedResource Remove="wwwroot\CommentAccomodationUploads\**" />
     <EmbeddedResource Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
     <EmbeddedResource Remove="wwwroot\hotel-datepicker-main\src\**" />
+    <None Remove="wwwroot\AccomodationImages\**" />
     <None Remove="wwwroot\CommentAccomodationUploads\**" />
     <None Remove="wwwroot\fecha-4.2.1\fecha-4.2.1\src\**" />
     <None Remove="wwwroot\hotel-datepicker-main\src\**" />
@@ -43,7 +47,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\ActivityImages\" />
-    <Folder Include="wwwroot\AccomodationImages\" />
     <Folder Include="wwwroot\MemberUploads\" />
     <Folder Include="wwwroot\AttractionImages\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />
