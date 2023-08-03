@@ -1,6 +1,9 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
+
 <html lang="zh-tw">
 <head>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -39,7 +42,7 @@
     </div>
     <!-- ***** Preloader End ***** -->
     <!-- ***** Pre HEader ***** -->
-    <div class="pre-header">
+    <div class="pre-header" style="position: fixed; top: 0; width: 100%; z-index:999; ">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 col-sm-6">
@@ -55,7 +58,7 @@
     </div>
 
     <!-- ***** Pre HEader End ***** -->
-    <header class="header-area header-sticky">
+    <header class="header-area header-sticky" style="margin-top:60px;">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -92,7 +95,7 @@
                                 }
                             }
                             <li id="Cart">                               
-                                @await Component.InvokeAsync("CartPartial")
+                                @await Component.InvokeAsync("CartPartial" )
                             </li>
 
                         </ul>

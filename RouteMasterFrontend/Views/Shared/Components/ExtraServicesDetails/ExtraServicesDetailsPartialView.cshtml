@@ -94,4 +94,20 @@
             }
         });
     }
+    function reloadCartItems() {
+        $.ajax({
+            url: '/Carts/RefreshCart',
+            type: 'GET',
+            success: function (data) {
+
+                $('#Cart').html(data);
+            },
+
+
+            error: function () {
+                alert('Failed to reload cart items.');
+            }
+        });
+    }
+
 </script>
