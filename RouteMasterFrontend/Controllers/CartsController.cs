@@ -35,22 +35,22 @@ namespace RouteMasterFrontend.Controllers
 			return View(cart);
 		}
 
-        public IActionResult Add2Cart(int extraserviceId, string customerAccount)
-        {
-            var memberId = GetMemberIdByAccount(customerAccount);
-            var cart = _context.Carts.SingleOrDefault(c=>c.MemberId == memberId);
-            if (cart == null)
-            {
-                cart = new Cart { MemberId = memberId };
-                _context.Carts.Add(cart);
-                _context.SaveChanges();
-            }
-            ViewBag.cartid = cart.Id;
+        //public IActionResult Add2Cart(int extraserviceId, string customerAccount)
+        //{
+        //    var memberId = GetMemberIdByAccount(customerAccount);
+        //    var cart = _context.Carts.SingleOrDefault(c=>c.MemberId == memberId);
+        //    if (cart == null)
+        //    {
+        //        cart = new Cart { MemberId = memberId };
+        //        _context.Carts.Add(cart);
+        //        _context.SaveChanges();
+        //    }
+        //    ViewBag.cartid = cart.Id;
 
 
-            return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
+        //    return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
         
-        }
+        //}
 		public Cart GetCartInfo(int memberId)
 		{
 			var cart = _context.Carts
@@ -99,6 +99,81 @@ namespace RouteMasterFrontend.Controllers
 
 			return extraServicesDetails;
 		}
+        public IActionResult AddExtraService2Cart(int extraserviceId)
+        {
+            try
+            {
+                // 查詢對應的 ExtraServiceProduct
+                var extraServiceProduct = _context.ExtraServiceProducts
+                    .FirstOrDefault(p => p.Id == extraserviceId);
+
+                if (extraServiceProduct != null)
+                {
+                    //// 查詢現有的購物車
+                    //var memberId = GetMemberIdByAccount(User.Identity.Name);
+                    //var cart = _context.Carts
+                    //    .Include(c => c.Cart_ExtraServicesDetails) // 可能需要根據您的資料庫結構進行調整
+                    //    .FirstOrDefault(c => c.MemberId == memberId);
+
+                    //if (cart == null)
+                    //{
+                    //    // 建立新的購物車
+                    //    cart = new Cart { MemberId = memberId };
+                    //    _context.Carts.Add(cart);
+                    //    _context.SaveChanges();
+                    //}
+
+                    // 建立新的 CartItem
+                    var cartItem = new Cart_ExtraServicesDetail
+                    {
+                        CartId = 23,
+                        ExtraServiceProductId = extraserviceId,
+                        Quantity = 1
+                    };
+
+                    _context.Cart_ExtraServicesDetails.Add(cartItem);
+                    _context.SaveChanges();
+
+                    // 加入購物車成功後回傳 JSON 物件
+                    return Json(new { success = true, message = "Successfully added to cart." });
+                }
+                else
+                {
+                    // 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
+                    return Json(new { success = false, message = "Product not found." });
+                }
+            }
+            catch
+            {
+                // 加入購物車失敗時回傳 JSON 物件
+                return Json(new { success = false, message = "Failed to add to cart." });
+            }
+        }
+        public IActionResult RemoveExtraServiceFromCart(int extraserviceId)
+        {
+            try
+            {
+                var cartItem = _context.Cart_ExtraServicesDetails.FirstOrDefault(p => p.Id == extraserviceId);
+                if (cartItem != null)
+                {
+                    _context.Cart_ExtraServicesDetails.Remove(cartItem);
+                    _context.SaveChanges();
+
+                    return Json(new { success = true, message = "Successfully removed from cart.", extraserviceId = extraserviceId });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Item not found in cart." });
+                }
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Failed to remove from the cart." });
+            }
+
+        }
+
+
         public IActionResult ActivitiesDetailsPartialView(int memberId)
         {
             var activitiesServicesDetails = _context.Cart_ActivitiesDetails
@@ -169,79 +244,44 @@ namespace RouteMasterFrontend.Controllers
 
             return cart.Id;
         }
-        public IActionResult AddExtraService2Cart (int extraserviceId)  
-        {
-            try
-            {
-                // 查詢對應的 ExtraServiceProduct
-                var extraServiceProduct = _context.ExtraServiceProducts
-                    .FirstOrDefault(p => p.Id == extraserviceId);
-
-                if (extraServiceProduct != null)
-                {
-                    // 建立新的 CartItem
-                    var cartItem = new Cart_ExtraServicesDetail
-                    {
-                        CartId = 1, // 假設 cartId 為 1
-                        ExtraServiceProductId = extraserviceId,
-                        Quantity = 1
-                    };
-
-                   _context.Cart_ExtraServicesDetails.Add(cartItem);
-                    _context.SaveChanges();
-
-                    // 加入購物車成功後回傳 JSON 物件
-                    return Json(new { success = true, message = "Successfully added to cart." });
-                }
-                else
-                {
-                    // 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
-                    return Json(new { success = false, message = "Product not found." });
-                }
-            }
-            catch
-            {
-                // 加入購物車失敗時回傳 JSON 物件
-                return Json(new { success = false, message = "Failed to add to cart." });
-            }
-        }
-
+       
 
         public IActionResult RefreshCart(int memberId)
         {
 
 
-            ViewData["CartId"] = _context.Carts.Where(s => s.MemberId == memberId).First().Id;
+            //ViewData["CartId"] = _context.Carts.Where(s => s.MemberId == memberId).First().Id;
             return ViewComponent("CartPartial");
         }
 
+        //public IActionResult Checkout()
+        //{
+        //    var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
+        //    var cart = GetCartInfo(memberId);
+
+        //    if (cart.AllowCheckout == false) ViewBag.ErrorMessage = "購物車是空的,無法進行結帳";
+
+        //    return View();
+        //}
+
+        //[HttpPost]
+        //public ActionResult Checkout(CheckOutVM vm)
+        //{
+        //    if (!ModelState.IsValid) return View(vm);
+        //    var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
+        //    var cart = GetCartInfo(memberId);
+
+        //    if (cart.AllowCheckout == false)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "購物車是空的,無法進行結帳");
+        //        return View(vm);
+        //    }
+        //    ProcessCheckout(memberId, vm);
+        //    return View("ConfirmCheckout");
+
+        //}
 
 
-
-        public IActionResult RemoveExtraServiceFromCart(int extraserviceId)
-        {
-            try
-            {
-                var cartItem = _context.Cart_ExtraServicesDetails.FirstOrDefault(p => p.Id == extraserviceId);
-                if (cartItem != null)
-                {
-                    _context.Cart_ExtraServicesDetails.Remove(cartItem);
-                    _context.SaveChanges();
-
-                    return Json(new { success = true, message = "Successfully removed from cart.", extraserviceId = extraserviceId });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Item not found in cart." });
-                }
-            }
-            catch
-            {
-                return Json(new { success = false, message = "Failed to remove from the cart." });
-            }
-        
-        }
-      
         public IActionResult AddAccomodation2Cart(int accomodationId)
         {
 

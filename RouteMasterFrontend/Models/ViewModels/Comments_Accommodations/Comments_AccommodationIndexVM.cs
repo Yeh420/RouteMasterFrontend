@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using RouteMasterFrontend.EFModels;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 {
 	public class Comments_AccommodationIndexVM
 	{
-		public int Id { get; set; }
+		public int? Id { get; set; }
 
 		[Display(Name = "用戶帳號")]
 		public string Account { get; set; }
@@ -28,5 +29,9 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 		[Display(Name = "建立時間")]
 		[DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
 		public DateTime CreateDate { get; set; }
+
+		public IEnumerable<Comments_AccommodationImage>? ImageList { get; set; }
+
+
 	}
 }
