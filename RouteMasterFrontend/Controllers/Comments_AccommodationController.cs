@@ -60,13 +60,13 @@ namespace RouteMasterFrontend.Controllers
             return Json(vm);
 		}
 
-        public IActionResult ImgSearch()
-        {
-            var img =  _context.Comments_AccommodationImages;
+        //public IActionResult ImgSearch()
+        //{
+        //    var img = _context.Comments_AccommodationImages;
          
 
-            return Json(img);
-        }
+        //    return Json(img);
+        //}
         public IActionResult PartialPage()  
         {
             return View();
@@ -130,8 +130,8 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 string webRootPath = _environment.WebRootPath;
-                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
-
+                string path = Path.Combine(webRootPath, "MemberUploads");
+               
                 foreach (IFormFile i in file1)
                 {
                     if (i != null && i.Length > 0)
@@ -141,11 +141,11 @@ namespace RouteMasterFrontend.Controllers
                         img.Comments_AccommodationId = commentDb.Id;
                         img.Image = fileName;
                         _context.Comments_AccommodationImages.Add(img);
-
+                       
                     }
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(PartialPage));
+                return RedirectToAction("Index","Home");
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);
