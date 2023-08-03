@@ -21,7 +21,7 @@
                                 <div class="row g-0">
                                     <div class="row g-0">
                                         <div class="col-md-4">
-                                            <img class="card-img card-img-left" src="~/AccomodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
+                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
                                         </div>
                                         <div class="col-md-8">
                                             <div class="card-body">
@@ -75,6 +75,8 @@
 @section Scripts{
 	<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
 	<script>
+        console.log(@Model.ToArray()[0].AcommodationCategoryId);
+
 		var vueApp={
 			data(){
 				return{
@@ -98,6 +100,6 @@
                 }
             }
 		}
-		var app =Vue.createApp(vueApp).mount("#app");
+		var app = Vue.createApp(vueApp).mount("#app");
 	</script>
 }
