@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Accommodation>
 
 <div id="app">
+    <button @@click="loadProducts()">按我</button>
+
 <table id="imgTable">
     <thead>
         <tr>
@@ -21,7 +23,7 @@
                                 <div class="row g-0">
                                     <div class="row g-0">
                                         <div class="col-md-4">
-                                            <img class="card-img card-img-left" src="~/AccomodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
+                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
                                         </div>
                                         <div class="col-md-8">
                                             <div class="card-body">
@@ -60,7 +62,6 @@
 </table>
 <hr />
 
-
 	<label>國家：{{Country}}</label>
 	<select asp-items="@ViewBag.Country" v-model="Country"></select>
 
@@ -75,6 +76,8 @@
 @section Scripts{
 	<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
 	<script>
+        console.log();
+
 		var vueApp={
 			data(){
 				return{
@@ -82,22 +85,21 @@
                     keyword:"",
                     products:[],
                     totalPages:1,
-                    thePage = 1,
+                    // thePage = 1,
 				}
 			},
-            mounted:(()=>{
-                loadProduscts();
-            });
             methods:{
-                loadProduscts:async ()=>{
-                   const response =  await fetch(`https://localhost:7251/api/GetAccommodations?keyword=${keyword.value}&page=${thePage.value}&pageSize=3`);
+                loadProducts:async ()=>{
+                   const response =  await fetch(`https://localhost:7251/api/Accommodations?page=1&pageSize=3`);
                    const datas = await response.json();
-                   products.value = datas.products;
-                   console.log(products.value);
-                   totalPages.value = datas.totalPages;
+                   // products.value = datas.products;
+                    console.log(datas);
+                    console.log(datas.TotalPages);
+                   // totalPages.value = datas.totalPages;
                 }
-            }
+            },
+            
 		}
-		var app =Vue.createApp(vueApp).mount("#app");
+		var app = Vue.createApp(vueApp).mount("#app");
 	</script>
 }
