@@ -155,7 +155,7 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto,  int value)
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, int value)
         {
             MemberImage img = new MemberImage();
             if (ModelState.IsValid)
@@ -226,6 +226,41 @@ namespace RouteMasterFrontend.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                 authProperties);
+
+            var memberid = _context.Members.Where(m => m.Account == vm.Account).FirstOrDefault()?.Id;
+            if (memberid != null)
+            {
+                var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                if (cart != null)
+                {
+                    int cartId = cart.Id;
+
+                   
+                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(2)
+                    });
+                }
+                else
+                {
+                    var newCart = new Cart
+                    {
+                        MemberId = memberid.Value
+                    };
+
+                    _context.Carts.Add(newCart);
+                    _context.SaveChanges();
+
+                    int cartId = newCart.Id;
+
+                  
+                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(2)
+                    });
+                }
+                
+            }
 
             return RedirectToAction("MyMemberIndex", "Members");
         }
@@ -424,7 +459,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     new Claim(ClaimTypes.Name, member.Account);
                     new Claim("LastName", member.LastName);
-                    
+                    new Claim("Id", member.Id.ToString());
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));

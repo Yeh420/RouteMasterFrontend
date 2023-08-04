@@ -6,6 +6,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 {
 	public class Comments_AccommodationIndexVM
 	{
+
 		public int Id { get; set; }
 
 		[Display(Name = "用戶帳號")]
@@ -30,13 +31,14 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Accommodations
 		[DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
 		public DateTime CreateDate { get; set; }
 
-        public string Status { get; set; }	
+		public string Status { get; set; }
+			
+		public string? ReplyMessage { get; set; }
 
-        public string? ReplyMesssage { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        public DateTime? ReplyDate { get; set; }
 
-        public DateTime? ReplyDate { get; set; }	
-
-        public IEnumerable<Comments_AccommodationImage>? ImageList { get; set; }
+		public IEnumerable<Comments_AccommodationImage>? ImageList { get; set; }
 
 
 	}

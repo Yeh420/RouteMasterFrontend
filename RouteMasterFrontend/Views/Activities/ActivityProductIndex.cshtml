@@ -58,8 +58,42 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>"
             </td>
         </tr>
 }
     </tbody>
 </table>
+<script>
+    function addToCart(activitiesId){
+        $.ajax({
+            url:'Carts/AddActivitiesDetail2Cart',
+            type:'Post',
+            data: { activitiesId: activitiesId },
+            success:function(response){
+                if(response.success){
+                    alert(response.message)
+                    reloadCartItems();
+                }
+            },
+            error:function(){
+                alert('An error occured while adding to cart.')';
+            }
+        })
+
+    
+    }
+    function reloadCartItems(){
+        $.ajax({
+            url:'/Carts/RefreshCart',
+            type:'Get',
+            success:function(data){
+                $('#Cart').html(data);
+            },
+            error:function(){
+                alert('Failed to reload cart items.')
+            }
+
+        })
+    }
+</script>

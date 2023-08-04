@@ -36,7 +36,7 @@
 
 
 
-<h1>購物車</h1>
+
 
 <div class="container">
     <div id="accordion">
@@ -44,17 +44,25 @@
             <div class="card-header" id="headingOne">
                 <h5 class="mb-0">
                     <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        服務訂單明細
+                       購物車明細
                     </button>
                 </h5>
             </div>
             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
                 <div class="card-body">
-                    @await Component.InvokeAsync("Cart_Ext", new { cartid = 23 })
+                    @await Component.InvokeAsync("Cart_Ext", new { ViewBag.CartId })
+                    @await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })
+                    @await Component.InvokeAsync("AccomodationDetails", new {ViewBag.CartId })
                 </div>
             </div>
         </div>
-        <div class="card">
+        <br />
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
+                <i class="fas fa-shopping-cart"></i>前往結帳
+            </button>
+        </div>
+       @* <div class="card">
             <div class="card-header" id="headingTwo">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -81,7 +89,7 @@
                     @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
                 </div>
             </div>
-        </div>
+        </div>*@
     </div>
 </div>
 

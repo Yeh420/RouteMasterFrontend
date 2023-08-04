@@ -68,31 +68,37 @@
                     <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
                 </label>
             </div>
-            <div class="form-group">
+            <div class="gorm-group"> 
+                <label asp-for="Image" class="control-label"></label>
+                <span asp-validation-for="Image" class="text-danger"></span>
+                <div class="form-check">
+                    <input type="file" name="facePhoto" multiple="multiple" accept="image/*" />
+                    <label class="form-check-label" for="flexRadioDefault1">
+                        Default radio
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" id="radioA" name="option" value="A">Option A<br>
+                    <label class="form-check-label" for="flexRadioDefault2">
+                        Default checked radio
+                    </label>
+                </div>
+
+            </div>
+          @*  <div class="form-group">
                 <label asp-for="Image" class="control-label"></label>
                 <span asp-validation-for="Image" class="text-danger"></span>
                 <input type="file" name="facePhoto" multiple="multiple" accept="image/*" />
+                <input type="hidden" id="imageNameInput" name="ImageName" value="" />              
+            </div>*@
+
+            <div id="divA" style="display: none;">
+                <h3>Div A Content</h3>
+                <li><img src="~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91.png" id="imageId" class="default-image imgs" alt="預設圖片 1" width="100" height="100" /></li>
+                <li><img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" /></li>
+                <li><img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" class="default-image imgs" alt="預設圖片 3" width="100" height="100" /></li>
             </div>
-            <div class="form-group">
-                <label>推薦大頭貼：</label>
-                <br />
-                <ul>
-                    <li><img src="~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91.png" class="default-image" alt="預設圖片 1" width="100" height="100" /></li>
-                    <li> <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" alt="預設圖片 2" width="100" height="100" onclick="showimg" /></li>
-                    <li><img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" alt="預設圖片 3" width="100" height="100" /></li>
-                    <li> <img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" alt="預設圖片 4" width="100" height="100" /></li>
-                    <li> <img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" alt="預設圖片 5" width="100" height="100" /></li>
-                    <li> <img src="~/SystemImages/9084525302b3452586f74a65145cb389.png" alt="預設圖片 6" width="100" height="100" onclick="showimg" /></li>
-                    <li><img src="~/SystemImages/ad1eddd31ad24334a5d3d1fed4356f0d.png" alt="預設圖片 7" width="100" height="100" /></li>
-                    <li><img src="~/SystemImages/c00e1205eb4e459eb9bc7fa2bdc94e00.png" alt="預設圖片 8" width="100" height="100" /></li>
-                    <li><img src="~/SystemImages/c447658e510242148b4a725840770885.png" alt="預設圖片 9" width="100" height="100" /></li>
-                    <li><img src="~/SystemImages/ff288dbbf8d3484ca88b6b086af3f2ac.png" alt="預設圖片 10" width="100" height="100" onclick="showimg" /></li>
-                </ul>
-            </div>
-
-            <input type="hidden" id="selectedDefaultImage" name="selectedDefaultImage" value="" />
-
-
+         
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
@@ -110,16 +116,23 @@
 </div>*@
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        // 在使用者點擊預設圖片時，將所選預設圖片的標識設置為隱藏欄位的值
-        $(document).ready(function () {
-            $(".imgs").each().click(function () {
-                var selectedImageSrc = $(this).attr("src");
-                $("#selectedDefaultImage").val(selectedImageSrc);
-            });
+        const radioA = document.getElementById("radioA");
+        const divA = document.getElementById("divA");
+
+        radioA.addEventListener("click", function () {
+            // Toggle the display style of Div A
+            divA.style.display = (divA.style.display === "none") ? "block" : "none";
+        });
+
+        $("#imageId").click(function () {
+            var src = $(this).attr('src');
+            var nameAr = src.split('/');
+            alert(nameAr[nameAr.length - 1]);
+
         });
     </script>
-
 }

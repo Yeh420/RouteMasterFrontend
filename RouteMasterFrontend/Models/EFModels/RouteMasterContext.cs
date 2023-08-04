@@ -1215,19 +1215,21 @@ namespace RouteMasterFrontend.EFModels
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberIndexVM>? MemberIndexVM { get; set; }
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberIndexVM>? MemberIndexVM { get; set; }
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberLoginVM>? MemberLoginVM { get; set; }
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberLoginVM>? MemberLoginVM { get; set; }
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM>? MemberRegisterVM { get; set; }
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM>? MemberRegisterVM { get; set; }
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM>? Comments_AccommodationCreateVM { get; set; }
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM>? Comments_AccommodationCreateVM { get; set; }
 
-        public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationIndexVM>? Comments_AccommodationIndexVM { get; set; }
 
-      
+        //public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationIndexVM>? Comments_AccommodationIndexVM { get; set; }
+
+
+
 
     }
 }

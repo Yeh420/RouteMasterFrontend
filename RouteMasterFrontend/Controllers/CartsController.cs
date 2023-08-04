@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +22,29 @@ namespace RouteMasterFrontend.Controllers
         {
             _context = context;
         }
-
+      
         // GET: Carts
         public async Task<IActionResult> Index()
         {
+            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
+
+            // 將讀取的值存入 ViewData
+            ViewData["CartId"] = cartIdFromCookie;
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-		public IActionResult Info()
+        [HttpGet]
+        public IActionResult IndexGET()
+        {
+            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
+
+            // 將讀取的值存入 ViewData
+            ViewData["CartId"] = cartIdFromCookie;
+
+            return View();
+        }
+
+        public IActionResult Info()
 		{
 			var customerAccount = User.Identity.Name;
 			int memberId = GetMemberIdByAccount(customerAccount);
@@ -51,23 +68,7 @@ namespace RouteMasterFrontend.Controllers
         //    return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
         
         //}
-		public Cart GetCartInfo(int memberId)
-		{
-			var cart = _context.Carts
-				.Include(c => c.Cart_ExtraServicesDetails)
-				.Include(c => c.Cart_ActivitiesDetails)
-				.Include(c => c.Cart_AccommodationDetails)
-				.Where(c => c.MemberId == memberId)
-				.FirstOrDefault();
-            if (cart == null)
-            {
-                cart = new Cart { MemberId = memberId };
-                _context.Carts.Add(cart);
-                _context.SaveChanges();
-            }
-            return cart;
-
-		}
+		
         public IActionResult ExtraServicesDetailsPartialView(int memberId)
         {
             var extraServicesDetails = _context.Cart_ExtraServicesDetails
@@ -123,16 +124,20 @@ namespace RouteMasterFrontend.Controllers
                     //    _context.SaveChanges();
                     //}
 
+
+
                     // 建立新的 CartItem
+                    var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["CartId"] ?? "0");
                     var cartItem = new Cart_ExtraServicesDetail
                     {
-                        CartId = 23,
+                        CartId = cartIdFromCookie,
                         ExtraServiceProductId = extraserviceId,
                         Quantity = 1
                     };
 
+
                     _context.Cart_ExtraServicesDetails.Add(cartItem);
-                    _context.SaveChanges();
+                    _context.SaveChanges(); 
 
                     // 加入購物車成功後回傳 JSON 物件
                     return Json(new { success = true, message = "Successfully added to cart." });
@@ -236,19 +241,12 @@ namespace RouteMasterFrontend.Controllers
 
 		
         }
-        private int GetCartId()
-        {
-           
-            var memberId = GetMemberIdByAccount(User.Identity.Name);
-            var cart = GetCartInfo(memberId);
-
-            return cart.Id;
-        }
+      
        
 
         public IActionResult RefreshCart(int memberId)
         {
-
+           
 
             //ViewData["CartId"] = _context.Carts.Where(s => s.MemberId == memberId).First().Id;
             return ViewComponent("CartPartial");
@@ -263,23 +261,96 @@ namespace RouteMasterFrontend.Controllers
 
         //    return View();
         //}
+        [HttpGet]
+        public ActionResult Checkout()
+        {
+            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+            if (memberId == null)
+            {
+                // Handle the case where member is not found
+                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+            }
 
-        //[HttpPost]
-        //public ActionResult Checkout(CheckOutVM vm)
-        //{
-        //    if (!ModelState.IsValid) return View(vm);
-        //    var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
-        //    var cart = GetCartInfo(memberId);
+            var cart = GetCartInfo(memberId.Value);
 
-        //    if (cart.AllowCheckout == false)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "購物車是空的,無法進行結帳");
-        //        return View(vm);
-        //    }
-        //    ProcessCheckout(memberId, vm);
-        //    return View("ConfirmCheckout");
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
 
-        //}
+            if (!allowCheckout)
+            {
+                ViewBag.ErrorMessage = "購物車是空的，無法進行結帳";
+            }
+
+            ViewBag.AllowCheckout = allowCheckout;
+            var cartItems = new List<object>();
+
+            if (cart.Cart_ExtraServicesDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_ExtraServicesDetails);
+            }
+
+            if (cart.Cart_ActivitiesDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_ActivitiesDetails);
+            }
+
+            if (cart.Cart_AccommodationDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_AccommodationDetails);
+            }
+
+            ViewBag.CartItems = cartItems;
+
+            return View(cartItems);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult CheckoutPost()
+        {
+            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+            if (memberId == null)
+            {
+                // Handle the case where member is not found
+                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+            }
+
+            var cart = GetCartInfo(memberId.Value);
+
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
+
+            if (!allowCheckout)
+            {
+                ModelState.AddModelError(string.Empty, "購物車是空的，無法進行結帳");
+                return View();
+            }
+
+            ProcessCheckout(memberId.Value); // 呼叫處理結帳的方法
+
+            return View("ConfirmCheckout");
+        }
+
+        private void ProcessCheckout(int memberId)
+        {
+            // 建立訂單主檔明細檔
+            CreateOrder(memberId);
+
+            // 清空購物車
+            EmptyCart(memberId);
+        }
+
+        private void CreateOrder(int memberId)
+        {
+            // 根據您的需求，實現建立訂單主檔和明細檔的邏輯
+            // 使用 memberId 和其他相關資訊建立訂單
+        }
+        private void EmptyCart(int memberId)
+        {
+            var cart = _context.Carts.FirstOrDefault(c => c.MemberId == memberId);
+            if (cart == null) return;
+
+            _context.Carts.Remove(cart);
+            _context.SaveChanges();
+        }
 
 
         public IActionResult AddAccomodation2Cart(int accomodationId)
@@ -315,10 +386,16 @@ namespace RouteMasterFrontend.Controllers
 		
             
         }
-        private int GetMemberIdByAccount(string customerAccount)
+        private int GetMemberIdByAccount(string Account)
 		{
-			var member = _context.Members
-				.Where(m => m.Account == customerAccount)
+
+            if (!User.Identity.IsAuthenticated)
+            {
+              
+                return -1;
+            }
+            var member = _context.Members
+				.Where(m => m.Account == Account)
 				.FirstOrDefault();
 			if (member != null)
 			{
@@ -329,8 +406,45 @@ namespace RouteMasterFrontend.Controllers
 				return -1;
 			}
 		}
-		// GET: Carts/Details/5
-		public async Task<IActionResult> Details(int? id)
+        private int GetCartId()
+        {
+            var userClaims = HttpContext.User.Claims;
+            var userAccountClaim = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+            if (userAccountClaim != null)
+            {
+                string userAccount = userAccountClaim.Value;
+
+                var memberId = GetMemberIdByAccount(userAccount);
+                var cart = GetCartInfo(memberId);
+
+                return cart.Id;
+            }
+
+          
+            return -1;
+        }
+
+        public Cart GetCartInfo(int memberId)
+        {
+            var cart = _context.Carts
+                .Include(c => c.Cart_ExtraServicesDetails)
+                .Include(c => c.Cart_ActivitiesDetails)
+                .Include(c => c.Cart_AccommodationDetails)
+                .Where(c => c.MemberId == memberId)
+                .FirstOrDefault();
+            if (cart == null)
+            {
+                cart = new Cart { MemberId = memberId };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+            return cart;
+
+        }
+        // GET: Carts/Details/5
+
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Carts == null)
             {
