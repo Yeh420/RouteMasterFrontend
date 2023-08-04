@@ -19,6 +19,28 @@
             @*<p>選到的選項value為:{{ selected }}</p>*@
         </div>
         <div v-for="item in indexVM" class="card mb-3">
+            <div class="modal " tabindex="-1" id="messageModal">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{item.hotelName}}的回覆</h5>
+                            <p>
+                                {{item.replyMessage}}
+                            </p>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                {{item.replyMessage}}
+                            </p>
+                            <div class="text-muted d-flex justify-content-end">{{item.replyDate}}</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="card-header">{{item.account}}</div>
@@ -33,6 +55,7 @@
                         <p class="card-text">缺點:{{item.cons}}</p>
                         <p class="card-text">{{item.score}}</p>
                         <p class="card-text">{{item.replyMessage}}</p>
+                        <p class="card-text">{{item.replyDate}}</p>
                         <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
                         <button type="button" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                             <i class="fa-regular fa-thumbs-up fa-lg"></i>
@@ -45,25 +68,7 @@
                                 <span class="visually-hidden"></span>
                             </span>
                         </button>
-                        <div class="modal " tabindex="-1" id="messageModal">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">{{item.hotelName}}的回覆</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>
-                                            {{item.replyMessage}}
-                                        </p>
-                                        <div class="text-muted d-flex justify-content-end">{{item.replyDate}}</div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -85,6 +90,8 @@
             data() {
                 return {
                     indexVM: [],
+                    item:{},
+                    imgVM:[],
                     selected: 0,
                     hotelId: 1 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                 }
@@ -107,23 +114,28 @@
                         _this.indexVM = response.data;
                         console.log(_this.indexVM);
                         for (let i = 0; i < _this.indexVM.length; i++) {
-                            let item = _this.indexVM[i];
+                           _this.item = _this.indexVM[i];
+                         
                         
                         }
 
                     }).catch(err => {
                         alert(err);
                     });
+                },
+                imgDisplay: function(){
+                let _this = this;
+                axios.get("https://localhost:7145/Comments_Accommodation/ImgSearch/?id=55").then(response => {
+                   _this.imgVM = response.data;
+                    console.log(_this.imgVM);
+                    //for(let j=0;j<_this.imgVM;J++){
+                    //    _this.img=_this.imgVM[j];
+                        
+                    //}
+                    }).catch(err=>{
+                        alert(err);
+                    });
                 }
-                //imgDisplay: function(){
-
-                //axios.get("https://localhost:7145/Comments_Accommodation/ImgSearch").then(response => {
-                //    var result = response.data;
-                //    console.log(result)
-                //    }).catch(err=>{
-                //        alert(err);
-                //    });
-                //}
 
 
             }

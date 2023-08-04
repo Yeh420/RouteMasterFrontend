@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +22,29 @@ namespace RouteMasterFrontend.Controllers
         {
             _context = context;
         }
-
+      
         // GET: Carts
         public async Task<IActionResult> Index()
         {
+            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
+
+            // 將讀取的值存入 ViewData
+            ViewData["CartId"] = cartIdFromCookie;
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-		public IActionResult Info()
+        [HttpGet]
+        public IActionResult IndexGET()
+        {
+            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
+
+            // 將讀取的值存入 ViewData
+            ViewData["CartId"] = cartIdFromCookie;
+
+            return View();
+        }
+
+        public IActionResult Info()
 		{
 			var customerAccount = User.Identity.Name;
 			int memberId = GetMemberIdByAccount(customerAccount);
@@ -51,23 +68,7 @@ namespace RouteMasterFrontend.Controllers
         //    return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
         
         //}
-		public Cart GetCartInfo(int memberId)
-		{
-			var cart = _context.Carts
-				.Include(c => c.Cart_ExtraServicesDetails)
-				.Include(c => c.Cart_ActivitiesDetails)
-				.Include(c => c.Cart_AccommodationDetails)
-				.Where(c => c.MemberId == memberId)
-				.FirstOrDefault();
-            if (cart == null)
-            {
-                cart = new Cart { MemberId = memberId };
-                _context.Carts.Add(cart);
-                _context.SaveChanges();
-            }
-            return cart;
-
-		}
+		
         public IActionResult ExtraServicesDetailsPartialView(int memberId)
         {
             var extraServicesDetails = _context.Cart_ExtraServicesDetails
@@ -123,16 +124,20 @@ namespace RouteMasterFrontend.Controllers
                     //    _context.SaveChanges();
                     //}
 
+
+
                     // 建立新的 CartItem
+                    var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["CartId"] ?? "0");
                     var cartItem = new Cart_ExtraServicesDetail
                     {
-                        CartId = 23,
+                        CartId = cartIdFromCookie,
                         ExtraServiceProductId = extraserviceId,
                         Quantity = 1
                     };
 
+
                     _context.Cart_ExtraServicesDetails.Add(cartItem);
-                    _context.SaveChanges();
+                    _context.SaveChanges(); 
 
                     // 加入購物車成功後回傳 JSON 物件
                     return Json(new { success = true, message = "Successfully added to cart." });
@@ -236,19 +241,12 @@ namespace RouteMasterFrontend.Controllers
 
 		
         }
-        private int GetCartId()
-        {
-           
-            var memberId = GetMemberIdByAccount(User.Identity.Name);
-            var cart = GetCartInfo(memberId);
-
-            return cart.Id;
-        }
+      
        
 
         public IActionResult RefreshCart(int memberId)
         {
-
+           
 
             //ViewData["CartId"] = _context.Carts.Where(s => s.MemberId == memberId).First().Id;
             return ViewComponent("CartPartial");
@@ -315,10 +313,16 @@ namespace RouteMasterFrontend.Controllers
 		
             
         }
-        private int GetMemberIdByAccount(string customerAccount)
+        private int GetMemberIdByAccount(string Account)
 		{
-			var member = _context.Members
-				.Where(m => m.Account == customerAccount)
+
+            if (!User.Identity.IsAuthenticated)
+            {
+              
+                return -1;
+            }
+            var member = _context.Members
+				.Where(m => m.Account == Account)
 				.FirstOrDefault();
 			if (member != null)
 			{
@@ -329,8 +333,45 @@ namespace RouteMasterFrontend.Controllers
 				return -1;
 			}
 		}
-		// GET: Carts/Details/5
-		public async Task<IActionResult> Details(int? id)
+        private int GetCartId()
+        {
+            var userClaims = HttpContext.User.Claims;
+            var userAccountClaim = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+            if (userAccountClaim != null)
+            {
+                string userAccount = userAccountClaim.Value;
+
+                var memberId = GetMemberIdByAccount(userAccount);
+                var cart = GetCartInfo(memberId);
+
+                return cart.Id;
+            }
+
+          
+            return -1;
+        }
+
+        public Cart GetCartInfo(int memberId)
+        {
+            var cart = _context.Carts
+                .Include(c => c.Cart_ExtraServicesDetails)
+                .Include(c => c.Cart_ActivitiesDetails)
+                .Include(c => c.Cart_AccommodationDetails)
+                .Where(c => c.MemberId == memberId)
+                .FirstOrDefault();
+            if (cart == null)
+            {
+                cart = new Cart { MemberId = memberId };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+            return cart;
+
+        }
+        // GET: Carts/Details/5
+
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Carts == null)
             {
