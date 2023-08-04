@@ -23,22 +23,47 @@
                 <div class="col-md-8">
                     <div class="card-header">{{item.account}}</div>
                     <div class="card-body">
-                        <h5 class="card-title">標題:{{item.title}}</h5>
+                        <div class="d-flex">
+                            <h5 class="card-title me-auto">標題:{{item.title}}</h5>
+                            <div>{{item.status}}</div>
+                        </div>
                         <p class="card-text">{{item.id}}</p>
                         <p class="card-text">{{item.hotelName}}</p>
                         <p class="card-text">優點:{{item.pros}}</p>
                         <p class="card-text">缺點:{{item.cons}}</p>
                         <p class="card-text">{{item.score}}</p>
+                        <p class="card-text">{{item.replyMessage}}</p>
                         <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
                         <button type="button" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                             <i class="fa-regular fa-thumbs-up fa-lg"></i>
                         </button>
-                        <button type="button" class="btn btn-secondary position-relative">
-                            回覆訊息
-                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                        <button type="button" class="btn btn-primary position-relative" data-bs-toggle="modal"
+                                data-bs-target="#messageModal">
+                            回覆通知
+                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle d-none"
+                                  id="dot">
                                 <span class="visually-hidden"></span>
                             </span>
                         </button>
+                        <div class="modal " tabindex="-1" id="messageModal">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{item.hotelName}}的回覆</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>
+                                            {{item.replyMessage}}
+                                        </p>
+                                        <div class="text-muted d-flex justify-content-end">{{item.replyDate}}</div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -67,6 +92,7 @@
             mounted: function () {
                 let _this = this;
                 _this.commentDisplay();
+                _this.imgDisplay();
 
 
             },
@@ -76,7 +102,7 @@
                     var request = {};
                     request.Manner = _this.selected;
                     request.HotelId = _this.hotelId;
-                    console.log(_this.selected);
+                    //console.log(_this.selected);
                     axios.post("https://localhost:7145/Comments_Accommodation/Index", request).then(response => {
                         _this.indexVM = response.data;
                         console.log(_this.indexVM);
@@ -86,6 +112,15 @@
                         }
 
                     }).catch(err => {
+                        alert(err);
+                    });
+                },
+                imgDisplay: function(){
+
+                fetch("https://localhost:7145/Comments_Accommodation/ImgSearch").then(response => {
+                    var result = response.json();
+                    console.log(result)
+                    }).catch(err=>{
                         alert(err);
                     });
                 }

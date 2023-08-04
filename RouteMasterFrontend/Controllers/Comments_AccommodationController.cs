@@ -29,7 +29,7 @@ namespace RouteMasterFrontend.Controllers
             var commentDb = _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
-                  //.Include(c=>c.Comments_AccommodationImages)
+                  .Include(c=>c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
                  
 
@@ -59,6 +59,14 @@ namespace RouteMasterFrontend.Controllers
             //};
             return Json(vm);
 		}
+
+        public IActionResult ImgSearch()
+        {
+            var img =  _context.Comments_AccommodationImages;
+         
+
+            return Json(img);
+        }
         public IActionResult PartialPage()  
         {
             return View();
@@ -122,7 +130,7 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 string webRootPath = _environment.WebRootPath;
-                string path = Path.Combine(webRootPath, "CommentsUploads");
+                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
 
                 foreach (IFormFile i in file1)
                 {

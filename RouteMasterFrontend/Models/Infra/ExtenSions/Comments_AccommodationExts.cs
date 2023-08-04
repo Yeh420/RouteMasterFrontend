@@ -13,7 +13,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 				CommentId = entity.Comments_AccommodationId,
 				Image = entity.Image,
 
-			};
+			};	
 		}
 
 		public static Comments_AccommodationIndexVM ToIndexVM(this Comments_Accommodation entity)
@@ -29,6 +29,9 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 				Cons = entity.Cons,
 				Title = entity.Title,
 				CreateDate = entity.CreateDate,
+				Status=entity.CommentStatus.Name,
+				ReplyMesssage=entity.Reply,
+				ReplyDate=entity.ReplyAt,
 				ImageList = entity.Comments_AccommodationImages.ToList()
 			};
 		}
