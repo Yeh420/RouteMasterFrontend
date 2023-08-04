@@ -2,12 +2,14 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RouteMasterFrontend.EFModels
 {
     public partial class Comments_AccommodationImage
     {
-        public int? Id { get; set; }
+       
+        public int Id { get; set; }
         public int Comments_AccommodationId { get; set; }
         public string Image { get; set; }
 

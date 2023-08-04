@@ -1,4 +1,21 @@
 ﻿
+<style>
+    .cart-icon-link {
+        display: inline-block;
+        font-size: 20px; /* 調整圖示大小 */
+        color: #333; /* 圖示顏色 */
+        text-decoration: none; /* 移除連結底線 */
+    }
+
+    .cart-icon {
+        font-size: 24px;
+    }
+
+    /* 購物車圖示懸停效果 */
+    .cart-icon-link:hover {
+        color: #007bff; /* 懸停時的顏色 */
+    }
+</style>
 
 @*<div class="dropdown">
     <a id="CartDropDown" class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -15,14 +32,32 @@
 
 
 
+@if (User.Identity.IsAuthenticated)
+{
+    
 
 
 <div class="dropdown">
-    <button id="cartOpen" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        購物車
-    </button>
-    <ul class="dropdown-menu">
-       @* <li>@await Component.InvokeAsync("ExtraServicesDetails", new { cartid = ViewBag.CartId })</li>*@
-        <li><a class="dropdown-item" href="#">結帳</a></li>
-    </ul>
+        <a id="cartOpen" class="cart-icon-link" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-shopping-cart cart-icon"></i>
+        </a>
+        <ul class="dropdown-menu">
+            @if (ViewBag.CartId == null)
+            {
+                <li>@await Component.InvokeAsync("EmptyCart")</li>
+            }
+            else
+            {
+                <li>@await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })</li>
+                <li>@await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })</li>
+                <li>@await Component.InvokeAsync("AccomodationDetails", new { ViewBag.CartId })</li>
+            }
+            <li>
+                <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Index'">
+                    <i class="fas fa-shopping-cart"></i> 查看購物車
+                </button>
+            </li>
+        </ul>
 </div>
+  
+}
