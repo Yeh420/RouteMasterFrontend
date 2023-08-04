@@ -55,6 +55,7 @@ namespace RouteMasterBackend.Controllers
             AccommodtaionsDTO accommodationsDTO = new AccommodtaionsDTO();
             accommodationsDTO.Items = await accommodations.Select(a => new AccommodtaionsDTOItem
             {
+                Id = a.Id,
                 Name = a.Name,
                 Description = a.Description,
                 Grade = a.Grade,
