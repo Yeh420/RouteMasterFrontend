@@ -156,7 +156,9 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
+
         public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
+
         {
             MemberImage img = new MemberImage();
             
