@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -267,8 +269,8 @@ namespace RouteMasterFrontend.Controllers
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
             if (memberId == null)
             {
-                // Handle the case where member is not found
-                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+                
+                return RedirectToAction("Index", "Home"); 
             }
 
             var cart = GetCartInfo(memberId.Value);
@@ -279,70 +281,163 @@ namespace RouteMasterFrontend.Controllers
             {
                 ViewBag.ErrorMessage = "購物車是空的，無法進行結帳";
             }
+            var member = _context.Members.FirstOrDefault(m => m.Id == memberId.Value);
 
-            ViewBag.AllowCheckout = allowCheckout;
-            var cartItems = new List<object>();
-
-            if (cart.Cart_ExtraServicesDetails != null)
+            if (member != null)
             {
-                cartItems.AddRange(cart.Cart_ExtraServicesDetails);
+                ViewBag.MemberFirstName = member.FirstName;
+                ViewBag.MemberLastName = member.LastName;
+                ViewBag.CellPhoneNumber = member.CellPhoneNumber;
+                ViewBag.Address = member.Address;
             }
 
-            if (cart.Cart_ActivitiesDetails != null)
-            {
-                cartItems.AddRange(cart.Cart_ActivitiesDetails);
-            }
+            ViewBag.PaymentMethods = _context.PaymentMethods.ToList();
+            List<Cart> cartList = new List<Cart> { cart };
 
-            if (cart.Cart_AccommodationDetails != null)
-            {
-                cartItems.AddRange(cart.Cart_AccommodationDetails);
-            }
-
-            ViewBag.CartItems = cartItems;
-
-            return View(cartItems);
+            return View(cartList);
         }
 
-        [Authorize]
+     
         [HttpPost]
-        public ActionResult CheckoutPost()
+        public ActionResult CheckoutPost(string paymentmethod, string name, string telephone, string address)
         {
-            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
             if (memberId == null)
             {
-                // Handle the case where member is not found
-                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+                return RedirectToAction("Index", "Home");
             }
-
-            var cart = GetCartInfo(memberId.Value);
-
+            var cart = GetCartInfo(memberId);
             bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
 
             if (!allowCheckout)
             {
                 ModelState.AddModelError(string.Empty, "購物車是空的，無法進行結帳");
-                return View();
+                return View("Checkout");
             }
-
-            ProcessCheckout(memberId.Value); // 呼叫處理結帳的方法
+            ProcessCheckout(memberId);
 
             return View("ConfirmCheckout");
         }
 
         private void ProcessCheckout(int memberId)
         {
-            // 建立訂單主檔明細檔
-            CreateOrder(memberId);
+            var cart = GetCartInfo(memberId);
 
-            // 清空購物車
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() ||
+                                 cart.Cart_ActivitiesDetails.Any() ||
+                                 cart.Cart_AccommodationDetails.Any();
+
+            if (!allowCheckout)
+            {
+                // 購物車是空的，無法進行結帳，進行相應處理
+                return;
+            }
+
+            // 創建新訂單
+            CreateOrder(memberId, cart);
+
             EmptyCart(memberId);
+
         }
 
-        private void CreateOrder(int memberId)
-        {
-            // 根據您的需求，實現建立訂單主檔和明細檔的邏輯
-            // 使用 memberId 和其他相關資訊建立訂單
-        }
+        //private void CreateOrder(int memberId, Cart cart)
+        //{
+        //    var order = new Order
+        //    {
+        //        MemberId = memberId,
+        //        TravelPlanId = cart..TravelPlanId
+        //        Total = cart.Total,
+        //        CreateDate = DateTime.Now,
+                
+        //    };
+        //}
+
+        //public void CreateOrder(int memberId, int travelPlanId, int paymentMethodId, int couponsId, List<ord> accommodationItems, List<ActivityOrderItem> activityItems, List<ExtraServiceOrderItem> extraServiceItems)
+        //{
+
+        //        var order = new Order
+        //        {
+        //            MemberId = memberId,
+        //            TravelPlanId = travelPlanId,
+        //            PaymentMethodId = paymentMethodId,
+        //            PaymentStatusId = initialPaymentStatusId, // Set the initial payment status ID
+        //            OrderHandleStatusId = initialHandleStatusId, // Set the initial handle status ID
+        //            CouponsId = couponsId,
+        //            CreateDate = DateTime.Now,
+        //            ModifiedDate = null, // Set this as needed
+        //            Total = CalculateTotal(accommodationItems, activityItems, extraServiceItems)
+        //        };
+
+        //        _context.Orders.Add(order);
+        //        _context.SaveChanges();
+
+        //        int orderId = order.Id;
+
+        //        foreach (var accommodationItem in accommodationItems)
+        //        {
+        //            var accommodationDetail = new OrderAccommodationDetail
+        //            {
+        //                OrderId = orderId,
+        //                AccommodationId = accommodationItem.AccommodationId,
+        //                AccommodationName = accommodationItem.AccommodationName,
+        //                RoomProductId = accommodationItem.RoomProductId,
+        //                RoomType = accommodationItem.RoomType,
+        //                RoomName = accommodationItem.RoomName,
+        //                CheckIn = accommodationItem.CheckIn,
+        //                CheckOut = accommodationItem.CheckOut,
+        //                RoomPrice = accommodationItem.RoomPrice,
+        //                Quantity = accommodationItem.Quantity,
+        //                Note = accommodationItem.Note
+        //            };
+
+        //           _context.OrderAccommodationDetails.Add(accommodationDetail);
+        //        }
+
+        //        foreach (var activityItem in activityItems)
+        //        {
+        //            var activityDetail = new OrderActivitiesDetail
+        //            {
+        //                OrderId = orderId,
+        //                ActivityId = activityItem.ActivityId,
+        //                ActivityName = activityItem.ActivityName,
+        //                ActivityProductId = activityItem.ActivityProductId,
+        //                Date = activityItem.Date,
+        //                StartTime = activityItem.StartTime,
+        //                EndTime = activityItem.EndTime,
+        //                Price = activityItem.Price,
+        //                Quantity = activityItem.Quantity
+        //            };
+
+        //        _context.OrderActivitiesDetails.Add(activityDetail);
+        //        }
+
+        //        foreach (var extraServiceItem in extraServiceItems)
+        //        {
+        //            var extraServiceDetail = new OrderExtraServicesDetail
+        //            {
+        //                OrderId = orderId,
+        //                ExtraServiceId = extraServiceItem.ExtraServiceId,
+        //                ExtraServiceName = extraServiceItem.ExtraServiceName,
+        //                ExtraServiceProductId = extraServiceItem.ExtraServiceProductId,
+        //                Date = extraServiceItem.Date,
+        //                Price = extraServiceItem.Price,
+        //                Quantity = extraServiceItem.Quantity
+        //            };
+
+        //        _context.OrderExtraServicesDetails.Add(extraServiceDetail);
+        //        }
+
+        //        _context.SaveChanges();
+
+        //}
+
+        //private int CalculateTotal(List<AccommodationOrderItem> accommodationItems, List<ActivityOrderItem> activityItems, List<ExtraServiceOrderItem> extraServiceItems)
+        //{
+        //    // Calculate and return the total amount based on the items in the order
+        //    // You need to implement the logic for calculating the total based on your requirements
+        //}
+
+
         private void EmptyCart(int memberId)
         {
             var cart = _context.Carts.FirstOrDefault(c => c.MemberId == memberId);
