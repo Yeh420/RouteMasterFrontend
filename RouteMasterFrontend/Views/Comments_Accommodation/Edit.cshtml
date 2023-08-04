@@ -1,0 +1,79 @@
+﻿@model RouteMasterFrontend.EFModels.Comments_Accommodation
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Comments_Accommodation</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MemberId" class="control-label"></label>
+                <select asp-for="MemberId" class="form-control" asp-items="ViewBag.MemberId"></select>
+                <span asp-validation-for="MemberId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccommodationId" class="control-label"></label>
+                <select asp-for="AccommodationId" class="form-control" asp-items="ViewBag.AccommodationId"></select>
+                <span asp-validation-for="AccommodationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Score" class="control-label"></label>
+                <input asp-for="Score" class="form-control" />
+                <span asp-validation-for="Score" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pros" class="control-label"></label>
+                <input asp-for="Pros" class="form-control" />
+                <span asp-validation-for="Pros" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cons" class="control-label"></label>
+                <input asp-for="Cons" class="form-control" />
+                <span asp-validation-for="Cons" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreateDate" class="control-label"></label>
+                <input asp-for="CreateDate" class="form-control" />
+                <span asp-validation-for="CreateDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CommentStatusId" class="control-label"></label>
+                <select asp-for="CommentStatusId" class="form-control" asp-items="ViewBag.CommentStatusId"></select>
+                <span asp-validation-for="CommentStatusId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Reply" class="control-label"></label>
+                <input asp-for="Reply" class="form-control" />
+                <span asp-validation-for="Reply" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReplyAt" class="control-label"></label>
+                <input asp-for="ReplyAt" class="form-control" />
+                <span asp-validation-for="ReplyAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

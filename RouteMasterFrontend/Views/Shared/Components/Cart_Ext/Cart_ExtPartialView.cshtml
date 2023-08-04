@@ -1,0 +1,107 @@
+﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart_ExtraServicesDetail>
+@section style{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+   @* <title>My Razor View</title>*@
+    <script src="https://kit.fontawesome.com/c3bf7d3bbb.js" crossorigin="anonymous"></script>
+</head>
+
+@*<p>
+    <a asp-action="Create">Create New</a>
+</p>*@
+<div class="partial-view-container">
+<table class="table" id="cartTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraServiceProduct)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraServiceProduct.ExtraService.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraServiceProduct.Date)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraServiceProduct.Price)
+            </th>
+          @*  <th>
+                @Html.DisplayNameFor(model => model.Cart)
+            </th>*@
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr data-extraserviceid="@item.Id">
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Description)
+            </td>   
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Date)
+            </td>
+
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Price)
+            </td>
+           @* <td>
+                @Html.DisplayFor(modelItem => item.Cart.Id)
+            </td>*@
+         @*   <td>
+                <a href="#" onclick="removeFromCart1(@item.Id)">
+                    <i class="fas fa-trash-can"></i>
+                </a>
+            </td>*@
+                  
+
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    //function removeFromCart1(extraserviceId) {
+    //    // 發送 AJAX 請求
+    //    $.ajax({
+    //        url: '/Carts/RemoveExtraServiceFromCart',
+    //        type: 'POST',
+    //        data: { extraserviceId: extraserviceId },
+    //        success: function (result) {
+    //            if (result.success) {
+    //                // 成功刪除時的處理
+    //                alert(result.message);
+    //                console.log("123")
+    //                // 更新購物車內容的表格
+    //                $('#cartTable').find('tr[data-extraserviceid="' + result.extraserviceId + '"]').remove();
+                  
+    //            } else {
+    //                // 失敗時的處理
+    //                alert(result.message);
+    //            }
+    //        },
+    //        error: function () {
+    //            // 發生錯誤時的處理
+    //            alert('發生錯誤，無法刪除項目。');
+    //        }
+    //    });
+    //}
+    
+</script>

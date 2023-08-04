@@ -1,0 +1,121 @@
+﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
+<head>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+@{
+    ViewData["Title"] = "Index";
+}
+
+    <style>
+        .container {
+            width: 100%;
+
+    }
+    /*    .partial-view-container {
+           /* display: inline-block; */
+            width: 900px; 
+            height: 100px;
+            margin: 10px; 
+            text-align: center; 
+             flex: 1;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: row;    
+            flex-wrap: wrap;
+          
+        }
+*/
+   
+    </style>
+
+
+
+
+
+
+<div class="container">
+    <div id="accordion">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                       購物車明細
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+                <div class="card-body">
+                    @await Component.InvokeAsync("Cart_Ext", new { ViewBag.CartId })
+                    @await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })
+                    @await Component.InvokeAsync("AccomodationDetails", new {ViewBag.CartId })
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
+                <i class="fas fa-shopping-cart"></i>前往結帳
+            </button>
+        </div>
+       @* <div class="card">
+            <div class="card-header" id="headingTwo">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                       活動訂單明細
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" >
+                <div class="card-body">
+                    @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingThree">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                       住宿訂單明細
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" >
+                <div class="card-body">
+                    @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
+                </div>
+            </div>
+        </div>*@
+    </div>
+</div>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+
+@*<p>
+    <a asp-action="Create">Create New</a>
+</p>
+```
+
+    </tbody>
+</table>*@
+
+@*<div class="container">
+    <div class="flex-container">    
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("Cart_Ext", new { cartid = 23 })
+        </div>
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
+        </div>
+     
+        <div class="partial-view-container">
+            @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
+        </div>
+    </div>
+</div>*@
