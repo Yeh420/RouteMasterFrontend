@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Dto;
+using RouteMasterFrontend.Models.Infra.ExtenSions;
 using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
+using static Dapper.SqlMapper;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -21,13 +24,47 @@ namespace RouteMasterFrontend.Controllers
         }
 
         // GET: Comments_Accommodation
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult<IEnumerable<Comments_AccommodationIndexVM>>> Index([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var routeMasterContext = _context.Comments_Accommodations.Include(c => c.Accommodation).Include(c => c.CommentStatus).Include(c => c.Member);
-            return View(await routeMasterContext.ToListAsync());
+            var commentDb = _context.Comments_Accommodations
+                  .Include(c => c.Member)
+                  .Include(c => c.Accommodation)
+                  .Include(c=>c.CommentStatus)
+                  .Where(c => c.AccommodationId == input.HotelId);
+                 
+
+			switch (input.Manner)
+			{
+				case 0:
+					commentDb = commentDb.OrderBy(c => c.Id);
+					break;
+				case 1:
+					commentDb = commentDb.OrderByDescending(c => c.CreateDate);
+					break;
+				case 2:
+					commentDb = commentDb.OrderByDescending(c => c.Score);
+					break;
+				case 3:
+					commentDb = commentDb.OrderBy(c => c.Score);
+					break;
+			}
+            //commentDb.ToListAsync().Wait();
+           
+
+            var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
+         
+            //for (var i = 0; i < v.Count; i++)
+            //{
+            //    v[i].ImageList = commentDb.ToList()[i].Comments_AccommodationImages;
+            //};
+            return Json(vm);
+		}
+        public IActionResult PartialPage()  
+        {
+            return View();
         }
 
-        // GET: Comments_Accommodation/Details/5
+        // GET: Comments_Accommodation/Details/5    
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Comments_Accommodations == null)
@@ -51,7 +88,7 @@ namespace RouteMasterFrontend.Controllers
         // GET: Comments_Accommodation/Create
         public IActionResult Create()
         {
-           ViewBag.AccommodationId = new SelectList(_context.Accommodations, "Id", "Name");
+            ViewBag.AccommodationId = new SelectList(_context.Accommodations, "Id", "Name");
             //ViewData["CommentStatusId"] = new SelectList(_context.CommentStatuses, "Id", "Name");
             ViewBag.MemberId = new SelectList(_context.Members, "Id", "Account");
             return View();
@@ -71,7 +108,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 Comments_Accommodation commentDb = new Comments_Accommodation
                 {
-                    AccommodationId = vm.AccommodationId,
+                    AccommodationId = 1,//vm.AccommodationId,
                     MemberId = vm.MemberId,
                     Score = vm.Score,
                     Title = vm.Title,
@@ -82,27 +119,26 @@ namespace RouteMasterFrontend.Controllers
                 };
 
                 _context.Comments_Accommodations.Add(commentDb);
-                //await _context.SaveChangesAsync();
-
-
-
-                //string webRootPath=_environment.WebRootPath;
-                //string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
-
-                //foreach(IFormFile i in file1)
-                //{
-                //    if(i != null && i.Length > 0)
-                //    {
-                //        Comments_AccommodationImage img = new Comments_AccommodationImage();
-                //        string fileName = SaveUploadedFile(path, i);
-                //        img.Comments_AccommodationId = commentDb.Id;
-                //        img.Image = fileName;
-                //        _context.Comments_AccommodationImages.Add(img);
-                      
-                //    }
-                //}
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                string webRootPath = _environment.WebRootPath;
+                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
+
+                foreach (IFormFile i in file1)
+                {
+                    if (i != null && i.Length > 0)
+                    {
+                        Comments_AccommodationImage img = new Comments_AccommodationImage();
+                        string fileName = SaveUploadedFile(path, i);
+                        img.Comments_AccommodationId = commentDb.Id;
+                        img.Image = fileName;
+                        _context.Comments_AccommodationImages.Add(img);
+
+                    }
+                }
+                await _context.SaveChangesAsync();
+                //return RedirectToAction(nameof(PartialPage));
+                return RedirectToAction("MemberLogin", "Members");
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);

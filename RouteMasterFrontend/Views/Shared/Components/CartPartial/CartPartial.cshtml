@@ -1,0 +1,28 @@
+﻿
+
+@*<div class="dropdown">
+    <a id="CartDropDown" class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span>購物車</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="CartDropDown">
+        <li id="cartItemsContainer">
+            <div class="partial-view-container">
+                @await Component.InvokeAsync("ExtraServicesDetails", new { cartid = 1 })
+            </div>
+        </li>
+    </ul>
+</div>*@
+
+
+
+
+
+<div class="dropdown">
+    <button id="cartOpen" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        購物車
+    </button>
+    <ul class="dropdown-menu">
+       @* <li>@await Component.InvokeAsync("ExtraServicesDetails", new { cartid = ViewBag.CartId })</li>*@
+        <li><a class="dropdown-item" href="#">結帳</a></li>
+    </ul>
+</div>

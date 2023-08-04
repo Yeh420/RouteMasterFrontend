@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - RouteMasterFrontend</title>
-	<link href="~/css/font-awesome.css" rel="stylesheet" />
-	<link href="~/css/owl-carousel.css" rel="stylesheet" />
-	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
+
+    <title>@ViewData["Title"] - RouteMasterFrontend</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/font-awesome.css" rel="stylesheet" />
+    <link href="~/css/owl-carousel.css" rel="stylesheet" />
+    <link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
+
     <style>
         .header-area .main-nav .logo {
             display: flex;
@@ -50,9 +53,9 @@
             </div>
         </div>
     </div>
-  
+
     <!-- ***** Pre HEader End ***** -->
-    <header class ="header-area header-sticky">
+    <header class="header-area header-sticky">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -68,14 +71,16 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="Index">評論</a></li>
+
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
+
                             @{
                                 if (User.Identity.IsAuthenticated)
                                 {
                                     <li>
-                                       <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
                                     </li>
-                                    <li >
+                                    <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
                                     </li>
                                 }
@@ -86,6 +91,9 @@
                                     </li>
                                 }
                             }
+                            <li id="Cart">                               
+                                @await Component.InvokeAsync("CartPartial",new {id=2})
+                            </li>
 
                         </ul>
                         <a class='menu-trigger'>
@@ -97,60 +105,61 @@
             </div>
         </div>
         @*<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RouteMasterFrontend</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a>
-                        </li>
-						<li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="ActivityProductIndex">活動商品</a>
-						</li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a>
-						</li>
-						<li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServiceProductsIndex" asp-action="Index">服務</a>
-						</li>
-                        @{
-                            if (User.Identity.IsAuthenticated)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
-                                </li>
-                            }
-                            else{
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
-                                </li>
-                            }
-                        }
-                        
+        <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RouteMasterFrontend</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="ActivityProductIndex">活動商品</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServiceProductsIndex" asp-action="Index">服務</a>
+        </li>
+        @{
+        if (User.Identity.IsAuthenticated)
+        {
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
+        </li>
+        }
+        else{
+        <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
+        </li>
+        }
+        }
 
-                    </ul>
-                </div>
-            </div>
+
+        </ul>
+        </div>
+        </div>
         </nav>*@
     </header>
-    <div class="container-fluid" style="padding:0px;" >
-        <main role="main" class="" style="margin:0px;">
-            @RenderBody()
-        </main>
-    </div>
+    <div class="container">
+        <dvi class="row">
+          @RenderBody()
+        </dvi>
+    </div> 
+
     <!-- *** Footer *** -->
     <footer>
         <div class="container">
@@ -165,7 +174,7 @@
                     <div class="links">
                         <h4>Useful Links</h4>
                         <ul>
-                            <li><a href="#">Info</a></li> 
+                            <li><a href="#">Info</a></li>
                             <li><a href="#">Guides</a></li>
                             <li><a href="#">Videos</a></li>
                             <li><a href="#">Outreach</a></li>
@@ -186,7 +195,6 @@
                     <div class="under-footer">
                         <div class="row">
                             <div class="col-lg-6 col-sm-6">
-                          
                             </div>
                             <div class="col-lg-6 col-sm-6">
                                 <p class="copyright">
@@ -200,7 +208,7 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="sub-footer">
-                        <div class="row">js/bootstrap.min.js.map
+                        <div class="row">
                             <div class="col-lg-3">
                                 <div class="logo"><span>Route<em>Master</em></span></div>
                             </div>
@@ -246,7 +254,7 @@
     <!-- Global Init -->
     <script src="~/js/custom.js"></script>
     <script>
-       
+
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
