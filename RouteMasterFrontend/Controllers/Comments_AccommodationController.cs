@@ -60,13 +60,15 @@ namespace RouteMasterFrontend.Controllers
             return Json(vm);
 		}
 
-        //public IActionResult ImgSearch()
-        //{
-        //    var img = _context.Comments_AccommodationImages;
-         
+        public IActionResult ImgSearch(int id)
+        {
+            var img = _context.Comments_AccommodationImages
+                .Where(i => i.Comments_AccommodationId == id)
+                .Select(c => c.Image);
 
-        //    return Json(img);
-        //}
+
+            return Json(img);
+        }
         public IActionResult PartialPage()  
         {
             return View();
