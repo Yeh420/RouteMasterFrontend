@@ -5,6 +5,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 {
 	public static class Comments_AccommodationExts
 	{
+
 		//public static Comments_AccommodationIndexImgVM ToImgList(this Comments_AccommodationImage entity)
 		//{
 		//	return new Comments_AccommodationIndexImgVM
@@ -12,6 +13,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 		//		Id = entity.Id,
 		//		CommentId = entity.Comments_AccommodationId,
 		//		Image = entity.Image,
+
 
 		//	};	
 		//}
