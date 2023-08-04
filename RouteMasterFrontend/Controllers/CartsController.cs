@@ -261,23 +261,96 @@ namespace RouteMasterFrontend.Controllers
 
         //    return View();
         //}
+        [HttpGet]
+        public ActionResult Checkout()
+        {
+            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+            if (memberId == null)
+            {
+                // Handle the case where member is not found
+                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+            }
 
-        //[HttpPost]
-        //public ActionResult Checkout(CheckOutVM vm)
-        //{
-        //    if (!ModelState.IsValid) return View(vm);
-        //    var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
-        //    var cart = GetCartInfo(memberId);
+            var cart = GetCartInfo(memberId.Value);
 
-        //    if (cart.AllowCheckout == false)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "購物車是空的,無法進行結帳");
-        //        return View(vm);
-        //    }
-        //    ProcessCheckout(memberId, vm);
-        //    return View("ConfirmCheckout");
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
 
-        //}
+            if (!allowCheckout)
+            {
+                ViewBag.ErrorMessage = "購物車是空的，無法進行結帳";
+            }
+
+            ViewBag.AllowCheckout = allowCheckout;
+            var cartItems = new List<object>();
+
+            if (cart.Cart_ExtraServicesDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_ExtraServicesDetails);
+            }
+
+            if (cart.Cart_ActivitiesDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_ActivitiesDetails);
+            }
+
+            if (cart.Cart_AccommodationDetails != null)
+            {
+                cartItems.AddRange(cart.Cart_AccommodationDetails);
+            }
+
+            ViewBag.CartItems = cartItems;
+
+            return View(cartItems);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult CheckoutPost()
+        {
+            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+            if (memberId == null)
+            {
+                // Handle the case where member is not found
+                return RedirectToAction("Index", "Home"); // Redirect to a suitable action
+            }
+
+            var cart = GetCartInfo(memberId.Value);
+
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
+
+            if (!allowCheckout)
+            {
+                ModelState.AddModelError(string.Empty, "購物車是空的，無法進行結帳");
+                return View();
+            }
+
+            ProcessCheckout(memberId.Value); // 呼叫處理結帳的方法
+
+            return View("ConfirmCheckout");
+        }
+
+        private void ProcessCheckout(int memberId)
+        {
+            // 建立訂單主檔明細檔
+            CreateOrder(memberId);
+
+            // 清空購物車
+            EmptyCart(memberId);
+        }
+
+        private void CreateOrder(int memberId)
+        {
+            // 根據您的需求，實現建立訂單主檔和明細檔的邏輯
+            // 使用 memberId 和其他相關資訊建立訂單
+        }
+        private void EmptyCart(int memberId)
+        {
+            var cart = _context.Carts.FirstOrDefault(c => c.MemberId == memberId);
+            if (cart == null) return;
+
+            _context.Carts.Remove(cart);
+            _context.SaveChanges();
+        }
 
 
         public IActionResult AddAccomodation2Cart(int accomodationId)

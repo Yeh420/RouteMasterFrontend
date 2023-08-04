@@ -92,6 +92,7 @@
             mounted: function () {
                 let _this = this;
                 _this.commentDisplay();
+                _this.imgDisplay();
 
 
             },
@@ -114,6 +115,15 @@
                         alert(err);
                     });
                 }
+                //imgDisplay: function(){
+
+                //axios.get("https://localhost:7145/Comments_Accommodation/ImgSearch").then(response => {
+                //    var result = response.data;
+                //    console.log(result)
+                //    }).catch(err=>{
+                //        alert(err);
+                //    });
+                //}
 
 
             }
