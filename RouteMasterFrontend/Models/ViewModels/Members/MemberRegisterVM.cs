@@ -67,7 +67,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "大頭貼")]
-		//[Required]
+		
 		public string? Image { get; set; }
 
 

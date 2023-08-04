@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using System.Security.Principal;
 using System.Runtime.Intrinsics.X86;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -155,9 +156,10 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto, int value)
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
         {
             MemberImage img = new MemberImage();
+            
             if (ModelState.IsValid)
             {
                 if (facePhoto != null && facePhoto.Length > 0)
@@ -168,18 +170,26 @@ namespace RouteMasterFrontend.Controllers
                     img.Name = "未命名";
                     vm.Image = fileName;
                 }
+                else
+                {
+                    string newFileName = vm.Image;
+                    img.Image = newFileName;
+                    img.Name = "未命名";
+                    vm.Image = newFileName;
+                }
             }
             else
             {
                 return View(vm);
             }
+           
 
 
             Result result = RegisterMember(vm, img);
 
             if (result.IsSuccess)
             {
-                return View("MyMemberIndex");
+                return View("MemberLogin");
             }
             else
             {
@@ -496,12 +506,15 @@ namespace RouteMasterFrontend.Controllers
             }
             string newFileName = Guid.NewGuid().ToString("N") + ext;
             string fullName = Path.Combine(filePath, newFileName);
+
             using (var fileStream = new FileStream(fullName, FileMode.Create))
             {
                 file.CopyTo(fileStream);
             }
             return newFileName;
         }
+
+
 
         //會員是否存在
         private bool MemberExists(int id)
