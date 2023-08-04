@@ -9,7 +9,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
 		{
 			return new Comments_AccommodationIndexImgVM
 			{
-				Id = entity.Id,
+				//Id = entity.Id,
 				CommentId = entity.Comments_AccommodationId,
 				Image = entity.Image,
 

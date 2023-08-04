@@ -155,7 +155,7 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto,  int value)
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile facePhoto, int value)
         {
             MemberImage img = new MemberImage();
             if (ModelState.IsValid)
@@ -424,7 +424,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     new Claim(ClaimTypes.Name, member.Account);
                     new Claim("LastName", member.LastName);
-                    
+                    new Claim("Id", member.Id.ToString());
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));

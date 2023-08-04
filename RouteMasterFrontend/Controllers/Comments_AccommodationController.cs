@@ -122,7 +122,7 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 string webRootPath = _environment.WebRootPath;
-                string path = Path.Combine(webRootPath, "CommentsUploads");
+                string path = Path.Combine(webRootPath, "CommentAccomodationUploads");
 
                 foreach (IFormFile i in file1)
                 {
@@ -137,7 +137,8 @@ namespace RouteMasterFrontend.Controllers
                     }
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(PartialPage));
+                //return RedirectToAction(nameof(PartialPage));
+                return RedirectToAction("MemberLogin", "Members");
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);
