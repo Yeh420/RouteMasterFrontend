@@ -1,21 +1,74 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Accommodation>
-
-<div id="app">
-    <button @@click="loadProducts()">按我</button>
-
-<table id="imgTable">
-    <thead>
-        <tr>
-            <th>
-
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-
-        @foreach (var item in Model)
-        {
+@section Styles{
+    <style>
+        .currentPage{
+        background-color: lightgray;
+    }
+    </style>
+}
+    <div id="app">
+        <div class="row-cols-2">
+            <input type="search" v-model="keyword" class="form-control col-auto" placeholder="請輸入" @@keyup="inputHandler">
+            <select class="form-select" v-model="pageSize" aria-label="Small select example" @@change = "showPages">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+            </select>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                            <div class="col-md-4">.col-md-4</div>
+                            <div class="col-md-4 ms-auto">.col-md-4 .ms-auto</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 ms-auto">.col-md-3 .ms-auto</div>
+                        <div class="col-md-2 ms-auto">.col-md-2 .ms-auto</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 ms-auto">.col-md-6 .ms-auto</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-9">
+                        Level 1: .col-sm-9
+                            <div class="row">
+                                <div class="col-8 col-sm-6">
+                                Level 2: .col-8 .col-sm-6
+                                </div>
+                                <div class="col-4 col-sm-6">
+                                Level 2: .col-4 .col-sm-6
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+    <table id="imgTable">
+        <thead>
             <tr>
+                <th>
+    
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="product in products" :key="product.id">
                 <td>
                     <div class="row mb-2">
                         <div class="col-md">
@@ -23,31 +76,32 @@
                                 <div class="row g-0">
                                     <div class="row g-0">
                                         <div class="col-md-4">
-                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
+                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
                                         </div>
                                         <div class="col-md-8">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-center">
                                                     <h5 class="card-title m-0">
-                                                        @Html.DisplayFor(modelItem => item.Name)
+                                                        {{product.name}}
                                                     </h5>
-                                                    @if (!string.IsNullOrEmpty(item.Grade.ToString()))
-                                                        {
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 32px; height: 32px; letter-spacing:1px">@item.Grade</span>
-                                                        }
+                                                    @*@if (!string.IsNullOrEmpty(item.Grade.ToString()))
+                                                        {*@
+                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                        @*}*@
                                                 </div>
                                                 @*<p class="card-text">
                                                         @Html.DisplayFor(modelItem => item.Name)
                                                     </p>*@
                                                 <p class="card-text">
                                                     <small class="text-muted">
-                                                        @Html.DisplayFor(modelItem => item.Address)
+                                                        {{product.address}}
                                                     </small>
                                                 </p>
                                                 @*@Html.ActionLink("繼續註冊流程", "Edit", new { id = item.Id })*@
-                                                <a href="/Accommodations/Details/@item.Id" class="btn btn-outline-warning">住所資訊</a>
-                                                |
-                                                <input type="button" class="btn btn-danger delete-accommodation" data-id="@item.Id" id="delete-accommodation-@item.Id" value="下架住所" />
+                                                @*<a href="/Accommodations/Details/{{product.id}}" class="btn btn-outline-warning">住所資訊</a>*@
+                                                @*|*@
+                                                <input type="button" class="btn btn-danger delete-accommodation" v-bind:data-id="product.id" v-bind:id=`delete-accommodation-${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" />
+                                                @*<input type="button" class="btn btn-danger delete-accommodation" data-id="{{product.id}}" id="delete-accommodation-{{product.id}}" value="下架住所" />*@
                                             </div>
                                         </div>
                                     </div>
@@ -57,49 +111,81 @@
                     </div>
                 </td>
             </tr>
-        }
-    </tbody>
-</table>
-<hr />
+        </tbody>
+    </table>
+    <hr />
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
+                <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
+            </li>
+        </ul>
+    </nav>
+    </div>
+    @section Scripts{
+        <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+        <script>
+          
+            var vueApp={
+                data(){
+                    return{
+                        //Country:"",
+                        keyword:"",
+                        products:[],
+                        totalPages:1,
+                        thePage: 1,
+                        pageSize:5,
+                    }
+                },
+                mounted: function(){
+				    let _this = this;
+				    _this.loadProducts();
+			    },
+                methods:{
+                    loadProducts:async function(){
+                       let _this = this;
+                       const response =  await fetch(`https://localhost:7251/api/Accommodations?keyword=${_this.keyword}&page=${_this.thePage}&pageSize=${_this.pageSize}`);
+                       const datas = await response.json();
+                        
+                       // totalPages.value = datas.totalPages;
+                       _this.products = datas.items;
+                       _this.totalPages = datas.totalPages;
+                       const exampleModal = document.getElementById('exampleModal')
+                        if (exampleModal) {
+                            exampleModal.addEventListener('show.bs.modal', event => {
+                                // Button that triggered the modal
+                                const button = event.relatedTarget
+                                // Extract info from data-bs-* attributes
+                                const recipient = button.getAttribute('data-bs-whatever')
+                                // If necessary, you could initiate an Ajax request here
+                                // and then do the updating in a callback.
 
-	<label>國家：{{Country}}</label>
-	<select asp-items="@ViewBag.Country" v-model="Country"></select>
+                                // Update the modal's content.
+                                const modalTitle = exampleModal.querySelector('.modal-title')
+                                const modalBodyInput = exampleModal.querySelector('.modal-body input')
 
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
-                    <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
-                </li>
-            </ul>
-        </nav>
-</div>
-@section Scripts{
-	<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
-	<script>
-        console.log();
-
-		var vueApp={
-			data(){
-				return{
-					Country:"",
-                    keyword:"",
-                    products:[],
-                    totalPages:1,
-                    // thePage = 1,
-				}
-			},
-            methods:{
-                loadProducts:async ()=>{
-                   const response =  await fetch(`https://localhost:7251/api/Accommodations?page=1&pageSize=3`);
-                   const datas = await response.json();
-                   // products.value = datas.products;
-                    console.log(datas);
-                    console.log(datas.TotalPages);
-                   // totalPages.value = datas.totalPages;
-                }
-            },
-            
-		}
-		var app = Vue.createApp(vueApp).mount("#app");
-	</script>
-}
+                                modalTitle.textContent = `New message to ${recipient}`
+                                modalBodyInput.value = recipient
+                            })
+                        }
+                    },
+                    clickHandler:function(value){
+                        let _this = this;
+                        _this.thePage = value;
+                        _this.loadProducts();
+                     },
+                    inputHandler:async function(){
+                        let _this = this;
+                        _this.thePage = 1;
+                        await _this.loadProducts();
+                    },
+                    showPages:function(){
+                        let _this = this;
+                        _this.thePage = 1;
+                        _this.loadProducts();
+                    }
+                },
+             }
+            var app = Vue.createApp(vueApp).mount("#app");
+        </script>
+    }

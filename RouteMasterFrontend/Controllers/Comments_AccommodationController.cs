@@ -167,7 +167,9 @@ namespace RouteMasterFrontend.Controllers
                 _context.Comments_Accommodations.Add(commentDb);
                 _context.SaveChanges();
                 string webRootPath = _environment.WebRootPath;
+
                 string path = Path.Combine(webRootPath, "MemberUploads");               
+
                 foreach (IFormFile i in file1)
                 {
                     if (i != null && i.Length > 0)
@@ -180,11 +182,13 @@ namespace RouteMasterFrontend.Controllers
                         _context.Comments_AccommodationImages.Add(img);                    
                     }
                 }
+
                 _context.SaveChanges();
 
 
 
                 return RedirectToAction("Index","Home");
+
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);
