@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Principal;
 using System.Runtime.Intrinsics.X86;
 using static System.Net.Mime.MediaTypeNames;
+using Google.Apis.Auth;
+using System.IO;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -85,12 +87,14 @@ namespace RouteMasterFrontend.Controllers
             return View(member);
         }
 
+
         //會員資料頁
         [HttpGet]
         public IActionResult MyMemberIndex()
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
+
 
             //列出與登入符合資料
             if (user.Identity.IsAuthenticated)
@@ -278,11 +282,154 @@ namespace RouteMasterFrontend.Controllers
         }
 
 
-        //Google登入的會員頁面
-        public async Task<IActionResult> GoogleMember()
+        //Google登入
+        public async Task<IActionResult> GoogleLogin()
         {
-            return View();
+            string? formCredential = Request.Form["credential"]; //回傳憑證
+            string? formToken = Request.Form["g_csrf_token"]; //回傳令牌
+            string? cookiesToken = Request.Cookies["g_csrf_token"]; //Cookie 令牌
+
+            //驗證Google Token
+            GoogleJsonWebSignature.Payload? payload = VerifyGoogleToken(formCredential, formToken, cookiesToken).Result;
+            
+             if (payload == null)
+            {
+                //驗證失敗
+                ViewData["info"] = "驗證Google授權失敗";
+            }
+            else
+            {
+                ViewData["info"] = "驗證 Google 授權成功" + "<br>";
+                ViewData["info"] += "Email:" + payload.Email + "<br>";
+                ViewData["info"] += "Name:" + payload.Name + "<br>";
+                ViewData["info"] += "Picture:" + payload.Picture;
+            }
+            
+             if(_context.Members.Any(m => m.Email == payload.Email))
+            {
+                const bool rememberMe = false;
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, payload.Name), // 使用 payload 中的用戶名稱作為身份標識
+                    new Claim(ClaimTypes.Email, payload.Email), // 使用 payload 中的郵件地址作為身份標識
+                    // 可以添加其他您需要的用戶身份資訊，如用戶角色等
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = rememberMe,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+                };
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                    authProperties);
+
+                var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+                if (memberid != null)
+                {
+                    var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                    if (cart != null)
+                    {
+                        int cartId = cart.Id;
+
+
+                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddHours(2)
+                        });
+                    }
+                    else
+                    {
+                        var newCart = new Cart
+                        {
+                            MemberId = memberid.Value
+                        };
+
+                        _context.Carts.Add(newCart);
+                        _context.SaveChanges();
+
+                        int cartId = newCart.Id;
+
+
+                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddHours(2)
+                        });
+                    }
+
+                }
+
+                return RedirectToAction("MyMemberIndex", "Members");
+            }
+            else
+            {
+                MemberImage img = new MemberImage();
+
+                Result result = RegisterGoogleMember(payload, img);
+
+                if (result.IsSuccess)
+                {
+                    return RedirectToAction("MyMemberIndex");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                    return View(payload);
+                }
+            }
+            
         }
+
+        
+        private async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string? formCredential, string? formToken, string? cookiesToken)
+        {
+            // 檢查空值
+            if (formCredential == null || formToken == null && cookiesToken == null) return null;
+
+            GoogleJsonWebSignature.Payload? payload;
+            try
+            {
+                // 驗證 token
+                if (formToken != cookiesToken)
+                {
+                    return null;
+                }
+
+                // 驗證憑證
+                IConfiguration Config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
+                string GoogleApiClientId = Config.GetSection("GoogleApiClientId").Value;
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { GoogleApiClientId }
+                };
+                payload = await GoogleJsonWebSignature.ValidateAsync(formCredential, settings);
+                if (!payload.Issuer.Equals("accounts.google.com") && !payload.Issuer.Equals("https://accounts.google.com"))
+                {
+                    return null;
+                }
+                if (payload.ExpirationTimeSeconds == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    DateTime now = DateTime.Now.ToUniversalTime();
+                    DateTime expiration = DateTimeOffset.FromUnixTimeSeconds((long)payload.ExpirationTimeSeconds).DateTime;
+                    if (now > expiration)
+                    {
+                        return null;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return payload;
+        }
+
 
         //會員登出
         [HttpGet]
@@ -576,6 +723,57 @@ namespace RouteMasterFrontend.Controllers
             img.MemberId = member.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
+
+            return Result.Success();
+        }
+
+        private Result RegisterGoogleMember(GoogleJsonWebSignature.Payload payload, MemberImage img)
+        {
+            if (_context.Members.Any(m => m.Email == payload.Email))
+            {
+                // 丟出異常,或者傳回 Result
+                return Result.Failure($"帳號 {payload.Email} 已被註冊過, 請更換後再試一次");
+            }
+
+            Regex PasswordRegex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
+            string[] CommonPasswords = new string[]
+            {
+        "password",
+        "123456",
+        "qwerty",
+                // 添加其他常見密碼
+            };
+
+            string imageFile = "6f495c61bbda42d8a053bd934045b593.png";
+            //string imagePath = Path.Combine(_environment.WebRootPath, imageFile);
+            //byte[] imageData = File.ReadAllBytes(imagePath);
+
+            //填入 isConfirmed, ConfirmCode
+            //vm.IsConfirmed = false;
+            //vm.ConfirmCode = Guid.NewGuid().ToString("N");
+
+            Member member = new Member
+            {
+                FirstName = payload.GivenName,
+                LastName = payload.FamilyName,
+                Account = payload.Name,
+                Email = payload.Email,
+                CellPhoneNumber="尚未新增電話",
+                Address="尚未新增地址",
+                Birthday= DateTime.Now,
+                Gender= false,
+                Image= imageFile,
+                IsConfirmed = false,
+                IsSuspended = false,
+                IsSuscribe = false,
+
+            };
+
+            //將它存到db
+            _context.Members.Add(member);
+            _context.SaveChanges();
+            img.MemberId = member.Id;
+           
 
             return Result.Success();
         }
