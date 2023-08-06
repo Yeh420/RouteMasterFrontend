@@ -19,7 +19,37 @@
             @*<p>選到的選項value為:{{ selected }}</p>*@
         </div>
         <div v-for="item in indexVM" class="card mb-3">
-            <div class="modal " tabindex="-1" id="messageModal">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-header">{{item.account}}</div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <h5 class="card-title me-auto">標題:{{item.title}}</h5>
+                            <div>{{item.status}}</div>
+                        </div>
+                        <p class="card-text">{{item.id}}</p>
+                        <p class="card-text">{{item.hotelName}}</p>
+                        <p class="card-text">優點:{{item.pros}}</p>
+                        <p class="card-text">缺點:{{item.cons}}</p>
+                        <p class="card-text">{{item.score}}</p>
+                        <p class="card-text">{{item.replyMessage}}</p>
+                        <p class="card-text">{{item.replyDate}}</p>
+                        <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
+                        <button type="button" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                            <i class="fa-regular fa-thumbs-up fa-lg"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary position-relative tb" data-bs-toggle="modal"
+                                data-bs-target="#messageModal">
+                            回覆通知
+                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle d-none">
+                                <span class="visually-hidden"></span>
+                            </span>
+                        </button>
+                        
+                    </div>
+                </div>
+                
+                <div class="modal" tabindex="-1" id="messageModal">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -41,43 +71,16 @@
                     </div>
                 </div>
             </div>
-            <div class="row g-0">
-                <div class="col-md-8">
-                    <div class="card-header">{{item.account}}</div>
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <h5 class="card-title me-auto">標題:{{item.title}}</h5>
-                            <div>{{item.status}}</div>
-                        </div>
-                        <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.hotelName}}</p>
-                        <p class="card-text">優點:{{item.pros}}</p>
-                        <p class="card-text">缺點:{{item.cons}}</p>
-                        <p class="card-text">{{item.score}}</p>
-                        <p class="card-text">{{item.replyMessage}}</p>
-                        <p class="card-text">{{item.replyDate}}</p>
-                        <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
-                        <button type="button" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
-                            <i class="fa-regular fa-thumbs-up fa-lg"></i>
-                        </button>
-                        <button type="button" class="btn btn-primary position-relative" data-bs-toggle="modal"
-                                data-bs-target="#messageModal">
-                            回覆通知
-                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle d-none"
-                                  id="dot">
-                                <span class="visually-hidden"></span>
-                            </span>
-                        </button>
-                        
-                    </div>
-                </div>
+
                 <div class="col-md-4">
                     @*<img src="..." class="img-fluid rounded-start" alt="...">*@
                 </div>
             </div>
         </div>
+        
     </div>
-</div>
+  </div>
+
 
 
 
@@ -91,15 +94,14 @@
                 return {
                     indexVM: [],
                     item:{},
-                    imgVM:[],
                     selected: 0,
+                    img:[],
                     hotelId: 1 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                 }
             },
             mounted: function () {
                 let _this = this;
                 _this.commentDisplay();
-                _this.imgDisplay();
 
 
             },
@@ -109,38 +111,26 @@
                     var request = {};
                     request.Manner = _this.selected;
                     request.HotelId = _this.hotelId;
-                    //console.log(_this.selected);
-                    axios.post("https://localhost:7145/Comments_Accommodation/Index", request).then(response => {
-                        _this.indexVM = response.data;
-                        console.log(_this.indexVM);
-                        for (let i = 0; i < _this.indexVM.length; i++) {
-                           _this.item = _this.indexVM[i];
-                         
-                        
-                        }
-
-                    }).catch(err => {
-                        alert(err);
-                    });
-                },
-                imgDisplay: function(){
-                let _this = this;
-                axios.get("https://localhost:7145/Comments_Accommodation/ImgSearch/?id=55").then(response => {
-                   _this.imgVM = response.data;
-                    console.log(_this.imgVM);
-                    //for(let j=0;j<_this.imgVM;J++){
-                    //    _this.img=_this.imgVM[j];
-                        
-                    //}
+                     axios.post("https://localhost:7145/Comments_Accommodation/ImgSearch",request).then(response => {
+                   _this.indexVM = response.data;
+                    console.log(_this.indexVM);
+                    for(let j=0;j<_this.indexVM.length;j++){
+                       _this.item =_this.indexVM[j];
+                   
+                     }
+                       
                     }).catch(err=>{
                         alert(err);
                     });
+                    
                 }
-
-
+                
             }
         };
         const app = Vue.createApp(vueApp).mount("#app");
+        
+       
+        
 
 
     </script>

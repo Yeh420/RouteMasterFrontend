@@ -40,7 +40,13 @@ namespace RouteMasterBackend.Controllers
                     .Include(a => a.AccommodationServiceInfos).AsQueryable();
             if (!string.IsNullOrEmpty(keyword))
             {
-	            accommodations = accommodations.Where(p => p.Name.Contains(keyword));
+	            accommodations = accommodations.Where(p => 
+                    p.Name.Contains(keyword)||
+                    p.Description.Contains(keyword)||
+                    p.Address.Contains(keyword)||
+                    p.AccommodationServiceInfos.Where(s=>s.Name.Contains(keyword)).Any()
+                );
+
             }
             #region
             //分頁

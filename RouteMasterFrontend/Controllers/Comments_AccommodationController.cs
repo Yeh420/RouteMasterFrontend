@@ -31,9 +31,10 @@ namespace RouteMasterFrontend.Controllers
                   .Include(c => c.Accommodation)
                   .Include(c=>c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
-                 
 
-			switch (input.Manner)
+            var proImg = _context.Comments_AccommodationImages;
+
+            switch (input.Manner)
 			{
 				case 0:
 					commentDb = commentDb.OrderBy(c => c.Id);
@@ -48,26 +49,61 @@ namespace RouteMasterFrontend.Controllers
 					commentDb = commentDb.OrderBy(c => c.Score);
 					break;
 			}
-            //commentDb.ToListAsync().Wait();
-           
-
             var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
-         
-            //for (var i = 0; i < v.Count; i++)
-            //{
-            //    v[i].ImageList = commentDb.ToList()[i].Comments_AccommodationImages;
-            //};
+
             return Json(vm);
 		}
 
-        public IActionResult ImgSearch(int id)
+        public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var img = _context.Comments_AccommodationImages
-                .Where(i => i.Comments_AccommodationId == id)
-                .Select(c => c.Image);
+           
+            var commentDb = _context.Comments_Accommodations
+                  .Include(c => c.Member)
+                  .Include(c => c.Accommodation)
+                  .Include(c => c.CommentStatus)
+                  .Where(c => c.AccommodationId == input.HotelId);
+
+            switch (input.Manner)
+            {
+                case 0:
+                    commentDb = commentDb.OrderBy(c => c.Id);
+                    break;
+                case 1:
+                    commentDb = commentDb.OrderByDescending(c => c.CreateDate);
+                    break;
+                case 2:
+                    commentDb = commentDb.OrderByDescending(c => c.Score);
+                    break;
+                case 3:
+                    commentDb = commentDb.OrderBy(c => c.Score);
+                    break;
+            }
+
+            var proImg = _context.Comments_AccommodationImages;
+               
+
+            var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
+            {
+                Id = c.Id,
+                Account=c.Member.Account,
+                HotelName=c.Accommodation.Name,
+                Score=c.Score,
+                Title=c.Title,
+                Pros=c.Pros,
+                Cons=c.Cons,
+                CreateDate=c.CreateDate,
+                Status=c.CommentStatus.Name,
+                ReplyMessage=c.Reply,
+                ReplyDate=c.ReplyAt,
+                ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
+                .Select(p=>p.Image).ToList(),
+
+            }).ToListAsync();
+
+          
 
 
-            return Json(img);
+            return Json(rod);
         }
         public IActionResult PartialPage()  
         {

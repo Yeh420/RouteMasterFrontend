@@ -4,123 +4,154 @@
         .currentPage{
         background-color: lightgray;
     }
+    .w200{
+        width:200px;
+    }
+    .h200{
+        height:200px;
+    }
+    .w-33{
+        width:33%;
+    }
+    .left{
+            width: 24% !important;
+            padding: 0 !important;
+            margin-top:2px;
+    }
+    .right{
+            width: 74% !important;
+            padding: 0 !important;
+    }
     </style>
 }
     <div id="app">
-        <div class="row-cols-2">
-            <input type="search" v-model="keyword" class="form-control col-auto" placeholder="請輸入" @@keyup="inputHandler">
-            <select class="form-select" v-model="pageSize" aria-label="Small select example" @@change = "showPages">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-            </select>
-        </div>
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row">
-                            <div class="col-md-4">.col-md-4</div>
-                            <div class="col-md-4 ms-auto">.col-md-4 .ms-auto</div>
+        <div class="d-flex">
+            <aside class="left border">
+            </aside>
+            <div class="right ms-auto">
+                <nav class="d-flex row">
+                    <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="inputHandler">
+                    <div class="d-flex col-3 ms-auto">
+                        <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
+                        <select class="form-select w-33" v-model="pageSize" aria-label="Small select example" @@change="showPages">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                        </select>
+                        <label for="page" class="form-label mb-0 ms-2 d-flex align-items-center">筆</label>
                     </div>
-                    <div class="row">
-                        <div class="col-md-3 ms-auto">.col-md-3 .ms-auto</div>
-                        <div class="col-md-2 ms-auto">.col-md-2 .ms-auto</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 ms-auto">.col-md-6 .ms-auto</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-9">
-                        Level 1: .col-sm-9
-                            <div class="row">
-                                <div class="col-8 col-sm-6">
-                                Level 2: .col-8 .col-sm-6
-                                </div>
-                                <div class="col-4 col-sm-6">
-                                Level 2: .col-4 .col-sm-6
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-              </div>
-            </div>
-          </div>
-        </div>
+                </nav>
+                <table id="imgTable" class="w-100">
+                        <thead>
+                            <tr>
+                                <th>
     
-    <table id="imgTable">
-        <thead>
-            <tr>
-                <th>
-    
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="product in products" :key="product.id">
-                <td>
-                    <div class="row mb-2">
-                        <div class="col-md">
-                            <div class="card mb-3">
-                                <div class="row g-0">
-                                    <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center">
-                                                    <h5 class="card-title m-0">
-                                                        {{product.name}}
-                                                    </h5>
-                                                    @*@if (!string.IsNullOrEmpty(item.Grade.ToString()))
-                                                        {*@
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
-                                                        @*}*@
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="product in products" :key="product.id">
+                                <td>
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <div class="card mb-3 h200">
+                                                <div class="row g-0 ">
+                                                    <div class="col-4 w200">
+                                                        <img class="card-img card-img-left w-100 h-100" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="card-body w-100">
+                                                            <div class="d-flex align-items-center">
+                                                                <h5 class="card-title m-0">
+                                                                    {{product.name}}
+                                                                </h5>
+                                                                <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                            </div>
+                                                            <p class="card-text">
+                                                                <small class="text-muted">
+                                                                    {{product.address}}
+                                                                </small>
+                                                            </p>
+                                                            <input type="button" class="btn btn-danger delete-accommodation" v-bind:data-id="product.id" v-bind:id=`delete-accommodation-${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                @*<p class="card-text">
-                                                        @Html.DisplayFor(modelItem => item.Name)
-                                                    </p>*@
-                                                <p class="card-text">
-                                                    <small class="text-muted">
-                                                        {{product.address}}
-                                                    </small>
-                                                </p>
-                                                @*@Html.ActionLink("繼續註冊流程", "Edit", new { id = item.Id })*@
-                                                @*<a href="/Accommodations/Details/{{product.id}}" class="btn btn-outline-warning">住所資訊</a>*@
-                                                @*|*@
-                                                <input type="button" class="btn btn-danger delete-accommodation" v-bind:data-id="product.id" v-bind:id=`delete-accommodation-${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" />
-                                                @*<input type="button" class="btn btn-danger delete-accommodation" data-id="{{product.id}}" id="delete-accommodation-{{product.id}}" value="下架住所" />*@
                                             </div>
                                         </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+        <hr />
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center flex-wrap mt-2 mb-4">
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(1)">&lt;&lt;</a>
+                </li>
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage-1)">&lt;</a>
+                </li>
+                <li v-for="(value, index) in pageRange" :key="index" class="page-item">
+                    <a v-if="value === ELLIPSIS" class="page-link d-flex align-items-center">{{ value }}</a>
+                    <a v-else :class="{'page-link': true, 'currentPage': value === thePage}" href="#" @@click="clickHandler(value)">{{ value }}</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage+1)">&gt;</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(totalPages)">&gt;&gt;</a>
+                </li>
+                @* <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
+                    <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
+                </li> *@
+            </ul>
+        </nav>
+    <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4">.col-md-4</div>
+                            <div class="col-md-4 ms-auto">.col-md-4 .ms-auto</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 ms-auto">.col-md-3 .ms-auto</div>
+                            <div class="col-md-2 ms-auto">.col-md-2 .ms-auto</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 ms-auto">.col-md-6 .ms-auto</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                Level 1: .col-sm-9
+                                <div class="row">
+                                    <div class="col-8 col-sm-6">
+                                        Level 2: .col-8 .col-sm-6
+                                    </div>
+                                    <div class="col-4 col-sm-6">
+                                        Level 2: .col-4 .col-sm-6
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <hr />
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
-                <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
-            </li>
-        </ul>
-    </nav>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
     @section Scripts{
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
@@ -141,12 +172,43 @@
 				    let _this = this;
 				    _this.loadProducts();
 			    },
+                computed: {
+                    hasPrevious() {
+                        return this.thePage > 1;
+                    },
+                    hasNext() {
+                        return this.thePage < this.totalPages;
+                    },
+                    pageRange() {
+                        const maxPagesToShow = 5; // Adjust the maximum number of pages to show in the pagination
+                        const middlePage = Math.floor(maxPagesToShow / 2);
+                        const startPage = Math.max(this.thePage - middlePage, 1);
+                        const endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+                        const pages = [];
+
+                        for (let i = startPage; i <= endPage; i++) {
+                            pages.push(i);
+                        }
+
+                        if (startPage > 1) {
+                            pages.unshift("...");
+                        }
+                        if (endPage < this.totalPages) {
+                            pages.push("...");
+                        }
+
+                        return pages;
+                    },
+                    ELLIPSIS() {
+                        return "...";
+                    },
+                },
                 methods:{
                     loadProducts:async function(){
                        let _this = this;
                        const response =  await fetch(`https://localhost:7251/api/Accommodations?keyword=${_this.keyword}&page=${_this.thePage}&pageSize=${_this.pageSize}`);
                        const datas = await response.json();
-                        
+                        console.log(datas);
                        // totalPages.value = datas.totalPages;
                        _this.products = datas.items;
                        _this.totalPages = datas.totalPages;
@@ -165,7 +227,7 @@
                                 const modalBodyInput = exampleModal.querySelector('.modal-body input')
 
                                 modalTitle.textContent = `New message to ${recipient}`
-                                modalBodyInput.value = recipient
+                                // modalBodyInput.value = recipient
                             })
                         }
                     },
