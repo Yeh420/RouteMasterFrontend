@@ -1,9 +1,8 @@
-﻿@section Styles
-    {
+﻿
     <style>
 
     </style>
-    }
+    
 
 <div id="app">
     <div class="container">
@@ -33,11 +32,21 @@
                         <p class="card-text">缺點:{{item.cons}}</p>
                         <p class="card-text">{{item.score}}</p>
                         <p class="card-text">{{item.replyMessage}}</p>
+                        <p class="card-text">{{item.clikable}}</p>
                         <p class="card-text">{{item.replyDate}}</p>
+                        <p class="card-text">{{item.thumbsUp}}</p>
                         <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
-                        <button type="button" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
-                            <i class="fa-regular fa-thumbs-up fa-lg"></i>
-                        </button>
+                        <template v-if="item.thumbsUp">
+                            <button type="button" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="取消讚">
+                                取消按讚
+                            </button>
+                        </template>
+                        <template v-else>
+                            <button type="button" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                                <i class="fa-regular fa-thumbs-up fa-lg"></i>
+                            </button>
+                        </template>
+                       
                         <template v-if="item.status===isReplyed">
                             <button type="button" class="btn btn-primary position-relative" data-bs-toggle="modal"
                                     data-bs-target="#messageModal">
@@ -86,7 +95,8 @@
                     <template v-if="item.imageList.length>1">
                         <div v-for="(photo,index) in item.imageList" :key="index">
                             <div>{{index}}</div>
-                            <img :src="`~/MemberUploads/${{photo}}`"/>
+                            <div>{{photo}}</div>
+                            @*<img :src="getImgPath(photo)"/>*@
                         </div>
                     </template>
                     <template v-else>
@@ -116,7 +126,6 @@
                     isReplyed:"已回復",
                     ep:null,
                     selected: 0,
-                    img:[],
                     hotelId: 1 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                 }
             },
@@ -137,8 +146,7 @@
                     console.log(_this.indexVM);
                     for(let j=0;j<_this.indexVM.length;j++){
                        _this.item =_this.indexVM[j];
-                       _this.img=_this.item.imageList;
-
+                        
                    
                      }
                        
@@ -146,7 +154,42 @@
                         alert(err);
                     });
                     
-                }
+                },
+                likeComment:function(commentId)
+               {
+                let _this = this;
+                var credit;
+                var request={};
+                request.CommentId=commentId;
+                request.IsLike=credit;
+
+              
+                    for (let j = 0; j < _this.indexVM.length; j++) {
+                       let likes = _this.indexVM[j];
+                    if (likes.id == commentId && likes.thumbsUp == false) {
+                        //ajax建立按讚紀錄
+                           credit=true;
+                        }
+                    else if (likes.id == commentId && likes.thumbsUp == true) {
+                        //ajax刪除按讚紀錄
+                        credit=false;
+                        }
+                        else{
+                            console.log("什鬼");
+                        }
+                    }
+                //axios.post("", request).then(response => { }).catch(err => { });
+                _this.commentDisplay();
+                },
+               
+               
+               
+                
+               
+            //getImgPath:function(photo){
+            //    console.log(photo);
+            //    return `~/MemberUploads/${photo}`;
+            //}
                 
             }
         };

@@ -80,6 +80,8 @@ namespace RouteMasterFrontend.Controllers
             }
 
             var proImg = _context.Comments_AccommodationImages;
+            var proLike = _context.Comment_Accommodation_Likes
+                .Include(l => l.Member);
                
 
             var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
@@ -97,17 +99,33 @@ namespace RouteMasterFrontend.Controllers
                 ReplyDate=c.ReplyAt,
                 ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
                 .Select(p=>p.Image).ToList(),
+                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.Member.Account== c.Member.Account),
 
             }).ToListAsync();
-
-          
-
 
             return Json(rod);
         }
         public IActionResult PartialPage()  
         {
             return View();
+        }
+
+        public async Task<string> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
+        {
+            var proLike =await _context.Comment_Accommodation_Likes
+                .Include(l => l.Member)
+                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
+            if(proLike==null)
+            {
+               //建立按讚紀錄
+
+            }
+            else
+            {
+                //刪除按讚紀錄
+            }
+
+            return string.Empty;
         }
 
         // GET: Comments_Accommodation/Details/5    
