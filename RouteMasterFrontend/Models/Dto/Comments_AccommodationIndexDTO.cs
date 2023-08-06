@@ -25,5 +25,7 @@
 
         public IEnumerable<string>? ImageList { get; set; }
 
+        public bool ThumbsUp { get; set; }   
+
     }
 }
