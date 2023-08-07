@@ -49,7 +49,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\ActivityImages\" />
-    <Folder Include="wwwroot\MemberUploads\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />
 
     <Folder Include="wwwroot\CommentsUploads\" />

@@ -26,6 +26,13 @@
             }
 
     </style>
+   
+    @*@{
+        string imageCookieValue = Request.Cookies["UserImage"]?.Value;
+        string imagePath = !string.IsNullOrEmpty(imageCookieValue) ? $"~/Uploads/{imageCookieValue}" : "~/Uploads/";
+    }*@
+
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -75,15 +82,17 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="Index">景點</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="Create">新增評論</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
+
 
                             @{
                                 if (User.Identity.IsAuthenticated)
                                 {
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
-                                    </li>
+                                    var userAccount = User.Identity.Name;
+                                    //<li>
+                                    //    <img src="~/MemberUploads/@userAccount.jpg" alt="會員圖片" class="member-image" />
+                                    //    <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                    //</li>
                                     <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
                                     </li>

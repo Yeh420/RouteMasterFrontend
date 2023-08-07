@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Accommodation>
 @section Styles{
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <style>
-        .currentPage{
+    .currentPage{
         background-color: lightgray;
     }
     .w200{
@@ -13,22 +16,122 @@
     .w-33{
         width:33%;
     }
-    .left{
+    .main-left{
             width: 24% !important;
             padding: 0 !important;
             margin-top:2px;
     }
-    .right{
+    .main-right{
             width: 74% !important;
             padding: 0 !important;
     }
+
+    .modal-xl{
+        max-width:90% !important;
+        width:90%;
+        height:90%;
+    }
+
+    .modal-container {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        /* align-items: center; */
+        /* border:1px solid #ccc; */
+    }
+
+    .product-info { /*內含left , right 二個div*/
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: end;
+        align-items: start;
+        /* border: 1px solid #ccc; */
+    }
+
+        .product-info .left {
+            /* max-width: 36%; */
+            width:604px;
+            /* height: 677px; */
+           
+            /* border: 1px solid #ccc; */
+        }
+
+        .product-info .right {
+            width: 63.54%;
+            /* height:677px; */
+            padding: 10px;
+            margin-left:auto;
+            overflow:auto;
+        }
+
+    .productPhoto {
+        object-fit: cover; /*contain 符合指定的寬高比例*/
+        width:100%;
+        aspect-ratio: auto 1 / 1;
+    }
+
+    .product-info .images {
+        width: 100%;
+        height: 64px;
+        /* display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        overflow-y: hidden;
+        overflow-x: auto; */
+        border: 1px solid #ccc;
+    }
+
+    .product-info li img {
+        width: 58px;
+        margin: 1px;
+    }
+
+    .product-info .imageList {
+        list-style: none; /* 不顯示項目符號 */
+        width: 100%;
+        display: flex;
+        /* justify-content: center; */
+        align-items: center;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        /* padding-left:116px; */
+    }
+
+   /*  .fixLeft{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    } */
+
     </style>
+    <noscript>
+        <style>
+            /**
+                * Reinstate scrolling for non-JS clients
+                */
+            .simplebar-content-wrapper {
+                scrollbar-width: auto;
+                -ms-overflow-style: auto;
+            }
+
+                .simplebar-content-wrapper::-webkit-scrollbar,
+                .simplebar-hide-scrollbar::-webkit-scrollbar {
+                    display: initial;
+                    width: initial;
+                    height: initial;
+                }
+        </style>
+    </noscript>
 }
     <div id="app">
         <div class="d-flex">
-            <aside class="left border">
+            <aside class="main-left border">
             </aside>
-            <div class="right ms-auto">
+            <div class="main-right ms-auto">
                 <nav class="d-flex row">
                     <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="inputHandler">
                     <div class="d-flex col-3 ms-auto">
@@ -50,14 +153,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="product in products" :key="product.id">
+                            <tr v-for="(product, index) in products" :key="product.id">
                                 <td>
                                     <div class="row mb-2">
                                         <div class="col">
                                             <div class="card mb-3 h200">
                                                 <div class="row g-0 ">
                                                     <div class="col-4 w200">
-                                                        <img class="card-img card-img-left w-100 h-100" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
+                                                        <img class="card-img card-img-left h-100 w-100" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
                                                     </div>
                                                     <div class="col-8">
                                                         <div class="card-body w-100">
@@ -72,7 +175,7 @@
                                                                     {{product.address}}
                                                                 </small>
                                                             </p>
-                                                            <input type="button" class="btn btn-danger delete-accommodation" v-bind:data-id="product.id" v-bind:id=`delete-accommodation-${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" />
+                                                            <input type="button" class="btn btn-danger" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" @@click="showModal(index)" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -111,50 +214,69 @@
         </nav>
     <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-4">.col-md-4</div>
-                            <div class="col-md-4 ms-auto">.col-md-4 .ms-auto</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 ms-auto">.col-md-3 .ms-auto</div>
-                            <div class="col-md-2 ms-auto">.col-md-2 .ms-auto</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 ms-auto">.col-md-6 .ms-auto</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-9">
-                                Level 1: .col-sm-9
-                                <div class="row">
-                                    <div class="col-8 col-sm-6">
-                                        Level 2: .col-8 .col-sm-6
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content h-100">
+                    <div class="modal-header d-f">
+                        <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationName}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-container h-100">
+                            <div class="product-info h-100">
+                                <div class="left h-100 mt-2 ms-2">
+                                    <div class="position-relative w-100">
+                                        <img v-bind:src=`../AccommodationImages/${accommodationImage}` class="productPhoto position-fix" alt="">
+                                        <div class="images" data-simplebar>
+                                            <ul class="imageList">
+                                            </ul>
+                                        </div>
                                     </div>
-                                    <div class="col-4 col-sm-6">
-                                        Level 2: .col-4 .col-sm-6
-                                    </div>
+                                </div>
+                                <div class="right h-100" data-simplebar>
+                                    <ul>
+                                        <li class="mb-3">
+                                            <p class="d-inline-flex gap-1 fs-5">
+                                                <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                </a>
+                                                <span data-bs-toggle="tooltip" data-bs-title="Default tooltip">
+                                                    {{accommodationAddress}}
+                                                </span>
+                                                <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                    顯示地圖
+                                                </a>
+                                                @* <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Button with data-bs-target
+                                                </button> *@
+                                            </p>
+                                            <div class="collapse" id="collapseExample">
+                                                <div class="card card-body">
+                                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="mb-3">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="" readonly id="floatingTextarea" rows="10" cols="10"> {{accommodationDescription}}</textarea>
+                                                <label for="floatingTextarea">住所描述</label>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">加入購物車</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
     @section Scripts{
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
         <script>
           
             var vueApp={
@@ -166,6 +288,10 @@
                         totalPages:1,
                         thePage: 1,
                         pageSize:5,
+                        accommodationName:"",
+                        accommodationImage:"",
+                        accommodationAddress:"",
+                        accommodationDescription:""
                     }
                 },
                 mounted: function(){
@@ -212,22 +338,31 @@
                        // totalPages.value = datas.totalPages;
                        _this.products = datas.items;
                        _this.totalPages = datas.totalPages;
-                       const exampleModal = document.getElementById('exampleModal')
+
+                    },
+                    showModal: function (id) {
+                        let _this = this;
+                        const exampleModal = document.getElementById('exampleModal')
                         if (exampleModal) {
-                            exampleModal.addEventListener('show.bs.modal', event => {
-                                // Button that triggered the modal
-                                const button = event.relatedTarget
-                                // Extract info from data-bs-* attributes
-                                const recipient = button.getAttribute('data-bs-whatever')
-                                // If necessary, you could initiate an Ajax request here
-                                // and then do the updating in a callback.
+                            _this.accommodationName = _this.products[id].name;
+                            _this.accommodationAddress = _this.products[id].address + "-";
+                            _this.accommodationDescription = _this.products[id].description;
+                            _this.accommodationImage = _this.products[id].images[0].image;
 
-                                // Update the modal's content.
-                                const modalTitle = exampleModal.querySelector('.modal-title')
-                                const modalBodyInput = exampleModal.querySelector('.modal-body input')
+                            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-                                modalTitle.textContent = `New message to ${recipient}`
-                                // modalBodyInput.value = recipient
+                            const modalImg = exampleModal.querySelector('.product-info ul');
+                            modalImg.innerHTML = "";
+                            _this.products[id].images.map(function (p) {
+                                const ce = document.createElement('li');
+                                ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
+                                modalImg.append(ce);
+                            });
+
+                            $('.product-info ul li img').click(function () {
+                                var imgSrc = $(this).attr('src');
+                                _this.accommodationImage = imgSrc;
                             })
                         }
                     },
@@ -245,9 +380,10 @@
                         let _this = this;
                         _this.thePage = 1;
                         _this.loadProducts();
-                    }
+                    },
                 },
              }
             var app = Vue.createApp(vueApp).mount("#app");
+           
         </script>
     }
