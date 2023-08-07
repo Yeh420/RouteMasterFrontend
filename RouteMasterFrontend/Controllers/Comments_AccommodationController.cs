@@ -115,14 +115,43 @@ namespace RouteMasterFrontend.Controllers
             var proLike =await _context.Comment_Accommodation_Likes
                 .Include(l => l.Member)
                 .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
-            if(proLike==null)
+            // @@l.MemberAccount==user.Identity.name
+            if (proLike==null)
             {
-               //建立按讚紀錄
+                //建立按讚紀錄
+                Comment_Accommodation_Like like = new Comment_Accommodation_Like
+                {
+                    MemberId = 1, //@@記得改user.Identity.name
+                    Comments_AccommodationId = input.CommentId,
+                    CreateDate = DateTime.Now,
+                    
+                };   
+                _context.Comment_Accommodation_Likes.Add(like);
+                await _context.SaveChangesAsync();
 
+                Comments_LikesFilterDTO info = (Comments_LikesFilterDTO)_context.Comments_Accommodations
+                    .Include(c => c.Member)
+                    .Where(c => c.Id == input.CommentId)
+                    .Select(c => c.ToFilterDto());
+
+
+
+
+                SystemMessage msg = new SystemMessage
+                {
+                    MemberId = info.MemberId,
+                    Content = $"按讚人對您標題為:{info.CommentTitle}的評論按讚",
+                    IsRead = false,
+
+
+                };
             }
             else
             {
                 //刪除按讚紀錄
+                _context.Comment_Accommodation_Likes.Remove(proLike);
+                await _context.SaveChangesAsync();
+
             }
 
             return string.Empty;
