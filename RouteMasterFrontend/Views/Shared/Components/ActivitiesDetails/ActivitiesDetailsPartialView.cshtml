@@ -12,7 +12,7 @@
 
 
 <div class="partial-view-container">
-<table class="table">
+    <table class="table" id="cartTable2">
     <thead>
             <tr>
                 <th>
@@ -54,7 +54,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+         <tr data-activitiesid="@item.Id">
             <td>
             @Html.DisplayFor(modelItem => item.ActivityProduct.Activity.Name)
            </td>
@@ -73,12 +73,57 @@
                 @Html.DisplayFor(modelItem => item.Cart.Id)
             </td>*@
             <td>
-           
-                <a asp-action="Delete" asp-route-id="@item.Id">
-                    <i class="fas fa-trash-can"></i>
-                </a>
+
+            <a href="#" onclick="removeFromCartAct( @item.Id)">
+                <i class="fas fa-trash-can"></i>
+            </a>
             </td>
         </tr>
 }
     </tbody>
 </table></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function removeFromCartAct(activitiesId) {
+        // 發送 AJAX 請求
+        $.ajax({
+            url: '/Carts/RemoveActivitiesFromCart',
+            type: 'POST',
+            data: { activitiesId: activitiesId },
+            success: function (result) {
+                if (result.success) {
+                  
+                 
+                    alert(result.message);
+                    
+                    $('#cartTable2').find('tr[data-activitiesid="' + result.activitiesId + '"]').remove();
+                } else {
+                  
+                    alert(result.message);
+                }
+            },
+            error: function () {
+                // 發生錯誤時的處理
+                console.log('66666')
+                alert('發生錯誤，無法刪除項目。');
+            }
+        });
+    }
+    function reloadCartItems() {
+        $.ajax({
+            url: '/Carts/RefreshCart',
+            type: 'GET',
+            success: function (data) {
+
+                $('#Cart').html(data);
+            },
+
+
+            error: function () {
+                alert('Failed to reload cart items.');
+            }
+        });
+    }
+
+</script>
