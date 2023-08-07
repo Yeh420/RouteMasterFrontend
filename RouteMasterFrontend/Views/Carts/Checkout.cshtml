@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Checkout";
+   
 }
 
 <h1>Checkout</h1>
@@ -9,14 +10,23 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<form asp-action="CheckoutPost" method="post">
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Member)
             </th>
+            <th>
+                Member Info
+            </th>
+            <th>
+                Payment Method
+            </th>
             <th></th>
+            
         </tr>
+      
     </thead>
     <tbody>
 @foreach (var item in Model) {
@@ -24,6 +34,22 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Member.Account)
             </td>
+                <td>
+                   
+                @Html.DisplayFor(modelItem => item.Member.FirstName)
+                @Html.DisplayFor(modelItem => item.Member.LastName)
+                  
+                </td>
+                <td>
+                   
+                    <select>
+                        @foreach (var paymentMethod in ViewBag.PaymentMethods)
+                        {
+                            <option value="@paymentMethod.Id">@paymentMethod.Name</option>
+                        }
+                    </select>
+                   
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
@@ -32,4 +58,13 @@
         </tr>
 }
     </tbody>
-</table>
+  </table>
+    <div>
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+@section Scripts {
+    <script>
+       
+    </script>
+}

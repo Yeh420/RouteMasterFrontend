@@ -93,11 +93,13 @@
                     @*<img src="..." class="img-fluid rounded-start" alt="...">*@
                     
                     <template v-if="item.imageList.length>1">
+
                         <div v-for="(photo,index) in item.imageList" :key="index">
                             <div>{{index}}</div>
                             <div>{{photo}}</div>
                             <img v-bind:src=`../MemberUploads/${photo}`>
                             @*getImgPath(photo)*@
+
                         </div>
                     </template>
                     <template v-else>
@@ -181,16 +183,18 @@
                     }
                 //axios.post("", request).then(response => { }).catch(err => { });
                 _this.commentDisplay();
-                },
+                }
                
                
                
                 
                
+
                 getImgPath:function(photo){
                     console.log(photo);
                     return `~/MemberUploads/${photo}`;
                 }
+
                 
             }
         };

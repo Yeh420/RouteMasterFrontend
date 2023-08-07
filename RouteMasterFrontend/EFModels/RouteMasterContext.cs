@@ -5,12 +5,6 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-using RouteMasterFrontend.Models.ViewModels.Members;
-
-using RouteMasterFrontend.Models.ViewModels.Carts;
-using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
-
-
 namespace RouteMasterFrontend.EFModels
 {
     public partial class RouteMasterContext : DbContext
@@ -88,13 +82,9 @@ namespace RouteMasterFrontend.EFModels
         {
             if (!optionsBuilder.IsConfigured)
             {
-				IConfigurationRoot config = new ConfigurationBuilder()
-								   .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-								   .AddJsonFile("appsettings.json")
-								   .Build();
-
-				optionsBuilder.UseSqlServer(config.GetConnectionString("RouteMaster"));
-			}
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=RouteMaster;User ID=sa5;Password=sa5");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -155,7 +145,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<Accommodation>().WithMany().HasForeignKey("AccommodationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Accommoda__Accom__4C6B5938"),
                         j =>
                         {
-                            j.HasKey("AccommodationId", "AccommodationServiceInfoId").HasName("PK__Accommod__DE629F1B77C9796B");
+                            j.HasKey("AccommodationId", "AccommodationServiceInfoId").HasName("PK__Accommod__DE629F1B7827F3C8");
 
                             j.ToTable("AccommodationServiceInfos_Accommodations");
                         });
@@ -262,7 +252,7 @@ namespace RouteMasterFrontend.EFModels
 
             modelBuilder.Entity<Administrator>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Administ__A9D105349D615D0C")
+                entity.HasIndex(e => e.Email, "UQ__Administ__A9D10534E74307ED")
                     .IsUnique();
 
                 entity.Property(e => e.ConfirmCode).HasMaxLength(300);
@@ -338,7 +328,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Tags_Attr__Attra__14E61A24"),
                         j =>
                         {
-                            j.HasKey("AttractionId", "TagId").HasName("PK__Tags_Att__0CB582C0E8746D79");
+                            j.HasKey("AttractionId", "TagId").HasName("PK__Tags_Att__0CB582C0B1405FFE");
 
                             j.ToTable("Tags_Attractions");
                         });
@@ -653,10 +643,10 @@ namespace RouteMasterFrontend.EFModels
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Members__A9D1053443BF756B")
+                entity.HasIndex(e => e.Email, "UQ__Members__A9D1053492362E04")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Account, "UQ__Members__B0C3AC46A2DE5401")
+                entity.HasIndex(e => e.Account, "UQ__Members__B0C3AC460F60ED2B")
                     .IsUnique();
 
                 entity.Property(e => e.Account)
@@ -754,12 +744,6 @@ namespace RouteMasterFrontend.EFModels
                     .HasForeignKey(d => d.PaymentStatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Orders__PaymentS__7C1A6C5A");
-
-                entity.HasOne(d => d.TravelPlan)
-                    .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.TravelPlanId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__TravelPl__7D0E9093");
             });
 
             modelBuilder.Entity<OrderAccommodationDetail>(entity =>
@@ -876,7 +860,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAc__Packa__7EF6D905"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "ActivityId").HasName("PK__PackageA__95FB0D5468E06230");
+                            j.HasKey("PackageTourId", "ActivityId").HasName("PK__PackageA__95FB0D54F413BDF5");
 
                             j.ToTable("PackageActivities");
                         });
@@ -889,7 +873,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAt__Packa__00DF2177"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "AttractionId").HasName("PK__PackageA__2C0A63F82BCD0554");
+                            j.HasKey("PackageTourId", "AttractionId").HasName("PK__PackageA__2C0A63F8830BBA8B");
 
                             j.ToTable("PackageAttractions");
                         });
@@ -902,7 +886,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageEx__Packa__02C769E9"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "ExtraServiceId").HasName("PK__PackageE__0943AA625E030956");
+                            j.HasKey("PackageTourId", "ExtraServiceId").HasName("PK__PackageE__0943AA6213C7E40A");
 
                             j.ToTable("PackageExtraServices");
                         });
@@ -910,7 +894,7 @@ namespace RouteMasterFrontend.EFModels
 
             modelBuilder.Entity<Partner>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Partners__A9D1053439BF761C")
+                entity.HasIndex(e => e.Email, "UQ__Partners__A9D1053473FBDA8E")
                     .IsUnique();
 
                 entity.Property(e => e.ConfirmCode).HasMaxLength(300);
@@ -1022,7 +1006,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<Room>().WithMany().HasForeignKey("RoomId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__RoomServi__RoomI__11158940"),
                         j =>
                         {
-                            j.HasKey("RoomId", "RoomServiceInfoId").HasName("PK__RoomServ__B47A76135D39470F");
+                            j.HasKey("RoomId", "RoomServiceInfoId").HasName("PK__RoomServ__B47A7613838EDBF8");
 
                             j.ToTable("RoomServiceInfos_Rooms");
                         });
@@ -1177,7 +1161,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanActiv__Trave__05A3D694"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "ActivityProductId").HasName("PK__PlanActi__EB02F9A075F78EA7");
+                            j.HasKey("TravelPlanId", "ActivityProductId").HasName("PK__PlanActi__EB02F9A02E9DAB0B");
 
                             j.ToTable("PlanActivities");
                         });
@@ -1190,7 +1174,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanAttra__Trave__078C1F06"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "AttractionId").HasName("PK__PlanAttr__99DDD1EEABC25F7C");
+                            j.HasKey("TravelPlanId", "AttractionId").HasName("PK__PlanAttr__99DDD1EEE327E1D3");
 
                             j.ToTable("PlanAttractions");
                         });
@@ -1203,7 +1187,7 @@ namespace RouteMasterFrontend.EFModels
                         r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanExtra__Trave__09746778"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "ExtraServiceProductId").HasName("PK__PlanExtr__4FFE2B658070A3BB");
+                            j.HasKey("TravelPlanId", "ExtraServiceProductId").HasName("PK__PlanExtr__4FFE2B653BA06987");
 
                             j.ToTable("PlanExtraServices");
                         });
@@ -1213,23 +1197,5 @@ namespace RouteMasterFrontend.EFModels
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberIndexVM>? MemberIndexVM { get; set; }
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberLoginVM>? MemberLoginVM { get; set; }
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Carts.Cart_ExtraServiceDetailsVM>? Cart_ExtraServiceDetailsVM { get; set; }
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM>? MemberRegisterVM { get; set; }
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationCreateVM>? Comments_AccommodationCreateVM { get; set; }
-
-
-        //public DbSet<RouteMasterFrontend.Models.ViewModels.Comments_Accommodations.Comments_AccommodationIndexVM>? Comments_AccommodationIndexVM { get; set; }
-
-
-
-
     }
 }

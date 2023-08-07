@@ -90,37 +90,21 @@ namespace RouteMasterFrontend.Controllers
 
         //會員資料頁
         [HttpGet]
-        public IActionResult MyMemberIndex()
+        public IActionResult MyMemberIndex2()
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
 
-
             //列出與登入符合資料
+            string userAccount = user.Identity.Name;
+
+            Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
+
             if (user.Identity.IsAuthenticated)
             {
-                string userName = user.Identity.Name;
-                IEnumerable<MemberIndexVM> members;
-                members = (IEnumerable<MemberIndexVM>)_context.Members
-                    .Where(m => m.Account == userName)
-                    .Select(m => new MemberIndexVM
-                    {
-                        FirstName = m.FirstName,
-                        LastName = m.LastName,
-                        Account = m.Account,
-                        Email = m.Email,
-                        CellPhoneNumber = m.CellPhoneNumber,
-                        Address = m.Address,
-                        Gender = m.Gender,
-                        Birthday = m.Birthday,
-                        CreateDate = m.CreateDate,
-                        Image = m.Image,
-                        LoginTime = m.LoginTime,
-                        IsConfirmed = m.IsConfirmed,
-                        IsSuscribe = m.IsSuscribe,
-
-                    }).ToList();
-                return View(members);
+               
+                    
+                return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
         }
@@ -205,6 +189,13 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        //註冊成功頁面
+        public IActionResult SuccessRegister()
+        {
+            return View();
+        }
+
+
         //會員普通登入
         [HttpGet]
         public async Task<IActionResult> MemberLogin()
@@ -233,6 +224,7 @@ namespace RouteMasterFrontend.Controllers
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
 
             var authProperties = new AuthenticationProperties
             {
@@ -278,7 +270,7 @@ namespace RouteMasterFrontend.Controllers
                 
             }
 
-            return RedirectToAction("MyMemberIndex", "Members");
+            return RedirectToAction("MyMemberIndex2", "Members");
         }
 
 
@@ -291,7 +283,6 @@ namespace RouteMasterFrontend.Controllers
 
             //驗證Google Token
             GoogleJsonWebSignature.Payload? payload = VerifyGoogleToken(formCredential, formToken, cookiesToken).Result;
-            
              if (payload == null)
             {
                 //驗證失敗
@@ -305,17 +296,18 @@ namespace RouteMasterFrontend.Controllers
                 ViewData["info"] += "Picture:" + payload.Picture;
             }
             
+             //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
              if(_context.Members.Any(m => m.Email == payload.Email))
             {
                 const bool rememberMe = false;
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, payload.Name), // 使用 payload 中的用戶名稱作為身份標識
-                    new Claim(ClaimTypes.Email, payload.Email), // 使用 payload 中的郵件地址作為身份標識
-                    // 可以添加其他您需要的用戶身份資訊，如用戶角色等
+                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
+                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
 
                 var authProperties = new AuthenticationProperties
                 {
@@ -325,8 +317,12 @@ namespace RouteMasterFrontend.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                     authProperties);
-
+                
+                //購物車功能
                 var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+
+
+
                 if (memberid != null)
                 {
                     var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
@@ -371,7 +367,63 @@ namespace RouteMasterFrontend.Controllers
 
                 if (result.IsSuccess)
                 {
-                    return RedirectToAction("MyMemberIndex");
+                    const bool rememberMe = false;
+                    var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
+                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
+                };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = rememberMe,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+                    };
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                        authProperties);
+
+                    //購物車功能
+                    var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+                    if (memberid != null)
+                    {
+                        var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                        if (cart != null)
+                        {
+                            int cartId = cart.Id;
+
+
+                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddHours(2)
+                            });
+                        }
+                        else
+                        {
+                            var newCart = new Cart
+                            {
+                                MemberId = memberid.Value
+                            };
+
+                            _context.Carts.Add(newCart);
+                            _context.SaveChanges();
+
+                            int cartId = newCart.Id;
+
+
+                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddHours(2)
+                            });
+                        }
+
+                    }
+
+                    return RedirectToAction("MyMemberIndex", "Members");
+                    
                 }
                 else
                 {
@@ -436,7 +488,13 @@ namespace RouteMasterFrontend.Controllers
         public async Task<IActionResult> Logout()
         {
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return View("Logout", "Members");
+            HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("LogoutSuccess", "Members");
+        }
+
+        public async Task<IActionResult> LogoutSuccess()
+        {
+            return View();
         }
 
         //忘記密碼並寄信
@@ -513,6 +571,23 @@ namespace RouteMasterFrontend.Controllers
                 return View(vm);
             }
             return RedirectToAction("MyMemberIndex");
+        }
+
+
+        [HttpGet]
+       public async Task<IActionResult> HistoryOrder(int? id)
+        {
+            if (id == null || _context.Members == null) return NotFound();
+            
+            var member = await _context.Members.FindAsync(id);
+            if (member == null) return NotFound();
+            return View(member);
+        }
+
+        [HttpPost]
+        public IActionResult HistoryOrder() 
+        {
+            return View(); 
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -756,7 +831,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name,
+                Account = payload.Name + DateTime.Now,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
