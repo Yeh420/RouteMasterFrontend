@@ -1,6 +1,5 @@
 [] forgetPassword
 	
-[] changePassword
 
 <li><img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" class="default-image imgs" alt="預設圖片 4" width="100" height="100" /></li>
                     <li><img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" class="default-image imgs" alt="預設圖片 5" width="100" height="100" /></li>
@@ -14,4 +13,8 @@
 []歷史訂單
 
 
-[]內建系統圖
+[√]內建系統圖
+
+8/5
+[]google登入畫面
+google登入也是要導向

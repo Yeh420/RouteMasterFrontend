@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Infra.DapperRepositories;
 using RouteMasterFrontend.Models.Interfaces;
 using System.Configuration;
+using static System.Net.WebRequestMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,13 +25,24 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Lockout.MaxFailedAccessAttempts = 2;
 
 });
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddGoogle(options =>
+{
+	options.ClientId = "161026089487 - tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com";
+	options.ClientSecret = "GOCSPX - USIP0 - CadhVekEq_roiE3MsuzmAS";
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
 	//未登入時導入的網址
-	options.LoginPath = new PathString("/Members/MemberLogin");
+	//options.LoginPath = new PathString("/Members/MemberLogin");
 
 	//options.AccessDeniedPath = "/"; 存取失敗的路徑
 });
+
+//.AddCookie(options =>
+//{
+//	options.LoginPath = "/Login/Index";
+//});
+
+
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
 	options.MinimumSameSitePolicy = SameSiteMode.Lax;
