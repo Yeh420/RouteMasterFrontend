@@ -37,6 +37,8 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.61.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.20">
       <PrivateAssets>all</PrivateAssets>
@@ -47,8 +49,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\ActivityImages\" />
-    <Folder Include="wwwroot\MemberUploads\" />
-    <Folder Include="wwwroot\AttractionImages\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />
 
     <Folder Include="wwwroot\CommentsUploads\" />
