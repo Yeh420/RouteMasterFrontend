@@ -268,7 +268,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">加入購物車</button>
+                    <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
                     </div>
                 </div>
             </div>
@@ -291,7 +291,8 @@
                         accommodationName:"",
                         accommodationImage:"",
                         accommodationAddress:"",
-                        accommodationDescription:""
+                        accommodationDescription:"",
+                        cartProductId:1
                     }
                 },
                 mounted: function(){
@@ -347,6 +348,7 @@
                             _this.accommodationName = _this.products[id].name;
                             _this.accommodationAddress = _this.products[id].address + "-";
                             _this.accommodationDescription = _this.products[id].description;
+                            _this.cartProductId = _this.products[id].id;
                             _this.accommodationImage = _this.products[id].images[0].image;
 
                             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -380,6 +382,11 @@
                         let _this = this;
                         _this.thePage = 1;
                         _this.loadProducts();
+                    },
+                    addCart:function(){
+                        let _this=this;
+
+
                     },
                 },
              }
