@@ -272,7 +272,7 @@
                                             @*</div>*@
                                         </li>
                                         <li class="mb-3">
-                                               
+                                            @await Html.PartialAsync("ShowCalendar")
                                         </li>
                                     </ul>
                                 </div>
@@ -370,7 +370,7 @@
                             const p = _this.products[id];
                             _this.accommodationName = p.name;
                             _this.accommodationAddress = p.address + "-";
-                            _this.accommodationImage = p.images[0].image;
+                            _this.accommodationImage = p.images[0] ? p.images[0].image : null;
 
                             const showMoreText = "...顯示更多";
                             const showLessText = "...顯示更少";
@@ -428,7 +428,7 @@
                         const showLessText = "...顯示更少";
                         const lines = this.temp;
                         const s = $('#small');
-                        if (s) {
+                        if (s[0]) {
                             if(!this.showFullDescription){
                                 this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
                             }else{
