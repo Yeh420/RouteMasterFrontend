@@ -37,6 +37,8 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.61.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.20">
       <PrivateAssets>all</PrivateAssets>
@@ -47,8 +49,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\ActivityImages\" />
-    <Folder Include="wwwroot\MemberUploads\" />
-    <Folder Include="wwwroot\AttractionImages\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />
 
     <Folder Include="wwwroot\CommentsUploads\" />
@@ -56,6 +56,10 @@
 
     <Folder Include="wwwroot\CommentAccomodationUploads\" />
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Attractions\Components\TopTenAtt\TopTenAttPartialView.cshtml" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/appsettings.json" wwwroot_4lib_4bootstrap_4dist_4css_4bootstrap-reboot_1css_1map__JsonSchema="" /></VisualStudio></ProjectExtensions>

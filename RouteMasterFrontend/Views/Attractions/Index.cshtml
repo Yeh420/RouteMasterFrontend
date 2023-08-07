@@ -1,0 +1,206 @@
+﻿@using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
+@model IEnumerable<RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionIndexVM>
+
+@{
+    ViewData["Title"] = "Index";
+    int count = ViewBag.Count;
+    List<string> categories = ViewBag.Categories;
+    List<string> tags = ViewBag.Tags;
+    List<string> regions = ViewBag.Regions;
+
+    var criteria = ViewBag.Criteria as AttractionCriteria;
+
+    string s_keyword = criteria.Keyword;
+    List<string> s_category = criteria.category;
+    List<string> s_tag = criteria.tag;
+    List<string> s_region = criteria.region;
+    string s_order = criteria.order;
+}
+
+@section Styles{
+    <style>
+        .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+    </style>
+    
+}
+
+<div >
+    @await Component.InvokeAsync("TopTenAtt",null)
+</div>
+
+<div class="container border my-5 p-3 rounded w-75">
+    <div class="d-flex align-items-center">
+        <h4 class="me-3">@($"目前共有{count}筆景點資料")</h4>
+        &emsp;
+        <button class="btn btn-secondary" id="toggleForm">篩選及排序</button>
+    </div>
+    
+    
+
+    <div class="formContainer">
+        <hr />
+        <form method="get">
+            <div class="row row-cols-5">
+                <div class="mb-3 col">
+                    <label>關鍵字</label>
+
+                    <input type="text" name="keyword" placeholder="請輸入關鍵字" class="form-control" value="@s_keyword" />
+                </div>
+
+                <div class="mb-3 col">
+                    <label>類別</label>
+
+                    @foreach (var category in categories)
+                    {
+                        <div>
+                            <input type="checkbox" id="category_@category" name="category" value="@category" @(s_category != null && s_category.Contains(category) ? "checked" : "")>
+                            <label for="category_@category">@category</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3 col">
+                    <label>標籤</label>
+
+                    @foreach (var tag in tags)
+                    {
+                        <div>
+                            <input type="checkbox" id="tag_@tag" name="tag" value="@tag" @(s_tag != null && s_tag.Contains(tag) ? "checked" : "")>
+                            <label for="tag_@tag">@tag</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3 col">
+                    <label>縣市</label>
+
+                    @foreach (var region in regions)
+                    {
+                        <div>
+                            <input type="checkbox" id="region_@region" name="region" value="@region" @(s_region != null && s_region.Contains(region) ? "checked" : "")>
+                            <label for="region_@region">@region</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3 col">
+                    <label>排序</label>
+                    <select name="order" class="form-select" >
+                        <option value="">請選擇排序方式</option>
+                        <!option value="click" @(s_order == "click" ? "selected" : "")>人氣最高</!option>
+                        <!option value="score" @(s_order == "score" ? "selected" : "")>評分最高</!option>
+                        <!option value="hours" @(s_order == "hours" ? "selected" : "")>停留時間從短到長</!option>
+                        <!option value="hoursDesc" @(s_order == "hoursDesc" ? "selected" : "")>停留時間從長到短</!option>
+                        <!option value="price" @(s_order == "price" ? "selected" : "")>花費從低到高</!option>
+                        <!option value="priceDesc" @(s_order == "priceDesc" ? "selected" : "")>花費從高到低</!option>
+                    </select>
+
+                </div>
+            </div>
+
+
+            <hr />
+            <button class="btn btn-info" id="clear">清空條件</button>
+            <button class="btn btn-warning" id="search">搜尋</button>
+        </form>
+    </div>
+    
+
+    
+</div>
+
+<section >
+    <div class="container w-75">
+        @foreach (var item in Model)
+        {
+            <div class="row mb-4 border rounded" style="height:250px" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">
+                
+
+                
+                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-left" style="object-fit: cover;">
+                
+                
+
+                <div class="col-8 d-flex flex-column justify-content-between  py-3">
+
+                    <h2>@($"{item.Name} ")<span class="badge badge-info text-white">@item.AttractionCategory</span></h2>
+                    <p>@item.DescriptionText</p>
+
+                    <div class="mb-0">
+                        <h5>@item.Region @item.Town</h5>
+                        <p>
+                            @($"{item.Score}")
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                @if (i <= Math.Round(item.Score))
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-regular fa-star"></i>
+                                }
+                            }
+                            @($"({item.ScoreCount}) | 平均停留{item.Hours}小時({item.HoursCount}) | 平均花費{item.Price}元({item.PriceCount})")
+                        </p>
+                        <h5>
+                            @foreach (var tag in item.Tags)
+                            {
+                                <span class="badge badge-primary text-white">@tag</span>
+                            }
+                        </h5>
+                    </div>
+
+
+                    @Html.ActionLink("景點詳情", "Details", new { id = item.Id }, new { @class = "d-none" })
+                    
+                </div>
+                
+            </div>
+        }
+    </div>
+</section>
+
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+       
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, criteria.Keyword, criteria.category, criteria.tag, criteria.region, criteria.order })"
+                   class="@(i == ViewBag.Page ? "active" : "")">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+
+@section Scripts{
+    <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            // 預設收合搜尋表單
+            $('.formContainer').hide();
+        });
+
+        $("#toggleForm").click(function(){
+            $(".formContainer").toggle();
+        })
+
+        $("#clear").click(function () {
+            $("input[name='keyword']").val("");
+            $("input[name='category']").prop("checked", false);
+            $("input[name='tag']").prop("checked", false);
+            $("input[name='region']").prop("checked", false);
+            $("select[name='order']").val("");
+        })
+    </script>
+}
