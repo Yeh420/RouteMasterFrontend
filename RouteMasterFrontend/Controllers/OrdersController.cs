@@ -21,7 +21,7 @@ namespace RouteMasterFrontend.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var routeMasterContext = _context.Orders.Include(o => o.Coupons).Include(o => o.Member).Include(o => o.OrderHandleStatus).Include(o => o.PaymentMethod).Include(o => o.PaymentStatus).Include(o => o.TravelPlan);
+            var routeMasterContext = _context.Orders.Include(o => o.Coupons).Include(o => o.Member).Include(o => o.OrderHandleStatus).Include(o => o.PaymentMethod).Include(o => o.PaymentStatus);
             return View(await routeMasterContext.ToListAsync());
         }
 
@@ -39,7 +39,7 @@ namespace RouteMasterFrontend.Controllers
                 .Include(o => o.OrderHandleStatus)
                 .Include(o => o.PaymentMethod)
                 .Include(o => o.PaymentStatus)
-                .Include(o => o.TravelPlan)
+
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -79,7 +79,7 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-            ViewData["TravelPlanId"] = new SelectList(_context.TravelPlans, "Id", "Id", order.TravelPlanId);
+
             return View(order);
         }
 
@@ -101,7 +101,7 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-            ViewData["TravelPlanId"] = new SelectList(_context.TravelPlans, "Id", "Id", order.TravelPlanId);
+
             return View(order);
         }
 
@@ -142,7 +142,7 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-            ViewData["TravelPlanId"] = new SelectList(_context.TravelPlans, "Id", "Id", order.TravelPlanId);
+
             return View(order);
         }
 
@@ -160,7 +160,7 @@ namespace RouteMasterFrontend.Controllers
                 .Include(o => o.OrderHandleStatus)
                 .Include(o => o.PaymentMethod)
                 .Include(o => o.PaymentStatus)
-                .Include(o => o.TravelPlan)
+
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {

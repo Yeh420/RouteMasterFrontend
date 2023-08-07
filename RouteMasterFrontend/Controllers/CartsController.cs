@@ -299,7 +299,7 @@ namespace RouteMasterFrontend.Controllers
 
      
         [HttpPost]
-        public ActionResult CheckoutPost(string paymentmethod, string name, string telephone, string address)
+        public ActionResult CheckoutPost(string paymentmethod, string name, string telephone, string address, string?note)
         {
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
             if (memberId == null)
@@ -314,12 +314,12 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, "購物車是空的，無法進行結帳");
                 return View("Checkout");
             }
-            ProcessCheckout(memberId);
+            ProcessCheckout(memberId, note);
 
             return View("ConfirmCheckout");
         }
 
-        private void ProcessCheckout(int memberId)
+        private void ProcessCheckout(int memberId, string?note)
         {
             var cart = GetCartInfo(memberId);
 
@@ -334,10 +334,94 @@ namespace RouteMasterFrontend.Controllers
             }
 
             // 創建新訂單
-            CreateOrder(memberId, cart);
+            CreateOrder(memberId, note);
 
             EmptyCart(memberId);
 
+        }
+
+        private void CreateOrder(int memberId, string note)
+        {
+            var cart = GetCartInfo(memberId);
+
+            bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() ||
+                                 cart.Cart_ActivitiesDetails.Any() ||
+                                 cart.Cart_AccommodationDetails.Any();
+
+            if (!allowCheckout)
+            {
+                
+                return;
+            }
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                 
+                    var order = new Order
+                    {
+                        MemberId = memberId,
+                        PaymentMethodId = 1,
+                        PaymentStatusId = 1,
+                        OrderHandleStatusId =1,
+                        CouponsId =1,
+                        CreateDate = DateTime.Now,
+                        ModifiedDate = null, 
+                      
+                       
+                    };
+                    _context.Orders.Add(order);
+                    _context.SaveChanges();
+
+                    foreach (var accommodationItem in cart.Cart_AccommodationDetails)
+                    {
+
+                        var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
+                        var accommodationId=_context.Rooms.Where(x=>x.Id==roomId).First().AccommodationId;
+
+                        var accommodationName = _context.Accommodations.Where(x => x.Id == accommodationId).First().Name;
+                        var RoomType = _context.Rooms.Where(x => x.Id == roomId).First().RoomTypeId;
+                        var RoomName= _context.Rooms.Where(x=>x.Id==roomId).First().Name;
+                        var RoomPrice=_context.Rooms.Where(x=>x.Id==roomId).First().Price;
+                        var Quantity = _context.Rooms.Where(x => x.Id == roomId).First().Quantity;
+                        TimeSpan checkinTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckIn??TimeSpan.Zero;
+                        var Checkin = DateTime.Today.Add(checkinTimeSpan);
+                        TimeSpan checkoutTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckOut ?? TimeSpan.Zero;
+                        var Checkout = DateTime.Today.Add(checkoutTimeSpan);
+
+                        var accommodationDetail = new OrderAccommodationDetail
+                        {
+                            OrderId = order.Id,
+                            AccommodationId = accommodationId,
+                            AccommodationName = accommodationName,
+                            RoomProductId = accommodationItem.RoomProductId,
+                            RoomType = RoomType.ToString(),
+                            RoomName = RoomName,
+                            CheckIn = Checkin,
+                            CheckOut = Checkout,
+                            RoomPrice = RoomPrice,
+                            Quantity = Quantity,
+                            Note = note
+                        };
+
+                        _context.OrderAccommodationDetails.Add(accommodationDetail);
+                        _context.SaveChanges();
+                    }
+             
+
+                    transaction.Commit();
+                }
+                catch (DbUpdateException ex)
+                {
+                    
+                    var innerException = ex.InnerException;
+
+                    
+
+                    transaction.Rollback();
+                }
+            }
         }
 
         //private void CreateOrder(int memberId, Cart cart)
@@ -442,6 +526,22 @@ namespace RouteMasterFrontend.Controllers
         {
             var cart = _context.Carts.FirstOrDefault(c => c.MemberId == memberId);
             if (cart == null) return;
+
+
+            var toBeDeletedAcco = _context.Cart_AccommodationDetails.Where(x => x.CartId == cart.Id);
+            _context.Cart_AccommodationDetails.RemoveRange(toBeDeletedAcco);
+            _context.SaveChanges();
+
+            var toBeDeleteEXT = _context.Cart_ExtraServicesDetails.Where(x=>x.CartId== cart.Id);
+            _context.Cart_ExtraServicesDetails.RemoveRange(toBeDeleteEXT);
+            _context.SaveChanges();
+
+            var toBeDeleteAct = _context.Cart_ActivitiesDetails.Where(x=>x.CartId==cart.Id);
+            _context.Cart_ActivitiesDetails.RemoveRange(toBeDeleteAct);
+            _context.SaveChanges();
+
+
+
 
             _context.Carts.Remove(cart);
             _context.SaveChanges();

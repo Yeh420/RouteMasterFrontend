@@ -9,7 +9,6 @@ namespace RouteMasterFrontend.EFModels
     {
         public TravelPlan()
         {
-            Orders = new HashSet<Order>();
             Transportations = new HashSet<Transportation>();
             ActivityProducts = new HashSet<ActivityProduct>();
             Attractions = new HashSet<Attraction>();
@@ -22,7 +21,6 @@ namespace RouteMasterFrontend.EFModels
         public DateTime CreateDate { get; set; }
 
         public virtual Member Member { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<Transportation> Transportations { get; set; }
 
         public virtual ICollection<ActivityProduct> ActivityProducts { get; set; }
