@@ -320,6 +320,9 @@ namespace RouteMasterFrontend.Controllers
                 
                 //購物車功能
                 var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+
+
+
                 if (memberid != null)
                 {
                     var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
