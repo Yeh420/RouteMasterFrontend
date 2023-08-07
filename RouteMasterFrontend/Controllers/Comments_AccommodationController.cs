@@ -31,9 +31,10 @@ namespace RouteMasterFrontend.Controllers
                   .Include(c => c.Accommodation)
                   .Include(c=>c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
-                 
 
-			switch (input.Manner)
+            var proImg = _context.Comments_AccommodationImages;
+
+            switch (input.Manner)
 			{
 				case 0:
 					commentDb = commentDb.OrderBy(c => c.Id);
@@ -48,30 +49,83 @@ namespace RouteMasterFrontend.Controllers
 					commentDb = commentDb.OrderBy(c => c.Score);
 					break;
 			}
-            //commentDb.ToListAsync().Wait();
-           
-
             var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
-         
-            //for (var i = 0; i < v.Count; i++)
-            //{
-            //    v[i].ImageList = commentDb.ToList()[i].Comments_AccommodationImages;
-            //};
+
             return Json(vm);
 		}
 
-        public IActionResult ImgSearch(int id)
+        public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var img = _context.Comments_AccommodationImages
-                .Where(i => i.Comments_AccommodationId == id)
-                .Select(c => c.Image);
+           
+            var commentDb = _context.Comments_Accommodations
+                  .Include(c => c.Member)
+                  .Include(c => c.Accommodation)
+                  .Include(c => c.CommentStatus)
+                  .Where(c => c.AccommodationId == input.HotelId);
 
+            switch (input.Manner)
+            {
+                case 0:
+                    commentDb = commentDb.OrderBy(c => c.Id);
+                    break;
+                case 1:
+                    commentDb = commentDb.OrderByDescending(c => c.CreateDate);
+                    break;
+                case 2:
+                    commentDb = commentDb.OrderByDescending(c => c.Score);
+                    break;
+                case 3:
+                    commentDb = commentDb.OrderBy(c => c.Score);
+                    break;
+            }
 
-            return Json(img);
+            var proImg = _context.Comments_AccommodationImages;
+            var proLike = _context.Comment_Accommodation_Likes
+                .Include(l => l.Member);
+               
+
+            var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
+            {
+                Id = c.Id,
+                Account=c.Member.Account,
+                HotelName=c.Accommodation.Name,
+                Score=c.Score,
+                Title=c.Title,
+                Pros=c.Pros,
+                Cons=c.Cons,
+                CreateDate=c.CreateDate,
+                Status=c.CommentStatus.Name,
+                ReplyMessage=c.Reply,
+                ReplyDate=c.ReplyAt,
+                ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
+                .Select(p=>p.Image).ToList(),
+                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.Member.Account== c.Member.Account),
+
+            }).ToListAsync();
+
+            return Json(rod);
         }
         public IActionResult PartialPage()  
         {
             return View();
+        }
+
+        public async Task<string> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
+        {
+            var proLike =await _context.Comment_Accommodation_Likes
+                .Include(l => l.Member)
+                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
+            if(proLike==null)
+            {
+               //建立按讚紀錄
+
+            }
+            else
+            {
+                //刪除按讚紀錄
+            }
+
+            return string.Empty;
         }
 
         // GET: Comments_Accommodation/Details/5    
@@ -131,7 +185,9 @@ namespace RouteMasterFrontend.Controllers
                 _context.Comments_Accommodations.Add(commentDb);
                 _context.SaveChanges();
                 string webRootPath = _environment.WebRootPath;
+
                 string path = Path.Combine(webRootPath, "MemberUploads");               
+
                 foreach (IFormFile i in file1)
                 {
                     if (i != null && i.Length > 0)
@@ -144,11 +200,13 @@ namespace RouteMasterFrontend.Controllers
                         _context.Comments_AccommodationImages.Add(img);                    
                     }
                 }
+
                 _context.SaveChanges();
 
 
 
                 return RedirectToAction("Index","Home");
+
             }
             ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);

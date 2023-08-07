@@ -40,7 +40,13 @@ namespace RouteMasterBackend.Controllers
                     .Include(a => a.AccommodationServiceInfos).AsQueryable();
             if (!string.IsNullOrEmpty(keyword))
             {
-	            accommodations = accommodations.Where(p => p.Name.Contains(keyword));
+	            accommodations = accommodations.Where(p => 
+                    p.Name.Contains(keyword)||
+                    p.Description.Contains(keyword)||
+                    p.Address.Contains(keyword)||
+                    p.AccommodationServiceInfos.Where(s=>s.Name.Contains(keyword)).Any()
+                );
+
             }
             #region
             //分頁
@@ -55,6 +61,7 @@ namespace RouteMasterBackend.Controllers
             AccommodtaionsDTO accommodationsDTO = new AccommodtaionsDTO();
             accommodationsDTO.Items = await accommodations.Select(a => new AccommodtaionsDTOItem
             {
+                Id = a.Id,
                 Name = a.Name,
                 Description = a.Description,
                 Grade = a.Grade,
