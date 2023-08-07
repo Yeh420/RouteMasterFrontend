@@ -281,7 +281,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" >加入購物車</button>
+
+                    <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
+
                     </div>
                 </div>
             </div>
@@ -305,9 +307,9 @@
                         accommodationImage:"",
                         accommodationAddress:"",
                         accommodationDescription:"",
-                        showFullDescription: false,
-                        maxDescriptionLines: 5,
-                        temp:""
+
+                        cartProductId:1
+
                     }
                 },
                 mounted: function(){
@@ -361,6 +363,10 @@
                         let _this = this;
                         const exampleModal = document.getElementById('exampleModal')
                         if (exampleModal) {
+
+                           
+                            _this.cartProductId = _this.products[id].id;
+                           
                             const p = _this.products[id];
                             _this.accommodationName = p.name;
                             _this.accommodationAddress = p.address + "-";
@@ -375,6 +381,7 @@
                             }else{
                                 _this.accommodationDescription = lines.join('<br>');
                             }
+
 
                             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
                             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
@@ -409,6 +416,13 @@
                         _this.thePage = 1;
                         _this.loadProducts();
                     },
+
+                    addCart:function(){
+                        let _this=this;
+
+
+                    },
+
                     toggleDescription: function() {
                         const showMoreText = "...顯示更多";
                         const showLessText = "...顯示更少";
@@ -423,6 +437,7 @@
                                 this.showFullDescription = !this.showFullDescription;
                         }
                     }
+
                 },
                
              }
