@@ -164,24 +164,35 @@
                 var credit;
                 var request={};
                 request.CommentId=commentId;
-                request.IsLike=credit;
+                request.IsLike=true;
 
               
                     for (let j = 0; j < _this.indexVM.length; j++) {
                        let likes = _this.indexVM[j];
                     if (likes.id == commentId && likes.thumbsUp == false) {
                         //ajax建立按讚紀錄
-                           credit=true;
+                        likes.thumbsUp=true;
+                         console.log("已按讚");
                         }
                     else if (likes.id == commentId && likes.thumbsUp == true) {
                         //ajax刪除按讚紀錄
-                        credit=false;
+                        likes.thumbsUp=false;
+                        console.log("取消按讚");
                         }
-                        else{
-                            console.log("什鬼");
-                        }
+
+                    else
+                    {
+                       console.log("什鬼");
                     }
-                //axios.post("", request).then(response => { }).catch(err => { });
+                    }
+                axios.post("https://localhost:7145/Comments_Accommodation/DecideLike", request).then(response =>{
+
+                    console.log(response.data);
+
+                }).catch(err =>{
+                    alert(err);
+                });
+
                 _this.commentDisplay();
                 }
                
