@@ -27,8 +27,8 @@
                     <div class="carousel-item active">
                         <img src="~/AttractionImages/@Model.ToArray()[i].Image" class="d-block w-100" style="height:400px; object-fit:cover" onclick=" location.href='@Url.Action("Details", new { id = Model.ToArray()[i].Id })'">
                         <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-pill ">
-                            <h1><strong>@Model.ToArray()[i].Name</strong></h1>
-                            <h3><strong>@($"{Model.ToArray()[i].Region} {Model.ToArray()[i].Town}")</strong></h3>
+                            <h3><strong>@Model.ToArray()[i].Name</strong></h3>
+                            <h5><strong>@($"{Model.ToArray()[i].Region} {Model.ToArray()[i].Town}")</strong></h5>
                             @Html.ActionLink("景點詳情", "Details", new { id = Model.ToArray()[i].Id }, new { @class = "d-none" })
                         </div>
                     </div>
@@ -38,8 +38,8 @@
                     <div class="carousel-item">
                         <img src="~/AttractionImages/@Model.ToArray()[i].Image" class="d-block w-100" style="height:400px; object-fit:cover" onclick=" location.href='@Url.Action("Details", new { id = Model.ToArray()[i].Id })'">
                         <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-pill " >
-                            <h1><strong>@Model.ToArray()[i].Name</strong></h1>
-                            <h3><strong>@($"{Model.ToArray()[i].Region} {Model.ToArray()[i].Town}")</strong></h3>
+                            <h3><strong>@Model.ToArray()[i].Name</strong></h3>
+                            <h5><strong>@($"{Model.ToArray()[i].Region} {Model.ToArray()[i].Town}")</strong></h5>
                             @Html.ActionLink("景點詳情", "Details", new { id = Model.ToArray()[i].Id }, new { @class = "d-none" })
                         </div>
                     </div>

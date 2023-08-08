@@ -7,5 +7,7 @@ namespace RouteMasterFrontend.Models.Interfaces
         IEnumerable<AttractionIndexDto> Search();
 
         IEnumerable<AttractionIndexDto> GetTopTen();
+
+        AttractionDetailDto Get(int id);
     }
 }

@@ -49,5 +49,26 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
             };
         }
 
+        public static AttractionDetailVM ToDetailVM(this AttractionDetailDto dto)
+        {
+            return new AttractionDetailVM
+            {
+                Id = dto.Id,
+                AttractionCategory = dto.AttractionCategory,
+                Name = dto.Name,
+                Region = dto.Region,
+                Town = dto.Town,
+                Images = dto.Images,
+                Description = dto.Description,
+                Tags = dto.Tags,
+                Score = dto.Score,
+                ScoreCount = dto.ScoreCount,
+                Hours = dto.Hours,
+                HoursCount = dto.HoursCount,
+                Price = dto.Price,
+                PriceCount = dto.PriceCount,
+                Clicks = dto.Clicks,
+            };
+        }
     }
 }

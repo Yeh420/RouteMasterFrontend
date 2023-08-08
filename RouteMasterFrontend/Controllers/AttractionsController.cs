@@ -82,19 +82,19 @@ namespace RouteMasterFrontend.Controllers
             return View(attractions);
         }
 
-        public IActionResult TopTenAtt()
+        public IActionResult Details(int id)
         {
-            IEnumerable<AttractionTopTenVM> topTenAtt = GetTopTenAtt();
+            AttractionDetailVM vm = Get(id);
 
-            return PartialView(topTenAtt);
+            return View(vm);
         }
 
-        private IEnumerable<AttractionTopTenVM> GetTopTenAtt()
+        private AttractionDetailVM Get(int id)
         {
             IAttractionRepository repo = new AttractionEFRepository();
             AttractionService service = new AttractionService(repo);
 
-            return service.GetTopTen().Select(dto => dto.ToTopTenVM());
+            return service.Get(id).ToDetailVM();
         }
 
         private IEnumerable<AttractionIndexVM> GetAttractions()
