@@ -8,10 +8,20 @@
 [v]Added extraservice/activities/accomodation to cart
 [v]Deleted extraservice
 
-8/2 Todo
-[.]update extraservice
+8/2 
+[V]update extraservice
 Todo:
 Add product to cart
 Delete product from cart
 CheckOut page
 123
+
+8/8 
+[v] cart finish
+
+
+
+
+
+Todo
+cart_accommodation(partial view hasn't been reloaded yet), remove not finish

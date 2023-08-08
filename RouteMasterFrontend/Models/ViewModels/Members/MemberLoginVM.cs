@@ -16,5 +16,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[DataType(DataType.Password)]
 		[Display(Name = "密碼")]
 		public string Password { get; set; }
+
+		public string? image { get; set; }
 	}
 }
