@@ -52,7 +52,7 @@
 
         .product-info .left {
             /* max-width: 36%; */
-            width:604px;
+            width:602px;
             /* height: 677px; */
            
             /* border: 1px solid #ccc; */
@@ -69,7 +69,7 @@
     .productPhoto {
         object-fit: cover; /*contain 符合指定的寬高比例*/
         width:100%;
-        aspect-ratio: auto 1 / 1;
+        /*aspect-ratio: auto 1 / 1;*/
     }
 
     .product-info .images {
@@ -81,12 +81,7 @@
         align-items: start;
         overflow-y: hidden;
         overflow-x: auto; */
-        border: 1px solid #ccc;
-    }
-
-    .product-info li img {
-        width: 58px;
-        margin: 1px;
+        /*border: 1px solid #ccc;*/
     }
 
     .product-info .imageList {
@@ -95,9 +90,19 @@
         display: flex;
         /* justify-content: center; */
         align-items: center;
-        cursor: pointer;
+        /*cursor: pointer;*/
         border: 1px solid #ccc;
         /* padding-left:116px; */
+    }
+    .product-info .imageList li {
+        margin: 1px;
+    }
+    
+    .product-info .imageList li img{
+        width: 58px;
+        height:58px;
+        cursor: pointer;
+        object-fit:cover;
     }
 
    /*  .fixLeft{
@@ -225,7 +230,9 @@
                             <div class="product-info h-100">
                                 <div class="left h-100 mt-2 ms-2">
                                     <div class="position-relative w-100">
-                                        <img v-bind:src=`../AccommodationImages/${accommodationImage}` class="productPhoto position-fix" alt="">
+                                        <div class="w-100 d-flex justify-content-center align-items-center" style="aspect-ratio: auto 1 / 1">
+                                            <img v-if="accommodationImage" v-bind:src=`../AccommodationImages/${accommodationImage}` class="productPhoto position-fix" alt="">
+                                        </div>
                                         <div class="images" data-simplebar>
                                             <ul class="imageList">
                                             </ul>
@@ -256,10 +263,16 @@
                                             </div>
                                         </li>
                                         <li class="mb-3">
-                                            <div class="form-floating">
-                                                <textarea class="form-control" placeholder="" readonly id="floatingTextarea" rows="10" cols="10"> {{accommodationDescription}}</textarea>
-                                                <label for="floatingTextarea">住所描述</label>
-                                            </div>
+                                            @*<div class="form-floating">*@
+                                                @*<label for="floatingTextarea" class="fs-2">住所描述</label>*@
+                                                
+                                                <div v-html="accommodationDescription" @@click="toggleDescription">
+                                                    
+                                                </div>
+                                            @*</div>*@
+                                        </li>
+                                        <li class="mb-3">
+                                               
                                         </li>
                                     </ul>
                                 </div>
@@ -268,7 +281,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">加入購物車</button>
+
+                    <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
+
                     </div>
                 </div>
             </div>
@@ -291,7 +306,10 @@
                         accommodationName:"",
                         accommodationImage:"",
                         accommodationAddress:"",
-                        accommodationDescription:""
+                        accommodationDescription:"",
+
+                        cartProductId:1
+
                     }
                 },
                 mounted: function(){
@@ -328,6 +346,7 @@
                     ELLIPSIS() {
                         return "...";
                     },
+                    
                 },
                 methods:{
                     loadProducts:async function(){
@@ -344,17 +363,33 @@
                         let _this = this;
                         const exampleModal = document.getElementById('exampleModal')
                         if (exampleModal) {
-                            _this.accommodationName = _this.products[id].name;
-                            _this.accommodationAddress = _this.products[id].address + "-";
-                            _this.accommodationDescription = _this.products[id].description;
-                            _this.accommodationImage = _this.products[id].images[0].image;
+
+                           
+                            _this.cartProductId = _this.products[id].id;
+                           
+                            const p = _this.products[id];
+                            _this.accommodationName = p.name;
+                            _this.accommodationAddress = p.address + "-";
+                            _this.accommodationImage = p.images[0].image;
+
+                            const showMoreText = "...顯示更多";
+                            const showLessText = "...顯示更少";
+                            const lines = _this.temp = p.description.split('\n');
+                            // 如果行數超過 5 行，僅保留前 5 行
+                            if (lines.length > 5) {
+                                _this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id='small' style='color: #999'>${showMoreText}</small>`;
+                            }else{
+                                _this.accommodationDescription = lines.join('<br>');
+                            }
+
 
                             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
                             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
+                            // 可改寫VUE
                             const modalImg = exampleModal.querySelector('.product-info ul');
                             modalImg.innerHTML = "";
-                            _this.products[id].images.map(function (p) {
+                            p.images.map(function (p) {
                                 const ce = document.createElement('li');
                                 ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
                                 modalImg.append(ce);
@@ -381,9 +416,33 @@
                         _this.thePage = 1;
                         _this.loadProducts();
                     },
+
+                    addCart:function(){
+                        let _this=this;
+
+
+                    },
+
+                    toggleDescription: function() {
+                        const showMoreText = "...顯示更多";
+                        const showLessText = "...顯示更少";
+                        const lines = this.temp;
+                        const s = $('#small');
+                        if (s) {
+                            if(!this.showFullDescription){
+                                this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
+                            }else{
+                                this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
+                            }
+                                this.showFullDescription = !this.showFullDescription;
+                        }
+                    }
+
                 },
+               
              }
             var app = Vue.createApp(vueApp).mount("#app");
            
+            
         </script>
     }
