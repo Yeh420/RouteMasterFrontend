@@ -6,6 +6,7 @@ using RouteMasterFrontend.EFModels;
 
 namespace RouteMasterFrontend.Controllers
 {
+    
     public class CartsController : Controller
     {
         private readonly RouteMasterContext _context;
@@ -188,23 +189,27 @@ namespace RouteMasterFrontend.Controllers
                 .ToList();
             return accomodationDetails;
         }
-        public IActionResult AddAccommodation2Cart(int accommodationId)
+
+        [HttpPost]
+        public IActionResult AddAccommodation2Cart( int roomProductId)
         {
             try
             {
-                var RoomProduct=_context.RoomProducts.FirstOrDefault(r=>r.Id==accommodationId);
+                var RoomProduct = _context.RoomProducts.FirstOrDefault(r=>r.Id == roomProductId);
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
+                    //var cartIdFromCookie = 3;
                     var cartItem = new Cart_AccommodationDetail
                     {
+                        Id = 0,
                         CartId = cartIdFromCookie,
                         RoomProductId = RoomProduct.Id,
                         Quantity = 1
                     };
                     _context.Cart_AccommodationDetails.Add(cartItem);
                     _context.SaveChanges();
-                    Response.Cookies.Append("cartId",cartIdFromCookie.ToString());
+                    Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
                     return Json(new { success = true, message = "Successfully added to cart" });
                 }
                 else
@@ -212,9 +217,9 @@ namespace RouteMasterFrontend.Controllers
                     return Json(new { success = false, message = "Product not found." });
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                return Json(new { success = false, message = "Failed to add to cart." });
+                return Json(new { success = false, message = "Failed to add to cart."+ex });
             }
         }
         public IActionResult RemoveAccommodationFromCart(int accommodationId)
@@ -615,7 +620,6 @@ namespace RouteMasterFrontend.Controllers
             _context.Carts.Remove(cart);
             _context.SaveChanges();
         }
-
 
         public IActionResult AddAccomodation2Cart(int accomodationId)
         {
