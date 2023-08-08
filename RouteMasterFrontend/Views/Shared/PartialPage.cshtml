@@ -7,6 +7,7 @@
 <div id="app">
     <div class="container">
         <div class="row mb-2" style="width:20%">
+            <a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>
             <label for="commentOrder">排序選擇:</label>
             <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
                 <option value="0" selected>請選擇</option>
@@ -14,16 +15,15 @@
                 <option value="2">星星評分高至低</option>
                 <option value="3">星星評分低至高</option>
             </select>
-            <a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>
             @*<p>選到的選項value為:{{ selected }}</p>*@
         </div>
-        <div v-for="item in indexVM" class="card mb-3">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="card-header">{{item.account}}</div>
                     <div class="card-body">
                         <div class="d-flex">
-                            <h5 class="card-title me-auto">標題:{{item.title}}</h5>
+                            <h4 class="card-title me-auto">標題:{{item.title}}</h4>
                             <div>{{item.status}}</div>
                         </div>
                         <p class="card-text">{{item.id}}</p>
@@ -36,7 +36,7 @@
                         <p class="card-text">{{item.replyDate}}</p>
                         <p class="card-text">{{item.thumbsUp}}</p>
                         <p class="card-text"><small class="text-muted">{{item.createDate}}</small></p>
-                        <template v-if="item.thumbsUp">
+                        @*<template v-if="item.thumbsUp">
                             <button type="button" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="取消讚">
                                 取消按讚
                             </button>
@@ -45,41 +45,28 @@
                             <button type="button" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                                 <i class="fa-regular fa-thumbs-up fa-lg"></i>
                             </button>
-                        </template>
+                        </template>*@
+                        <button type="button" v-html="thumbicon[index]" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                                
+                            </button>
                        
                         <template v-if="item.status===isReplyed">
-                            <button type="button" class="btn btn-primary position-relative" data-bs-toggle="modal"
-                                    data-bs-target="#messageModal">
-                                回覆通知
-                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                            <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
+                                    :data-bs-target=`#collapseExample${index}` @@showReply(item.id)>
+                                看回覆訊息
+                               @* <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                                     <span class="visually-hidden"></span>
-                                </span>
+                                </span>*@
                             </button>
-                            <div class="modal" tabindex="-1" id="messageModal">
-                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">{{item.hotelName}}的回覆</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>
-                                                {{item.replyMessage}}
-                                            </p>
-                                            <div class="text-muted d-flex justify-content-end">{{item.replyDate}}</div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
+                            <div class="collapse mt-3" :id=`collapseExample${index}`>
+                                <div class="card card-body">
+                                    <h5>來自{{item.hotelName}}的回覆:</h5>
+                                    <p>{{item.replyMessage}}</p>
+                                    <p class="text-muted text-end"><small class="text-muted">{{item.replyDate}}</small></p>
                                 </div>
                             </div>
                         </template>
-                        <template v-else>
-                            <button type="button" class="btn btn-primary position-relative">
-                                回覆通知
-                            </button>
-                        </template>
+                       
                        
                         
 
@@ -90,14 +77,35 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    @*<img src="..." class="img-fluid rounded-start" alt="...">*@
-                    
                     <template v-if="item.imageList.length>1">
-                        <div v-for="photo in item.imageList" style="width:100px" class="d-flex">
-                           @* <div>{{photo}}</div>*@
-                            <img :src=`../MemberUploads/${photo}` style="width:100px">
+                        <div :id=`carousel${index}` class="carousel carousel-dark slide" data-bs-ride="carousel">
+                            <div class="carousel-inner w-50">
+
+
+
+                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                        <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                    </div>
+                               
+                            </div>
+                            <button class="carousel-control-prev" type="button" :data-bs-target=`#carousel${index}` data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" :data-bs-target=`#carousel${index}` data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
                         </div>
+                        
+
+
                     </template>
+
+
+                    
+
+                    
                     <template v-else>
                         <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
                     </template>
@@ -116,6 +124,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <script>
         var vueApp = {
             data() {
@@ -125,14 +134,17 @@
                     isReplyed:"已回復",
                     ep:null,
                     selected: 0,
-                    hotelId: 1 //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
+                    hotelId: 1, //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
+                    thumbicon:[],
+                   
                 }
+            },
+            created: function(){
+                let _this = this;
+                _this.commentDisplay();
             },
             mounted: function () {
                 let _this = this;
-                _this.commentDisplay();
-
-
             },
             methods: {
                 commentDisplay: function () {
@@ -143,8 +155,15 @@
                      axios.post("https://localhost:7145/Comments_Accommodation/ImgSearch",request).then(response => {
                    _this.indexVM = response.data;
                     console.log(_this.indexVM);
+                    _this.thumbicon = _this.indexVM.map(function(vm){
+                        //console.log(vm.thumbsUp);
+                        return vm.thumbsUp ? '<i class="fa-solid fa-thumbs-up"></i>' : '<i class="fa-regular fa-thumbs-up"></i>';
+                    })
+                    //console.log(_this.thumbicon);
+
                     for(let j=0;j<_this.indexVM.length;j++){
                        _this.item =_this.indexVM[j];
+
                         
                    
                      }
@@ -152,53 +171,35 @@
                     }).catch(err=>{
                         alert(err);
                     });
+                   
                     
                 },
-                likeComment:function(commentId)
+                likeComment: async function(commentId)
                {
                 let _this = this;
-                var credit;
                 var request={};
                 request.CommentId=commentId;
                 request.IsLike=true;
-
               
-                    for (let j = 0; j < _this.indexVM.length; j++) {
-                       let likes = _this.indexVM[j];
-                    if (likes.id == commentId && likes.thumbsUp == false) {
-                        //ajax建立按讚紀錄
-                        likes.thumbsUp=true;
-                         console.log("已按讚");
-                        }
-                    else if (likes.id == commentId && likes.thumbsUp == true) {
-                        //ajax刪除按讚紀錄
-                        likes.thumbsUp=false;
-                        console.log("取消按讚");
-                        }
+                await axios.post("https://localhost:7145/Comments_Accommodation/DecideLike", request).then(response =>{
 
-                    else
-                    {
-                       console.log("什鬼");
-                    }
-                    }
-                axios.post("https://localhost:7145/Comments_Accommodation/DecideLike", request).then(response =>{
-
-                    console.log(response.data);
-
+                _this.commentDisplay();
+                   
+                    
                 }).catch(err =>{
                     alert(err);
                 });
 
-                _this.commentDisplay();
-                }
-               
-               
-               
-                
-               
-        
-                
+                },
+            getImgPath:function(photo){
+                return `../MemberUploads/${photo}`;
             }
+   
+            },
+        getActive:function(){
+            console.log(this);
+            return this.classList.add("active");
+        }
         };
         const app = Vue.createApp(vueApp).mount("#app");
         
