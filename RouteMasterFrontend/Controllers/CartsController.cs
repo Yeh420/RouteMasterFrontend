@@ -1,4 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Policy;
+using System.Text;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +15,10 @@ namespace RouteMasterFrontend.Controllers
     public class CartsController : Controller
     {
         private readonly RouteMasterContext _context;
-
+        private const string PaymentApiUrl = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
+     
+        private const string HashKey = "pwFHCqoQZGmho4w6"; 
+        private const string HashIV = "EkRm7iFT261dpevs";
         public CartsController(RouteMasterContext context)
         {
             _context = context;
@@ -390,13 +398,16 @@ namespace RouteMasterFrontend.Controllers
             }
 
             // 創建新訂單
-            CreateOrder(memberId, note);
+            CreateOrderAsync(memberId, note);
+            //GetPaymentRedirectUrl(order);
 
+            // 將用戶重定向到支付金流頁面
+            //return Redirect(paymentUrl);
             EmptyCart(memberId);
 
         }
 
-        private void CreateOrder(int memberId, string note)
+        private async Task CreateOrderAsync(int memberId, string note)
         {
             var cart = GetCartInfo(memberId);
 
@@ -404,7 +415,7 @@ namespace RouteMasterFrontend.Controllers
                                  cart.Cart_ActivitiesDetails.Any() ||
                                  cart.Cart_AccommodationDetails.Any();
 
-            if (!allowCheckout)
+            if (!allowCheckout) 
             {
                 
                 return;
@@ -469,7 +480,8 @@ namespace RouteMasterFrontend.Controllers
              
 
                     transaction.Commit();
-                }
+                //    PrepareAndExecutePayment(order);
+                //}
                 catch (DbUpdateException ex)
                 {
                     
@@ -481,6 +493,67 @@ namespace RouteMasterFrontend.Controllers
                 }
             }
         }
+
+    //    private void PrepareAndExecutePayment(Order order)
+    //    {
+    //        var paymentParameters = new Dictionary<string, string>
+    //{
+    //            { "MerchantID", "3002607" },
+    //            { "MerchantTradeNo", order.Id.ToString() },
+    //            { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
+    //            { "PaymentType", "aio" },
+    //            { "TotalAmount", order.Total.ToString() },
+
+    //        };
+    //        var checkMacValue = BuildCheckMacValue(paymentParameters);
+    //        paymentParameters.Add("CheckMacValue", checkMacValue);
+
+    //        var content = new FormUrlEncodedContent(paymentParameters);
+    //        using (var client = new HttpClient())
+    //        {
+    //            var response = client.PostAsync(PaymentApiUrl, content).Result;
+    //            if (response.IsSuccessStatusCode)
+    //            {
+    //                Console.WriteLine("Payment successful");
+    //            }
+    //            else
+    //            {
+    //                Console.WriteLine("Payment failed");
+    //            }
+    //        }
+
+    //    }
+
+    //    private string BuildCheckMacValue(Dictionary<string, string> parameters)
+    //    {
+    //        string szCheckMacValue = String.Format("HashKey={0}{1}&HashIV={2}",
+    //            HashKey, string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}")), HashIV);
+    //        szCheckMacValue = HttpUtility.UrlEncode(szCheckMacValue).ToLower();
+
+    //        using (SHA256 sha256 = SHA256Managed.Create())
+    //        {
+    //            byte[] bytes = Encoding.UTF8.GetBytes(szCheckMacValue);
+    //            byte[] hashBytes = sha256.ComputeHash(bytes);
+    //            szCheckMacValue = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+    //        }
+
+    //        return szCheckMacValue;
+    //    }
+
+    //    private string GetPaymentRedirectUrl(Order order)
+    //    {
+    //        string PaymentBaseUrl = "https://localhost:7145/Carts/CheckoutPost";
+    //        var paymentUrl = PaymentBaseUrl + "?orderId=" + order.Id +
+    //            "&totalAmount=" + order.Total +
+    //            "&memberId=" + order.MemberId +
+    //            "&paymentMethodId=" + order.PaymentMethodId +
+    //            "&paymentStatusId=" + order.PaymentStatusId +
+    //            "&orderHandleStatusId=" + order.OrderHandleStatusId +
+    //            "&couponsId=" + order.CouponsId +
+    //            "&createDate=" + order.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") +
+    //            "&modifiedDate=" + (order.ModifiedDate.HasValue ? order.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "");
+    //        return paymentUrl;
+    //    }
 
         private int CalculateCartTotal(Cart cart)
         {
