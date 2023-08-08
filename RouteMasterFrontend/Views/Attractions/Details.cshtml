@@ -4,98 +4,66 @@
     ViewData["Title"] = "Details";
 }
 
-<div class="container w-75">
-    <h1>@($"{Model.Name} ")<span class="badge bg-info">@Model.AttractionCategory</span></h1>
+@section Styles{
+    <style>
+        p {
+            font-size:1.4em;
+        }
+    </style>
+}
 
+<div class="container w-75 border rounded">
+    <div class="mb-3 mt-3">
+        <h1><strong>@($"{Model.Name} ")</strong><span class="badge bg-info">@Model.AttractionCategory</span></h1>
+    </div>
+    
+    <div class="mb-5">
+        <h3>@($"{Model.Region} {Model.Town}")</h3>
+    </div>
+    
+    <div class="mb-5">
+        <h5>
+            @($"{Model.Score}")
+            @for (int i = 1; i <= 5; i++)
+            {
+                @if (i <= Math.Round(Model.Score))
+                {
+                    <i class="fa-solid fa-star"></i>
+                }
+                else
+                {
+                    <i class="fa-regular fa-star"></i>
+                }
+            }
+            @($"({Model.ScoreCount}) | 平均停留{Model.Hours}小時({Model.HoursCount}) | 平均花費{Model.Price}元({Model.PriceCount})")
+        </h5>
+    </div>
+
+    <div class="mb-5">
+        <h5>
+            @foreach (var tag in Model.Tags)
+            {
+                <span class="badge bg-primary text-white">@tag</span>
+            }
+        </h5>
+    </div>
+
+    <div class="mb-5">
+        <h5>景點介紹:<br><br></h5>
+        @Html.Raw(Model.Description)
+    </div>
+    
+    <div class="mb-3">
+        @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+        <button class="btn btn-secondary "><a asp-action="Index" class="text-white">返回列表</a></button>
+    </div>
 </div>
 
-<h1>Details</h1>
 
-<div>
-    <h4>AttractionDetailVM</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AttractionCategory)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AttractionCategory)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Region)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Region)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Town)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Town)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Score)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Score)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ScoreCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ScoreCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Hours)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Hours)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoursCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoursCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PriceCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PriceCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Clicks)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Clicks)
-        </dd>
-    </dl>
-</div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+@section Scripts{
+    
+    <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin = "anonymous" ></script>
+   
+}
