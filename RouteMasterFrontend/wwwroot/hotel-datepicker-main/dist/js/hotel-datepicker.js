@@ -219,7 +219,8 @@ var HotelDatepicker = (function (fecha) {
         this.setFechaI18n();
         return fecha__namespace.parse(date, format);
       }
-      init() {
+        init() {
+            console.log(this);
         // DOM container
         this.parent = this.container ? this.container : this.input.parentElement;
 
@@ -377,7 +378,7 @@ var HotelDatepicker = (function (fecha) {
         window.addEventListener("keydown", evt => this.doKeyDown(evt));
 
         // Listen for focus
-        document.addEventListener("focus", evt => this.checkOnFocus(evt), true);
+        //document.addEventListener("focus", evt => this.checkOnFocus(evt), true);
       }
       generateId() {
         // Generate an unique ID for each datepicker
