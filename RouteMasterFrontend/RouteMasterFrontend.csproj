@@ -52,7 +52,6 @@
     <Folder Include="wwwroot\ExtraServiceImages\" />
 
     <Folder Include="wwwroot\CommentsUploads\" />
-    <Folder Include="wwwroot\SystemImages\" />
 
     <Folder Include="wwwroot\CommentAccomodationUploads\" />
 
