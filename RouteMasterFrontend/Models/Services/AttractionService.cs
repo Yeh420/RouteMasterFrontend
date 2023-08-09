@@ -26,5 +26,10 @@ namespace RouteMasterFrontend.Models.Services
         {
             return _repo.Get(id);
         }
+
+        public void AddClick (int id)
+        {
+            _repo.AddClick(id);
+        }
     }
 }

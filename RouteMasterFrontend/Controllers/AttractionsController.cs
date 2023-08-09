@@ -84,9 +84,18 @@ namespace RouteMasterFrontend.Controllers
 
         public IActionResult Details(int id)
         {
+            AddClick(id);
             AttractionDetailVM vm = Get(id);
 
             return View(vm);
+        }
+
+        private void AddClick(int id)
+        {
+            IAttractionRepository repo = new AttractionEFRepository();
+            AttractionService service = new AttractionService(repo);
+
+            service.AddClick(id);
         }
 
         private AttractionDetailVM Get(int id)

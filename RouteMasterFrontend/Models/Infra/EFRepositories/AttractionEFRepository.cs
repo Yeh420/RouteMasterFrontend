@@ -19,6 +19,17 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
 
         }
 
+        public void AddClick(int id)
+        {
+            AttractionClick attractionClick = new AttractionClick
+            {
+                AttractionId = id,
+            };
+
+            _db.Add(attractionClick);
+            _db.SaveChanges();
+        }
+
         public AttractionDetailDto Get(int id)
         {
             var query = _db.Attractions
@@ -76,7 +87,8 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
                         .Count(),
                     Clicks = q.AttractionClicks
                         .Where(a => a.AttractionId == q.Id)
-                        .Count()
+                        .Count(),
+                    Website = q.Website,
                 }).FirstOrDefault();
 
             return result;

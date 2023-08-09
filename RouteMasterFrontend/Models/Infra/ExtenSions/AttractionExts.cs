@@ -68,6 +68,7 @@ namespace RouteMasterFrontend.Models.Infra.ExtenSions
                 Price = dto.Price,
                 PriceCount = dto.PriceCount,
                 Clicks = dto.Clicks,
+                Website = dto.Website,
             };
         }
     }

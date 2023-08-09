@@ -12,8 +12,8 @@
     </style>
 }
 
-<div class="container w-75 border rounded">
-    <div class="mb-3 mt-3">
+<div class="container w-75 border rounded my-5">
+    <div class="mb-1 mt-3">
         <h1><strong>@($"{Model.Name} ")</strong><span class="badge bg-info">@Model.AttractionCategory</span></h1>
     </div>
     
@@ -49,8 +49,18 @@
     </div>
 
     <div class="mb-5">
-        <h5>景點介紹:<br><br></h5>
+        <div class="mb-3">
+            <h3>景點介紹<br></h3>
+        </div>
         @Html.Raw(Model.Description)
+    </div>
+
+    <div class="mb-5">
+        <div class="mb-3">
+            <h3>地圖<br></h3>
+        </div>
+        
+        @Html.Raw(Model.Website)
     </div>
     
     <div class="mb-3">

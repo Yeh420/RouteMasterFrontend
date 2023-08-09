@@ -17,5 +17,6 @@
         public int Price { get; set; }
         public int PriceCount { get; set; }
         public int Clicks { get; set; }
+        public string Website { get; set; }
     }
 }

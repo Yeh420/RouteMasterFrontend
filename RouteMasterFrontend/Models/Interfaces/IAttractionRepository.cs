@@ -9,5 +9,7 @@ namespace RouteMasterFrontend.Models.Interfaces
         IEnumerable<AttractionIndexDto> GetTopTen();
 
         AttractionDetailDto Get(int id);
+
+        void AddClick(int id);
     }
 }
