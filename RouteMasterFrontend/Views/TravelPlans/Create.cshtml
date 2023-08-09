@@ -1,5 +1,28 @@
 ﻿
+@section Styles{
+    <style>
+ 
+        .initialHeight{
+            height:50px;
+        }
 
+
+        .travelComponent {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 设置子元素之间的间隔，可根据需要调整 */
+            padding: 10px; /* 设置父元素的内边距，使子元素与父元素之间有间隔 */
+            border: 2px solid #000; /* 设置父元素的边框 */
+            border-radius: 10px; /* 设置父元素的圆角 */
+        }
+
+        .travelComponent > div {
+                padding: 5px; /* 设置子元素的内边距，使内容与子元素边框有一定的间隔 */
+                border: 1px solid #000; /* 设置子元素的边框 */
+                border-radius: 5px; /* 设置子元素的圆角 */
+        }
+    </style>
+}
 
 <hr />
 <div id="AttractionListContainer">
@@ -10,26 +33,26 @@
 
 
 
-<div class="row">
-    <div class="col-md-3 border" id="sortedAttractions" >
-        
+<div class="row" style="min-height: 500px; height: auto;">
+    
+    <div class="col-6 border border-primary" style="min-height: 500px; height: auto;" id="schedule">
+        <input type="date" id="travelStartDate" />
+        <input type="time" id="travelStartTime" />
 
 
+        <button id="createAttractionTimeSpanContainer">新增</button>
     </div>
-    <div class="col-md-3" id="selectedAttractions">
-
-
-        
-    </div>
-
-
-    <div class="col-md-6">
-        <div id="map" style="height:400px; width:400px"></div>       
+    <div class="col-3" style="position:relative;">
+        <div id="sortedAttractions" class="border border-primary" style="height:500px"></div>
+        <button id="greedyTSP" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">推薦路線</button>
     </div>
 
+    <di class="col-3" style="position:relative;">
+        <div id="selectedAttractions" class="border border-primary" style="height:500px"></div>
+        <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得距離資料</button>
+    </di>
 
-    <button class="col-md-3" id="greedyTSP">推薦路線</button>
-    <button class="col-md-3" id="getInformations">取得距離資料</button>
+    
 </div>
 
 
@@ -194,6 +217,18 @@
         })
 
 
+
+
+
+        function dragStartHandler(){
+           
+            console.log('666');
+        }
+
+
+
+
+
         document.querySelector("#greedyTSP").addEventListener('click',function(){
             let unvisited = selectedAttraction.slice();
             let distanceToEach = allData.filter(x => x.distance.value !== 0);
@@ -262,23 +297,90 @@
 
 
 
-
+                
                 departure.textContent = selectedPath[i].start.Name;
+                departure.setAttribute('data-id', selectedPath[i].start.Id);
+                departure.classList.add('draggable-container');
+                departure.addEventListener('dragstart', dragStartHandler);
+
+
+
                 distance.textContent = selectedPath[i].distance.text;
                 distance.value = selectedPath[i].distance.value;
                 duration.textContent = selectedPath[i].duration.text;
                 duration.value = selectedPath[i].duration.value;
+
+
+
                 destination.textContent = selectedPath[i].end.Name;
+                destination.setAttribute('data-id', selectedPath[i].end.Id);
 
 
-                sortedContainer.appendChild(newPath);
-                newPath.appendChild(departure);
-                newPath.appendChild(distance);
-                newPath.appendChild(duration);
-                newPath.appendChild(destination);
+    
+                if(i==0){
+                    sortedContainer.appendChild(newPath);
+                    newPath.appendChild(departure);
+                    newPath.appendChild(distance);
+                    newPath.appendChild(duration);
+                    newPath.appendChild(destination);
+
+                }else{
+                    sortedContainer.appendChild(newPath);
+                    newPath.appendChild(distance);
+                    newPath.appendChild(duration);
+                    newPath.appendChild(destination);
+                }
+
             }
         })
-      
+
+
+
+
+        document.querySelector("#createAttractionTimeSpanContainer").addEventListener('click',function(){
+            let travelComponent = document.createElement('div');
+            travelComponent.classList.add('border', 'border-danger', 'mb-3', 'travelComponent','row')
+
+
+
+            let attractionName=document.createElement('input');
+            attractionName.type="text";
+            attractionName.value="請拖入景點";
+            let attractionActivities=document.createElement('div');
+            attractionActivities.classList.add('border', 'border-primary', 'initialHeight','activitiesContainerOfAttraction','mb-1');
+
+
+
+
+            let attractionExtraServices=document.createElement('div');
+            attractionExtraServices.classList.add('border', 'border-primary', 'initialHeight','extraServicesContainerOfAttraction','mb-1');
+            let labelForTimeSpent = document.createElement('label');
+            labelForTimeSpent.classList.add('initialHeight')
+            labelForTimeSpent.textContent = "停留期間";                 
+            let startTime=document.createElement('input');
+            startTime.type="time";
+            let endTime=document.createElement('input');
+            endTime.type="time";
+            let dateTimeResult=document.createElement("input");
+            dateTimeResult.type = "datetime-local";
+            dateTimeResult.readOnly = true;
+
+
+
+
+            travelComponent.appendChild(attractionName);
+            travelComponent.appendChild(attractionActivities);
+            travelComponent.appendChild(attractionExtraServices);
+            travelComponent.appendChild(labelForTimeSpent);
+            travelComponent.appendChild(startTime);
+            travelComponent.appendChild(endTime);
+            travelComponent.appendChild(dateTimeResult);
+
+
+
+ 
+            this.parentNode.appendChild(travelComponent);
+        })
     </script>
 
 

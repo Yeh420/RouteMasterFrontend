@@ -3,6 +3,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+	<link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
+
     <style>
     .currentPage{
         background-color: lightgray;
@@ -52,14 +54,14 @@
 
         .product-info .left {
             /* max-width: 36%; */
-            width:602px;
+            width:662px;
             /* height: 677px; */
            
             /* border: 1px solid #ccc; */
         }
 
         .product-info .right {
-            width: 63.54%;
+            width: 56.65%;
             /* height:677px; */
             padding: 10px;
             margin-left:auto;
@@ -104,7 +106,7 @@
         cursor: pointer;
         object-fit:cover;
     }
-
+   
    /*  .fixLeft{
         display: flex;
         flex-direction: column;
@@ -180,7 +182,7 @@
                                                                     {{product.address}}
                                                                 </small>
                                                             </p>
-                                                            <input type="button" class="btn btn-danger" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" @@click="showModal(index)" />
+                                                            <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(index)" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -223,7 +225,9 @@
                 <div class="modal-content h-100">
                     <div class="modal-header d-f">
                         <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationName}}</h1>
+                        
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
                     </div>
                     <div class="modal-body">
                         <div class="modal-container h-100">
@@ -262,17 +266,32 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li class="mb-3">
+                                        <li class="mb-3 border-top pt-1">
                                             @*<div class="form-floating">*@
                                                 @*<label for="floatingTextarea" class="fs-2">住所描述</label>*@
                                                 
-                                                <div v-html="accommodationDescription" @@click="toggleDescription">
+                                                <p class="fs-5" v-html="accommodationDescription" @@click="toggleDescription">
                                                     
-                                                </div>
+                                                </p>
                                             @*</div>*@
                                         </li>
-                                        <li class="mb-3">
-                                            @await Html.PartialAsync("ShowCalendar")
+                                        <li class="mb-3 border-top pt-1">
+                                            <h2 class="mb-2"><i class="fa-solid fa-bed"></i>客房供應：</h2>
+                                            <table class="table table-hover table-success">
+                                                <tbody>
+                                                    <tr v-for="(room, index) in rooms" class="row w-100 ms-0">
+                                                        <td class="col-2 d-flex align-items-center">
+                                                            {{room.name}} 
+                                                        </td>
+                                                        <td class="d-flex col-10">
+                                                            <button class="btn btn-warning mx-3" data-bs-toggle="collapse" v-bind:id=`collapseBtn${room.id}` v-bind:data-bs-target=`#collapseDatePicker${index}` role="button" aria-expanded="false" aria-controls="collapseDatePicker" @@click.once="createdp(room.id)">訂房</button>
+                                                            <div class="collapse" v-bind:id=`collapseDatePicker${index}`>
+		                                                        <input v-bind:id=`input-${room.id}` type="text" class="form-control" autocomplete="off" placeholder="請選擇日期" readonly style="background:white"/>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </li>
                                     </ul>
                                 </div>
@@ -281,9 +300,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
-                    <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
-
+                        <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
+                    
                     </div>
                 </div>
             </div>
@@ -292,9 +310,14 @@
     @section Scripts{
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+        <script src="~/fecha-4.2.1/fecha-4.2.1/lib/fecha.js"></script>
+	    <script src="~/hotel-datepicker-main/dist/js/hotel-datepicker.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
         <script>
           
             var vueApp={
@@ -310,7 +333,7 @@
                         accommodationImage:"",
                         accommodationAddress:"",
                         accommodationDescription:"",
-
+                        rooms:[1,2,3],
                         cartProductId:1
 
                     }
@@ -360,21 +383,19 @@
                        // totalPages.value = datas.totalPages;
                        _this.products = datas.items;
                        _this.totalPages = datas.totalPages;
-
                     },
-                    showModal: function (id) {
+                    showModal:async function (id) {
+               
                         let _this = this;
                         const exampleModal = document.getElementById('exampleModal')
                         if (exampleModal) {
-
-                           
                             _this.cartProductId = _this.products[id].id;
                            
                             const p = _this.products[id];
                             _this.accommodationName = p.name;
                             _this.accommodationAddress = p.address + "-";
                             _this.accommodationImage = p.images[0] ? p.images[0].image : null;
-
+                            _this.rooms = p.rooms;
                             const showMoreText = "...顯示更多";
                             const showLessText = "...顯示更少";
                             const lines = _this.temp = p.description.split('\n');
@@ -455,13 +476,68 @@
                             }
                                 this.showFullDescription = !this.showFullDescription;
                         }
-                    }
+                    },
+                    createdp: async function(id){
+                         "use strict";
+                         //$(`#collapseBtn${id}`).attr('disabled','ture');
+			            const response = await fetch(`https://localhost:7251/api/RoomProducts/${id}`);
+			            const datas = await response.json();
+			            const rps = datas.items;
+			            const disabledDates = datas.disableDate;
+                        const input = document.getElementById(`input-${id}`);
 
+			            var hdpkr = new HotelDatepicker(input, {
+				            clearButton: true,
+				            topbarPosition: 'bottom',
+				            selectForward: true,
+				            disabledDates: disabledDates,
+				            enableCheckout: true,
+				            extraDayText: function (date, attributes) {
+					            for(var  i = 0; i < rps.length ; i++){
+						            if (date === fecha.format(new Date(rps[i].date), "YYYY-MM-DD") && attributes.class.includes("datepicker__month-day--visibleMonth")) {
+							            return `<br>$${rps[i].newPrice}`;
+						            }
+					            }
+				            },
+				            endDate: rps[rps.length-1].date
+			            });
+                        //input.addEventListener('afterClose', function () {
+                        //    $(`#collapseBtn${id}`).removeAttr('disabled');
+                        //}, false);
+                    }
                 },
-               
              }
             var app = Vue.createApp(vueApp).mount("#app");
            
             
         </script>
+        
+	    @*<script>
+		    $(document).ready(async function () {
+			    "use strict";
+			    const response = await fetch('https://localhost:7251/api/RoomProducts/1');
+			    const datas = await response.json();
+			    const rps = datas.items;
+			    const disabledDates = datas.disableDate;
+
+			    var hdpkr = new HotelDatepicker(document.getElementById("input-id")
+                , {
+				    clearButton: true,
+				    topbarPosition: 'bottom',
+				    selectForward: true,
+				    disabledDates: disabledDates,
+				    enableCheckout: true,
+				    extraDayText: function (date, attributes) {
+					    for(var  i = 0; i < rps.length ; i++){
+						    if (date === fecha.format(new Date(rps[i].date), "YYYY-MM-DD") && attributes.class.includes("datepicker__month-day--visibleMonth")) {
+							    return `<br>$${rps[i].newPrice}`;
+						    }
+					    }
+				    },
+				    endDate: rps[rps.length-1].date
+			    }
+                );
+
+		    });
+	    </script>*@
     }
