@@ -11,21 +11,18 @@
             display: flex;
             flex-direction: column;
             gap: 10px; 
-            padding: 10px; 
-            border: 2px solid #000;
+            padding: 10px;           
+          
             border-radius: 10px; 
         }
 
-        .travelComponent > div {
-                padding: 5px; 
-                border: 1px solid #000;
-                border-radius: 5px; 
-        }
+     
 
         .draggable {
             width: 100px;
             height: 50px;
             background-color: lightblue;
+            border-radius:20px;
             margin: 10px;
             text-align: center;
             line-height: 50px;
@@ -37,7 +34,24 @@
             transform: scaleY(3); 
         }
 
-  
+        .attractionDropContainer{
+            width:50%;
+            border: 1px solid #000;
+            text-align:center;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #selectedAttractions{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            max-height: 500px; 
+            overflow: auto; 
+        }
+
+    
     </style>
 }
 
@@ -64,11 +78,9 @@
     </div>
 
     <di class="col-3" style="position:relative;">
-        <div id="selectedAttractions" class="border border-primary" style="height:500px"></div>
+        <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
         <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得距離資料</button>
-    </di>
-
-    
+    </di>    
 </div>
 
 
@@ -123,9 +135,10 @@
                 const newAtt = document.createElement('div');
                 newAtt.addEventListener('dblclick', handleDoubleClick)
                 newAtt.textContent = attractionName;
-                newAtt.classList.add('mb-3', 'rounded', 'text-center');
+                newAtt.classList.add('m-3', 'rounded', 'text-center', 'w-50', 'p-3');
                 newAtt.id = attractionId;
                 newAtt.style.border = '1px solid #000';
+                newAtt.style.left='50%';
                 attContainer.appendChild(newAtt);
             });
         }
@@ -256,7 +269,10 @@
                     }
 
                 }).then(response => {
-                    console.log('success')
+                    console.log(response)
+
+
+
                 }).catch(error=>{
                     console.log('error')
                 })
@@ -399,49 +415,20 @@
 
         document.querySelector("#createAttractionTimeSpanContainer").addEventListener('click',function(){
             let travelComponent = document.createElement('div');
-            travelComponent.classList.add('border', 'border-danger', 'mb-3', 'travelComponent','row')
+            travelComponent.classList.add('travelComponent')
 
 
 
             let attractionName=document.createElement('div');      
             attractionName.textContent="請拖入景點";
+            attractionName.classList.add('attractionDropContainer')
             attractionName.addEventListener('drop', drop);
             attractionName.addEventListener('dragover',allowDrop)
 
 
-            let attractionActivities=document.createElement('div');
-            attractionActivities.classList.add('border', 'border-primary', 'initialHeight','activitiesContainerOfAttraction','mb-1');
 
 
-
-
-            let attractionExtraServices=document.createElement('div');
-            attractionExtraServices.classList.add('border', 'border-primary', 'initialHeight','extraServicesContainerOfAttraction','mb-1');
-            let labelForTimeSpent = document.createElement('label');
-            labelForTimeSpent.classList.add('initialHeight')
-            labelForTimeSpent.textContent = "停留期間";                 
-            let startTime=document.createElement('input');
-            startTime.type="time";
-            let endTime=document.createElement('input');
-            endTime.type="time";
-            let dateTimeResult=document.createElement("input");
-            dateTimeResult.type = "datetime-local";
-            dateTimeResult.readOnly = true;
-
-    
-
-
-            travelComponent.appendChild(attractionName);
-            travelComponent.appendChild(attractionActivities);
-            travelComponent.appendChild(attractionExtraServices);
-            travelComponent.appendChild(labelForTimeSpent);
-            travelComponent.appendChild(startTime);
-            travelComponent.appendChild(endTime);
-            travelComponent.appendChild(dateTimeResult);
-
-
-
- 
+            travelComponent.appendChild(attractionName); 
             this.parentNode.appendChild(travelComponent);
         })
     </script>
