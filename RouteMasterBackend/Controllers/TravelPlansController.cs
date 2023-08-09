@@ -156,20 +156,20 @@ namespace RouteMasterBackend.Controllers
 
         // GET: api/TravelPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TravelPlan>> GetTravelPlan(int id)
+        public async Task<ActionResult<AttractionInfoDto>> GetAttractionInfo(int id,DateTime? startDateTime)
         {
-          if (_context.TravelPlans == null)
-          {
-              return NotFound();
-          }
-            var travelPlan = await _context.TravelPlans.FindAsync(id);
+            var attractionInDb= _context.Attractions.Where(a => a.Id == id).First();
 
-            if (travelPlan == null)
+
+            var data = new AttractionInfoDto
             {
-                return NotFound();
-            }
 
-            return travelPlan;
+            };
+
+
+
+            return data;
+         
         }
 
         // PUT: api/TravelPlans/5
