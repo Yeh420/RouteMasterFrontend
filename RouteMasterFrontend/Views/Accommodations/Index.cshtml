@@ -320,6 +320,7 @@
                                                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                                                 </div>
                                             </div>
+
                                         </section>
                                         <section class="mb-3 border-top pt-1">
                                             <p class="fs-5" v-html="accommodationDescription" @@click="toggleDescription">
@@ -327,6 +328,7 @@
                                         </section>
                                         <section class="mb-3 border-top pt-1">
                                             <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
+
                                             <table class="table table-hover table-success">
                                                 <tbody>
                                                     <tr v-for="(room, index) in rooms" class="row w-100 ms-0">
@@ -415,7 +417,9 @@
                 </div>
             </div>
         </div>
+
     </div>
+
     @section Scripts{
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
@@ -427,7 +431,8 @@
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-        <script>
+    @*<script src="~/js/Comments_AccommodationPartial.js"></script>*@
+    <script>
           
             var vueApp={
                 data(){
@@ -447,60 +452,63 @@
                         accommodationServiceCId:[],
                         accommodationService:[]
                     }
+
+            },
+            mounted: function(){
+				let _this = this;
+				_this.loadProducts();
+			},
+            computed: {
+                hasPrevious() {
+                    return this.thePage > 1;
+
                 },
-                mounted: function(){
-				    let _this = this;
-				    _this.loadProducts();
-			    },
-                computed: {
-                    hasPrevious() {
-                        return this.thePage > 1;
-                    },
-                    hasNext() {
-                        return this.thePage < this.totalPages;
-                    },
-                    pageRange() {
-                        const maxPagesToShow = 5; // Adjust the maximum number of pages to show in the pagination
-                        const middlePage = Math.floor(maxPagesToShow / 2);
-                        const startPage = Math.max(this.thePage - middlePage, 1);
-                        const endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
-                        const pages = [];
+                hasNext() {
+                    return this.thePage < this.totalPages;
+                },
+                pageRange() {
+                    const maxPagesToShow = 5; // Adjust the maximum number of pages to show in the pagination
+                    const middlePage = Math.floor(maxPagesToShow / 2);
+                    const startPage = Math.max(this.thePage - middlePage, 1);
+                    const endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+                    const pages = [];
 
-                        for (let i = startPage; i <= endPage; i++) {
-                            pages.push(i);
-                        }
+                    for (let i = startPage; i <= endPage; i++) {
+                        pages.push(i);
+                    }
 
-                        if (startPage > 1) {
-                            pages.unshift("...");
-                        }
-                        if (endPage < this.totalPages) {
-                            pages.push("...");
-                        }
+                    if (startPage > 1) {
+                        pages.unshift("...");
+                    }
+                    if (endPage < this.totalPages) {
+                        pages.push("...");
+                    }
 
-                        return pages;
-                    },
-                    ELLIPSIS() {
-                        return "...";
-                    },
+                    return pages;
+                },
+                ELLIPSIS() {
+                    return "...";
+                },
                     
+            },
+            methods:{
+                loadProducts:async function(){
+                    let _this = this;
+                    const response =  await fetch(`https://localhost:7251/api/Accommodations?keyword=${_this.keyword}&page=${_this.thePage}&pageSize=${_this.pageSize}`);
+                    const datas = await response.json();
+                    console.log(datas);
+                    // totalPages.value = datas.totalPages;
+                    _this.products = datas.items;
+                    _this.totalPages = datas.totalPages;
                 },
-                methods:{
-                    loadProducts:async function(){
-                       let _this = this;
-                       const response =  await fetch(`https://localhost:7251/api/Accommodations?keyword=${_this.keyword}&page=${_this.thePage}&pageSize=${_this.pageSize}`);
-                       const datas = await response.json();
-                        console.log(datas);
-                       // totalPages.value = datas.totalPages;
-                       _this.products = datas.items;
-                       _this.totalPages = datas.totalPages;
-                    },
-                    showModal:async function (id) {
+                showModal:async function (id) {
                
-                        let _this = this;
-                        const exampleModal = document.getElementById('exampleModal')
-                        if (exampleModal) {
-                            _this.cartProductId = _this.products[id].id;
+                    let _this = this;
+                    const exampleModal = document.getElementById('exampleModal')
+                    if (exampleModal) {
+                        _this.cartProductId = _this.products[id].id;
                            
+
                             const p = _this.products[id];
                             _this.accommodationName = p.name;
                             _this.accommodationAddress = p.address + "-";
@@ -523,77 +531,82 @@
                             }
 
 
-                            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-                            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+                        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-                            // 可改寫VUE
-                            const modalImg = exampleModal.querySelector('.product-info ul');
-                            modalImg.innerHTML = "";
-                            p.images.map(function (p) {
-                                const ce = document.createElement('li');
-                                ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
-                                modalImg.append(ce);
-                            });
-
-                            $('.product-info ul li img').click(function () {
-                                var imgSrc = $(this).attr('src');
-                                _this.accommodationImage = imgSrc;
-                            })
-                        }
-                    },
-                    clickHandler:function(value){
-                        let _this = this;
-                        _this.thePage = value;
-                        _this.loadProducts();
-                     },
-                    inputHandler:async function(){
-                        let _this = this;
-                        _this.thePage = 1;
-                        await _this.loadProducts();
-                    },
-                    showPages:function(){
-                        let _this = this;
-                        _this.thePage = 1;
-                        _this.loadProducts();
-                    },
-
-                addCart:function() {
-                    let _this = this;
-                    let postRoomProductId = this.cartProductId;
-                    let productId = 3;
-                    axios({
-                        method: 'post',
-                        url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=3`,
-                    })
-                        .then(response => {
-                            console.log(response.data);
-                            if (response.data.success) {
-                                console.log("Successfully added to cart.");
-                            } else {
-                                console.log("Product not found.");
-                            }
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            alert("An error occurred.");
+                        // 可改寫VUE
+                        const modalImg = exampleModal.querySelector('.product-info ul');
+                        modalImg.innerHTML = "";
+                        p.images.map(function (p) {
+                            const ce = document.createElement('li');
+                            ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
+                            modalImg.append(ce);
                         });
+
+                        $('.product-info ul li img').click(function () {
+                            var imgSrc = $(this).attr('src');
+                            _this.accommodationImage = imgSrc;
+                        })
+                    }
+                },
+                clickHandler:function(value){
+                    let _this = this;
+                    _this.thePage = value;
+                    _this.loadProducts();
+                    },
+                inputHandler:async function(){
+                    let _this = this;
+                    _this.thePage = 1;
+                    await _this.loadProducts();
+                },
+                showPages:function(){
+                    let _this = this;
+                    _this.thePage = 1;
+                    _this.loadProducts();
                 },
 
-                    toggleDescription: function() {
-                        const showMoreText = "...顯示更多";
-                        const showLessText = "...顯示更少";
-                        const lines = this.temp;
-                        const s = $('#small');
-                        if (s[0]) {
-                            if(!this.showFullDescription){
-                                this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
-                            }else{
-                                this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
-                            }
-                                this.showFullDescription = !this.showFullDescription;
+            addCart:function() {
+                let _this = this;
+                let postRoomProductId = this.cartProductId;
+                let productId = 3;
+                axios({
+                    method: 'post',
+                    url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=3`,
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        if (response.data.success) {
+                            console.log("Successfully added to cart.");
+                        } else {
+                            console.log("Product not found.");
                         }
+
                     },
-                    createdp: async function(id){
+                    
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("An error occurred.");
+                    });
+            },
+
+                toggleDescription: function() {
+                    const showMoreText = "...顯示更多";
+                    const showLessText = "...顯示更少";
+                    const lines = this.temp;
+                    const s = $('#small');
+                    if (s[0]) {
+                        if(!this.showFullDescription){
+                            this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
+                        }else{
+                            this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
+                        }
+                            this.showFullDescription = !this.showFullDescription;
+                    }
+
+                },
+                createdp: async function(id){
                          "use strict";
 			            const response = await fetch(`https://localhost:7251/api/RoomProducts/${id}`);
 			            const datas = await response.json();
@@ -665,12 +678,11 @@
                         //    $(`#collapseBtn${id}`).removeAttr('disabled');
                         //}, false);
                     },
-                },
-             }
-            var app = Vue.createApp(vueApp).mount("#app");
-           
+            },
+            }
+        var app = Vue.createApp(vueApp).mount("#app");
             
-        </script>
+    </script>
         
 	    @*<script>
 		    $(document).ready(async function () {
