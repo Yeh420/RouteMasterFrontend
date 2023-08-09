@@ -444,10 +444,10 @@
                 addCart:function() {
                     let _this = this;
                     let postRoomProductId = this.cartProductId;
-                    let productId = 3;
+                    let productId = 1;
                     axios({
                         method: 'post',
-                        url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=3`,
+                        url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=1`,
                     })
                         .then(response => {
                             console.log(response.data);

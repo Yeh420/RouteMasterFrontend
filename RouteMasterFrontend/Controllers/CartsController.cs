@@ -1,16 +1,27 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Policy;
+using System.Text;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using ECPay.Payment.Integration;
+
 
 namespace RouteMasterFrontend.Controllers
 {
     
     public class CartsController : Controller
     {
+        private readonly HttpClient _httpClient;
         private readonly RouteMasterContext _context;
-
+        private const string MerchantID = "3002607";
+        private const string PaymentApiUrl = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
+        private const string HashKey = "pwFHCqoQZGmho4w6"; 
+        private const string HashIV = "EkRm7iFT261dpevs";
         public CartsController(RouteMasterContext context)
         {
             _context = context;
@@ -372,9 +383,10 @@ namespace RouteMasterFrontend.Controllers
             }
             ProcessCheckout(memberId, note);
 
-            return View("ConfirmCheckout");
+            return RedirectToAction("Index", "Ecpay");
         }
 
+      
         private void ProcessCheckout(int memberId, string?note)
         {
             var cart = GetCartInfo(memberId);
@@ -391,6 +403,7 @@ namespace RouteMasterFrontend.Controllers
 
             // 創建新訂單
             CreateOrder(memberId, note);
+            //GetPaymentRedirectUrl(order);
 
             EmptyCart(memberId);
 
@@ -406,7 +419,7 @@ namespace RouteMasterFrontend.Controllers
 
             if (!allowCheckout)
             {
-                
+
                 return;
             }
 
@@ -421,13 +434,13 @@ namespace RouteMasterFrontend.Controllers
                         MemberId = memberId,
                         PaymentMethodId = 1,
                         PaymentStatusId = 1,
-                        OrderHandleStatusId =1,
-                        CouponsId =1,
+                        OrderHandleStatusId = 1,
+                        CouponsId = 1,
                         CreateDate = DateTime.Now,
-                        ModifiedDate = null, 
-                        Total=cartTotal
-                      
-                       
+                        ModifiedDate = null,
+                        Total = cartTotal
+
+
                     };
                     _context.Orders.Add(order);
                     _context.SaveChanges();
@@ -436,14 +449,14 @@ namespace RouteMasterFrontend.Controllers
                     {
 
                         var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
-                        var accommodationId=_context.Rooms.Where(x=>x.Id==roomId).First().AccommodationId;
+                        var accommodationId = _context.Rooms.Where(x => x.Id == roomId).First().AccommodationId;
 
                         var accommodationName = _context.Accommodations.Where(x => x.Id == accommodationId).First().Name;
                         var RoomType = _context.Rooms.Where(x => x.Id == roomId).First().RoomTypeId;
-                        var RoomName= _context.Rooms.Where(x=>x.Id==roomId).First().Name;
-                        var RoomPrice=_context.Rooms.Where(x=>x.Id==roomId).First().Price;
+                        var RoomName = _context.Rooms.Where(x => x.Id == roomId).First().Name;
+                        var RoomPrice = _context.Rooms.Where(x => x.Id == roomId).First().Price;
                         var Quantity = _context.Rooms.Where(x => x.Id == roomId).First().Quantity;
-                        TimeSpan checkinTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckIn??TimeSpan.Zero;
+                        TimeSpan checkinTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckIn ?? TimeSpan.Zero;
                         var Checkin = DateTime.Today.Add(checkinTimeSpan);
                         TimeSpan checkoutTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckOut ?? TimeSpan.Zero;
                         var Checkout = DateTime.Today.Add(checkoutTimeSpan);
@@ -463,24 +476,121 @@ namespace RouteMasterFrontend.Controllers
                             Note = note
                         };
 
-                        _context.OrderAccommodationDetails.Add(accommodationDetail);
+                        //var paymentClient = new Models.Infra.ECPayPaymentClient(
+                        //   apiUrl: "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5",
+                        //   hashKey: "pwFHCqoQZGmho4w6",
+                        //   hashIV: "EkRm7iFT261dpevs",
+                        //   merchantID: "3002607"
+                        //            );
+
+                        //// 呼叫綠界支付 API
+                        //var paymentResult = paymentClient.CallECPayApiAsync().Result;
+                        //_context.OrderAccommodationDetails.Add(accommodationDetail);
                         _context.SaveChanges();
                     }
-             
+
 
                     transaction.Commit();
+                   
                 }
                 catch (DbUpdateException ex)
                 {
-                    
                     var innerException = ex.InnerException;
-
-                    
-
                     transaction.Rollback();
                 }
             }
         }
+
+        //[HttpPost]
+        //public IActionResult ReturnUrl([FromForm] Dictionary<string, string> formData)
+        //{
+        //    string merchantTradeNo = Guid.NewGuid().ToString("N").Substring(0, 20);
+        //    string tradeDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        //    string paymentType = "aio";
+        //    string tradeDesc = "Sample Transaction";
+        //    string itemNames = "Item1#Item2";
+        //    string returnURL = "https://yourwebsite.com/payment/callback";
+        //    string choosePayment = "All";
+
+        //    string checkMacValue = $"HashKey={HashKey}&MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&PaymentDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={HashIV}";
+
+        //    using (SHA256 sha256 = SHA256.Create())
+        //    {
+        //        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(checkMacValue));
+        //        string checkMac = BitConverter.ToString(hashBytes).Replace("-", "").ToUpper();
+
+        //        string queryString = HttpUtility.UrlEncode($"MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&MerchantTradeDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={checkMac}&EncryptType=1");
+
+        //        var redirectUrl = $"{PaymentApiUrl}?{queryString}";
+
+        //        // 使用 JsonResult 返回 JSON 數據
+        //        return new JsonResult(new { redirectUrl });
+        //    }
+        //}
+
+      
+
+
+        //    private void PrepareAndExecutePayment(Order order)
+        //    {
+        //        var paymentParameters = new Dictionary<string, string>
+        //{
+        //            { "MerchantID", "3002607" },
+        //            { "MerchantTradeNo", order.Id.ToString() },
+        //            { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
+        //            { "PaymentType", "aio" },
+        //            { "TotalAmount", order.Total.ToString() },
+
+        //        };
+        //        var checkMacValue = BuildCheckMacValue(paymentParameters);
+        //        paymentParameters.Add("CheckMacValue", checkMacValue);
+
+        //        var content = new FormUrlEncodedContent(paymentParameters);
+        //        using (var client = new HttpClient())
+        //        {
+        //            var response = client.PostAsync(PaymentApiUrl, content).Result;
+        //            if (response.IsSuccessStatusCode)
+        //            {
+        //                Console.WriteLine("Payment successful");
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("Payment failed");
+        //            }
+        //        }
+
+        //    }
+
+        //    private string BuildCheckMacValue(Dictionary<string, string> parameters)
+        //    {
+        //        string szCheckMacValue = String.Format("HashKey={0}{1}&HashIV={2}",
+        //            HashKey, string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}")), HashIV);
+        //        szCheckMacValue = HttpUtility.UrlEncode(szCheckMacValue).ToLower();
+
+        //        using (SHA256 sha256 = SHA256Managed.Create())
+        //        {
+        //            byte[] bytes = Encoding.UTF8.GetBytes(szCheckMacValue);
+        //            byte[] hashBytes = sha256.ComputeHash(bytes);
+        //            szCheckMacValue = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+        //        }
+
+        //        return szCheckMacValue;
+        //    }
+
+        //    private string GetPaymentRedirectUrl(Order order)
+        //    {
+        //        string PaymentBaseUrl = "https://localhost:7145/Carts/CheckoutPost";
+        //        var paymentUrl = PaymentBaseUrl + "?orderId=" + order.Id +
+        //            "&totalAmount=" + order.Total +
+        //            "&memberId=" + order.MemberId +
+        //            "&paymentMethodId=" + order.PaymentMethodId +
+        //            "&paymentStatusId=" + order.PaymentStatusId +
+        //            "&orderHandleStatusId=" + order.OrderHandleStatusId +
+        //            "&couponsId=" + order.CouponsId +
+        //            "&createDate=" + order.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") +
+        //            "&modifiedDate=" + (order.ModifiedDate.HasValue ? order.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "");
+        //        return paymentUrl;
+        //    }
 
         private int CalculateCartTotal(Cart cart)
         {
