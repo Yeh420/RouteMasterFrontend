@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using NuGet.Packaging;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
 
@@ -149,27 +150,65 @@ namespace RouteMasterBackend.Controllers
                 },
             };
 
-
+           
 
             return data;
         }
 
         // GET: api/TravelPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TravelPlan>> GetTravelPlan(int id)
+        public async Task<ActionResult<AttractionInfoDto>> GetAttractionInfo(int id,DateTime startDateTime)
         {
-          if (_context.TravelPlans == null)
-          {
-              return NotFound();
-          }
-            var travelPlan = await _context.TravelPlans.FindAsync(id);
+            var attractionInDb= _context.Attractions.Where(a => a.Id == id).First();
+            var stayHours = Math.Round(_context.CommentsAttractions.Where(c => c.AttractionId == id && c.StayHours != null).Select(c => c.StayHours.Value).Average());
 
-            if (travelPlan == null)
+            var activityProducts = new List<ActivityProduct>();
+            var extraServiceProduct = new List<ExtraServiceProduct>();
+            
+
+           
+          
+            var matchActivityIds = _context.Activities.Where(x => x.AttractionId == id).Select(x=>x.Id);
+            var filterActivityProducts = _context.ActivityProducts
+                .Where(x => matchActivityIds.Contains(x.ActivityId))
+                .Where(x=>x.Date==startDateTime.Date&&x.StartTime>startDateTime.TimeOfDay);
+
+
+            if (filterActivityProducts.Count() > 0)
             {
-                return NotFound();
+                activityProducts.AddRange(filterActivityProducts);
+            }
+            
+
+
+            var matchExtraServiceIds=_context.ExtraServices.Where(x=>x.AttractionId==id).Select(x=>x.Id);
+            var filterExtraServiceProducts = _context.ExtraServiceProducts
+                .Where(x => matchExtraServiceIds.Contains(x.ExtraServiceId))
+                .Where(x => x.Date == startDateTime.Date);
+
+            if (filterExtraServiceProducts.Count() > 0)
+            {
+                extraServiceProduct.AddRange(filterExtraServiceProducts);
             }
 
-            return travelPlan;
+
+
+
+
+
+            var data = new AttractionInfoDto
+            {
+                Id=attractionInDb.Id,
+                Name=attractionInDb.Name,
+                StayHours=(int?)stayHours,
+                ActivityProducts= activityProducts,
+                ExtraServiceProducts= extraServiceProduct,
+            };
+
+
+
+            return data;
+         
         }
 
         // PUT: api/TravelPlans/5
