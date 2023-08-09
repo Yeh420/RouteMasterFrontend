@@ -1,105 +1,448 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Accommodation>
+@section Styles{
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+    <style>
+    .currentPage{
+        background-color: lightgray;
+    }
+    .w200{
+        width:200px;
+    }
+    .h200{
+        height:200px;
+    }
+    .w-33{
+        width:33%;
+    }
+    .main-left{
+            width: 24% !important;
+            padding: 0 !important;
+            margin-top:2px;
+    }
+    .main-right{
+            width: 74% !important;
+            padding: 0 !important;
+    }
 
-<div id="app">
-    <button @@click="loadProducts()">按我</button>
+    .modal-xl{
+        max-width:90% !important;
+        width:90%;
+        height:90%;
+    }
 
-<table id="imgTable">
-    <thead>
-        <tr>
-            <th>
+    .modal-container {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        /* align-items: center; */
+        /* border:1px solid #ccc; */
+    }
 
-            </th>
-        </tr>
-    </thead>
-    <tbody>
+    .product-info { /*內含left , right 二個div*/
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: end;
+        align-items: start;
+        /* border: 1px solid #ccc; */
+    }
 
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <div class="row mb-2">
-                        <div class="col-md">
-                            <div class="card mb-3">
-                                <div class="row g-0">
-                                    <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <img class="card-img card-img-left" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" />  @*@item.AccommodationImages*@
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center">
-                                                    <h5 class="card-title m-0">
-                                                        @Html.DisplayFor(modelItem => item.Name)
-                                                    </h5>
-                                                    @if (!string.IsNullOrEmpty(item.Grade.ToString()))
-                                                        {
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 32px; height: 32px; letter-spacing:1px">@item.Grade</span>
-                                                        }
+        .product-info .left {
+            /* max-width: 36%; */
+            width:602px;
+            /* height: 677px; */
+           
+            /* border: 1px solid #ccc; */
+        }
+
+        .product-info .right {
+            width: 63.54%;
+            /* height:677px; */
+            padding: 10px;
+            margin-left:auto;
+            overflow:auto;
+        }
+
+    .productPhoto {
+        object-fit: cover; /*contain 符合指定的寬高比例*/
+        width:100%;
+        /*aspect-ratio: auto 1 / 1;*/
+    }
+
+    .product-info .images {
+        width: 100%;
+        height: 64px;
+        /* display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        overflow-y: hidden;
+        overflow-x: auto; */
+        /*border: 1px solid #ccc;*/
+    }
+
+    .product-info .imageList {
+        list-style: none; /* 不顯示項目符號 */
+        width: 100%;
+        display: flex;
+        /* justify-content: center; */
+        align-items: center;
+        /*cursor: pointer;*/
+        border: 1px solid #ccc;
+        /* padding-left:116px; */
+    }
+    .product-info .imageList li {
+        margin: 1px;
+    }
+    
+    .product-info .imageList li img{
+        width: 58px;
+        height:58px;
+        cursor: pointer;
+        object-fit:cover;
+    }
+
+   /*  .fixLeft{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    } */
+
+    </style>
+    <noscript>
+        <style>
+            /**
+                * Reinstate scrolling for non-JS clients
+                */
+            .simplebar-content-wrapper {
+                scrollbar-width: auto;
+                -ms-overflow-style: auto;
+            }
+
+                .simplebar-content-wrapper::-webkit-scrollbar,
+                .simplebar-hide-scrollbar::-webkit-scrollbar {
+                    display: initial;
+                    width: initial;
+                    height: initial;
+                }
+        </style>
+    </noscript>
+}
+    <div id="app">
+        <div class="d-flex">
+            <aside class="main-left border">
+            </aside>
+            <div class="main-right ms-auto">
+                <nav class="d-flex row">
+                    <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="inputHandler">
+                    <div class="d-flex col-3 ms-auto">
+                        <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
+                        <select class="form-select w-33" v-model="pageSize" aria-label="Small select example" @@change="showPages">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                        </select>
+                        <label for="page" class="form-label mb-0 ms-2 d-flex align-items-center">筆</label>
+                    </div>
+                </nav>
+                <table id="imgTable" class="w-100">
+                        <thead>
+                            <tr>
+                                <th>
+    
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(product, index) in products" :key="product.id">
+                                <td>
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <div class="card mb-3 h200">
+                                                <div class="row g-0 ">
+                                                    <div class="col-4 w200">
+                                                        <img class="card-img card-img-left h-100 w-100" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" /> 
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="card-body w-100">
+                                                            <div class="d-flex align-items-center">
+                                                                <h5 class="card-title m-0">
+                                                                    {{product.name}}
+                                                                </h5>
+                                                                <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                            </div>
+                                                            <p class="card-text">
+                                                                <small class="text-muted">
+                                                                    {{product.address}}
+                                                                </small>
+                                                            </p>
+                                                            <input type="button" class="btn btn-danger" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" v-bind:data-bs-whatever=product.name value="住所資訊" @@click="showModal(index)" />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                @*<p class="card-text">
-                                                        @Html.DisplayFor(modelItem => item.Name)
-                                                    </p>*@
-                                                <p class="card-text">
-                                                    <small class="text-muted">
-                                                        @Html.DisplayFor(modelItem => item.Address)
-                                                    </small>
-                                                </p>
-                                                @*@Html.ActionLink("繼續註冊流程", "Edit", new { id = item.Id })*@
-                                                <a href="/Accommodations/Details/@item.Id" class="btn btn-outline-warning">住所資訊</a>
-                                                |
-                                                <input type="button" class="btn btn-danger delete-accommodation" data-id="@item.Id" id="delete-accommodation-@item.Id" value="下架住所" />
                                             </div>
                                         </div>
                                     </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+        <hr />
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center flex-wrap mt-2 mb-4">
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(1)">&lt;&lt;</a>
+                </li>
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage-1)">&lt;</a>
+                </li>
+                <li v-for="(value, index) in pageRange" :key="index" class="page-item">
+                    <a v-if="value === ELLIPSIS" class="page-link d-flex align-items-center">{{ value }}</a>
+                    <a v-else :class="{'page-link': true, 'currentPage': value === thePage}" href="#" @@click="clickHandler(value)">{{ value }}</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage+1)">&gt;</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(totalPages)">&gt;&gt;</a>
+                </li>
+                @* <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
+                    <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
+                </li> *@
+            </ul>
+        </nav>
+    <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content h-100">
+                    <div class="modal-header d-f">
+                        <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationName}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-container h-100">
+                            <div class="product-info h-100">
+                                <div class="left h-100 mt-2 ms-2">
+                                    <div class="position-relative w-100">
+                                        <div class="w-100 d-flex justify-content-center align-items-center" style="aspect-ratio: auto 1 / 1">
+                                            <img v-if="accommodationImage" v-bind:src=`../AccommodationImages/${accommodationImage}` class="productPhoto position-fix" alt="">
+                                        </div>
+                                        <div class="images" data-simplebar>
+                                            <ul class="imageList">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="right h-100" data-simplebar>
+                                    <ul>
+                                        <li class="mb-3">
+                                            <p class="d-inline-flex gap-1 fs-5">
+                                                <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                </a>
+                                                <span data-bs-toggle="tooltip" data-bs-title="Default tooltip">
+                                                    {{accommodationAddress}}
+                                                </span>
+                                                <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                    顯示地圖
+                                                </a>
+                                                @* <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Button with data-bs-target
+                                                </button> *@
+                                            </p>
+                                            <div class="collapse" id="collapseExample">
+                                                <div class="card card-body">
+                                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="mb-3">
+                                            @*<div class="form-floating">*@
+                                                @*<label for="floatingTextarea" class="fs-2">住所描述</label>*@
+                                                
+                                                <div v-html="accommodationDescription" @@click="toggleDescription">
+                                                    
+                                                </div>
+                                            @*</div>*@
+                                        </li>
+                                        <li class="mb-3">
+                                            @await Html.PartialAsync("ShowCalendar")
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<hr />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-	<label>國家：{{Country}}</label>
-	<select asp-items="@ViewBag.Country" v-model="Country"></select>
+                    <button type="button" class="btn btn-primary" v-bind:data-id=`${cartProductId}` @@click="addCart">加入購物車</button>
 
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item" v-for="(value, index) in totalPages" :key="index" @@click="clickHandler(value)">
-                    <a :class="{'currentPage':thePage === value,'page-link':true}">{{value}}</a>
-                </li>
-            </ul>
-        </nav>
-</div>
-@section Scripts{
-	<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
-	<script>
-        console.log();
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Scripts{
+        <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+        <script>
+          
+            var vueApp={
+                data(){
+                    return{
+                        //Country:"",
+                        keyword:"",
+                        products:[],
+                        totalPages:1,
+                        thePage: 1,
+                        pageSize:5,
+                        accommodationName:"",
+                        accommodationImage:"",
+                        accommodationAddress:"",
+                        accommodationDescription:"",
 
-		var vueApp={
-			data(){
-				return{
-					Country:"",
-                    keyword:"",
-                    products:[],
-                    totalPages:1,
-                    // thePage = 1,
-				}
-			},
-            methods:{
-                loadProducts:async ()=>{
-                   const response =  await fetch(`https://localhost:7251/api/Accommodations?page=1&pageSize=3`);
-                   const datas = await response.json();
-                   // products.value = datas.products;
-                    console.log(datas);
-                    console.log(datas.TotalPages);
-                   // totalPages.value = datas.totalPages;
-                }
-            },
+                        cartProductId:1
+
+                    }
+                },
+                mounted: function(){
+				    let _this = this;
+				    _this.loadProducts();
+			    },
+                computed: {
+                    hasPrevious() {
+                        return this.thePage > 1;
+                    },
+                    hasNext() {
+                        return this.thePage < this.totalPages;
+                    },
+                    pageRange() {
+                        const maxPagesToShow = 5; // Adjust the maximum number of pages to show in the pagination
+                        const middlePage = Math.floor(maxPagesToShow / 2);
+                        const startPage = Math.max(this.thePage - middlePage, 1);
+                        const endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+                        const pages = [];
+
+                        for (let i = startPage; i <= endPage; i++) {
+                            pages.push(i);
+                        }
+
+                        if (startPage > 1) {
+                            pages.unshift("...");
+                        }
+                        if (endPage < this.totalPages) {
+                            pages.push("...");
+                        }
+
+                        return pages;
+                    },
+                    ELLIPSIS() {
+                        return "...";
+                    },
+                    
+                },
+                methods:{
+                    loadProducts:async function(){
+                       let _this = this;
+                       const response =  await fetch(`https://localhost:7251/api/Accommodations?keyword=${_this.keyword}&page=${_this.thePage}&pageSize=${_this.pageSize}`);
+                       const datas = await response.json();
+                        console.log(datas);
+                       // totalPages.value = datas.totalPages;
+                       _this.products = datas.items;
+                       _this.totalPages = datas.totalPages;
+
+                    },
+                    showModal: function (id) {
+                        let _this = this;
+                        const exampleModal = document.getElementById('exampleModal')
+                        if (exampleModal) {
+
+                           
+                            _this.cartProductId = _this.products[id].id;
+                           
+                            const p = _this.products[id];
+                            _this.accommodationName = p.name;
+                            _this.accommodationAddress = p.address + "-";
+                            _this.accommodationImage = p.images[0] ? p.images[0].image : null;
+
+                            const showMoreText = "...顯示更多";
+                            const showLessText = "...顯示更少";
+                            const lines = _this.temp = p.description.split('\n');
+                            // 如果行數超過 5 行，僅保留前 5 行
+                            if (lines.length > 5) {
+                                _this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id='small' style='color: #999'>${showMoreText}</small>`;
+                            }else{
+                                _this.accommodationDescription = lines.join('<br>');
+                            }
+
+
+                            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+                            // 可改寫VUE
+                            const modalImg = exampleModal.querySelector('.product-info ul');
+                            modalImg.innerHTML = "";
+                            p.images.map(function (p) {
+                                const ce = document.createElement('li');
+                                ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
+                                modalImg.append(ce);
+                            });
+
+                            $('.product-info ul li img').click(function () {
+                                var imgSrc = $(this).attr('src');
+                                _this.accommodationImage = imgSrc;
+                            })
+                        }
+                    },
+                    clickHandler:function(value){
+                        let _this = this;
+                        _this.thePage = value;
+                        _this.loadProducts();
+                     },
+                    inputHandler:async function(){
+                        let _this = this;
+                        _this.thePage = 1;
+                        await _this.loadProducts();
+                    },
+                    showPages:function(){
+                        let _this = this;
+                        _this.thePage = 1;
+                        _this.loadProducts();
+                    },
+
+                    addCart:function(){
+                        let _this=this;
+
+
+                    },
+
+                    toggleDescription: function() {
+                        const showMoreText = "...顯示更多";
+                        const showLessText = "...顯示更少";
+                        const lines = this.temp;
+                        const s = $('#small');
+                        if (s[0]) {
+                            if(!this.showFullDescription){
+                                this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
+                            }else{
+                                this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
+                            }
+                                this.showFullDescription = !this.showFullDescription;
+                        }
+                    }
+
+                },
+               
+             }
+            var app = Vue.createApp(vueApp).mount("#app");
+           
             
-		}
-		var app = Vue.createApp(vueApp).mount("#app");
-	</script>
-}
+        </script>
+    }

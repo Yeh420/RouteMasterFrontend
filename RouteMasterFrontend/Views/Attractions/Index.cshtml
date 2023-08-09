@@ -127,7 +127,7 @@
 
                 <div class="col-8 d-flex flex-column justify-content-between  py-3">
 
-                    <h2>@($"{item.Name} ")<span class="badge badge-info text-white">@item.AttractionCategory</span></h2>
+                    <h2>@($"{item.Name} ")<span class="badge bg-info text-white">@item.AttractionCategory</span></h2>
                     <p>@item.DescriptionText</p>
 
                     <div class="mb-0">
@@ -150,7 +150,7 @@
                         <h5>
                             @foreach (var tag in item.Tags)
                             {
-                                <span class="badge badge-primary text-white">@tag</span>
+                                <span class="badge bg-primary text-white">@tag</span>
                             }
                         </h5>
                     </div>

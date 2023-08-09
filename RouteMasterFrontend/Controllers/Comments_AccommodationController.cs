@@ -31,9 +31,10 @@ namespace RouteMasterFrontend.Controllers
                   .Include(c => c.Accommodation)
                   .Include(c=>c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
-                 
 
-			switch (input.Manner)
+            var proImg = _context.Comments_AccommodationImages;
+
+            switch (input.Manner)
 			{
 				case 0:
 					commentDb = commentDb.OrderBy(c => c.Id);
@@ -48,30 +49,117 @@ namespace RouteMasterFrontend.Controllers
 					commentDb = commentDb.OrderBy(c => c.Score);
 					break;
 			}
-            //commentDb.ToListAsync().Wait();
-           
-
             var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
-         
-            //for (var i = 0; i < v.Count; i++)
-            //{
-            //    v[i].ImageList = commentDb.ToList()[i].Comments_AccommodationImages;
-            //};
+
             return Json(vm);
 		}
 
-        public IActionResult ImgSearch(int id)
+        public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var img = _context.Comments_AccommodationImages
-                .Where(i => i.Comments_AccommodationId == id)
-                .Select(c => c.Image);
+           
+            var commentDb = _context.Comments_Accommodations
+                  .Include(c => c.Member)
+                  .Include(c => c.Accommodation)
+                  .Include(c => c.CommentStatus)
+                  .Where(c => c.AccommodationId == input.HotelId);
 
+            switch (input.Manner)
+            {
+                case 0:
+                    commentDb = commentDb.OrderBy(c => c.Id);
+                    break;
+                case 1:
+                    commentDb = commentDb.OrderByDescending(c => c.CreateDate);
+                    break;
+                case 2:
+                    commentDb = commentDb.OrderByDescending(c => c.Score);
+                    break;
+                case 3:
+                    commentDb = commentDb.OrderBy(c => c.Score);
+                    break;
+            }
 
-            return Json(img);
+            var proImg = _context.Comments_AccommodationImages;
+            var proLike = _context.Comment_Accommodation_Likes
+                .Include(l => l.Member);
+               
+
+            var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
+            {
+                Id = c.Id,
+                Account=c.Member.Account,
+                HotelName=c.Accommodation.Name,
+                Score=c.Score,
+                Title=c.Title,
+                Pros=c.Pros,
+                Cons=c.Cons,
+                CreateDate=c.CreateDate,
+                Status=c.CommentStatus.Name,
+                ReplyMessage=c.Reply,
+                ReplyDate=c.ReplyAt,
+                ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
+                .Select(p=>p.Image).ToList(),
+                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.Member.Account== c.Member.Account),
+
+            }).ToListAsync();
+
+            return Json(rod);
         }
         public IActionResult PartialPage()  
         {
             return View();
+        }
+
+        public async Task<string> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
+        {
+            var proLike =await _context.Comment_Accommodation_Likes
+                .Include(l => l.Member)
+                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
+            // @@l.MemberAccount==user.Identity.name
+            if (proLike==null)
+            {
+                //建立按讚紀錄
+                Comment_Accommodation_Like like = new Comment_Accommodation_Like
+                {
+                    MemberId = 1, //@@記得改user.Identity.name
+                    Comments_AccommodationId = input.CommentId,
+                    CreateDate = DateTime.Now,
+                    
+                };   
+                _context.Comment_Accommodation_Likes.Add(like);
+                await _context.SaveChangesAsync();
+
+                var info = _context.Comments_Accommodations
+                    .Include(c => c.Member)
+                    .Where(c => c.Id == input.CommentId)
+                    .Select(c => c.ToFilterDto());
+
+                int id = info.Select(c => c.MemberId).First();
+                var title = info.Select(c=>c.CommentTitle).First();
+
+
+                //按讚通知生成
+                SystemMessage msg = new SystemMessage
+                {
+                    //@@按讚人記得改user.Identity.name
+                    MemberId =id,
+                    Content =$"按讚人對您標題為:{title}的評論按讚",
+                    IsRead = false,
+                };
+                _context.SystemMessages.Add(msg);
+                await _context.SaveChangesAsync();
+
+                return "按讚通知已生成";
+            }
+            else
+            {
+                //刪除按讚紀錄
+                _context.Comment_Accommodation_Likes.Remove(proLike);
+                await _context.SaveChangesAsync();
+              
+            }
+
+            return string.Empty;
         }
 
         // GET: Comments_Accommodation/Details/5    

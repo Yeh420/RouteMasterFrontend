@@ -67,11 +67,10 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "大頭貼")]
-		//[Required]
 		public string? Image { get; set; }
 
 
-
+		[Display(Name ="廣告訂閱")]
 		public bool IsSuscribe { get; set; }
 	}
 }

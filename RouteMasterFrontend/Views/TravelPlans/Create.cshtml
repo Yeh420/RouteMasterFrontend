@@ -1,37 +1,287 @@
-﻿@model RouteMasterFrontend.EFModels.TravelPlan
+﻿
 
-@{
-    ViewData["Title"] = "Create";
-}
 
-<h1>Create</h1>
-
-<h4>TravelPlan</h4>
 <hr />
+<div id="AttractionListContainer">
+    @await Component.InvokeAsync("SelectAttraction")
+</div>
+<hr />
+
+
+
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="MemberId" class="control-label"></label>
-                <select asp-for="MemberId" class ="form-control" asp-items="ViewBag.MemberId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TravelDays" class="control-label"></label>
-                <input asp-for="TravelDays" class="form-control" />
-                <span asp-validation-for="TravelDays" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    <div class="col-md-3 border" id="sortedAttractions" >
+        
+
+
     </div>
+    <div class="col-md-3" id="selectedAttractions">
+
+
+        
+    </div>
+
+
+    <div class="col-md-6">
+        <div id="map" style="height:400px; width:400px"></div>       
+    </div>
+
+
+    <button class="col-md-3" id="greedyTSP">推薦路線</button>
+    <button class="col-md-3" id="getInformations">取得距離資料</button>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+
+    <script>
+
+        let selectedAttraction = [];
+        let coordinatesArray = [];
+        let allData = [];
+        let greedyResult = [];
+        let attContainer = document.querySelector('#selectedAttractions');
+        let visited = [];
+        let selectedPath = [];
+        const addAttBtns = document.querySelectorAll('.addAtt');
+
+
+
+        function handleDoubleClick() {
+            const id = this.id;
+            const index = selectedAttraction.findIndex((element) => element.Id == id);
+            if (index !== -1) {
+                selectedAttraction.splice(index, 1);
+                coordinatesArray.splice(index, 1);
+            }
+            this.remove();
+        }
+
+
+
+
+
+        for (let i = 0; i < addAttBtns.length; i++) {
+            addAttBtns[i].addEventListener('click', function () {
+                const positionX = this.getAttribute('data-positionX');
+                const positionY = this.getAttribute('data-positionY');
+                coordinatesArray.push({ lat: parseFloat(positionX), lng: parseFloat(positionY) });
+
+                const attractionId = this.getAttribute('data-id');
+                const attractionName = this.getAttribute('data-name');
+                selectedAttraction.push({ Id: attractionId, Name: attractionName });
+
+                const newAtt = document.createElement('div');
+                newAtt.addEventListener('dblclick', handleDoubleClick)
+                newAtt.textContent = attractionName;
+                newAtt.classList.add('mb-3', 'rounded', 'text-center');
+                newAtt.id = attractionId;
+                newAtt.style.border = '1px solid #000';
+                attContainer.appendChild(newAtt);
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function getTravelInformations() {
+            axios.get('https://localhost:7251/api/TravelPlans')
+                .then(function (response) {
+                    const informations = response.data;
+                    for(let i=0;i<informations.length;i++){
+                        const startId = informations[i].start.id;
+                        const endId = informations[i].end.id;
+                        const startObj = selectedAttraction.find(item => item.Id == startId);
+                        const endObj = selectedAttraction.find(item => item.Id == endId);
+
+
+                        allData.push({
+                            start: startObj,
+                            end: endObj,
+                            distance: informations[i].distance,
+                            duration: informations[i].duration                         
+                        })
+                    }          
+                })
+                .catch(function (error) {
+                    console.error('Error fetching travel plans:', error);
+                });
+        }
+
+
+
+
+        function getShortestDistanceObject(distanceToEach) {
+            if (distanceToEach.length === 0) {
+                return undefined;
+            }
+            let shortestDistanceObject = distanceToEach[0];
+            let shortestDistance = shortestDistanceObject.distance.value;
+
+            for (let i = 1; i < distanceToEach.length; i++) {
+                const currentObject = distanceToEach[i];
+                const currentDistance = currentObject.distance.value;
+
+                if (currentDistance < shortestDistance) {
+                    shortestDistanceObject = currentObject;
+                    shortestDistance = currentDistance;
+                }
+            }
+            return shortestDistanceObject;
+        }
+
+
+        function getNextDistanceObject(distanceToEach, startPoint, visited) {
+            if (distanceToEach.length === 0) {
+                return undefined;
+            }
+
+            const objectsWithStartingPoint = distanceToEach.filter(obj => obj.start == startPoint);
+
+            if (objectsWithStartingPoint.length == 0) {
+                return undefined;
+            }
+
+            // Filter out objects whose destinations are already in "visited" array
+            const unvisitedObjects = objectsWithStartingPoint.filter(obj => !visited.includes(obj.end));
+
+            if (unvisitedObjects.length === 0) {
+                return undefined;
+            }
+
+            let shortestDistanceObject = unvisitedObjects[0];
+            let shortestDistance = shortestDistanceObject.distance.value;
+
+            for (let i = 1; i < unvisitedObjects.length; i++) {
+                const currentObject = unvisitedObjects[i];
+                const currentDistance = currentObject.distance.value;
+
+                if (currentDistance < shortestDistance) {
+                    shortestDistanceObject = currentObject;
+                    shortestDistance = currentDistance;
+                }
+            }
+            return shortestDistanceObject;
+        }
+      
+
+
+        document.querySelector("#getInformations").addEventListener('click',function(){
+            getTravelInformations();
+            console.log(allData);
+            console.log(selectedAttraction)
+        })
+
+
+        document.querySelector("#greedyTSP").addEventListener('click',function(){
+            let unvisited = selectedAttraction.slice();
+            let distanceToEach = allData.filter(x => x.distance.value !== 0);
+            let sortedContainer = document.querySelector('#sortedAttractions');
+            let newStart;
+
+
+            while (unvisited.length > 0) {     
+                console.log(unvisited)
+
+                if (unvisited.length == selectedAttraction.length) {
+                    let shortestObj = getShortestDistanceObject(distanceToEach);
+                    console.log(shortestObj)
+                    selectedPath.push(shortestObj);
+           
+
+                    let startIndex = unvisited.indexOf(shortestObj.start);
+                    if (startIndex !== -1) {
+                        unvisited.splice(startIndex, 1);
+                        visited.push(shortestObj.start);
+
+                    }
+
+                    let endIndex = unvisited.indexOf(shortestObj.end);
+                    if (endIndex !== -1) {
+                        unvisited.splice(endIndex, 1);
+                        visited.push(shortestObj.end);
+                    }
+
+
+
+                    newStart = shortestObj.end;
+                    console.log('第一次')
+                } else {
+                    let shortestObj = getNextDistanceObject(distanceToEach, newStart, visited)
+                    selectedPath.push(shortestObj);
+                    let startIndex = unvisited.indexOf(shortestObj.start);
+                    if (startIndex !== -1) {
+                        unvisited.splice(startIndex, 1);
+                        visited.push(shortestObj.start);
+                    }
+
+                    let endIndex = unvisited.indexOf(shortestObj.end);
+                    if (endIndex !== -1) {
+                        unvisited.splice(endIndex, 1);
+                        visited.push(shortestObj.end);
+                    }
+
+                    newStart = shortestObj.end;
+                    console.log('第二次')
+                }
+
+                if (unvisited.length === 0) {
+                    break;
+                }
+            }
+
+            for (i = 0; i < selectedPath.length; i++) {
+
+                let newPath = document.createElement('div');
+                let departure = document.createElement('div');
+                let distance = document.createElement('div');
+                let duration = document.createElement('div');
+                let destination = document.createElement('div');
+
+
+
+
+
+                departure.textContent = selectedPath[i].start.Name;
+                distance.textContent = selectedPath[i].distance.text;
+                distance.value = selectedPath[i].distance.value;
+                duration.textContent = selectedPath[i].duration.text;
+                duration.value = selectedPath[i].duration.value;
+                destination.textContent = selectedPath[i].end.Name;
+
+
+                sortedContainer.appendChild(newPath);
+                newPath.appendChild(departure);
+                newPath.appendChild(distance);
+                newPath.appendChild(duration);
+                newPath.appendChild(destination);
+            }
+        })
+      
+    </script>
+
+
+
+
 }

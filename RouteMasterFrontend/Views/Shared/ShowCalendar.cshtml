@@ -1,0 +1,47 @@
+﻿@* @model IEnumerable<RouteMasterFrontend.EFModels.RoomProduct> *@
+
+	<link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
+
+	<style>
+
+	</style>
+
+
+<div class="row">
+	<div class="col-3">
+		<input id="input-id" type="text" class="form-control" autocomplete="off"/>
+	</div>
+</div>
+
+
+	<script src="~/fecha-4.2.1/fecha-4.2.1/lib/fecha.js"></script>
+	<script src="~/hotel-datepicker-main/dist/js/hotel-datepicker.js"></script>
+	<script>
+		$(document).ready(async function () {
+			"use strict";
+			const response = await fetch('https://localhost:7251/api/RoomProducts/1');
+			const datas = await response.json();
+			const rps = datas.items;
+			const disabledDates = datas.disableDate;
+
+			var hdpkr = new HotelDatepicker(document.getElementById("input-id"), {
+				clearButton: true,
+				topbarPosition: 'bottom',
+				selectForward: true,
+				disabledDates: disabledDates,
+				enableCheckout: true,
+				extraDayText: function (date, attributes) {
+					for(var  i = 0; i < rps.length ; i++){
+						if (date === fecha.format(new Date(rps[i].date), "YYYY-MM-DD") && attributes.class.includes("datepicker__month-day--visibleMonth")) {
+							return `<br>$${rps[i].newPrice}`;
+						}
+					}
+				},
+				endDate: rps[rps.length-1].date
+			});
+
+
+		});
+	</script>
+
+
