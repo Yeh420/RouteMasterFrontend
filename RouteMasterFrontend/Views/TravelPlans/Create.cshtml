@@ -248,6 +248,19 @@
                 const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
                 draggableElement.draggable = false;
                 draggableElement.style.backgroundColor = "lightgray";
+
+                axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`,{
+                    params:{
+                        startDateTime: document.querySelector('#travelBeginDateTime').value
+
+                    }
+
+                }).then(response => {
+                    console.log('success')
+                }).catch(error=>{
+                    console.log('error')
+                })
+                
             }
         }
 
