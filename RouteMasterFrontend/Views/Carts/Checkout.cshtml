@@ -40,16 +40,16 @@
                 @Html.DisplayFor(modelItem => item.Member.LastName)
                   
                 </td>
-                <td>
-                   
-                    <select>
+                    <td>
                         @foreach (var paymentMethod in ViewBag.PaymentMethods)
                         {
-                            <option value="@paymentMethod.Id">@paymentMethod.Name</option>
+                            <label>
+                                <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
+                                @paymentMethod.Name
+                            </label>
                         }
-                    </select>
-                   
-                </td>
+                        <p class="selected-payment-method-info"></p>
+                    </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
@@ -65,6 +65,25 @@
 </form>
 @section Scripts {
     <script>
-       
+        // 監聽 payment method 選擇變化事件
+        document.querySelectorAll('.payment-method-radio').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const selectedRadio = document.querySelector('.payment-method-radio:checked');
+                if (selectedRadio) {
+                    const selectedMethodId = selectedRadio.value;
+                    const selectedItemRow = selectedRadio.closest('tr');
+                    const selectedPaymentMethodInfo = selectedItemRow.querySelector('.selected-payment-method-info');
+                    console.log(123);
+                    // 更新顯示的內容
+                    selectedPaymentMethodInfo.textContent = `Selected Payment Method: ${selectedRadio.nextSibling.textContent} (ID: ${selectedMethodId})`;
+                }
+            });
+        });
     </script>
 }
+
+
+
+
+
+
