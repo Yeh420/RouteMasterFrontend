@@ -99,7 +99,8 @@ namespace RouteMasterFrontend.Controllers
                 ReplyDate=c.ReplyAt,
                 ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
                 .Select(p=>p.Image).ToList(),
-                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.Member.Account== c.Member.Account),
+                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.MemberId==1),
+                TotalThumbs=proLike.Where(l=>l.Comments_AccommodationId== c.Id).Count(),
 
             }).ToListAsync();
 
@@ -110,57 +111,58 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
-        //public async Task<string> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
-        //{
-        //    var proLike =await _context.Comment_Accommodation_Likes
-        //        .Include(l => l.Member)
-        //        .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
-        //    // @@l.MemberAccount==user.Identity.name
-        //    if (proLike==null)
-        //    {
-        //        //建立按讚紀錄
-        //        Comment_Accommodation_Like like = new Comment_Accommodation_Like
-        //        {
-        //            MemberId = 1, //@@記得改user.Identity.name
-        //            Comments_AccommodationId = input.CommentId,
-        //            CreateDate = DateTime.Now,
+
+        public async Task<bool> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
+        {
+            var proLike =await _context.Comment_Accommodation_Likes
+                .Include(l => l.Member)
+                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
+            // @@l.MemberAccount==user.Identity.name
+            if (proLike==null)
+            {
+                //建立按讚紀錄
+                Comment_Accommodation_Like like = new Comment_Accommodation_Like
+                {
+                    MemberId = 1, //@@記得改user.Identity.name
+                    Comments_AccommodationId = input.CommentId,
+                    CreateDate = DateTime.Now,
                     
-        //        };   
-        //        _context.Comment_Accommodation_Likes.Add(like);
-        //        await _context.SaveChangesAsync();
+                };   
+                _context.Comment_Accommodation_Likes.Add(like);
+                await _context.SaveChangesAsync();
 
-        //        var info = _context.Comments_Accommodations
-        //            .Include(c => c.Member)
-        //            .Where(c => c.Id == input.CommentId)
-        //            .Select(c => c.ToFilterDto());
+                var info = _context.Comments_Accommodations
+                    .Include(c => c.Member)
+                    .Where(c => c.Id == input.CommentId)
+                    .Select(c => c.ToFilterDto());
 
-        //        int id = info.Select(c => c.MemberId).First();
-        //        var title = info.Select(c=>c.CommentTitle).First();
+                int id = info.Select(c => c.MemberId).First();
+                var title = info.Select(c=>c.CommentTitle).First();
 
 
-        //        //按讚通知生成
-        //        SystemMessage msg = new SystemMessage
-        //        {
-        //            //@@按讚人記得改user.Identity.name
-        //            MemberId =id,
-        //            Content =$"按讚人對您標題為:{title}的評論按讚",
-        //            IsRead = false,
-        //        };
-        //        _context.SystemMessages.Add(msg);
-        //        await _context.SaveChangesAsync();
+                //按讚通知生成
+                SystemMessage msg = new SystemMessage
+                {
+                    //@@按讚人記得改user.Identity.name
+                    MemberId =id,
+                    Content =$"按讚人對您標題為:{title}的評論按讚",
+                    IsRead = false,
+                };
+                _context.SystemMessages.Add(msg);
+                await _context.SaveChangesAsync();
 
-        //        return "按讚通知已生成";
-        //    }
-        //    else
-        //    {
-        //        //刪除按讚紀錄
-        //        _context.Comment_Accommodation_Likes.Remove(proLike);
-        //        await _context.SaveChangesAsync();
-              
-        //    }
+                return true;
+            }
+            else
+            {
+                //刪除按讚紀錄
+                _context.Comment_Accommodation_Likes.Remove(proLike);
+                await _context.SaveChangesAsync();
+                return false;
+            }
+            
 
-        //    return string.Empty;
-        //}
+        }
 
         // GET: Comments_Accommodation/Details/5    
         public async Task<IActionResult> Details(int? id)
