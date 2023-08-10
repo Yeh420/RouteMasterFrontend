@@ -20,6 +20,9 @@ using System.Runtime.Intrinsics.X86;
 using static System.Net.Mime.MediaTypeNames;
 using Google.Apis.Auth;
 using System.IO;
+using RouteMasterFrontend.Models.Dto;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -28,12 +31,14 @@ namespace RouteMasterFrontend.Controllers
         private readonly RouteMasterContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
+        private readonly IConfiguration _configuration;
 
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
+            _configuration = configuration;
         }
 
         // GET: Members/Edit/5
@@ -190,12 +195,14 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
+
                 //new Claim("memberImage", member.Image),
                 //new Claim("id",member.Id.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             //identity.AddClaim(new Claim("memberImage", member.Image));
+
 
             var authProperties = new AuthenticationProperties
             {
@@ -555,11 +562,33 @@ namespace RouteMasterFrontend.Controllers
             return View(member);
         }
 
-        [HttpPost]
-        public IActionResult HistoryOrder()
+        //使用dapper做資料庫存取歷史訂單
+        [HttpGet]
+        public async Task<IActionResult> HistoryOrder()
+        {
+            ClaimsPrincipal user = HttpContext.User;
+            
+            //列出與登入符合資料
+            string userAccount = user.Identity.Name;
+
+            Member myMember = _context.Members.FirstOrDefault(m => m.Account == userAccount);
+
+
+            string connStr = _configuration.GetConnectionString("RouteMaster");
+
+             string sql = $@"select ord.memberid, ord.PaymentStatusId, ord.CreateDate, ord.ModifiedDate, ord.Total, m.Account, m.Email
+                            from Orders as ORD
+                            inner join Members as M on ORD.MemberId = m.Id
+                            where m.Account=@Account";
+            IEnumerable<HistoryOrderDTO> orderDTOs = new SqlConnection(connStr).Query<HistoryOrderDTO>(sql, new { Account = myMember.Account });
+            return Json(orderDTOs);
+        }
+
+        public IActionResult Test123()
         {
             return View();
         }
+
 
         //註冊成功頁面
         public IActionResult SuccessRegister()

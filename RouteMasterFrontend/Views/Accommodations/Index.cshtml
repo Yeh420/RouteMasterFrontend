@@ -1,10 +1,11 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
 @model FilterDTO
 @section Styles{
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
-    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+	<script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
 	<link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
+
     <style>
     .currentPage{
         background-color: lightgray;
@@ -327,6 +328,15 @@
                                             <p class="fs-5" v-html="accommodationDescription" @@click="toggleDescription">
                                             </p>
                                         </section>
+                                  <section>
+									<a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2">
+										顯示評論
+									</a>
+									<div class="collapse" id="collapse2">
+										<dec ref="childRef"></dec>
+									</div>
+								</section>
+
                                         <section class="mb-3 border-top pt-1">
                                             <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
 
@@ -458,10 +468,13 @@
                 }
             },
             mounted: function(){
+
+								
 				let _this = this;
 				_this.loadProducts();
                 console.log(_this.grades);
 			},
+
             computed: {
                 hasPrevious() {
                     return this.thePage > 1;
@@ -673,8 +686,61 @@
                     }, false);
                 },
             },
+          
+			components: {
+				dec
         }
         var app = Vue.createApp(vueApp).mount("#app");
             
     </script>
+<!-- 
+				showModal: async function (id) {
+
+					let _this = this;
+					const exampleModal = document.getElementById('exampleModal')
+					if (exampleModal) {
+						_this.cartProductId = _this.products[id].id;
+
+
+						const p = _this.products[id];
+						_this.accommodationName = p.name;
+						_this.accommodationAddress = p.address + "-";
+						_this.accommodationImage = p.images[0] ? p.images[0].image : null;
+						_this.rooms = p.rooms;
+						_this.accommodationServiceCId = p.services.map(function (s) {
+							return s.serviceInfoCategoryId;
+						});
+						_this.accommodationService = p.services;
+						_this.$refs.childRef.commentDisplay(p.id);
+
+
+						const showMoreText = "...顯示更多";
+						const showLessText = "...顯示更少";
+						const lines = _this.temp = p.description.split('\n');
+						// 如果行數超過 5 行，僅保留前 5 行
+						if (lines.length > 5) {
+							_this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id='small' style='color: #999'>${showMoreText}</small>`;
+						} else {
+							_this.accommodationDescription = lines.join('<br>');
+						}
+
+
+						const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+						const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+						// 可改寫VUE
+						const modalImg = exampleModal.querySelector('.product-info ul');
+						modalImg.innerHTML = "";
+						p.images.map(function (p) {
+							const ce = document.createElement('li');
+							ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
+							modalImg.append(ce);
+						});
+
+						$('.product-info ul li img').click(function () {
+							var imgSrc = $(this).attr('src');
+							_this.accommodationImage = imgSrc;
+						})
+					}
+				}, -->
     }

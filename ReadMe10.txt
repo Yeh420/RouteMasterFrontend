@@ -25,3 +25,16 @@ google登入也是要導向
 []更改大頭貼
 []版面
 
+//HistoryOrderDTO historyDTO = _context.Members
+            //     .Join(_context.Orders,
+            //     m=>m.Id,
+            //     o=>o.MemberId,
+            //     (m, o) => new {Member= m, Order= o})
+            //     .Where(mo => mo.Member.Id == id)
+            //     .Select(mo => new HistoryOrderDTO
+            //     {
+            //         MemberId = mo.Member.Id,
+            //         Account = mo.Member.Account,
+            //         PaymentStatusId = mo.Orders.PaymentStatusId,
+
+            //     }).ToList();
