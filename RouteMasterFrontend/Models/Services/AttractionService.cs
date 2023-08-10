@@ -21,5 +21,15 @@ namespace RouteMasterFrontend.Models.Services
         {
             return _repo.GetTopTen();
         }
+
+        public AttractionDetailDto Get(int id)
+        {
+            return _repo.Get(id);
+        }
+
+        public void AddClick (int id)
+        {
+            _repo.AddClick(id);
+        }
     }
 }

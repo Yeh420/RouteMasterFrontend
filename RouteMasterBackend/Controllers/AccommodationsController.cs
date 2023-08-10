@@ -27,7 +27,6 @@ namespace RouteMasterBackend.Controllers
 
         // GET: api/Accommodations
         [HttpGet]
-        
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(string? keyword, int page = 1, int pageSize = 3)
         {
             
@@ -103,6 +102,11 @@ namespace RouteMasterBackend.Controllers
             return accommodation;
         }
 
+        [HttpGet]
+         public async Task<ActionResult<FilterDTO>> GetFilterDTO()
+        {
+            return new FilterDTO();
+        }
         // PUT: api/Accommodations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
