@@ -535,4 +535,24 @@
 
 
 
+            axios.post(`https://localhost:7251/api/Carts/Post/Travel`,postData)
+            .then(response=>{
+               // 請求已成功發送，但沒有返回值
+               console.log('Request successful, no response data.');
+            })
+            .catch(error=>{
+                console.log(error)
+            });         
+        }
+
+
+
+        document.querySelector('#callApiToAddToCart').addEventListener('click',function(){
+            addToCartByCallWebApi();
+        })
+    </script>
+
+
+
+
 }
