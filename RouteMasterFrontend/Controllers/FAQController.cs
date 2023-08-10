@@ -21,23 +21,32 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Search()
+        public async Task<JsonResult> Search([FromBody] FAQAjaxDTO input)
         {
             var questList = _context.FAQs
-                .Include(f => f.FAQCategory);
+                .Include(f => f.FAQCategory)
+                .Where(f => f.FAQCategory.Name == input.Name);
+            string cateName = input.Name;
+            var keySearch = input.Keyword;
+
+            if (!string.IsNullOrEmpty(input.Keyword))
+            {
+                questList = questList.Where(f => f.Question.Contains(input.Keyword) ||
+                f.Answer.Contains(input.Keyword));
+            }
 
 
-            var dto = await questList.Select(f=>new FAQIndexDTO
+            var dto = await questList.Select(f => new FAQIndexDTO
             {
                 Id = f.Id,
-                CategoryName=f.FAQCategory.Name,
-                Question=f.Question,
-                Answer=f.Answer,
-                Helpful=f.Helpful,
-                Image=f.Image,
+                CategoryName = f.FAQCategory.Name,
+                Question = f.Question,
+                Answer = f.Answer,
+                Helpful = f.Helpful,
+                Image = f.Image,
             }).ToListAsync();
-                
-                
+
+
             return Json(dto);
         }
     }

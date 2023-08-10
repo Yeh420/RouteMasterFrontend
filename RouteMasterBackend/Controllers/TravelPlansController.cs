@@ -162,8 +162,8 @@ namespace RouteMasterBackend.Controllers
             var attractionInDb= _context.Attractions.Where(a => a.Id == id).First();
             var stayHours = Math.Round(_context.CommentsAttractions.Where(c => c.AttractionId == id && c.StayHours != null).Select(c => c.StayHours.Value).Average());
 
-            var activityProducts = new List<ActivityProduct>();
-            var extraServiceProduct = new List<ExtraServiceProduct>();
+            var activityProductsShowOnTravel =new List<ActivityProductShowOnTravelPlan>();
+            var extraServiceProductShowOnTravel = new List<ExtraServiceProductShowOnTravelPlan>();
             
 
            
@@ -171,12 +171,25 @@ namespace RouteMasterBackend.Controllers
             var matchActivityIds = _context.Activities.Where(x => x.AttractionId == id).Select(x=>x.Id);
             var filterActivityProducts = _context.ActivityProducts
                 .Where(x => matchActivityIds.Contains(x.ActivityId))
-                .Where(x=>x.Date==startDateTime.Date&&x.StartTime>startDateTime.TimeOfDay);
+                .Where(x => x.Date == startDateTime.Date && x.StartTime > startDateTime.TimeOfDay)
+                .Select(x => new ActivityProductShowOnTravelPlan
+                {
+                    Id = x.Id,
+                    ActivityId = x.ActivityId,
+                    ActivityName=_context.Activities.Where(a=>a.Id==x.ActivityId).First().Name,
+                    Date = x.Date,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                });
 
+
+            
 
             if (filterActivityProducts.Count() > 0)
             {
-                activityProducts.AddRange(filterActivityProducts);
+                activityProductsShowOnTravel.AddRange(filterActivityProducts);
             }
             
 
@@ -184,11 +197,20 @@ namespace RouteMasterBackend.Controllers
             var matchExtraServiceIds=_context.ExtraServices.Where(x=>x.AttractionId==id).Select(x=>x.Id);
             var filterExtraServiceProducts = _context.ExtraServiceProducts
                 .Where(x => matchExtraServiceIds.Contains(x.ExtraServiceId))
-                .Where(x => x.Date == startDateTime.Date);
+                .Where(x => x.Date == startDateTime.Date)
+                .Select(x => new ExtraServiceProductShowOnTravelPlan
+                {
+                    Id=x.Id,
+                    ExtraServiceId = x.ExtraServiceId,
+                    ExtraServiceName=_context.ExtraServices.Where(e=>e.Id==x.ExtraServiceId).First().Name,
+                    Date=x.Date,
+                    Price=x.Price,
+                    Quantity = x.Quantity,  
+                });
 
             if (filterExtraServiceProducts.Count() > 0)
             {
-                extraServiceProduct.AddRange(filterExtraServiceProducts);
+                extraServiceProductShowOnTravel.AddRange(filterExtraServiceProducts);
             }
 
 
@@ -199,10 +221,10 @@ namespace RouteMasterBackend.Controllers
             var data = new AttractionInfoDto
             {
                 Id=attractionInDb.Id,
-                Name=attractionInDb.Name,
+                AttractionName=attractionInDb.Name,               
                 StayHours=(int?)stayHours,
-                ActivityProducts= activityProducts,
-                ExtraServiceProducts= extraServiceProduct,
+                ActivityProducts= activityProductsShowOnTravel,
+                ExtraServiceProducts= extraServiceProductShowOnTravel,
             };
 
 
