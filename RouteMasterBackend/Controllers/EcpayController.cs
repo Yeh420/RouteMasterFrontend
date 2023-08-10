@@ -20,7 +20,12 @@ namespace RouteMasterBackend.Controllers
         {
             try
             {
-                _memoryCache.Set(info.Value<string>("MerchantTradeNo"), info, DateTime.Now.AddMinutes(60));
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60) // 60 分鐘後過期
+                };
+
+                _memoryCache.Set(info.Value<string>("MerchantTradeNo"), info, cacheEntryOptions);
                 return Ok("1|OK");
             }
             catch (Exception e)
