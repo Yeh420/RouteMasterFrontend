@@ -40,6 +40,12 @@ namespace RouteMasterFrontend.Controllers
             {
                 attractions = attractions.OrderByDescending(a => a.Clicks);
             }
+            if (criteria.order == "clickInThirty")
+            {
+                attractions = attractions
+                    .Where(a => a.ClicksInThirty > 0)
+                    .OrderByDescending(a => a.ClicksInThirty);
+            }
             if (criteria.order == "score")
             {
                 attractions = attractions.OrderByDescending(a => a.Score);
@@ -64,6 +70,8 @@ namespace RouteMasterFrontend.Controllers
             {
                 attractions = attractions.OrderByDescending(a => a.Id);
             }
+
+            
 
             #endregion
 
