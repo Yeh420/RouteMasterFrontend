@@ -99,7 +99,8 @@ namespace RouteMasterFrontend.Controllers
                 ReplyDate=c.ReplyAt,
                 ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
                 .Select(p=>p.Image).ToList(),
-                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.Member.Account== c.Member.Account),
+                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.MemberId==1),
+                TotalThumbs=proLike.Where(l=>l.Comments_AccommodationId== c.Id).Count(),
 
             }).ToListAsync();
 
@@ -110,7 +111,8 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
-        public async Task<string> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
+
+        public async Task<bool> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
         {
             var proLike =await _context.Comment_Accommodation_Likes
                 .Include(l => l.Member)
@@ -149,17 +151,17 @@ namespace RouteMasterFrontend.Controllers
                 _context.SystemMessages.Add(msg);
                 await _context.SaveChangesAsync();
 
-                return "按讚通知已生成";
+                return true;
             }
             else
             {
                 //刪除按讚紀錄
                 _context.Comment_Accommodation_Likes.Remove(proLike);
                 await _context.SaveChangesAsync();
-              
+                return false;
             }
+            
 
-            return string.Empty;
         }
 
         // GET: Comments_Accommodation/Details/5    

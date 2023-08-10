@@ -27,8 +27,10 @@ namespace RouteMasterBackend.Controllers
 
         // GET: api/Accommodations
         [HttpGet]
+        
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(string? keyword, int page = 1, int pageSize = 3)
         {
+            
             if (_context.Accommodations == null)
             {
                 return NotFound();

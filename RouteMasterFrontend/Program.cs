@@ -32,15 +32,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
 	//未登入時導入的網址
-	//options.LoginPath = new PathString("/Members/MemberLogin");
-
-	//options.AccessDeniedPath = "/"; 存取失敗的路徑
+	options.LoginPath = new PathString("/Members/MemberLogin");
+	
+	//options.AccessDeniedPath = new PathString("/Members/MemberLogin"); /*存取失敗的路徑*/
 });
 
-//.AddCookie(options =>
-//{
-//	options.LoginPath = "/Login/Index";
-//});
+
 
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -68,11 +65,16 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseRouting();
+
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseRouting();
+
+
+
+
 
 app.MapControllerRoute(
 	name: "default",

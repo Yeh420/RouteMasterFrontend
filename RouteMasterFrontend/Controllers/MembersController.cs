@@ -94,10 +94,11 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
+            var member = _context.Members;
 
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
-
+            
             Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
@@ -109,33 +110,7 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("MemberLogin", "Members");
         }
 
-        [HttpGet]
-        //上傳系統圖片 -- 有空時應該改去後台管理系統
-        public IActionResult UploadSystemImages()
-        {
-            return View();
-        }
-
-        //上傳系統內建大頭貼
-        [HttpPost]
-        public IActionResult UploadSystemImages(IFormFile[] files)
-        {
-            if (files != null && files.Length > 0)
-            {
-                foreach (var file in files)
-                {
-                    string path = Path.Combine(_environment.WebRootPath, "SystemImages");
-                    string fileName = SaveUploadFile(path, file);
-                    SystemImage img = new SystemImage();
-                    img.Image = fileName;
-                    _context.SystemImages.Add(img);
-                    _context.SaveChanges();
-                }
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
-        //註冊會員
+        
         [HttpGet]
         public IActionResult MemberRegister()
         {
@@ -189,12 +164,6 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
-        //註冊成功頁面
-        public IActionResult SuccessRegister()
-        {
-            return View();
-        }
-
 
         //會員普通登入
         [HttpGet]
@@ -216,15 +185,17 @@ namespace RouteMasterFrontend.Controllers
             }
 
             const bool rememberMe = false;
+            var member = _context.Members.FirstOrDefault(m => m.Account == vm.Account);
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-
+                // new Claim("memberImage", member.Image),
+                // new Claim("id",member.Id.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
+            // identity.AddClaim(new Claim("memberImage", member.Image));
 
             var authProperties = new AuthenticationProperties
             {
@@ -357,7 +328,7 @@ namespace RouteMasterFrontend.Controllers
 
                 }
 
-                return RedirectToAction("MyMemberIndex", "Members");
+                return RedirectToAction("MyMemberIndex2", "Members");
             }
             else
             {
@@ -422,7 +393,7 @@ namespace RouteMasterFrontend.Controllers
 
                     }
 
-                    return RedirectToAction("MyMemberIndex", "Members");
+                    return RedirectToAction("MyMemberIndex2", "Members");
                     
                 }
                 else
@@ -573,7 +544,7 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("MyMemberIndex");
         }
 
-
+        //歷史訂單
         [HttpGet]
        public async Task<IActionResult> HistoryOrder(int? id)
         {
@@ -585,9 +556,42 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult HistoryOrder() 
+        public IActionResult HistoryOrder()
         {
-            return View(); 
+            return View();
+        }
+
+        //註冊成功頁面
+        public IActionResult SuccessRegister()
+        {
+            return View();
+        }
+
+
+        [HttpGet]
+        //上傳系統圖片 -- 有空時應該改去後台管理系統
+        public IActionResult UploadSystemImages()
+        {
+            return View();
+        }
+
+        //上傳系統內建大頭貼
+        [HttpPost]
+        public IActionResult UploadSystemImages(IFormFile[] files)
+        {
+            if (files != null && files.Length > 0)
+            {
+                foreach (var file in files)
+                {
+                    string path = Path.Combine(_environment.WebRootPath, "SystemImages");
+                    string fileName = SaveUploadFile(path, file);
+                    SystemImage img = new SystemImage();
+                    img.Image = fileName;
+                    _context.SystemImages.Add(img);
+                    _context.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -687,18 +691,18 @@ namespace RouteMasterFrontend.Controllers
 
                 return Result.Failure("帳密有錯");
             }
-            else
-            {
-                var claims = new List<Claim>();
-                {
-                    new Claim(ClaimTypes.Name, member.Account);
-                    new Claim("LastName", member.LastName);
-                    new Claim("Id", member.Id.ToString());
-                };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            //else
+            //{
+            //    var claims = new List<Claim>();
+            //    {
+            //        new Claim(ClaimTypes.Name, member.Account);
+            //        new Claim("LastName", member.LastName);
+            //        new Claim("Id", member.Id.ToString());
+            //    };
+            //    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            }
+            //}
             //if(member.IsSuspended)  --有沒有停權
 
             var salt = _hashUtility.GetSalt();
@@ -713,6 +717,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 return Result.Failure("帳密有誤");
             }
+            
         }
 
         //上傳圖片
