@@ -102,7 +102,7 @@ namespace RouteMasterBackend.Controllers
             return accommodation;
         }
 
-        [HttpGet]
+        [HttpGet("/Filter")]
          public async Task<ActionResult<FilterDTO>> GetFilterDTO()
         {
             return new FilterDTO();
