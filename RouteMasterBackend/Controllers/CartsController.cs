@@ -20,7 +20,7 @@ namespace RouteMasterBackend.Controllers
 
 
 
-        [HttpPost]
+        [HttpPost("Post/Travel")]
         public void AddItemToCart(TravelProductDto dto)
         {
             var cartId=Convert.ToInt32(Request.Cookies["CartId"]);          
