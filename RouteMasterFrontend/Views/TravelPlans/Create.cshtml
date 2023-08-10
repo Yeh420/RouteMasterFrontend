@@ -10,17 +10,48 @@
         .travelComponent {
             display: flex;
             flex-direction: column;
-            gap: 10px; /* 设置子元素之间的间隔，可根据需要调整 */
-            padding: 10px; /* 设置父元素的内边距，使子元素与父元素之间有间隔 */
-            border: 2px solid #000; /* 设置父元素的边框 */
-            border-radius: 10px; /* 设置父元素的圆角 */
+            gap: 10px; 
+            padding: 10px;           
+          
+            border-radius: 10px; 
         }
 
-        .travelComponent > div {
-                padding: 5px; /* 设置子元素的内边距，使内容与子元素边框有一定的间隔 */
-                border: 1px solid #000; /* 设置子元素的边框 */
-                border-radius: 5px; /* 设置子元素的圆角 */
+     
+
+        .draggable {
+            width: 100px;
+            height: 50px;
+            background-color: lightblue;
+            border-radius:20px;
+            margin: 10px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
         }
+
+        .custom-arrow {
+           
+            transform: scaleY(3); 
+        }
+
+        .attractionDropContainer{
+            width:50%;
+            border: 1px solid #000;
+            text-align:center;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #selectedAttractions{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            max-height: 500px; 
+            overflow: auto; 
+        }
+
+    
     </style>
 }
 
@@ -35,12 +66,11 @@
 
 <div class="row" style="min-height: 500px; height: auto;">
     
-    <div class="col-6 border border-primary" style="min-height: 500px; height: auto;" id="schedule">
-        <input type="date" id="travelStartDate" />
-        <input type="time" id="travelStartTime" />
+    <div class="col-6 border border-primary p-3" style="min-height: 500px; height: auto;" id="schedule">
+        <input type="datetime-local"  id="travelBeginDateTime"/>
 
 
-        <button id="createAttractionTimeSpanContainer">新增</button>
+        <button id="createAttractionTimeSpanContainer">新增區塊</button>
     </div>
     <div class="col-3" style="position:relative;">
         <div id="sortedAttractions" class="border border-primary" style="height:500px"></div>
@@ -48,11 +78,9 @@
     </div>
 
     <di class="col-3" style="position:relative;">
-        <div id="selectedAttractions" class="border border-primary" style="height:500px"></div>
+        <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
         <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得距離資料</button>
-    </di>
-
-    
+    </di>    
 </div>
 
 
@@ -65,7 +93,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+  
 
     <script>
 
@@ -107,9 +135,10 @@
                 const newAtt = document.createElement('div');
                 newAtt.addEventListener('dblclick', handleDoubleClick)
                 newAtt.textContent = attractionName;
-                newAtt.classList.add('mb-3', 'rounded', 'text-center');
+                newAtt.classList.add('m-3', 'rounded', 'text-center', 'w-50', 'p-3');
                 newAtt.id = attractionId;
                 newAtt.style.border = '1px solid #000';
+                newAtt.style.left='50%';
                 attContainer.appendChild(newAtt);
             });
         }
@@ -219,12 +248,41 @@
 
 
 
-
-        function dragStartHandler(){
-           
-            console.log('666');
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.getAttribute("data-id"));
         }
 
+        function drop(event) {
+            event.preventDefault();
+            let dataId = event.dataTransfer.getData("text"); 
+            console.log(dataId);
+
+            if (dataId) {
+                const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
+                draggableElement.draggable = false;
+                draggableElement.style.backgroundColor = "lightgray";
+
+                axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`,{
+                    params:{
+                        startDateTime: document.querySelector('#travelBeginDateTime').value
+
+                    }
+
+                }).then(response => {
+                    console.log(response)
+
+
+
+                }).catch(error=>{
+                    console.log('error')
+                })
+                
+            }
+        }
+
+        function allowDrop(e){
+            e.preventDefault();
+        }
 
 
 
@@ -293,41 +351,60 @@
                 let distance = document.createElement('div');
                 let duration = document.createElement('div');
                 let destination = document.createElement('div');
+                let arrow=document.createElement('img');
+                let flexContainer=document.createElement('div');
+
+                flexContainer.style.display="flex";
 
 
-
+                arrow.src = "@Url.Content("~/SystemImages/downArrow.jpg")";
+                arrow.style.width = "50px";
+                arrow.style.height = "50px"; 
+                
 
                 
                 departure.textContent = selectedPath[i].start.Name;
                 departure.setAttribute('data-id', selectedPath[i].start.Id);
-                departure.classList.add('draggable-container');
-                departure.addEventListener('dragstart', dragStartHandler);
+                departure.draggable=true;
+                departure.addEventListener('dragstart',drag);
+                departure.classList.add('draggable');
 
 
 
                 distance.textContent = selectedPath[i].distance.text;
                 distance.value = selectedPath[i].distance.value;
+                distance.classList.add('border', 'rounded', 'm-3')
+
                 duration.textContent = selectedPath[i].duration.text;
                 duration.value = selectedPath[i].duration.value;
+                duration.classList.add('border', 'rounded', 'm-3')
 
 
 
                 destination.textContent = selectedPath[i].end.Name;
                 destination.setAttribute('data-id', selectedPath[i].end.Id);
+                destination.draggable = true;
+                destination.addEventListener('dragstart', drag);
+                destination.classList.add('draggable');
 
+          
 
     
                 if(i==0){
                     sortedContainer.appendChild(newPath);
                     newPath.appendChild(departure);
-                    newPath.appendChild(distance);
-                    newPath.appendChild(duration);
+                    flexContainer.appendChild(arrow);
+                    flexContainer.appendChild(distance);
+                    flexContainer.appendChild(duration);
+                    newPath.appendChild(flexContainer);
                     newPath.appendChild(destination);
 
                 }else{
                     sortedContainer.appendChild(newPath);
-                    newPath.appendChild(distance);
-                    newPath.appendChild(duration);
+                    flexContainer.appendChild(arrow);
+                    flexContainer.appendChild(distance);
+                    flexContainer.appendChild(duration);
+                    newPath.appendChild(flexContainer);
                     newPath.appendChild(destination);
                 }
 
@@ -336,49 +413,22 @@
 
 
 
-
         document.querySelector("#createAttractionTimeSpanContainer").addEventListener('click',function(){
             let travelComponent = document.createElement('div');
-            travelComponent.classList.add('border', 'border-danger', 'mb-3', 'travelComponent','row')
+            travelComponent.classList.add('travelComponent')
 
 
 
-            let attractionName=document.createElement('input');
-            attractionName.type="text";
-            attractionName.value="請拖入景點";
-            let attractionActivities=document.createElement('div');
-            attractionActivities.classList.add('border', 'border-primary', 'initialHeight','activitiesContainerOfAttraction','mb-1');
-
-
-
-
-            let attractionExtraServices=document.createElement('div');
-            attractionExtraServices.classList.add('border', 'border-primary', 'initialHeight','extraServicesContainerOfAttraction','mb-1');
-            let labelForTimeSpent = document.createElement('label');
-            labelForTimeSpent.classList.add('initialHeight')
-            labelForTimeSpent.textContent = "停留期間";                 
-            let startTime=document.createElement('input');
-            startTime.type="time";
-            let endTime=document.createElement('input');
-            endTime.type="time";
-            let dateTimeResult=document.createElement("input");
-            dateTimeResult.type = "datetime-local";
-            dateTimeResult.readOnly = true;
+            let attractionName=document.createElement('div');      
+            attractionName.textContent="請拖入景點";
+            attractionName.classList.add('attractionDropContainer')
+            attractionName.addEventListener('drop', drop);
+            attractionName.addEventListener('dragover',allowDrop)
 
 
 
 
-            travelComponent.appendChild(attractionName);
-            travelComponent.appendChild(attractionActivities);
-            travelComponent.appendChild(attractionExtraServices);
-            travelComponent.appendChild(labelForTimeSpent);
-            travelComponent.appendChild(startTime);
-            travelComponent.appendChild(endTime);
-            travelComponent.appendChild(dateTimeResult);
-
-
-
- 
+            travelComponent.appendChild(attractionName); 
             this.parentNode.appendChild(travelComponent);
         })
     </script>

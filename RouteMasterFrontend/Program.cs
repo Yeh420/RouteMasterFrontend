@@ -19,6 +19,7 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 
 
 
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
