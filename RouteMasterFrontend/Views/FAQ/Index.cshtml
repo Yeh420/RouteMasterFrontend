@@ -1,0 +1,108 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div id="app">
+    <div class="container">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">行程</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">住宿</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">訂單</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
+                    <div v-if="item.categoryName===cate[0]">
+                        <h5 class="card-header">{{item.categoryName}}</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">{{item.question}}</h5>
+                            <p class="card-text">{{item.answer}}</p>
+                            <p class="card-text">{{item.image}}</p>
+                            <p class="card-text">{{item.helpful}}</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
+                    <div v-if="item.categoryName===cate[1]">
+                        <h5 class="card-header">{{item.categoryName}}</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">{{item.question}}</h5>
+                            <p class="card-text">{{item.answer}}</p>
+                            <p class="card-text">{{item.image}}</p>
+                            <p class="card-text">{{item.helpful}}</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">..dgfdgdf.</div>
+        </div>
+   
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script>
+        var vueApp={
+            data(){
+                return{
+                    qList:[],
+                    cate:["行程","住宿","訂單","帳號"]
+                }
+            },
+            mounted:function(){
+                let _this=this;
+                _this.getQuestion();
+            },
+            methods:{
+                getQuestion: async function(){
+                    const response = await fetch("https://localhost:7145/FAQ/Search", {
+                        method: "POST",
+                        //headers: {
+                        //    "Content-Type": "application/json"
+                        //},
+                        //body: JSON.stringify(requestData)
+                    });
+
+                    if (response.ok) {
+                        let _this=this;
+                       _this.qList = await response.json();
+
+                        console.log(_this.qList);
+                      
+
+                    } else {
+                        console.log("error");
+                    }
+
+                    }
+                }
+            }
+        
+        var app = Vue.createApp(vueApp).mount("#app");
+        
+       
+
+       
+          
+        
+        
+    </script>
+    }

@@ -100,6 +100,7 @@ namespace RouteMasterFrontend.Controllers
                 ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
                 .Select(p=>p.Image).ToList(),
                 ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.MemberId==1),
+                TotalThumbs=proLike.Where(l=>l.Comments_AccommodationId== c.Id).Count(),
 
             }).ToListAsync();
 

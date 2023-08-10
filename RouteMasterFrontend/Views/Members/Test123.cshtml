@@ -1,0 +1,19 @@
+﻿@section Scripts{
+	function getOrder(){
+        fetch('https://localhost:7145/Members/HistoryOrder', {
+    method: 'GET',
+    @*headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }*@
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // 在這裡處理獲得的 JSON 數據
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+    }
+    getOrder();
+}
