@@ -543,6 +543,7 @@
                             _this.accommodationServiceCId = p.services.map(function(s){
                                 return s.serviceInfoCategoryId;
                             });
+                            _this.$refs.childRef.commentDisplay(p.id);
 
 
                             const showMoreText = "...顯示更多";
@@ -686,61 +687,9 @@
                     }, false);
                 },
             },
-          
 			components: {
 				dec
         }
         var app = Vue.createApp(vueApp).mount("#app");
-            
     </script>
-<!-- 
-				showModal: async function (id) {
-
-					let _this = this;
-					const exampleModal = document.getElementById('exampleModal')
-					if (exampleModal) {
-						_this.cartProductId = _this.products[id].id;
-
-
-						const p = _this.products[id];
-						_this.accommodationName = p.name;
-						_this.accommodationAddress = p.address + "-";
-						_this.accommodationImage = p.images[0] ? p.images[0].image : null;
-						_this.rooms = p.rooms;
-						_this.accommodationServiceCId = p.services.map(function (s) {
-							return s.serviceInfoCategoryId;
-						});
-						_this.accommodationService = p.services;
-						_this.$refs.childRef.commentDisplay(p.id);
-
-
-						const showMoreText = "...顯示更多";
-						const showLessText = "...顯示更少";
-						const lines = _this.temp = p.description.split('\n');
-						// 如果行數超過 5 行，僅保留前 5 行
-						if (lines.length > 5) {
-							_this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id='small' style='color: #999'>${showMoreText}</small>`;
-						} else {
-							_this.accommodationDescription = lines.join('<br>');
-						}
-
-
-						const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-						const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-						// 可改寫VUE
-						const modalImg = exampleModal.querySelector('.product-info ul');
-						modalImg.innerHTML = "";
-						p.images.map(function (p) {
-							const ce = document.createElement('li');
-							ce.innerHTML = `<img src="../AccommodationImages/${p.image}"/>`;
-							modalImg.append(ce);
-						});
-
-						$('.product-info ul li img').click(function () {
-							var imgSrc = $(this).attr('src');
-							_this.accommodationImage = imgSrc;
-						})
-					}
-				}, -->
     }
