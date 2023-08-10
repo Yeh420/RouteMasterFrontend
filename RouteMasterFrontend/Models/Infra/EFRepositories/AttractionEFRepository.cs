@@ -172,6 +172,8 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
 
         public IEnumerable<AttractionIndexDto> Search()
         {
+            DateTime thirtyDaysAgo = DateTime.Now.AddDays(-30);
+
             var query = _db.Attractions
                 .AsNoTracking()
                 .Include(a => a.AttractionCategory)
@@ -227,6 +229,10 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
                         .Count(),
                     Clicks = q.AttractionClicks
                         .Where(a => a.AttractionId == q.Id)
+                        .Count(),
+                    ClicksInThirty = q.AttractionClicks
+                        .Where(a => a.AttractionId == q.Id)
+                        .Where(a => a.ClickDate >= thirtyDaysAgo)
                         .Count()
                 }).ToList();
 

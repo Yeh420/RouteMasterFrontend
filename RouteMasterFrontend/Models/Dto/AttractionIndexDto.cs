@@ -26,5 +26,7 @@
         public int PriceCount { get; set; }
 
         public int Clicks { get; set; }
+
+        public int ClicksInThirty { get; set; }
     }
 }
