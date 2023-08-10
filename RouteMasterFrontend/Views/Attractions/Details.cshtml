@@ -9,6 +9,9 @@
         p {
             font-size:1.4em;
         }
+        iframe {
+            width: 100%;
+        }
     </style>
 }
 
@@ -110,8 +113,8 @@
     </div>
     
     <div class="mb-3">
-        @Html.ActionLink("加入我的最愛", "AddToFavorite", new { /* id = Model.PrimaryKey */ }) |
-        <button class="btn btn-secondary "><a asp-action="Index" class="text-white">返回列表</a></button>
+        <button class="btn btn-primary" id="addToFavoriteButton">加入我的最愛</button> |
+        <a asp-action="Index" class="btn btn-secondary">返回列表</a>
     </div>
 </div>
 
@@ -121,5 +124,25 @@
 @section Scripts{
     
     <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin = "anonymous" ></script>
-   
+
+    <script>
+        document.getElementById("addToFavoriteButton").addEventListener("click", function () {
+            var attractionId = @Model.Id;
+
+            $.ajax({
+                url: '@Url.Action("AddToFavorite", "Attractions")',
+                type: 'POST',
+                data: { id: attractionId },
+                success: function (result) {
+                    console.log("AJAX success:", result); // 檢查 AJAX 回傳的結果
+                    if (result.success) {
+                        alert("已加入最愛");
+                    }
+                    else {
+                        alert("請先登入");
+                    }
+                }
+            });
+        });
+    </script>
 }

@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using RouteMasterFrontend.Models.Infra.EFRepositories;
 using RouteMasterFrontend.Models.Infra.ExtenSions;
 using RouteMasterFrontend.Models.Interfaces;
 using RouteMasterFrontend.Models.Services;
 using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
+using RouteMasterFrontend.Models.ViewModels.Members;
+using System.Drawing.Printing;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -96,6 +100,57 @@ namespace RouteMasterFrontend.Controllers
             AttractionDetailVM vm = Get(id);
 
             return View(vm);
+        }
+
+        public IActionResult AddToFavorite (int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var customerAccount = User.Identity.Name;
+                Add2Favorite(customerAccount, id);
+
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+
+        [Authorize]
+        public IActionResult FavoriteAtt(int page = 1)
+        {
+            var customerAccount = User.Identity.Name;
+            IEnumerable<AttractionIndexVM> attractions = GetFavoriteAtt(customerAccount);
+
+            int pageSize = 15;
+
+            int totalItems = attractions.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            attractions = attractions.Skip((page - 1) * pageSize).Take(pageSize);
+
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = totalPages;
+
+            return View(attractions);
+        }
+
+        private IEnumerable<AttractionIndexVM> GetFavoriteAtt(string? customerAccount)
+        {
+            IAttractionRepository repo = new AttractionEFRepository();
+            AttractionService service = new AttractionService(repo);
+
+            return service.GetFavoriteAtt(customerAccount).Select(dto => dto.ToIndexVM());
+        }
+
+        private void Add2Favorite(string? customerAccount, int id)
+        {
+            IAttractionRepository repo = new AttractionEFRepository();
+            AttractionService service = new AttractionService(repo);
+
+            service.AddToFarvorite(customerAccount, id);
         }
 
         private void AddClick(int id)
