@@ -1,4 +1,9 @@
-﻿
+﻿@{
+    int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
+}
+
+
+
 @section Styles{
     <style>
  
@@ -13,7 +18,11 @@
             gap: 10px; 
             padding: 10px;           
           
-            border-radius: 10px; 
+            border-radius: 10px;
+            justify-content:center;
+            align-items:center;
+        
+
         }
 
      
@@ -51,6 +60,9 @@
             overflow: auto; 
         }
 
+        .hide{
+            display:none
+        }
     
     </style>
 }
@@ -66,13 +78,32 @@
 
 <div class="row" style="min-height: 500px; height: auto;">
     
-    <div class="col-6 border border-primary p-3" style="min-height: 500px; height: auto;" id="schedule">
-        <input type="datetime-local"  id="travelBeginDateTime"/>
+    <div class="col-6 border border-primary p-3 " style="min-height: 500px; height: auto;" id="schedule">
+        <input type="datetime-local"  id="travelBeginDateTime" />
+        <button id="createAttractionTimeSpanContainer" >新增區塊</button>
+        <button id="callApiToAddToCart" >加入購物車</button>
+        <div class="row">            
+            <div id="dropZoneContainer" class="col-6">
 
-
-        <button id="createAttractionTimeSpanContainer">新增區塊</button>
-        <button id="callApiToAddToCart">加入購物車</button>
+            </div>
+            <div id="tableContainer" class="col-6 hide">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>事項</th>
+                            <th>景點名稱</th>
+                            <th>開始時間</th>
+                            <th>結束時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ajaxUpdateSchedule">
+                    </tbody>
+                </table>
+            </div>
+        </div>       
     </div>
+
+
     <div class="col-3" style="position:relative;">
         <div id="sortedAttractions" class="border border-primary" style="height:500px"></div>
         <button id="greedyTSP" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">推薦路線</button>
@@ -459,17 +490,23 @@
 
         document.querySelector("#createAttractionTimeSpanContainer").addEventListener('click',function(){
             let travelComponent = document.createElement('div');
-            travelComponent.classList.add('travelComponent')
+            travelComponent.classList.add('travelComponent');
+            travelComponent.style.position="relative";
 
-            let attractionName=document.createElement('div');      
+            let attractionName=document.createElement('div');
+            
             attractionName.textContent="請拖入景點";
-            attractionName.classList.add('attractionDropContainer')
+            attractionName.classList.add('attractionDropContainer');
             attractionName.addEventListener('drop', drop);
-            attractionName.addEventListener('dragover',allowDrop)
+            attractionName.addEventListener('dragover',allowDrop);
+            
 
 
             travelComponent.appendChild(attractionName); 
-            this.parentNode.appendChild(travelComponent);
+
+            
+            let targetContainer = document.querySelector('#dropZoneContainer');
+            targetContainer.appendChild(travelComponent);
         })
 
 
@@ -483,40 +520,17 @@
 
 
 
-            
+
+
+           let cartIdFromCookie=@cartIdFromCookie;
+
+
+            //todo AccommodationProduct
             const postData={
+                cartId: cartIdFromCookie,
                 activityProductIds: actCheckboxValues,
                 extraServiceProductIds:extCheckboxValues
             };
-
-
-
-
-
-
-
-
-
-
-
-
-
-            axios.post(`https://localhost:7251/api/Carts/Post/Travel`,postData)
-            .then(response=>{
-               // 請求已成功發送，但沒有返回值
-               console.log('Request successful, no response data.');
-            })
-            .catch(error=>{
-                console.log(error)
-            });         
-        }
-
-
-
-        document.querySelector('#callApiToAddToCart').addEventListener('click',function(){
-            addToCartByCallWebApi();
-        })
-    </script>
 
 
 
