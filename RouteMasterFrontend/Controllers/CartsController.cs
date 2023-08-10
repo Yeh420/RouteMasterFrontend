@@ -104,10 +104,11 @@ namespace RouteMasterFrontend.Controllers
 
 			return extraServicesDetails;
 		}
-        public IActionResult AddExtraService2Cart(int extraserviceId)
+        public IActionResult AddExtraService2Cart(int extraserviceId, int quantity)
         {
             try
             {
+
                
                 var extraServiceProduct = _context.ExtraServiceProducts
                     .FirstOrDefault(p => p.Id == extraserviceId);
@@ -120,7 +121,7 @@ namespace RouteMasterFrontend.Controllers
                     {
                         CartId = cartIdFromCookie,
                         ExtraServiceProductId = extraserviceId,
-                        Quantity = 1
+                        Quantity = quantity
                     };
 
 

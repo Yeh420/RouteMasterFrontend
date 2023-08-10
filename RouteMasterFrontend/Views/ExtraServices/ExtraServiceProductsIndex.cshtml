@@ -48,33 +48,64 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
+               @* <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>*@
+                
+                    <div class="right-content">
+                        <div class="quantity buttons_added">
+                            <input type="button" value="-" class="minus">
+                            <input id="quantityInput" type="number" step="1" min="1" max="" name="quantity" value="1" title="Qty"
+                                   class="input-text qty text" size="4" pattern="" inputmode="">
+                            <input type="button" value="+" class="plus"> 
+                        </div>
+                    </div>
+                  
+                     <button class="btn btn-primary" onclick="addToCart(@item.Id)">Add to Cart</button>
+                    
             </td>
+          
         </tr>
+            
 }
     </tbody>
+
 </table>
 <script>
+    $(document).ready(function () {
+        // 處理增加數量操作
+        $(".plus").on("click", function () {
+            var self = $(this);
+            var quantityInput = self.siblings(".qty");
+            var currentQty = parseInt(quantityInput.val()); 
+            quantityInput.val(currentQty + 1); 
+        });
 
+        $(".minus").on("click", function () {
+            var self = $(this); 
+            var quantityInput = self.siblings(".qty"); 
+            var currentQty = parseInt(quantityInput.val()); 
+            if (currentQty > 1) {
+                quantityInput.val(currentQty - 1); 
+        });
 
-
+      
+    });
     function addToCart(extraserviceId) {
+        var quantity = parseInt($("#quantityInput").val()); 
+
         $.ajax({
             url: '/Carts/AddExtraService2Cart',
             type: 'Post',
-            data: { extraserviceId: extraserviceId },
+            data: { extraserviceId: extraserviceId, quantity: quantity },
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
                     console.log("123");
                     reloadCartItems();
-
-                } 
+                }
             },
             error: function () {
                 alert('An error occurred while adding to cart.');
             }
-
         });
     }
 
