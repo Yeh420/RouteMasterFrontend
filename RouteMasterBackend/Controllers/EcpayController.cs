@@ -29,18 +29,18 @@ namespace RouteMasterBackend.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult AddAccountInfo(JObject info)
-        {
-            try
-            {
-                _memoryCache.Set(info.Value<string>("MerchantTradeNo"), info, DateTime.Now.AddMinutes(60));
-                return Ok("1|OK");
-            }
-            catch (Exception e)
-            {
-                return BadRequest("0|Error");
-            }
-        }
+        //[HttpPost]
+        //public IActionResult AddAccountInfo(JObject info)
+        //{
+        //    try
+        //    {
+        //        _memoryCache.Set(info.Value<string>("MerchantTradeNo"), info, DateTime.Now.AddMinutes(60));
+        //        return Ok("1|OK");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest("0|Error");
+        //    }
+        //}
     }
 }
