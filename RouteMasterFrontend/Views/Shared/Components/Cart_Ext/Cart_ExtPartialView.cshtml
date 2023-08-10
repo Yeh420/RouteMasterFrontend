@@ -41,24 +41,30 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr data-extraserviceid="@item.Id">
+            @{
+                var groupitems = Model.GroupBy(item => item.ExtraServiceProduct.Id);
+
+            }
+            @foreach (var group in groupitems)
+            {
+                var firstitem = group.First();
+                <tr data-extraserviceid="@firstitem.Id">
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Name)
+                        @Html.DisplayFor(modelItem => firstitem.ExtraServiceProduct.ExtraService.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Description)
+                        @Html.DisplayFor(modelItem => firstitem.ExtraServiceProduct.ExtraService.Description)
             </td>   
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Date)
+                        @Html.DisplayFor(modelItem => firstitem.ExtraServiceProduct.Date)
             </td>
 
            
             <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
+                @group.Sum(item=>item.Quantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Price)
+                @Html.DisplayFor(modelItem => firstitem.ExtraServiceProduct.Price)
             </td>
            @* <td>
                 @Html.DisplayFor(modelItem => item.Cart.Id)

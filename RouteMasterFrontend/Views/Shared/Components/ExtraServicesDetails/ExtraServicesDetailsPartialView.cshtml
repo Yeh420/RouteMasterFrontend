@@ -38,26 +38,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr data-extraserviceid="@item.Id">
+            @{
+                var groupitems = Model.GroupBy(item => item.ExtraServiceProduct.Id);
+            }
+            @foreach (var group in groupitems)
+            {
+                var firstItem = group.First();
+        <tr data-extraserviceid="@firstItem.ExtraServiceProductId">
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.ExtraService.Name)
+                        @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Date)
+                        @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)
             </td>
            
             <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
+                        @group.Sum(item=>item.Quantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ExtraServiceProduct.Price)
+                        @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Price)
             </td>
            @* <td>
                 @Html.DisplayFor(modelItem => item.Cart.Id)
             </td>*@
             <td>
-                <a href="#" onclick="removeFromCartExt(@item.Id)">
+                        <a href="#" onclick="removeFromCartExt(@firstItem.Id)">
                     <i class="fas fa-trash-can"></i>
                 </a>
            

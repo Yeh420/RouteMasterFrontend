@@ -1,21 +1,83 @@
-﻿
-  
-    
+﻿const dec = {
+    data() {
+        return {
+            indexVM: [],
+            item: {},
+            isReplyed: "已回復",
+            ep: null,
+            selected: 0,
+            //hotelId: 1, //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
+            thumbicon: [],
+            hotelId:0
 
-<div id="dec">
-    <div class="container">
+        }
+    },
+    //created: function () {
+    //    let _this = this;
+    //},
+    //mounted: function () {
+    //    let _this = this;
+    //    _this.commentDisplay();
+    //},
+    methods: {
+        commentDisplay: function (id) {
+            let _this = this;
+            var request = {};
+            if (id) {
+                _this.hotelId = id;
+            }
+            request.Manner = _this.selected;
+            request.HotelId = _this.hotelId;
+
+            axios.post("https://localhost:7145/Comments_Accommodation/ImgSearch", request).then(response => {
+                _this.indexVM = response.data;
+                console.log(_this.indexVM);
+                _this.thumbicon = _this.indexVM.map(function (vm) {
+                    //console.log(vm.thumbsUp);
+                    return vm.thumbsUp ? '<i class="fa-solid fa-thumbs-up fa-lg"></i>' : '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
+                })
+                //console.log(_this.thumbicon);
+
+                for (let j = 0; j < _this.indexVM.length; j++) {
+                    _this.item = _this.indexVM[j];
+                }
+
+            }).catch(err => {
+                alert(err);
+            });
+        },
+        likeComment: async function (commentId) {
+            let _this = this;
+            var request = {};
+            request.CommentId = commentId;
+            request.IsLike = true;
+
+            await axios.post("https://localhost:7145/Comments_Accommodation/DecideLike", request).then(response => {
+
+                _this.commentDisplay();
+
+            }).catch(err => {
+                alert(err);
+            });
+
+        },
+        getImgPath: function (photo) {
+            return `../MemberUploads/${photo}`;
+        }
+
+    },
+    template: `
+        <div class="container">
         <div class="row mb-2" style="width:20%">
-            <a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>
-            <label for="commentOrder">排序選擇:</label>
-            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
-                <option value="0" selected>請選擇</option>
+            <select v-model="selected" id="commentOrder" class="ms-3" @change="commentDisplay()">
+                <option value="0" selected>排序選擇</option>
                 <option value="1">最新留言</option>
                 <option value="2">星星評分高至低</option>
                 <option value="3">星星評分低至高</option>
             </select>
-            @*<p>選到的選項value為:{{ selected }}</p>*@
+            <div class="ms-auto"><a href="https://localhost:7145/Comments_Accommodation/Create" class="link-dark">新增評論</a></div>
         </div>
-        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3 w-75">
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="card-header">{{item.account}}</div>
@@ -35,13 +97,13 @@
                         </div>
                         
                         <hr />
-                        <button type="button" v-html="thumbicon[index]" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                        <button type="button" v-html="thumbicon[index]" @click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                                 
                         </button>
                        
                         <template v-if="item.status===isReplyed">
                             <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
-                                    :data-bs-target='"#collapseExample"+index' @@showReply(item.id)>
+                                    :data-bs-target='"#collapseExample"+index' @showReply(item.id)>
                                 看回覆訊息
                             </button>
                             <div class="collapse mt-3" :id='"collapseExample" + index'>
@@ -74,25 +136,12 @@
                         </div>    
                     </template>                    
                     <template v-else>
-                        <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
+                        <img src="../MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
                     </template>                   
                 </div>
             </div>
         </div>
     </div>
-  </div>
+    `
 
-
-
-
-   @* <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
-            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>*@
-@*<script src="~/js/Comments_AccommodationPartial.js"></script>*@
-
-   @* <script>
-       
-       
-    </script>*@
+};

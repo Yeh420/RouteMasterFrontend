@@ -19,6 +19,7 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 
 
 
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
@@ -37,7 +38,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 	//options.AccessDeniedPath = new PathString("/Members/MemberLogin"); /*存取失敗的路徑*/
 });
 
-
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(120); 
+});
 
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -64,7 +69,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseSession();
 app.UseRouting();
 
 app.UseCookiePolicy();
