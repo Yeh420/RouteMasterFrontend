@@ -220,9 +220,11 @@ namespace RouteMasterBackend.Controllers
 
             var data = new AttractionInfoDto
             {
-                Id=attractionInDb.Id,
-                AttractionName=attractionInDb.Name,               
-                StayHours=(int?)stayHours,
+                Id = attractionInDb.Id,
+                AttractionName = attractionInDb.Name,
+                StartDateTime = startDateTime,
+                EndDateTime = startDateTime.AddHours(stayHours),
+                StayHours =(int?)stayHours,
                 ActivityProducts= activityProductsShowOnTravel,
                 ExtraServiceProducts= extraServiceProductShowOnTravel,
             };
