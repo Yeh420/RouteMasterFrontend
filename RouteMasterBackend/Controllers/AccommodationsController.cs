@@ -34,11 +34,12 @@ namespace RouteMasterBackend.Controllers
             {
                 return NotFound();
             }
-            var accommodations = _db.Accommodations
+            var accommodations = _db.Accommodations.AsNoTracking()
                     .Include(a => a.CommentsAccommodations)
                     .Include(a => a.AccommodationImages)
                     .Include(a => a.Rooms)
-                    .Include(a => a.AccommodationServiceInfos).AsQueryable();
+                    .Include(a => a.AccommodationServiceInfos)
+                    .AsQueryable();
             if (!string.IsNullOrEmpty(data.Keyword))
             {
 	            accommodations = accommodations.Where(p => 
@@ -49,10 +50,20 @@ namespace RouteMasterBackend.Controllers
                 );
             }
 
-            //if(data.Grades != null && data.Grades.Length > 0)
-            //{
-            //    accommodations = accommodations.Where(a => data.Grades.All(grade => a.Grade == grade));
-            //};
+            if (data.Grades != null && data.Grades.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Grades.Contains(a.Grade));
+            };
+
+            if (data.ACategory != null && data.ACategory.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.ACategory.Contains(a.AcommodationCategory.Name));
+            };
+
+            if(data.score != null)
+            {
+                accommodations = accommodations.Where(a => a.CommentsAccommodations.Average(ca=>ca.Score) >= data.score);
+            }
 
 
 
