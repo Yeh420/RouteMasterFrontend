@@ -110,21 +110,6 @@ namespace RouteMasterFrontend.Controllers
             return View(vm);
         }
 
-        public IActionResult Details2(int id)
-        {
-            AddClick(id);
-            AttractionDetailVM vm = Get(id);
-
-
-            // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
-            bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
-
-
-
-            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
-
-            return View(vm);
-        }
 
         private bool CheckIfFavorite(int id)
         {
