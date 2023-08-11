@@ -41,10 +41,10 @@
                        
                         <template v-if="item.status===isReplyed">
                             <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
-                                    :data-bs-target=`#collapseExample${index}` @@showReply(item.id)>
+                                    :data-bs-target='"#collapseExample"+index' @@showReply(item.id)>
                                 看回覆訊息
                             </button>
-                            <div class="collapse mt-3" :id=`collapseExample${index}`>
+                            <div class="collapse mt-3" :id='"collapseExample" + index'>
                                 <div class="card card-body">
                                     <h5>來自{{item.hotelName}}的回覆:</h5>
                                     <p>{{item.replyMessage}}</p>
@@ -56,18 +56,18 @@
                 </div>
                 <div class="col-md-4">
                     <template v-if="item.imageList.length>1">
-                        <div :id=`carousel${index}` class="carousel carousel-dark slide" data-bs-ride="carousel">
+                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
                             <div class="carousel-inner w-100 mx-auto my-auto">
                                 <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
                                     <img v-bind:src="getImgPath(photo)" class="d-block w-100">
                                 </div>
                   
                             </div>
-                            <button class="carousel-control-prev" type="button" :data-bs-target=`#carousel${index}` data-bs-slide="prev">
+                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>
                             </button>
-                            <button class="carousel-control-next" type="button" :data-bs-target=`#carousel${index}` data-bs-slide="next">
+                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Next</span>
                             </button>
