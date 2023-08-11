@@ -1,5 +1,8 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
 @model FilterDTO
+
 @section Styles{
 	<link rel="stylesheet"
 		  href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
@@ -177,11 +180,11 @@
                     <ul>
                         <li v-for="(sCategory, index) in filterDto.serviceInfoes">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="sCategory" v-bind:id="'sCategory' + index" v-model="selectedsCategories" v-bind:value="sCategory" @@change="showPages"/>
-                                <label class="form-check-label" v-bind:for="'sCategory' + index"> {{sCategory.name}} </label>
-                                <div v-for="s in sCategory.accommodationServiceInfos">
-                                    <input type="checkbox" class="form-check-input" name="sCategory" v-bind:id="'sCategory' + index" v-model="selectedsCategories" v-bind:value="sCategory" @@change="showPages"/>
-                                    <label class="form-check-label" v-bind:for="'sCategory' + index"> {{s.name}} </label>
+                                <input type="checkbox" class="form-check-input" name="sCategory" v-bind:id="'sCategory' + index" v-model="selectedsCategories" v-bind:value="sCategory.name" @@change="toggleSInfos(index)">
+                                <label class="form-check-label" v-bind:for="'sCategory' + index">{{ sCategory.name }}</label>
+                                <div class="ms-4" v-for="(sInfo, sIndex) in sCategory.infos">
+                                    <input type="checkbox" class="form-check-input" name="sInfo" v-bind:id="'sInfo' + index + '-' + sIndex" v-model="selectedServiceInfos" v-bind:value="sInfo" @@change="showPages">
+                                    <label class="form-check-label" v-bind:for="'sInfo' + index + '-' + sIndex">{{ sInfo }}</label>
                                 </div>
                             </div>
                         </li>
@@ -459,23 +462,22 @@
                         totalPages:1,
                         thePage: 1,
                         pageSize:5,
-                        filterDto:@Html.Raw(Json.Serialize(Model)),
+                        filterDto: @Html.Raw(Json.Serialize(Model)),
                         selectedGrades:[],
                         selectedaCategories:[],
                         selectedScore:Number,
                         selectedsCategories:[],
+                        selectedServiceInfos:[],
                         accommodationIndex:{},
                         accommodationImage:"",
                         accommodationDescription:"",
                         cartProductId:1,
                         accommodationServiceCId:[],
-
                     }
                 },
                 mounted: async function(){
 				    let _this = this;
 				    _this.loadProducts();
-                    console.log(this.filterDto)
 			    },
                 computed: {
                     hasPrevious() {
@@ -515,7 +517,7 @@
                             grades : _this.selectedGrades,
                             aCategory : _this.selectedaCategories,
                             score : _this.selectedScore,
-                            sCategory : _this.selectedsCategories
+                            sCategory: _this.selectedServiceInfos
                         };
                         const response =  await fetch(`https://localhost:7251/api/Accommodations`,{
                             method:"Post",
@@ -575,10 +577,20 @@
                         _this.thePage = value;
                         _this.loadProducts();
                     },
+                    toggleSInfos(index) {
+                        const sCategory = this.filterDto.serviceInfoes[index];
+                        const sInfos = sCategory.infos;
+
+                        if (this.selectedsCategories.includes(sCategory.name)) {
+                            this.selectedServiceInfos = [...new Set([...this.selectedServiceInfos, ...sInfos])];
+                        } else {
+                            this.selectedServiceInfos = this.selectedServiceInfos.filter(item => !sInfos.includes(item));
+                        }
+                        this.showPages();
+                    },
                     showPages:function(){
                         let _this = this;
                         _this.thePage = 1;
-                        console.log(this.selectedScore);
                         _this.loadProducts();
                     },
                     addCart:function() {
