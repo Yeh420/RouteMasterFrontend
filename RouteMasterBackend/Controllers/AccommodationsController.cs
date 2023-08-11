@@ -49,10 +49,10 @@ namespace RouteMasterBackend.Controllers
                 );
             }
 
-            //if(data.Grades != null && data.Grades.Length > 0)
-            //{
-            //    accommodations = accommodations.Where(a => data.Grades.All(grade => a.Grade == grade));
-            //};
+            if (data.Grades != null && data.Grades.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Grades.Contains(a.Grade));
+            };
 
 
 
