@@ -114,7 +114,7 @@
     
     <div class="mb-3">
         <button class="btn btn-primary" id="addToFavoriteButton">加入我的最愛</button> |
-        <a asp-action="Index" class="btn btn-secondary">返回列表</a>
+        <button class="btn btn-secondary" onclick="history.back()">上一頁</button>
     </div>
 </div>
 
@@ -124,6 +124,7 @@
 @section Scripts{
     
     <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin = "anonymous" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         document.getElementById("addToFavoriteButton").addEventListener("click", function () {
@@ -134,12 +135,37 @@
                 type: 'POST',
                 data: { id: attractionId },
                 success: function (result) {
-                    console.log("AJAX success:", result); // 檢查 AJAX 回傳的結果
+                    console.log("AJAX success:", result);
+
+                    
+
                     if (result.success) {
-                        alert("已加入最愛");
-                    }
-                    else {
-                        alert("請先登入");
+                        Swal.fire({
+                            icon: 'success',
+                            title: null,
+                            text: '已加入最愛!',
+                            confirmButtonText: '確認'
+                        });
+                        //alert("已加入最愛");
+                    } else {
+                        Swal.fire({
+                            title: '登入後才可以使用此功能',
+                            text: "請問您要登入嗎?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            cancelButtonText: '取消',
+                            confirmButtonText: '登入'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("MemberLogin", "Members")';
+                            }
+                        })
+                        //var loginConfirmation = confirm("請先登入。是否前往登入頁面？");
+                        //if (loginConfirmation) {
+                        //    window.location.href = '@Url.Action("MemberLogin", "Members")';
+                        //}
                     }
                 }
             });
