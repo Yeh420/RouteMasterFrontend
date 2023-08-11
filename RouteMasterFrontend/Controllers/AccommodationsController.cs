@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.ViewModels.Accommodation;
+using Dapper;
+using System.Text.Json;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -23,16 +25,30 @@ namespace RouteMasterFrontend.Controllers
         // GET: Accommodations
         public async Task<IActionResult> Index()
         {
-
             FilterDTO dto = new FilterDTO
             {
-                Grades = new List<double?>() { 1,2,3,4,5},
+                Grades = new List<double?>() { 1, 2, 3, 4, 5 },
                 AcommodationCategories = await _context.AcommodationCategories.Select(ac => ac.Name).ToListAsync(),
-                CommentSorce = new List<int>() { 9, 8 , 7},
-                ServiceInfoCategories = await _context.ServiceInfoCategories.Select(sc => sc.Name).ToListAsync(),
+                CommentSorce = new List<int>() { 9, 8, 7 },
+                ServiceInfoes = new List<ServiceDTO>(),
                 Regions = await _context.Regions.Select(r => r.Name).ToListAsync()
             };
-            return View(dto);
+
+            var temps = await _context.ServiceInfoCategories.Include(sc=>sc.AccommodationServiceInfos).ToListAsync();
+
+            foreach (var temp in temps)
+            {
+                ServiceDTO s = new ServiceDTO
+                {
+                    Id = temp.Id,
+                    Name = temp.Name,
+                    AccommodationServiceInfos = temp.AccommodationServiceInfos
+                };
+
+                dto.ServiceInfoes.Add(s);
+            };
+
+            return View((dto));
         }
 
         // GET: Accommodations/Details/5

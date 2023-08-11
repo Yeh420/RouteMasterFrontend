@@ -8,5 +8,6 @@
         public double?[]? Grades { get; set; }
         public string?[]? ACategory { get; set; }
         public int? score { get; set; }
+        public string?[]? SCategory { get; set; }
     }
 }
