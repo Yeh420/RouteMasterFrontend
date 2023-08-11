@@ -178,7 +178,9 @@ namespace RouteMasterFrontend.Controllers
             service.RemoveAttFromFavorite(customerAccount, id);
         }
 
+        
         [Authorize]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult FavoriteAtt(int page = 1)
         {
             var customerAccount = User.Identity.Name;
