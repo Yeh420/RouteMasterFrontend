@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.ViewModels.Accommodation;
+using Dapper;
+using System.Text.Json;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -22,24 +25,30 @@ namespace RouteMasterFrontend.Controllers
         // GET: Accommodations
         public async Task<IActionResult> Index()
         {
-            
-                //IEnumerable<AccommodationIndexVM> accommodations;
+            FilterDTO dto = new FilterDTO
+            {
+                Grades = new List<double?>() { 1, 2, 3, 4, 5 },
+                AcommodationCategories = await _context.AcommodationCategories.Select(ac => ac.Name).ToListAsync(),
+                CommentSorce = new List<int>() { 9, 8, 7 },
+                ServiceInfoes = new List<ServiceDTO>(),
+                Regions = await _context.Regions.Select(r => r.Name).ToListAsync()
+            };
 
-                   // accommodations = GetAccommodations(identity.Id)
-                   //.OrderBy(a => a.Name.Contains("(已下架)"))
-                   //.ThenByDescending(a => a.Id);
+            var temps = await _context.ServiceInfoCategories.Include(sc=>sc.AccommodationServiceInfos).ToListAsync();
 
-                   // return View(accommodations);//.ToList());
+            foreach (var temp in temps)
+            {
+                ServiceDTO s = new ServiceDTO
+                {
+                    Id = temp.Id,
+                    Name = temp.Name,
+                    AccommodationServiceInfos = temp.AccommodationServiceInfos
+                };
 
+                dto.ServiceInfoes.Add(s);
+            };
 
-                   // accommodations = GetAccommodations(null)
-                   //.OrderBy(a => a.Name.Contains("(已下架)"))
-                   //.ThenByDescending(a => a.Id);
-
-                   // return View(accommodations);
-
-            var routeMasterContext = _context.Accommodations.Include(a => a.AcommodationCategory).Include(a => a.Partner).Include(a => a.Region).Include(a => a.Town);
-            return View(await routeMasterContext.ToListAsync());
+            return View((dto));
         }
 
         // GET: Accommodations/Details/5
