@@ -16,7 +16,7 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" @@click="showMe(cate[2])">{{cate[2]}}</button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li class="nav-item me-3" role="presentation">
                 <button class="nav-link" id="pills-about-tab" data-bs-toggle="pill" data-bs-target="#pills-about" type="button" role="tab" aria-controls="pills-about" aria-selected="false" @@click="showMe(cate[3])">{{cate[3]}}</button>
             </li>
             <li class="nav-item" role="presentation">
@@ -30,12 +30,13 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-
+                        @*<p class="card-text">{{item.answer}}</p>
+                        <p class="card-text">{{item.image}}</p>*@
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>                       
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
+                    </div>                   
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
@@ -43,10 +44,10 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
@@ -55,10 +56,10 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
@@ -67,15 +68,34 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="modaltarget" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modaltargetLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modaltargetLabel">{{question}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{qnumber}}</p>
+                        <p>{{answer}}</p>
+                        <img src="../MemberUploads/FAQ1.png" class="img-fluid">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
 
     </div>
 </div>
@@ -87,6 +107,7 @@
 
 @section Scripts{
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
 
     <script>
         var vueApp = {
@@ -95,7 +116,11 @@
                     qList: [],
                     cate: ["行程", "住宿", "訂單", "帳號"],
                     cateInput: null,
-                    filter: ""
+                    filter: "",
+                    question:"",
+                    answer:"",
+                    qnumber:0,
+                    img:""
                 }
             },
             mounted: function () {
@@ -134,6 +159,22 @@
                     let _this = this;
                     _this.cateInput = msg;
                     _this.getQuestion();
+                },
+                showModal:function(id){
+
+                    let _this=this;
+                    for(let i=0;i<_this.qList.length;i++){
+                        var qa = _this.qList[i];
+                        if(qa.id==id){
+                            _this.question = qa.question;
+                            _this.answer = qa.answer;
+                            _this.qnumber = qa.id;
+                            _this.img = qa.image;
+                        }
+                    }
+                    
+                  
+                   
                 }
 
 
