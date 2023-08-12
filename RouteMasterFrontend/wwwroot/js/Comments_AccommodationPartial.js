@@ -77,31 +77,46 @@
             </select>
             <div class="ms-auto"><a href="https://localhost:7145/Comments_Accommodation/Create" class="link-dark">新增評論</a></div>
         </div>
-        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3 w-75">
-            <div class="row g-0">
-                <div class="col-md-8">
-                    <div class="card-header">{{item.account}}</div>
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <h4 class="card-title me-auto">標題: {{item.title}}</h4>
-                            <div>{{item.status}}</div>
+         <div class="row g-4">
+            <div v-for="(item, index) in indexVM" :key="index" class="col-4">
+                <div class="card">
+                    <template v-if="item.imageList.length>1">
+                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
+                            <div class="carousel-inner mx-auto my-auto w-50">
+                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                    <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
+                                </div>
+
+                            </div>
+                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
                         </div>
+                    </template>
+                    <template v-else>
+                        <img src="../MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
+                    </template>
+                    <hr/>
+                    <div class="card-body">
+                        <h5 class="card-title">標題: {{item.title}}</h5>
                         <p class="card-text">{{item.id}}</p>
                         <p class="card-text">{{item.hotelName}}</p>
                         <p class="card-text">優點: {{item.pros}}</p>
                         <p class="card-text">缺點: {{item.cons}}</p>
                         <p class="card-text">{{item.score}}</p>
                         <div class="d-flex">
-                            <p class="card-text me-auto"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.totalThumbs}}</p>
+                            <button type="button" v-html="thumbicon[index]" @click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                            </button>
+                            <p class="card-text me-auto"> {{item.totalThumbs}}</p>
                             <p><small class="text-muted">{{item.createDate}}</small></p>
                         </div>
-                        
-                        <hr />
-                        <button type="button" v-html="thumbicon[index]" @click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
-                                
-                        </button>
-                       
                         <template v-if="item.status===isReplyed">
+                            <hr />
                             <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
                                     :data-bs-target='"#collapseExample"+index' @showReply(item.id)>
                                 看回覆訊息
@@ -113,35 +128,11 @@
                                     <p class="card-text text-end"><small class="text-muted">{{item.replyDate}}</small></p>
                                 </div>
                             </div>
-                        </template>                                             
+                        </template>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <template v-if="item.imageList.length>1">
-                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
-                            <div class="carousel-inner w-100 mx-auto my-auto">
-                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
-                                    <img v-bind:src="getImgPath(photo)" class="d-block w-100">
-                                </div>
-                  
-                            </div>
-                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>    
-                    </template>                    
-                    <template v-else>
-                        <img src="../MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
-                    </template>                   
                 </div>
             </div>
         </div>
-    </div>
     `
 
 };

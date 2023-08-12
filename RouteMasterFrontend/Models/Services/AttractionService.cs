@@ -61,6 +61,27 @@ namespace RouteMasterFrontend.Models.Services
             }
         }
 
+        public void RemoveAttFromFavorite(string? customerAccount, int id)
+        {
+            var db = new RouteMasterContext();
+
+            var memberId = db.Members
+                .Where(m => m.Account.Contains(customerAccount))
+                .Select(m => m.Id)
+                .FirstOrDefault();
+
+            var item = db.FavoriteAttractions
+                .Where(f => f.MemberId == memberId && f.AttractionId == id)
+                .FirstOrDefault();
+
+
+            if (memberId != 0)
+            {
+                db.Remove(item);
+                db.SaveChanges();
+            }
+        }
+
 
         public IEnumerable<AttractionIndexDto> GetFavoriteAtt(string? customerAccount)
         {
@@ -94,6 +115,7 @@ namespace RouteMasterFrontend.Models.Services
                 .ToList();
 
                 var result = query
+                .OrderByDescending(f => f.Id)
                 .Select(q => new AttractionIndexDto
                 {
                     Id = q.Attraction.Id,
