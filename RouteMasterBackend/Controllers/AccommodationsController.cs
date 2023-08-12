@@ -25,9 +25,6 @@ namespace RouteMasterBackend.Controllers
             _db = context;
         }
 
-        // GET: api/Accommodations
-
-        // GET: api/Accommodations/5
         [HttpGet]
         public async Task<ActionResult<List<ServiceInfoCategory>>> GetServiceInfoCategory()
         {
@@ -78,7 +75,6 @@ namespace RouteMasterBackend.Controllers
             {
                 accommodations = accommodations.Where(a => data.ACategory.Contains(a.AcommodationCategory.Name));
             };
-
             if(data.score != null)
             {
                 accommodations = accommodations.Where(a => a.CommentsAccommodations.Average(ca=>ca.Score) >= data.score);
@@ -86,8 +82,13 @@ namespace RouteMasterBackend.Controllers
 
             if(data.SCategory != null && data.SCategory.Length > 0)
             {
-                accommodations = accommodations.Where(a => a.AccommodationServiceInfos.Select(s=>s.Name).Intersect(data.SCategory).Any());
+                accommodations = accommodations.Where(a => a.AccommodationServiceInfos.All(s => data.SCategory.Contains(s.Name)));
             }
+
+            if (data.Regions != null && data.Regions.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Regions.Contains(a.Region.Name));
+            };
 
             #region
             //分頁

@@ -9,5 +9,6 @@
         public string?[]? ACategory { get; set; }
         public int? score { get; set; }
         public string?[]? SCategory { get; set; }
+        public string?[]? Regions { get; set; }
     }
 }
