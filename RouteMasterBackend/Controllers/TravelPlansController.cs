@@ -222,6 +222,8 @@ namespace RouteMasterBackend.Controllers
             {
                 Id = attractionInDb.Id,
                 AttractionName = attractionInDb.Name,
+                PositionX = attractionInDb.PositionX,
+                PositionY = attractionInDb.PositionY,
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(stayHours),
                 StayHours =(int?)stayHours,
@@ -234,6 +236,20 @@ namespace RouteMasterBackend.Controllers
             return data;
          
         }
+
+
+        [HttpGet]
+        [Route("Get/ActProductInfo")]
+        public async Task<ActionResult<ActivityProduct>> GetActProductInfo(int actProductId)
+        {
+            var data = _context.ActivityProducts.Where(x => x.Id == actProductId).First();
+
+
+            return data;
+        }
+
+
+
 
         // PUT: api/TravelPlans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

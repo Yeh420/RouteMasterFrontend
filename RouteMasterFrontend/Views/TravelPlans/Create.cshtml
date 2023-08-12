@@ -78,15 +78,15 @@
 
 <div class="row" style="min-height: 500px; height: auto;">
     
-    <div class="col-6 border border-primary p-3 " style="min-height: 500px; height: auto;" id="schedule">
+    <div class="col-9 border border-primary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
         <input type="datetime-local"  id="travelBeginDateTime" />
         <button id="createAttractionTimeSpanContainer" >新增區塊</button>
         <button id="callApiToAddToCart" >加入購物車</button>
         <div class="row">            
-            <div id="dropZoneContainer" class="col-6">
+            <div id="dropZoneContainer" class="col-4">
 
             </div>
-            <div id="tableContainer" class="col-6">
+            <div id="tableContainer" class="col-8 hide">
                 <table class="w-100">
                     <thead class="w-100">
                         <tr>
@@ -106,15 +106,15 @@
     </div>
 
 
-    <div class="col-3" style="position:relative;">
+    <div id="sortedAttractionsPreContainer" class="col-3 hide" style="position:relative;">
         <div id="sortedAttractions" class="border border-primary" style="height:500px"></div>
-        <button id="greedyTSP" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">推薦路線</button>
+        <button id="greedyTSP" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">計算最短路徑</button>
     </div>
 
-    <di class="col-3" style="position:relative;">
+    <div id="selectedAttractionsPreContainer"  class="col-3" style="position:relative;">
         <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
-        <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得距離資料</button>
-    </di>    
+        <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
+    </div>    
 </div>
 
 
@@ -208,7 +208,12 @@
                             distance: informations[i].distance,
                             duration: informations[i].duration                         
                         })
-                    }          
+                    }
+
+
+               
+
+
                 })
                 .catch(function (error) {
                     console.error('Error fetching travel plans:', error);
@@ -276,7 +281,19 @@
         document.querySelector("#getInformations").addEventListener('click',function(){
             getTravelInformations();
             console.log(allData);
-            console.log(selectedAttraction)
+            console.log(selectedAttraction);
+            document.querySelector('#selectedAttractionsPreContainer').classList.add('hide');
+            document.querySelector('#AttractionListContainer').classList.add('hide');
+            document.querySelector('#sortedAttractionsPreContainer').classList.remove('hide');
+     
+
+
+
+ 
+
+
+
+
         })
 
 
@@ -304,6 +321,17 @@
 
                 }).then(response => {
                     console.log(response);
+
+
+
+                    let selectAccommodationBtn = document.createElement('button');
+                    selectAccommodationBtn.textContent = "在此景點附近選擇住宿";
+                    selectAccommodationBtn.classList.add('btn', 'btn-primary');
+                    selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
+                    selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
+
+
+
 
 
 
@@ -340,15 +368,16 @@
                     tdEndTimeInput.style.width = "100%";
 
 
+                    const startDateTime = new Date(response.data.startDateTime);
+                    const startFormattedTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
+                    const endDateTime = new Date(response.data.endDateTime);
+                    const endFormattedTime = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`;
 
 
-                    //開秀
                     tdEventNameInput.value="停留";
                     tdAttractionNameInput.value = response.data.attractionName;
-                    tdStartTimeInput.value = response.data.startDateTime
-                    tdEndTimeInput.value = response.data.endDateTime
-
-
+                    tdStartTimeInput.value = startFormattedTime;
+                    tdEndTimeInput.value = endFormattedTime;
 
 
 
@@ -376,6 +405,11 @@
                                 newActProduct.type="checkbox";
                                 newActProduct.id = 'activityProduct' + i;
                                 newActProduct.name = 'activityProduct';
+                                newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
+
+
+
+
                                 label.setAttribute('for', 'activityProduct' + i);
                                 label.textContent = response.data.activityProducts[i].activityName;
                                 label.appendChild(newActProduct);
@@ -383,6 +417,7 @@
                                 newActProduct.value = response.data.activityProducts[i].id;                      
                                 newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
                                 newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
+                                newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
                                 container.appendChild(label);
                             }
                         } else if (response.data.extraServiceProducts.length > 0) {
@@ -393,6 +428,10 @@
                                 newExtProduct.type = "checkbox";
                                 newExtProduct.id = 'extraServiceProduct' + i;
                                 newExtProduct.name = 'extraServiceProduct';
+                                newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
+
+
+                                //ExtAddEventListener
                                 label.setAttribute('for', 'extraServiceProduct' + i);
                                 label.textContent = response.data.extraServiceProducts[i].extraServiceName;
                                 label.appendChild(newExtProduct);
@@ -403,10 +442,10 @@
                         }
 
 
-                        
-                        
-                       this.textContent = response.data.attractionName
-                       this.appendChild(container)
+                  
+                       this.textContent = response.data.attractionName;
+                       this.appendChild(container);
+                       this.appendChild(selectAccommodationBtn);
                         
                     }
 
@@ -425,22 +464,21 @@
 
 
 
-
-        document.querySelector("#greedyTSP").addEventListener('click',function(){
+        function greedyTSPSolution(){
             let unvisited = selectedAttraction.slice();
             let distanceToEach = allData.filter(x => x.distance.value !== 0);
             let sortedContainer = document.querySelector('#sortedAttractions');
             let newStart;
 
 
-            while (unvisited.length > 0) {     
+            while (unvisited.length > 0) {
                 console.log(unvisited)
 
                 if (unvisited.length == selectedAttraction.length) {
                     let shortestObj = getShortestDistanceObject(distanceToEach);
                     console.log(shortestObj)
                     selectedPath.push(shortestObj);
-           
+
 
                     let startIndex = unvisited.indexOf(shortestObj.start);
                     if (startIndex !== -1) {
@@ -490,22 +528,22 @@
                 let distance = document.createElement('div');
                 let duration = document.createElement('div');
                 let destination = document.createElement('div');
-                let arrow=document.createElement('img');
-                let flexContainer=document.createElement('div');
+                let arrow = document.createElement('img');
+                let flexContainer = document.createElement('div');
 
-                flexContainer.style.display="flex";
+                flexContainer.style.display = "flex";
 
 
                 arrow.src = "@Url.Content("~/SystemImages/downArrow.jpg")";
                 arrow.style.width = "50px";
-                arrow.style.height = "50px"; 
-                
+                arrow.style.height = "50px";
 
-                
+
+
                 departure.textContent = selectedPath[i].start.Name;
                 departure.setAttribute('data-id', selectedPath[i].start.Id);
-                departure.draggable=true;
-                departure.addEventListener('dragstart',drag);
+                departure.draggable = true;
+                departure.addEventListener('dragstart', drag);
                 departure.classList.add('draggable');
 
 
@@ -526,10 +564,10 @@
                 destination.addEventListener('dragstart', drag);
                 destination.classList.add('draggable');
 
-          
 
-    
-                if(i==0){
+
+
+                if (i == 0) {
                     sortedContainer.appendChild(newPath);
                     newPath.appendChild(departure);
                     flexContainer.appendChild(arrow);
@@ -538,7 +576,7 @@
                     newPath.appendChild(flexContainer);
                     newPath.appendChild(destination);
 
-                }else{
+                } else {
                     sortedContainer.appendChild(newPath);
                     flexContainer.appendChild(arrow);
                     flexContainer.appendChild(distance);
@@ -548,6 +586,110 @@
                 }
 
             }
+
+
+
+        }
+
+
+        function toggleActivityProductTimeBlock(e) {
+
+            const checkbox = e.target;
+            const trId = checkbox.getAttribute('data-tr-id');
+            const targetRow = document.getElementById(trId);
+            
+
+
+            
+
+            let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+
+
+            if(checkbox.checked){
+                let newTr = document.createElement('tr');
+                newTr.id = trId;
+                let tdEventName = document.createElement('td');
+                let tdEventNameInput = document.createElement('input');
+                tdEventNameInput.type = "text";
+                let tdAttractionName = document.createElement('td');
+                let tdAttractionNameInput = document.createElement('input');
+                tdAttractionNameInput.type = "text";
+                tdAttractionNameInput.readOnly = true;
+                let tdStartTime = document.createElement('td');
+                let tdStartTimeInput = document.createElement('input');
+                tdStartTimeInput.type = "text";
+                let tdEndTime = document.createElement('td');
+                let tdEndTimeInput = document.createElement('input');
+                tdEndTimeInput.type = "text";
+
+
+                tdEventNameInput.style.width = "100%";
+                tdAttractionNameInput.style.width = "100%";
+                tdStartTimeInput.style.width = "100%";
+                tdEndTimeInput.style.width = "100%";
+
+
+                
+
+
+                axios.get(`https://localhost:7251/api/TravelPlans/Get/ActProductInfo`, {
+                    params: {
+                        actProductId: checkbox.value,
+                    }
+
+                }).then(response=>{
+
+                    console.log(response)
+
+
+
+                    tdEventNameInput.value = "活動名稱";
+                    tdAttractionNameInput.value ="景點名稱" ;
+                    tdStartTimeInput.value = response.data.startTime;
+                    tdEndTimeInput.value = response.data.endTime;
+                    console.log('success')
+
+                }).catch(err=>{
+                    console.log('error')
+                })
+
+
+
+
+              
+
+
+                
+
+
+
+
+                tdEventName.appendChild(tdEventNameInput);
+                tdAttractionName.appendChild(tdAttractionNameInput);
+                tdStartTime.appendChild(tdStartTimeInput);
+                tdEndTime.appendChild(tdEndTimeInput);
+                newTr.appendChild(tdEventName);
+                newTr.appendChild(tdAttractionName);
+                newTr.appendChild(tdStartTime);
+                newTr.appendChild(tdEndTime);
+                targetTableBody.appendChild(newTr);
+            }else{
+                targetRow.remove();
+
+
+            }
+
+
+            
+        }
+
+
+
+
+
+
+        document.querySelector("#greedyTSP").addEventListener('click',function(){
+            greedyTSPSolution()
         })
 
 
