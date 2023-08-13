@@ -23,6 +23,7 @@ using System.IO;
 using RouteMasterFrontend.Models.Dto;
 using Microsoft.Data.SqlClient;
 using Dapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -638,6 +639,13 @@ namespace RouteMasterFrontend.Controllers
                 }
             }
             return RedirectToAction("Index", "Home");
+        }
+
+        //歷史訂單
+        //這是前後端分離，做成web api 的服務
+        public  IActionResult MemOrder()
+        {
+            return View();
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
