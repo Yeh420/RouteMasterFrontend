@@ -16,62 +16,68 @@
             </select>
             @*<p>選到的選項value為:{{ selected }}</p>*@
         </div>
-        <div class="row g-4">
-            <div v-for="(item, index) in indexVM" :key="index" class="col-4">
-                <div class="card">
-                    <template v-if="item.imageList.length>1">
-                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
-                            <div class="carousel-inner mx-auto my-auto w-50">
-                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
-                                    <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
-                                </div>
+        <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            顯示更多
+        </a>
+        
+            <div class="row g-4">
+                <div v-for="(item, index) in indexVM" :key="index" class="col-4">               
+                    <div class="card">
+                        <template v-if="item.imageList.length>1">
+                            <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
+                                <div class="carousel-inner mx-auto my-auto w-50">
+                                    <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                        <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
+                                    </div>
 
-                            </div>
-                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <img src="~/MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
-                    </template>
-                    <hr/>
-                    <div class="card-body">
-                        <h5 class="card-title">標題: {{item.title}}</h5>
-                        <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.hotelName}}</p>
-                        <p class="card-text">優點: {{item.pros}}</p>
-                        <p class="card-text">缺點: {{item.cons}}</p>
-                        <p class="card-text">{{item.score}}</p>
-                        <div class="d-flex">
-                            <button type="button" v-html="thumbicon[index]" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
-                            </button>
-                            <p class="card-text me-auto"> {{item.totalThumbs}}</p>
-                            <p><small class="text-muted">{{item.createDate}}</small></p>
-                        </div>
-                        <template v-if="item.status===isReplyed">
-                            <hr />
-                            <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
-                                    :data-bs-target='"#collapseExample"+index' @@showReply(item.id)>
-                                看回覆訊息
-                            </button>
-                            <div class="collapse mt-3" :id='"collapseExample" + index'>
-                                <div class="card card-body">
-                                    <h5>來自{{item.hotelName}}的回覆:</h5>
-                                    <p>{{item.replyMessage}}</p>
-                                    <p class="card-text text-end"><small class="text-muted">{{item.replyDate}}</small></p>
                                 </div>
+                                <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
                             </div>
                         </template>
+                        <template v-else>
+                            <img src="~/MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
+                        </template>
+                        <hr />
+                        <div class="card-body">
+                            <h5 class="card-title">標題: {{item.title}}</h5>
+                            <p class="card-text">{{item.id}}</p>
+                            <p class="card-text">{{item.hotelName}}</p>
+                            <p class="card-text">優點: {{item.pros}}</p>
+                            <p class="card-text">缺點: {{item.cons}}</p>
+                            <p class="card-text">{{item.score}}</p>
+                            <div class="d-flex">
+                                <button type="button" v-html="thumbicon[index]" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
+                                </button>
+                                <p class="card-text me-auto"> {{item.totalThumbs}}</p>
+                                <p><small class="text-muted">{{item.createDate}}</small></p>
+                            </div>
+                            <template v-if="item.status===isReplyed">
+                                <hr />
+                                <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
+                                        :data-bs-target='"#collapseExample"+index' @@showReply(item.id)>
+                                    看回覆訊息
+                                </button>
+                                <div class="collapse mt-3" :id='"collapseExample" + index'>
+                                    <div class="card card-body">
+                                        <h5>來自{{item.hotelName}}的回覆:</h5>
+                                        <p>{{item.replyMessage}}</p>
+                                        <p class="card-text text-end"><small class="text-muted">{{item.replyDate}}</small></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        
+        
 
     </div>
 </div>
