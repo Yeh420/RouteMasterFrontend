@@ -78,8 +78,10 @@ namespace RouteMasterFrontend.Controllers
 
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
 
-            string formattedItemNames = string.Join("#", extraServiceNames);
+            
             var extraServiceNameArray = new List<string>();
+            var activityProductNameArray = new List<string>();
+
             foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
             {
                 var extraservicesProductsId = _context.ExtraServices
@@ -95,8 +97,28 @@ namespace RouteMasterFrontend.Controllers
                 extraServiceNameArray.Add(extraServiceName); // 將每個值添加到陣列中
             }
 
+            foreach (var activityItem in cart.Cart_ActivitiesDetails)
+            {
+                var activityProductsId = _context.Activities
+                    .Where(x => x.Id == activityItem.ActivityProductId)
+                    .Select(x => x.Id)
+                    .FirstOrDefault();
+
+                var activityProductName = _context.Activities
+                    .Where(x => x.Id == activityProductsId)
+                    .Select(x => x.Name)
+                    .FirstOrDefault();
+
+                activityProductNameArray.Add(activityProductName); // 將每個值添加到陣列中
+            }
+
 
             string[] extraServiceNamesArray = extraServiceNameArray.ToArray();
+            string[] activityProductNamesArray = activityProductNameArray.ToArray();
+
+            string[] allItemNamesArray = extraServiceNamesArray.Concat(activityProductNamesArray).ToArray();
+
+            string formattedItemNames = string.Join("#", allItemNamesArray);
 
             var order = new Dictionary<string, string>
             {
