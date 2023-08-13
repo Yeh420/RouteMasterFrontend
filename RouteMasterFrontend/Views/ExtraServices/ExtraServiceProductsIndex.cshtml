@@ -71,7 +71,7 @@
 </table>
 <script>
     $(document).ready(function () {
-        // 處理增加數量操作
+      
         $(".plus").on("click", function () {
             var self = $(this);
             var quantityInput = self.siblings(".qty");
@@ -84,7 +84,7 @@
             var quantityInput = self.siblings(".qty"); 
             var currentQty = parseInt(quantityInput.val()); 
             if (currentQty > 1) {
-                quantityInput.val(currentQty - 1); 
+                quantityInput.val(currentQty - 1); }
         });
 
       

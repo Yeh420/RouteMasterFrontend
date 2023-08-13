@@ -99,7 +99,45 @@ namespace RouteMasterFrontend.Controllers
             AddClick(id);
             AttractionDetailVM vm = Get(id);
 
+            
+            // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
+            bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
+            
+                
+
+            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
+
             return View(vm);
+        }
+
+        public IActionResult Details2(int id)
+        {
+            AddClick(id);
+            AttractionDetailVM vm = Get(id);
+
+
+            // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
+            bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
+
+
+
+            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
+
+            return View(vm);
+        }
+
+        private bool CheckIfFavorite(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var customerAccount = User.Identity.Name;
+                return GetFavoriteAtt(customerAccount).Select(a=>a.Id).Contains(id);
+            }
+            else
+            {
+                return false;
+            }
+            
         }
 
         public IActionResult AddToFavorite (int id)
@@ -117,7 +155,32 @@ namespace RouteMasterFrontend.Controllers
             }
         }
 
+        public IActionResult RemoveFromFavorite(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var customerAccount = User.Identity.Name;
+                RemoveAttFromFavorite(customerAccount, id);
+
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+
+        private void RemoveAttFromFavorite(string? customerAccount, int id)
+        {
+            IAttractionRepository repo = new AttractionEFRepository();
+            AttractionService service = new AttractionService(repo);
+
+            service.RemoveAttFromFavorite(customerAccount, id);
+        }
+
+        
         [Authorize]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult FavoriteAtt(int page = 1)
         {
             var customerAccount = User.Identity.Name;
