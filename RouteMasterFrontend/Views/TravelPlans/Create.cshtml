@@ -115,6 +115,7 @@
         <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
         <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
     </div>    
+ 
 
 </div>
 
@@ -157,7 +158,7 @@
             this.remove();
         }
 
-
+        
 
 
 
@@ -293,7 +294,7 @@
         }
 
 
-        function createTransportTr(dataId){
+        async function createTransportTr(dataId){
 
             let targetTable = document.querySelector('#tableContainer');
             let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
@@ -324,7 +325,7 @@
                     let targetData = allData.filter(x => x.start.Id == theCurrentAttractionOfDropContainer).filter(x => x.end.Id == theNextAttractionOfDropContainer)
                     console.log(targetData);
                     let latestEndTimeInput = document.querySelector(`input[data-endTimeAttractionId="${theCurrentAttractionOfDropContainer}"]`)
-                 axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime`, {
+                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime`, {
                         params: {
                             latestEndTime: latestEndTimeInput.value,
                             timeValue: targetData[0].duration.value
@@ -337,7 +338,7 @@
                         tdTransportDistanceInput.value = targetData[0].distance.text;
                         tdTransportStartTimeInput.value = response.data.startTime;
                         tdTransportEndTimeInput.value = response.data.endTime;
-                        tdTransportEndTimeInput.setAttribute('data-destinationstayId', theCurrentAttractionOfDropContainer)
+                    tdTransportEndTimeInput.setAttribute('data-destinationstayId', theNextAttractionOfDropContainer)
                     }).catch(err => {
                         console.log(err)
                     })
@@ -366,7 +367,7 @@
 
 
         //todo解耦 寫了一坨垃圾
-        async function drop(event) {
+       async function drop(event) {
             event.preventDefault();
             let dataId = event.dataTransfer.getData("text");            
             
@@ -384,17 +385,22 @@
             //console.log(dataId);
 
             if (dataId) {
+
                 const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
                 draggableElement.draggable = false;
                 draggableElement.style.backgroundColor = "lightgray";
 
 
 
-                
+
+
+                 let thMonster= document.querySelector(`input[data-destinationstayid="${theNextAttractionOfDropContainer}"]`)
+                console.log(thMonster)
 
 
 
-                 if(! document.querySelector(`input[data-destinationstayid="${theNextAttractionOfDropContainer}"]`)){
+
+                if (thMonster==null) {
 
 
                     axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`, {
@@ -530,13 +536,146 @@
                     })
 
                 }
+                else {
+                    console.log('拜託啦不要再搞了啦')
 
-                }else{
-         
-                    console.log('666')
+
+
+                    axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`, {
+                        params: {
+                            startDateTime: thMonster.value,
+                        }
+                    }).then(response => {
+                        console.log(response);
+                        let selectAccommodationBtn = document.createElement('button');
+                        selectAccommodationBtn.textContent = "選擇住宿";
+                        selectAccommodationBtn.classList.add('btn', 'btn-primary');
+                        selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
+                        selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
+                        targetTable.classList.remove('hide');
+
+
+
+
+
+
+                        let newTr = document.createElement('tr');
+                        let tdEventName = document.createElement('td');
+                        let tdEventNameInput = document.createElement('input');
+                        tdEventNameInput.type = "text";
+                        let tdAttractionName = document.createElement('td');
+                        let tdAttractionNameInput = document.createElement('input');
+                        tdAttractionNameInput.type = "text";
+                        tdAttractionNameInput.readOnly = true;
+                        let tdStartTime = document.createElement('td');
+                        let tdStartTimeInput = document.createElement('input');
+                        tdStartTimeInput.type = "time";
+                        let tdEndTime = document.createElement('td');
+                        let tdEndTimeInput = document.createElement('input');
+                        tdEndTimeInput.type = "time";
+                        tdEventNameInput.style.width = "100%";
+                        tdAttractionNameInput.style.width = "100%";
+                        tdStartTimeInput.style.width = "100%";
+                        tdEndTimeInput.style.width = "100%";
+
+                        const startDateTime = new Date(response.data.startDateTime);
+                        const startFormattedTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
+                        const endDateTime = new Date(response.data.endDateTime);
+                        const endFormattedTime = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`;
+
+
+
+
+                        tdEventNameInput.value = "停留";
+                        tdAttractionNameInput.value = response.data.attractionName;
+                        tdStartTimeInput.value = startFormattedTime;
+                        tdEndTimeInput.value = endFormattedTime;
+
+
+
+
+
+                        //995R
+                        tdEndTimeInput.setAttribute('data-endTimeAttractionId', response.data.id)
+
+                        tdEventName.appendChild(tdEventNameInput);
+                        tdAttractionName.appendChild(tdAttractionNameInput);
+                        tdStartTime.appendChild(tdStartTimeInput);
+                        tdEndTime.appendChild(tdEndTimeInput);
+
+                        newTr.appendChild(tdEventName);
+                        newTr.appendChild(tdAttractionName);
+                        newTr.appendChild(tdStartTime);
+                        newTr.appendChild(tdEndTime);
+
+
+
+
+
+
+                        targetTableBody.appendChild(newTr);
+
+                        if (response.status == 200) {
+                            let container = document.createElement('div');
+                            if (response.data.activityProducts.length > 0) {
+                                for (let i = 0; i < response.data.activityProducts.length; i++) {
+                                    let label = document.createElement('label');
+                                    let newActProduct = document.createElement('input');
+                                    newActProduct.type = "checkbox";
+                                    newActProduct.id = 'activityProduct' + i;
+                                    newActProduct.name = 'activityProduct';
+                                    newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
+
+                                    label.setAttribute('for', 'activityProduct' + i);
+                                    label.textContent = response.data.activityProducts[i].activityName;
+                                    label.appendChild(newActProduct);
+                                    label.classList.add('m-1');
+                                    newActProduct.value = response.data.activityProducts[i].id;
+                                    newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
+                                    newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
+                                    newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
+                                    container.appendChild(label);
+                                }
+                            } else if (response.data.extraServiceProducts.length > 0) {
+
+                                for (let i = 0; i < response.data.extraServiceProducts.length; i++) {
+                                    let label = document.createElement('label');
+                                    let newExtProduct = document.createElement('input');
+                                    newExtProduct.type = "checkbox";
+                                    newExtProduct.id = 'extraServiceProduct' + i;
+                                    newExtProduct.name = 'extraServiceProduct';
+                                    newExtProduct.addEventListener('click', toggleExtraServiceProductTimeBlock);
+
+
+                                    label.setAttribute('for', 'extraServiceProduct' + i);
+                                    label.textContent = response.data.extraServiceProducts[i].extraServiceName;
+                                    label.appendChild(newExtProduct);
+                                    label.classList.add('m-1');
+                                    newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
+                                    newExtProduct.value = response.data.extraServiceProducts[i].id;
+                                    container.appendChild(label);
+                                }
+                            }
+
+
+
+                            this.textContent = response.data.attractionName;
+                            this.appendChild(container);
+                            this.appendChild(selectAccommodationBtn);
+
+                        }
+
+
+
+
+                        theCurrentAttractionOfDropContainer = dataId;
+                    }).catch(error => {
+                        console.log('error')
+                    })
                 }
-                
 
+
+            }
 
 
 
