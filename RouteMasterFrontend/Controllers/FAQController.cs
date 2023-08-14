@@ -1,6 +1,7 @@
 ﻿using MessagePack;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
@@ -25,16 +26,25 @@ namespace RouteMasterFrontend.Controllers
         {
             var questList = _context.FAQs
                 .Include(f => f.FAQCategory)
-                .Where(f => f.FAQCategory.Name == input.Name);
-            string cateName = input.Name;
-            var keySearch = input.Keyword;
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(input.Name))
+            {
+                questList= questList.Where(f => f.FAQCategory.Name == input.Name);
+            }
+            else
+            {
+                questList = questList
+                   .OrderByDescending(f => f.Helpful)
+                   .Take(5);
+            }
+
 
             if (!string.IsNullOrEmpty(input.Keyword))
             {
-                questList = questList.Where(f => f.Question.Contains(input.Keyword) ||
-                f.Answer.Contains(input.Keyword));
+                questList = questList.Where(f => f.Question.Contains(input.Keyword));   
             }
-
+          
 
             var dto = await questList.Select(f => new FAQIndexDTO
             {
@@ -48,6 +58,25 @@ namespace RouteMasterFrontend.Controllers
 
 
             return Json(dto);
+        }
+        [HttpPost]
+        public async Task<string> UpdateHelpful(int faqId)
+        {
+            FAQ quest= await _context.FAQs
+                .Include(f=> f.FAQCategory)
+                .FirstAsync(f=> f.Id == faqId);
+            if(quest != null)
+            {
+                quest.Helpful = quest.Helpful + 1;
+                string result = quest.FAQCategory.Name;
+
+                _context.Update(quest);
+                _context.SaveChanges();
+               
+                return result;
+            }
+
+            return "Not Found";
         }
     }
 }
