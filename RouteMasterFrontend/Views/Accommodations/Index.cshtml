@@ -376,7 +376,7 @@
                                                                             <input v-bind:id=`pq-${room.id}` type="number" min="1" value="1" size="2" class="form-control me-2" style="width:63px; box-sizing:border-box"/>
                                                                             <label v-bind:for=`tp-${room.id}`>總價：</label>
                                                                             <input v-bind:id=`tp-${room.id}` type="text" value="999999" class="form-control me-3" style="background:white;width:87px; box-sizing:border-box" readonly/>
-                                                                            <button class="btn btn-primary">加入購物車</button>
+                                                                            <button class="btn btn-primary" @@click="addCart(room.id)">加入購物車</button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -484,7 +484,9 @@
                         accommodationDescription:"",
                         cartProductId:1,
                         accommodationServiceCId:[],
+
                         map:null,
+
                     }
                 },
                 mounted: async function(){
@@ -706,24 +708,20 @@
                         _this.thePage = 1;
                         _this.loadProducts();
                     },
-                    addCart:function() {
-                        let _this = this;
-                        let postRoomProductId = this.cartProductId;
-                        let productId = 3;
-                        axios({
-                            method: 'post',
-                            url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=3`,
-                        }).then(response => {
+                    addCart: function (roomId) {
+                            let _this = this;
+
+                            axios({
+                                method: 'post',
+                                url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=${roomId}`,
+                            }).then(response => {
                                 console.log(response.data);
-                                if (response.data.success) {
-                                    console.log("Successfully added to cart.");
-                                } else {
-                                    console.log("Product not found.");
-                                }
-                        }).catch(err => {
-                            console.error(err);
-                            alert("An error occurred.");
-                        });
+                                $('#Cart').html(response.data);
+                               alert("已成功加入購物車");
+                            }).catch(err => {
+                                console.error(err);
+                                alert("An error occurred.");
+                            });
                     },
                     toggleDescription: function() {
                         const showMoreText = "...顯示更多";
