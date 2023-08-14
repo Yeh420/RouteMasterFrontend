@@ -343,12 +343,16 @@
                                             <p class="fs-5" v-html="accommodationDescription" @@click="toggleDescription">
                                             </p>
                                         </section>
-                                        <section>
-									<a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2">
-										顯示評論
-									</a>
+
+                                  <section>
+                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
+                                        顯示更多評論
+                                    </a>
+                                    <dec id="topthree" ref="childRef"></dec>
+                                  
+
                                     <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-										<dec ref="childRef"></dec>
+                                        
 									</div>
 								</section>
                                         <section class="mb-3 border-top pt-1">
@@ -629,7 +633,8 @@
                                 _this.accommodationServiceCId = p.services.map(function(s){
                                     return s.serviceInfoCategoryId;
                                 });
-                                _this.$refs.childRef.commentDisplay(p.id);
+                                var parentInput=5;
+                                _this.$refs.childRef.commentDisplay(p.id, parentInput);
 
                                 _this.initMap(id);
                                 const showMoreText = "...顯示更多";
@@ -659,6 +664,26 @@
                                 _this.accommodationImage = imgSrc;
                             })
                         }
+                    },
+                    showAllComment:function(){
+                        let _this=this;
+                    const swcollapse2=document.getElementById("swcollapse2");
+                    const collapse2 = document.getElementById("collapse2");
+                    const topthree = document.getElementById("topthree");
+
+                    const isCollapsed = swcollapse2.classList.contains('collapsed');
+                    if (isCollapsed) {
+                        // Collapse 已展開，這裡可以執行相關程式碼
+                        topthree.style.display = 'block';
+                        console.log("close");
+
+                    }
+                    else {
+                        _this.$refs.childRef.commentDisplay();                      
+                        topthree.style.display = 'none';
+                        console.log("open");
+                    }
+                    
                     },
                     clickHandler:function(value){
                         let _this = this;

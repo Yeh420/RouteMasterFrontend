@@ -91,7 +91,7 @@
                     <thead class="w-100">
                         <tr>
                             <th >事項</th>
-                            <th >景點名稱</th>
+                            <th >景點/距離</th>
                             <th >開始時間</th>
                             <th >結束時間</th>
                         </tr>
@@ -115,6 +115,7 @@
         <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
         <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
     </div>    
+
 </div>
 
 
@@ -130,7 +131,7 @@
   
 
     <script>
-
+        
         let selectedAttraction = [];
         let coordinatesArray = [];
         let allData = [];
@@ -138,6 +139,10 @@
         let attContainer = document.querySelector('#selectedAttractions');
         let visited = [];
         let selectedPath = [];
+
+        let theCurrentAttractionOfDropContainer;
+        let theNextAttractionOfDropContainer;
+
         const addAttBtns = document.querySelectorAll('.addAtt');
 
 
@@ -182,9 +187,8 @@
 
 
 
-
-
-
+     
+          
 
 
 
@@ -200,20 +204,13 @@
                         const endId = informations[i].end.id;
                         const startObj = selectedAttraction.find(item => item.Id == startId);
                         const endObj = selectedAttraction.find(item => item.Id == endId);
-
-
                         allData.push({
                             start: startObj,
                             end: endObj,
                             distance: informations[i].distance,
                             duration: informations[i].duration                         
                         })
-                    }
-
-
-               
-
-
+                    }              
                 })
                 .catch(function (error) {
                     console.error('Error fetching travel plans:', error);
@@ -247,23 +244,17 @@
             if (distanceToEach.length === 0) {
                 return undefined;
             }
-
             const objectsWithStartingPoint = distanceToEach.filter(obj => obj.start == startPoint);
-
             if (objectsWithStartingPoint.length == 0) {
                 return undefined;
             }
-
             // Filter out objects whose destinations are already in "visited" array
             const unvisitedObjects = objectsWithStartingPoint.filter(obj => !visited.includes(obj.end));
-
             if (unvisitedObjects.length === 0) {
                 return undefined;
             }
-
             let shortestDistanceObject = unvisitedObjects[0];
             let shortestDistance = shortestDistanceObject.distance.value;
-
             for (let i = 1; i < unvisitedObjects.length; i++) {
                 const currentObject = unvisitedObjects[i];
                 const currentDistance = currentObject.distance.value;
@@ -284,16 +275,7 @@
             console.log(selectedAttraction);
             document.querySelector('#selectedAttractionsPreContainer').classList.add('hide');
             document.querySelector('#AttractionListContainer').classList.add('hide');
-            document.querySelector('#sortedAttractionsPreContainer').classList.remove('hide');
-     
-
-
-
- 
-
-
-
-
+            document.querySelector('#sortedAttractionsPreContainer').classList.remove('hide');   
         })
 
 
@@ -301,168 +283,259 @@
 
         function drag(event) {
             event.dataTransfer.setData("text", event.target.getAttribute("data-id"));
+
+
+      
+
+ 
+
+
         }
 
-        function drop(event) {
+
+
+
+        //todo解耦 寫了一坨垃圾
+       function drop(event) {
             event.preventDefault();
-            let dataId = event.dataTransfer.getData("text"); 
-            console.log(dataId);
+            let dataId = event.dataTransfer.getData("text");            
+            
+            theNextAttractionOfDropContainer = dataId;
+            let targetTable = document.querySelector('#tableContainer');
+            let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+            
+           
+
+
+
+
+
+
+
+            
+            //console.log(dataId);
 
             if (dataId) {
                 const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
                 draggableElement.draggable = false;
                 draggableElement.style.backgroundColor = "lightgray";
 
-                axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`,{
-                    params:{
-                        startDateTime: document.querySelector('#travelBeginDateTime').value
-
-                    }
-
-                }).then(response => {
-                    console.log(response);
 
 
+                if (theCurrentAttractionOfDropContainer != undefined) {
+                    let newTransportTr = document.createElement('tr');
+                    let tdTransportName = document.createElement('td');
+                    let tdTransportNameInput = document.createElement('input');
+                    tdTransportNameInput.type = "text";
+                    let tdTransportDistance = document.createElement('td');
+                    let tdTransportDistanceInput = document.createElement('input');
+                    tdTransportDistanceInput.type = "text";
+                    let tdTransportStartTime = document.createElement('td');
+                    let tdTransportStartTimeInput = document.createElement('input');
+                    tdTransportStartTimeInput.type = "time";
+                    let tdTransportEndTime = document.createElement('td');
+                    let tdTransportEndTimeInput = document.createElement('input');
+                    tdTransportEndTimeInput.type = "time";
 
-                    let selectAccommodationBtn = document.createElement('button');
-                    selectAccommodationBtn.textContent = "在此景點附近選擇住宿";
-                    selectAccommodationBtn.classList.add('btn', 'btn-primary');
-                    selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
-                    selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
 
-
-
-
-
-
-                    let targetTable = document.querySelector('#tableContainer');
-                    targetTable.classList.remove('hide');
-
-
-
-                    let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');                    
-                    let newTr=document.createElement('tr');
-
-                    let tdEventName=document.createElement('td');
-                    let tdEventNameInput=document.createElement('input');
-                    tdEventNameInput.type="text";                  
-
-                    let tdAttractionName=document.createElement('td');
-                    let tdAttractionNameInput=document.createElement('input');
-                    tdAttractionNameInput.type="text";
-                    tdAttractionNameInput.readOnly=true;
-
-                    let tdStartTime=document.createElement('td');
-                    let tdStartTimeInput=document.createElement('input');
-                    tdStartTimeInput.type="text";
-
-                    let tdEndTime=document.createElement('td');
-                    let tdEndTimeInput = document.createElement('input');
-                    tdEndTimeInput.type = "text";
+                    //GPT995R
+                    tdTransportNameInput.style.width = "100%";
+                    tdTransportDistanceInput.style.width = "100%";
+                    tdTransportStartTimeInput.style.width = "100%";
+                    tdTransportEndTimeInput.style.width = "100%";
 
 
 
-                    tdEventNameInput.style.width = "100%";
-                    tdAttractionNameInput.style.width = "100%";
-                    tdStartTimeInput.style.width = "100%";
-                    tdEndTimeInput.style.width = "100%";
+                    let targetData = allData.filter(x => x.start.Id == theCurrentAttractionOfDropContainer).filter(x => x.end.Id == theNextAttractionOfDropContainer)
+                    console.log(targetData);
+                    let latestEndTimeInput = document.querySelector(`input[data-endTimeAttractionId="${theCurrentAttractionOfDropContainer}"]`)
+                    axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime`, {
+                        params: {
+                            latestEndTime: latestEndTimeInput.value,
+                            timeValue: targetData[0].duration.value
+                        }
+                    }).then(response => {
+                        console.log('時間老人');
+                        console.log(response);
+
+                        tdTransportNameInput.value = "交通";
+                        tdTransportDistanceInput.value = targetData[0].distance.text;
+                        tdTransportStartTimeInput.value = response.data.startTime;
+                        tdTransportEndTimeInput.value = response.data.endTime;
+                        tdTransportEndTimeInput.setAttribute('data-destinationstayId', theCurrentAttractionOfDropContainer)
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                    tdTransportName.appendChild(tdTransportNameInput);
+                    tdTransportDistance.appendChild(tdTransportDistanceInput);
+                    tdTransportStartTime.appendChild(tdTransportStartTimeInput);
+                    tdTransportEndTime.appendChild(tdTransportEndTimeInput);
+                    newTransportTr.appendChild(tdTransportName);
+                    newTransportTr.appendChild(tdTransportDistance);
+                    newTransportTr.appendChild(tdTransportStartTime);
+                    newTransportTr.appendChild(tdTransportEndTime);
+                    targetTableBody.appendChild(newTransportTr);
+                    theCurrentAttractionOfDropContainer = dataId
+                } else {
+                    theCurrentAttractionOfDropContainer = dataId
+                }
 
 
-                    const startDateTime = new Date(response.data.startDateTime);
-                    const startFormattedTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
-                    const endDateTime = new Date(response.data.endDateTime);
-                    const endFormattedTime = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`;
+
+                 if(! document.querySelector(`input[data-destinationstayid="${theNextAttractionOfDropContainer}"]`)){
 
 
-                    tdEventNameInput.value="停留";
-                    tdAttractionNameInput.value = response.data.attractionName;
-                    tdStartTimeInput.value = startFormattedTime;
-                    tdEndTimeInput.value = endFormattedTime;
-
-
-
-
-                    tdEventName.appendChild(tdEventNameInput);
-                    tdAttractionName.appendChild(tdAttractionNameInput);
-                    tdStartTime.appendChild(tdStartTimeInput);
-                    tdEndTime.appendChild(tdEndTimeInput);
-
-                    newTr.appendChild(tdEventName);
-                    newTr.appendChild(tdAttractionName);
-                    newTr.appendChild(tdStartTime);
-                    newTr.appendChild(tdEndTime);
-
-                    targetTableBody.appendChild(newTr);
-
-
-
-                    if (response.status == 200) {
-                        let container=document.createElement('div');
-                        if(response.data.activityProducts.length>0){                           
-                            for (let i = 0; i<response.data.activityProducts.length;i++){
-                                let label=document.createElement('label');
-                                let newActProduct=document.createElement('input');
-                                newActProduct.type="checkbox";
-                                newActProduct.id = 'activityProduct' + i;
-                                newActProduct.name = 'activityProduct';
-                                newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
+                    axios.get(`https://localhost:7251/api/TravelPlans/${dataId}`, {
+                        params: {
+                            startDateTime: document.querySelector('#travelBeginDateTime').value,
+                        }
+                    }).then(response => {
+                        console.log(response);
+                        let selectAccommodationBtn = document.createElement('button');
+                        selectAccommodationBtn.textContent = "選擇住宿";
+                        selectAccommodationBtn.classList.add('btn', 'btn-primary');
+                        selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
+                        selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
+                        targetTable.classList.remove('hide');
 
 
 
 
-                                label.setAttribute('for', 'activityProduct' + i);
-                                label.textContent = response.data.activityProducts[i].activityName;
-                                label.appendChild(newActProduct);
-                                label.classList.add('m-1');
-                                newActProduct.value = response.data.activityProducts[i].id;                      
-                                newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
-                                newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
-                                newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
-                                container.appendChild(label);
+
+
+                        let newTr = document.createElement('tr');
+                        let tdEventName = document.createElement('td');
+                        let tdEventNameInput = document.createElement('input');
+                        tdEventNameInput.type = "text";
+                        let tdAttractionName = document.createElement('td');
+                        let tdAttractionNameInput = document.createElement('input');
+                        tdAttractionNameInput.type = "text";
+                        tdAttractionNameInput.readOnly = true;
+                        let tdStartTime = document.createElement('td');
+                        let tdStartTimeInput = document.createElement('input');
+                        tdStartTimeInput.type = "time";
+                        let tdEndTime = document.createElement('td');
+                        let tdEndTimeInput = document.createElement('input');
+                        tdEndTimeInput.type = "time";
+                        tdEventNameInput.style.width = "100%";
+                        tdAttractionNameInput.style.width = "100%";
+                        tdStartTimeInput.style.width = "100%";
+                        tdEndTimeInput.style.width = "100%";
+
+                        const startDateTime = new Date(response.data.startDateTime);
+                        const startFormattedTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
+                        const endDateTime = new Date(response.data.endDateTime);
+                        const endFormattedTime = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`;
+
+
+
+
+                        tdEventNameInput.value = "停留";
+                        tdAttractionNameInput.value = response.data.attractionName;
+                        tdStartTimeInput.value = startFormattedTime;
+                        tdEndTimeInput.value = endFormattedTime;
+
+
+
+
+
+                        //995R
+                        tdEndTimeInput.setAttribute('data-endTimeAttractionId', response.data.id)
+
+                        tdEventName.appendChild(tdEventNameInput);
+                        tdAttractionName.appendChild(tdAttractionNameInput);
+                        tdStartTime.appendChild(tdStartTimeInput);
+                        tdEndTime.appendChild(tdEndTimeInput);
+
+                        newTr.appendChild(tdEventName);
+                        newTr.appendChild(tdAttractionName);
+                        newTr.appendChild(tdStartTime);
+                        newTr.appendChild(tdEndTime);
+
+
+
+
+
+
+                        targetTableBody.appendChild(newTr);
+
+                        if (response.status == 200) {
+                            let container = document.createElement('div');
+                            if (response.data.activityProducts.length > 0) {
+                                for (let i = 0; i < response.data.activityProducts.length; i++) {
+                                    let label = document.createElement('label');
+                                    let newActProduct = document.createElement('input');
+                                    newActProduct.type = "checkbox";
+                                    newActProduct.id = 'activityProduct' + i;
+                                    newActProduct.name = 'activityProduct';
+                                    newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
+
+                                    label.setAttribute('for', 'activityProduct' + i);
+                                    label.textContent = response.data.activityProducts[i].activityName;
+                                    label.appendChild(newActProduct);
+                                    label.classList.add('m-1');
+                                    newActProduct.value = response.data.activityProducts[i].id;
+                                    newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
+                                    newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
+                                    newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
+                                    container.appendChild(label);
+                                }
+                            } else if (response.data.extraServiceProducts.length > 0) {
+
+                                for (let i = 0; i < response.data.extraServiceProducts.length; i++) {
+                                    let label = document.createElement('label');
+                                    let newExtProduct = document.createElement('input');
+                                    newExtProduct.type = "checkbox";
+                                    newExtProduct.id = 'extraServiceProduct' + i;
+                                    newExtProduct.name = 'extraServiceProduct';
+                                    newExtProduct.addEventListener('click', toggleExtraServiceProductTimeBlock);
+
+
+                                    label.setAttribute('for', 'extraServiceProduct' + i);
+                                    label.textContent = response.data.extraServiceProducts[i].extraServiceName;
+                                    label.appendChild(newExtProduct);
+                                    label.classList.add('m-1');
+                                    newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
+                                    newExtProduct.value = response.data.extraServiceProducts[i].id;
+                                    container.appendChild(label);
+                                }
                             }
-                        } else if (response.data.extraServiceProducts.length > 0) {
-                           
-                            for (let i = 0; i < response.data.extraServiceProducts.length; i++) {
-                                let label = document.createElement('label');
-                                let newExtProduct = document.createElement('input');
-                                newExtProduct.type = "checkbox";
-                                newExtProduct.id = 'extraServiceProduct' + i;
-                                newExtProduct.name = 'extraServiceProduct';
-                                newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
 
 
-                                //ExtAddEventListener
-                                label.setAttribute('for', 'extraServiceProduct' + i);
-                                label.textContent = response.data.extraServiceProducts[i].extraServiceName;
-                                label.appendChild(newExtProduct);
-                                label.classList.add('m-1');
-                                newExtProduct.value = response.data.extraServiceProducts[i].id;
-                                container.appendChild(label);
-                            }
+
+                            this.textContent = response.data.attractionName;
+                            this.appendChild(container);
+                            this.appendChild(selectAccommodationBtn);
+
                         }
 
 
-                  
-                       this.textContent = response.data.attractionName;
-                       this.appendChild(container);
-                       this.appendChild(selectAccommodationBtn);
-                        
-                    }
 
 
+                        theCurrentAttractionOfDropContainer = dataId;
+                    }).catch(error => {
+                        console.log('error')
+                    })
 
-                }).catch(error=>{
-                    console.log('error')
-                })
+                }
+
+                }else{
+         
+                }
                 
-            }
+
+
+
+
+
+       
         }
 
         function allowDrop(e){
             e.preventDefault();
         }
 
-
+   
 
         function greedyTSPSolution(){
             let unvisited = selectedAttraction.slice();
@@ -496,7 +569,7 @@
 
 
                     newStart = shortestObj.end;
-                    console.log('第一次')
+                    //console.log('第一次')
                 } else {
                     let shortestObj = getNextDistanceObject(distanceToEach, newStart, visited)
                     selectedPath.push(shortestObj);
@@ -513,7 +586,7 @@
                     }
 
                     newStart = shortestObj.end;
-                    console.log('第二次')
+                    //console.log('第二次')
                 }
 
                 if (unvisited.length === 0) {
@@ -586,84 +659,114 @@
                 }
 
             }
-
-
-
         }
 
 
-        function toggleActivityProductTimeBlock(e) {
 
-            const checkbox = e.target;
-            const trId = checkbox.getAttribute('data-tr-id');
-            const targetRow = document.getElementById(trId);
-            
-
-
-            
+        function toggleExtraServiceProductTimeBlock(e){
+            const checkbox=e.target;
+            const trId=checkbox.getAttribute('data-tr-id');
+            const targetRow=document.getElementById(trId);
 
             let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+            if (checkbox.checked) {
+                let newTr = document.createElement('tr');
+                newTr.id = trId;
+                let tdEventName = document.createElement('td');
+                let tdEventNameInput = document.createElement('input');
+                tdEventNameInput.type = "text";
+                tdEventNameInput.readOnly = true;
+                let tdAttractionName = document.createElement('td');
+                let tdAttractionNameInput = document.createElement('input');
+                tdAttractionNameInput.type = "text";
+                tdAttractionNameInput.readOnly = true;
 
 
+                let tdStartTime = document.createElement('td');
+                let tdStartTimeInput = document.createElement('input');
+                tdStartTimeInput.type = "time";
+
+                let tdEndTime = document.createElement('td');
+                let tdEndTimeInput = document.createElement('input');
+                tdEndTimeInput.type = "time";
+   
+                tdEventNameInput.style.width = "100%";
+                tdAttractionNameInput.style.width = "100%";
+                tdStartTimeInput.style.width = "100%";
+                tdEndTimeInput.style.width = "100%";
+                axios.get(`https://localhost:7251/api/TravelPlans/Get/ExtProductInfo`, {
+                    params: {
+                        extProductId: checkbox.value,
+                    }
+                }).then(response => {
+                    console.log(response)
+                    tdEventNameInput.value = response.data.extraServiceName;
+                    tdAttractionNameInput.value = response.data.attractionName;
+                    tdStartTimeInput.placeholder = "請自行設定時間";
+                    tdEndTimeInput.placeholder = "請自行設定時間";
+                }).catch(err => {
+                    console.log('error')
+                })
+                tdEventName.appendChild(tdEventNameInput);
+                tdAttractionName.appendChild(tdAttractionNameInput);
+                tdStartTime.appendChild(tdStartTimeInput);
+                tdEndTime.appendChild(tdEndTimeInput);
+                newTr.appendChild(tdEventName);
+                newTr.appendChild(tdAttractionName);
+                newTr.appendChild(tdStartTime);
+                newTr.appendChild(tdEndTime);
+                targetTableBody.appendChild(newTr);
+            } else {
+                targetRow.remove();
+            }
+        }
+
+
+
+
+
+
+        function toggleActivityProductTimeBlock(e) {
+            const checkbox = e.target;
+            const trId = checkbox.getAttribute('data-tr-id');
+            const targetRow = document.getElementById(trId);                              
+            let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
             if(checkbox.checked){
                 let newTr = document.createElement('tr');
                 newTr.id = trId;
                 let tdEventName = document.createElement('td');
                 let tdEventNameInput = document.createElement('input');
                 tdEventNameInput.type = "text";
+                tdEventNameInput.readOnly = true;
                 let tdAttractionName = document.createElement('td');
                 let tdAttractionNameInput = document.createElement('input');
                 tdAttractionNameInput.type = "text";
                 tdAttractionNameInput.readOnly = true;
                 let tdStartTime = document.createElement('td');
                 let tdStartTimeInput = document.createElement('input');
-                tdStartTimeInput.type = "text";
+                tdStartTimeInput.type = "time";
+                tdStartTimeInput.readOnly = true;
                 let tdEndTime = document.createElement('td');
                 let tdEndTimeInput = document.createElement('input');
-                tdEndTimeInput.type = "text";
-
-
+                tdEndTimeInput.type = "time";
+                tdEndTimeInput.readOnly = true;
                 tdEventNameInput.style.width = "100%";
                 tdAttractionNameInput.style.width = "100%";
                 tdStartTimeInput.style.width = "100%";
-                tdEndTimeInput.style.width = "100%";
-
-
-                
-
-
+                tdEndTimeInput.style.width = "100%";                
                 axios.get(`https://localhost:7251/api/TravelPlans/Get/ActProductInfo`, {
                     params: {
                         actProductId: checkbox.value,
                     }
-
                 }).then(response=>{
-
-                    console.log(response)
-
-
-
-                    tdEventNameInput.value = "活動名稱";
-                    tdAttractionNameInput.value ="景點名稱" ;
+                    console.log(response)            
+                    tdEventNameInput.value = response.data.activityName;
+                    tdAttractionNameInput.value = response.data.attractionName;
                     tdStartTimeInput.value = response.data.startTime;
-                    tdEndTimeInput.value = response.data.endTime;
-                    console.log('success')
-
+                    tdEndTimeInput.value = response.data.endTime;               
                 }).catch(err=>{
                     console.log('error')
-                })
-
-
-
-
-              
-
-
-                
-
-
-
-
+                })                        
                 tdEventName.appendChild(tdEventNameInput);
                 tdAttractionName.appendChild(tdAttractionNameInput);
                 tdStartTime.appendChild(tdStartTimeInput);
@@ -675,12 +778,7 @@
                 targetTableBody.appendChild(newTr);
             }else{
                 targetRow.remove();
-
-
-            }
-
-
-            
+            }            
         }
 
 
@@ -703,6 +801,7 @@
             
             attractionName.textContent="請拖入景點";
             attractionName.classList.add('attractionDropContainer');
+
             attractionName.addEventListener('drop', drop);
             attractionName.addEventListener('dragover',allowDrop);
             
@@ -743,8 +842,7 @@
 
             axios.post(`https://localhost:7251/api/Carts/Post/Travel`,postData)
             .then(response=>{
-               // 加入購物車後續動作
-               console.log('Request successful, no response data.');
+               alert('已成功加入購物車!');
             })
             .catch(error=>{
                 console.log(error)
