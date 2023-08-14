@@ -56,7 +56,7 @@ namespace RouteMasterFrontend.Controllers
 
         public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
         {
-           
+            int takeNum = 3;
             var commentDb = _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
@@ -82,8 +82,8 @@ namespace RouteMasterFrontend.Controllers
             var proImg = _context.Comments_AccommodationImages;
             var proLike = _context.Comment_Accommodation_Likes
                 .Include(l => l.Member);
-               
 
+            
             var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
             {
                 Id = c.Id,
@@ -102,7 +102,7 @@ namespace RouteMasterFrontend.Controllers
                 ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.MemberId==1),
                 TotalThumbs=proLike.Where(l=>l.Comments_AccommodationId== c.Id).Count(),
 
-            }).ToListAsync();
+            }).Take(takeNum).ToListAsync();
 
             return Json(rod);
         }

@@ -68,40 +68,40 @@
     },
     template: `
         <div class="container">
-        <div class="row mb-2" style="width:20%">
-            <select v-model="selected" id="commentOrder" class="ms-3" @change="commentDisplay()">
-                <option value="0" selected>排序選擇</option>
-                <option value="1">最新留言</option>
-                <option value="2">星星評分高至低</option>
-                <option value="3">星星評分低至高</option>
-            </select>
-            <div class="ms-auto"><a href="https://localhost:7145/Comments_Accommodation/Create" class="link-dark">新增評論</a></div>
-        </div>
-         <div class="row g-4">
-            <div v-for="(item, index) in indexVM" :key="index" class="col-4">
-                <div class="card">
-                    <template v-if="item.imageList.length>1">
-                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
-                            <div class="carousel-inner mx-auto my-auto w-50">
-                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
-                                    <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
-                                </div>
+                <div class="row mb-2" style="width:20%">
+                    <select v-model="selected" id="commentOrder" class="ms-3" @change="commentDisplay()">
+                        <option value="0" selected>排序選擇</option>
+                        <option value="1">最新留言</option>
+                        <option value="2">星星評分高至低</option>
+                        <option value="3">星星評分低至高</option>
+                    </select>
+                    <div class="ms-auto"><a href="https://localhost:7145/Comments_Accommodation/Create" class="link-dark">新增評論</a></div>
+                </div>
+             <div class="row g-4">
+                <div v-for="(item, index) in indexVM" :key="index" class="col-4">
+                    <div class="card">
+                        <template v-if="item.imageList.length>1">
+                            <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
+                                <div class="carousel-inner mx-auto my-auto w-50">
+                                    <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                        <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
+                                    </div>
 
+                                </div>
+                                <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
                             </div>
-                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <img src="../MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
-                    </template>
-                    <hr/>
+                        </template>
+                        <template v-else>
+                            <img src="../MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
+                        </template>
+                        <hr/>
                     <div class="card-body">
                         <h5 class="card-title">標題: {{item.title}}</h5>
                         <p class="card-text">{{item.id}}</p>
@@ -133,6 +133,7 @@
                 </div>
             </div>
         </div>
-    `
+    </div>
+`
 
 };
