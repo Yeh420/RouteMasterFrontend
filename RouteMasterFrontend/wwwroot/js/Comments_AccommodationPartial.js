@@ -5,10 +5,10 @@
             item: {},
             isReplyed: "已回復",
             ep: null,
-            selected: 0,
-            //hotelId: 1, //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
+            selected: 0,         
             thumbicon: [],
-            hotelId:0
+            hotelId: 0,
+
 
         }
     },
@@ -20,7 +20,7 @@
     //    _this.commentDisplay();
     //},
     methods: {
-        commentDisplay: function (id) {
+        commentDisplay: function (id,showAll) {
             let _this = this;
             var request = {};
             if (id) {
@@ -28,6 +28,7 @@
             }
             request.Manner = _this.selected;
             request.HotelId = _this.hotelId;
+            request.Getall = showAll == null ? true : false;
 
             axios.post("https://localhost:7145/Comments_Accommodation/ImgSearch", request).then(response => {
                 _this.indexVM = response.data;
