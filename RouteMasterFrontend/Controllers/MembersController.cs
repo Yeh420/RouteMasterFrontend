@@ -179,7 +179,7 @@ namespace RouteMasterFrontend.Controllers
         }
 
         //會員普通登入
-        public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
+        public async Task<IActionResult> MemberLogin([FromBody] MemberLoginVM vm)
         {
             if (ModelState.IsValid == false) return View(vm);
 
