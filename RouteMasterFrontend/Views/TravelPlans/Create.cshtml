@@ -293,36 +293,11 @@
         }
 
 
+        function createTransportTr(dataId){
 
-
-        //todo解耦 寫了一坨垃圾
-       function drop(event) {
-            event.preventDefault();
-            let dataId = event.dataTransfer.getData("text");            
-            
-            theNextAttractionOfDropContainer = dataId;
             let targetTable = document.querySelector('#tableContainer');
             let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
-            
-           
-
-
-
-
-
-
-
-            
-            //console.log(dataId);
-
-            if (dataId) {
-                const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
-                draggableElement.draggable = false;
-                draggableElement.style.backgroundColor = "lightgray";
-
-
-
-                if (theCurrentAttractionOfDropContainer != undefined) {
+            if (theCurrentAttractionOfDropContainer != undefined) {
                     let newTransportTr = document.createElement('tr');
                     let tdTransportName = document.createElement('td');
                     let tdTransportNameInput = document.createElement('input');
@@ -349,7 +324,7 @@
                     let targetData = allData.filter(x => x.start.Id == theCurrentAttractionOfDropContainer).filter(x => x.end.Id == theNextAttractionOfDropContainer)
                     console.log(targetData);
                     let latestEndTimeInput = document.querySelector(`input[data-endTimeAttractionId="${theCurrentAttractionOfDropContainer}"]`)
-                    axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime`, {
+                 axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime`, {
                         params: {
                             latestEndTime: latestEndTimeInput.value,
                             timeValue: targetData[0].duration.value
@@ -379,6 +354,43 @@
                 } else {
                     theCurrentAttractionOfDropContainer = dataId
                 }
+
+
+
+
+        }
+
+
+
+
+
+
+        //todo解耦 寫了一坨垃圾
+        async function drop(event) {
+            event.preventDefault();
+            let dataId = event.dataTransfer.getData("text");            
+            
+            theNextAttractionOfDropContainer = dataId;
+            let targetTable = document.querySelector('#tableContainer');
+            let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+
+
+
+
+           await createTransportTr(dataId);
+
+
+            
+            //console.log(dataId);
+
+            if (dataId) {
+                const draggableElement = document.querySelector(`.draggable[data-id="${dataId}"]`);
+                draggableElement.draggable = false;
+                draggableElement.style.backgroundColor = "lightgray";
+
+
+
+                
 
 
 
@@ -521,6 +533,7 @@
 
                 }else{
          
+                    console.log('666')
                 }
                 
 
