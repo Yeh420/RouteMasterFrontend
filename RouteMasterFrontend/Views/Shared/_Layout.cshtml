@@ -15,6 +15,7 @@
     <link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+
     <style>
         .header-area .main-nav .logo {
             display: flex;
@@ -88,7 +89,6 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
 
-
                             @{
                                 if (User.Identity.IsAuthenticated)
                                 {
@@ -101,9 +101,7 @@
                                     </li>
                                     <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
-                                    </li>
-                                    
-                                    
+                                    </li>        
                                 }
                                 else
                                 {
@@ -126,55 +124,7 @@
                 </div>
             </div>
         </div>
-        @*<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
-        <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RouteMasterFrontend</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-        aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-        <ul class="navbar-nav flex-grow-1">
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="ActivityProductIndex">活動商品</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="ExtraServiceProductsIndex" asp-action="Index">服務</a>
-        </li>
-        @{
-        if (User.Identity.IsAuthenticated)
-        {
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
-        </li>
-        }
-        else{
-        <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
-        </li>
-        }
-        }
-
-
-        </ul>
-        </div>
-        </div>
-        </nav>*@
+      
     </header>
     <div class="container">
         <div>
@@ -184,6 +134,7 @@
           @RenderBody()
         </div>
     </div> 
+
 
     <!-- *** Footer *** -->
     <footer>
