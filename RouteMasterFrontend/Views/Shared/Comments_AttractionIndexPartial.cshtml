@@ -1,0 +1,124 @@
+﻿<style>
+    .panel li {
+        color: #ccc;
+    }
+</style>
+<div>@Model.Id</div>
+<div id="app">
+    <div class="container">
+        <div class="row mb-2" style="width:20%">
+            @*<a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>*@         
+            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
+                <option value="0" selected>排序選擇</option>
+                <option value="1">最新留言</option>
+                <option value="2">星星評分高至低</option>
+                <option value="3">星星評分低至高</option>
+                <option value="4">停留時間由高至低</option>
+                <option value="5">花費由高至低</option>    
+            </select>
+
+        </div>
+       
+           <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-7">
+                    <div class="card-header">{{item.account}}</div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
+                            <div>{{item.isHidden}}</div>
+                        </div>
+                        <div class="panel">
+                            <ul class="d-flex list-unstyled">
+                                <li><i class="fa fa-star fa-fw"></i></li>
+                                <li><i class="fa fa-star fa-fw"></i></li>
+                                <li><i class="fa fa-star fa-fw"></i></li>
+                                <li><i class="fa fa-star fa-fw"></i></li>
+                                <li><i class="fa fa-star fa-fw"></i></li>
+                            </ul>
+                            <p class="card-text">{{item.score}}</p>
+                        </div>
+                        <p class="card-text">{{item.id}}</p>
+                        <p class="card-text">{{item.content}}</p>
+                        <p class="card-text">停留: {{item.stayHours}}小時</p>                      
+                        <div class="d-flex">
+                            <p class="me-auto">花費: {{item.price}}元</p>
+                            <p class="text-muted">{{item.createDate}}</p>                            
+                        </div>                                                                                     
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <template v-if="item.imageList.length>1">
+                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
+                            <div class="carousel-inner w-100 mx-auto my-auto">
+                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                    <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                </div>
+
+                            </div>
+                            <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
+                    </template>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+<script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+<script>
+    const vueApp={
+        data(){
+            return{
+                indexVM:[],
+                selected:0,
+                spotId: @Html.Raw(Json.Serialize(Model.Id)),
+
+            }
+        },
+        mounted: function () {
+            let _this = this;
+            _this.commentDisplay();
+        },
+        methods:{
+            commentDisplay: async function(){
+                let _this=this;
+                var data={};
+                data.Manner=_this.selected;
+                data.SpotId=_this.spotId;
+                var uri = "https://localhost:7145/Comments_Attraction/GetComments";
+                const response = await fetch(uri, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+
+                });
+                if (response.ok) {
+                    _this.indexVM = await response.json();
+                    console.log(_this.indexVM);
+                   
+                }
+                else {
+                    console.error('Error:', response.status);
+                }
+            },
+        }
+
+    }
+
+    var app = Vue.createApp(vueApp).mount("#app");
+</script>
