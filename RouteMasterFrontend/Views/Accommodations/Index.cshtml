@@ -345,15 +345,16 @@
                                         </section>
 
                                   <section>
-                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
+                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2">
                                         顯示更多評論
                                     </a>
+                                     <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
+                                        cccccccccccccccccccccccccc
+									</div>
                                     <dec id="topthree" ref="childRef"></dec>
                                   
 
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                        
-									</div>
+                                   
 								</section>
                                         <section class="mb-3 border-top pt-1">
                                             <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -485,6 +486,7 @@
                         cartProductId:1,
                         accommodationServiceCId:[],
                         map:null,
+                        onlyThree:"只顯示前三筆",
                     }
                 },
                 mounted: async function(){
@@ -624,7 +626,8 @@
                     },
                     showModal:async function (id) {
                         let _this = this;
-                        const exampleModal = document.getElementById('exampleModal')
+                        const exampleModal = document.getElementById('exampleModal');
+                         const swcollapse2=document.getElementById("swcollapse2");
                         if (exampleModal) {
                                 const p = _this.products[id];
                                 _this.accommodationIndex = p;
@@ -633,8 +636,17 @@
                                 _this.accommodationServiceCId = p.services.map(function(s){
                                     return s.serviceInfoCategoryId;
                                 });
-                                var parentInput=5;
-                                _this.$refs.childRef.commentDisplay(p.id, parentInput);
+
+                                const isCollapsed = swcollapse2.classList.contains('collapsed');
+                                if(isCollapsed){
+                                    _this.$refs.childRef.commentDisplay(p.id,_this.onlyThree);
+                                    console.log("收起來");
+                                }
+                                else{
+                                    _this.$refs.childRef.commentDisplay(p.id);
+                                      console.log("打開");
+                                }
+                                
 
                                 _this.initMap(id);
                                 const showMoreText = "...顯示更多";
@@ -664,27 +676,7 @@
                                 _this.accommodationImage = imgSrc;
                             })
                         }
-                    },
-                    showAllComment:function(){
-                        let _this=this;
-                    const swcollapse2=document.getElementById("swcollapse2");
-                    const collapse2 = document.getElementById("collapse2");
-                    const topthree = document.getElementById("topthree");
-
-                    const isCollapsed = swcollapse2.classList.contains('collapsed');
-                    if (isCollapsed) {
-                        // Collapse 已展開，這裡可以執行相關程式碼
-                        topthree.style.display = 'block';
-                        console.log("close");
-
-                    }
-                    else {
-                        _this.$refs.childRef.commentDisplay();                      
-                        topthree.style.display = 'none';
-                        console.log("open");
-                    }
-                    
-                    },
+                    },                    
                     clickHandler:function(value){
                         let _this = this;
                         _this.thePage = value;

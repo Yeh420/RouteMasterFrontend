@@ -83,11 +83,7 @@ namespace RouteMasterFrontend.Controllers
             var proLike = _context.Comment_Accommodation_Likes
                 .Include(l => l.Member);
 
-            if (!input.Getall)
-            {
-                commentDb= commentDb.Take(3).AsQueryable();
-
-            }
+            
             var rod = await commentDb.Select(c => new Comments_AccommodationIndexDTO
             {
                 Id = c.Id,

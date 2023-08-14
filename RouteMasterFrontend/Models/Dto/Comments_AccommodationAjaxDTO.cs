@@ -5,6 +5,5 @@
 		public int Manner { get; set; }
 		public int HotelId { get; set; }
 
-        public bool Getall { get; set; }	
     }
 }
