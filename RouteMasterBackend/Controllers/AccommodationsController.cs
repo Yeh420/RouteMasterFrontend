@@ -25,7 +25,23 @@ namespace RouteMasterBackend.Controllers
             _db = context;
         }
 
-        // GET: api/Accommodations
+        [HttpGet]
+        public async Task<ActionResult<List<ServiceInfoCategory>>> GetServiceInfoCategory()
+        {
+          if (_db.ServiceInfoCategories == null)
+          {
+              return NotFound();
+          }
+            var sc = _db.ServiceInfoCategories.AsNoTracking().Include(sc=>sc.AccommodationServiceInfos).AsQueryable();
+
+            if (sc == null)
+            {
+                return NotFound();
+            }
+
+            return await sc.ToListAsync();
+        }
+
         [HttpPost]
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(FilterData data)
         {
@@ -34,11 +50,12 @@ namespace RouteMasterBackend.Controllers
             {
                 return NotFound();
             }
-            var accommodations = _db.Accommodations
+            var accommodations = _db.Accommodations.AsNoTracking()
                     .Include(a => a.CommentsAccommodations)
                     .Include(a => a.AccommodationImages)
                     .Include(a => a.Rooms)
-                    .Include(a => a.AccommodationServiceInfos).AsQueryable();
+                    .Include(a => a.AccommodationServiceInfos)
+                    .AsQueryable();
             if (!string.IsNullOrEmpty(data.Keyword))
             {
 	            accommodations = accommodations.Where(p => 
@@ -49,12 +66,29 @@ namespace RouteMasterBackend.Controllers
                 );
             }
 
-            //if(data.Grades != null && data.Grades.Length > 0)
-            //{
-            //    accommodations = accommodations.Where(a => data.Grades.All(grade => a.Grade == grade));
-            //};
+            if (data.Grades != null && data.Grades.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Grades.Contains(a.Grade));
+            };
 
+            if (data.ACategory != null && data.ACategory.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.ACategory.Contains(a.AcommodationCategory.Name));
+            };
+            if(data.score != null)
+            {
+                accommodations = accommodations.Where(a => a.CommentsAccommodations.Average(ca=>ca.Score) >= data.score);
+            }
 
+            if(data.SCategory != null && data.SCategory.Length > 0)
+            {
+                accommodations = accommodations.Where(a => a.AccommodationServiceInfos.All(s => data.SCategory.Contains(s.Name)));
+            }
+
+            if (data.Regions != null && data.Regions.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Regions.Contains(a.Region.Name));
+            };
 
             #region
             //分頁
@@ -90,25 +124,6 @@ namespace RouteMasterBackend.Controllers
 
             return accommodationsDTO;
         }
-
-        // GET: api/Accommodations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Accommodation>> GetAccommodation(int id)
-        {
-          if (_db.Accommodations == null)
-          {
-              return NotFound();
-          }
-            var accommodation = await _db.Accommodations.FindAsync(id);
-
-            if (accommodation == null)
-            {
-                return NotFound();
-            }
-
-            return accommodation;
-        }
-
         //[HttpGet("GetFilterDTO")]
         // public async Task<ActionResult<FilterDTO>> GetFilterDTO()
         //{

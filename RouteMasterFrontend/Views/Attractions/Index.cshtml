@@ -122,7 +122,7 @@
                 
 
                 
-                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-left" style="object-fit: cover;">
+                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-start" style="object-fit: cover;">
                 
                 
 
@@ -190,10 +190,18 @@
         $(document).ready(function() {
             // 預設收合搜尋表單
             $('.formContainer').hide();
+
+            $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-down"></i>`);
         });
 
         $("#toggleForm").click(function(){
             $(".formContainer").toggle();
+
+            if ($(".formContainer").is(":visible")) {
+                $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-up"></i>`);
+            } else {
+                $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-down"></i>`);
+            }
         })
 
         $("#clear").click(function () {

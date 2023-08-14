@@ -222,7 +222,7 @@ namespace RouteMasterFrontend.Controllers
                     _context.Cart_AccommodationDetails.Add(cartItem);
                     _context.SaveChanges();
                     Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
-                    return Json(new { success = true, message = "Successfully added to cart" });
+                    return ViewComponent("CartPartial");
                 }
                 else
                 {
@@ -234,17 +234,17 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "Failed to add to cart."+ex });
             }
         }
-        public IActionResult RemoveAccommodationFromCart(int accommodationId)
+        public IActionResult RemoveAccommodationFromCart(int roomProductId)
         {
             try
             {
                 var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.Id==accommodationId);
+                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.Id== roomProductId);
                 if (cartItem != null)
                 {
                     _context.Cart_AccommodationDetails.Remove(cartItem);
                     _context.SaveChanges();
-                    return Json(new {success=true, message="Successfully removed from cart.", accommodationId=accommodationId});
+                    return Json(new {success=true, message="Successfully removed from cart.", roomProductId = roomProductId });
                 }
                 else
                 {
@@ -274,7 +274,7 @@ namespace RouteMasterFrontend.Controllers
                     _context.SaveChanges();
 
                     Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
-                    return Json(new { success = true, message = "Successfully added to cart." });
+                    return ViewComponent("CartPartial");
                 }
                 else
                 {
@@ -799,40 +799,8 @@ namespace RouteMasterFrontend.Controllers
             _context.Carts.Remove(cart);
             _context.SaveChanges();
         }
-
-        public IActionResult AddAccomodation2Cart(int accomodationId)
-        {
-
-            try
-            {
-                var RoomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == accomodationId);
-                if(RoomProduct!= null)
-                {
-                    var cartItem = new Cart_AccommodationDetail
-                    {
-                        CartId = 1,
-                        RoomProductId = RoomProduct.Id,
-                        Quantity = 1
-                    };
-                    _context.Cart_AccommodationDetails.Add(cartItem);
-                    _context.SaveChanges();
-					// 加入購物車成功後回傳 JSON 物件
-					return Json(new { success = true, message = "Successfully added to cart." });
-				}
-				else
-				{
-					// 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
-					return Json(new { success = false, message = "Product not found." });
-				}
-			}
-			catch
-			{
-				// 加入購物車失敗時回傳 JSON 物件
-				return Json(new { success = false, message = "Failed to add to cart." });
-			}
-		
-            
-        }
+   
+        
         private int GetMemberIdByAccount(string Account)
 		{
 

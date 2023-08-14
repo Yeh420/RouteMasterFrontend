@@ -7,6 +7,8 @@ namespace RouteMasterBackend.DTOs
         public int Id { get; set; }
         public string? AttractionName { get; set; }
         public int? StayHours { get; set; }
+        public double? PositionX { get; set; }
+        public double? PositionY { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public List<ActivityProductShowOnTravelPlan>? ActivityProducts { get; set; }
