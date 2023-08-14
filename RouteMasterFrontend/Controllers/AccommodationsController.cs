@@ -36,13 +36,13 @@ namespace RouteMasterFrontend.Controllers
 
             var temps = await _context.ServiceInfoCategories.Include(sc=>sc.AccommodationServiceInfos).ToListAsync();
 
-            foreach (var temp in temps)
+            foreach ( var temp in temps)
             {
                 ServiceDTO s = new ServiceDTO
                 {
                     Id = temp.Id,
                     Name = temp.Name,
-                    AccommodationServiceInfos = temp.AccommodationServiceInfos
+                    AccommodationServiceInfos = temp.AccommodationServiceInfos.ToList()
                 };
 
                 dto.ServiceInfoes.Add(s);

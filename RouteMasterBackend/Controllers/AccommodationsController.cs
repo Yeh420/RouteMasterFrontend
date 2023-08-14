@@ -31,10 +31,10 @@ namespace RouteMasterBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ServiceInfoCategory>>> GetServiceInfoCategory()
         {
-          if (_db.ServiceInfoCategories == null)
-          {
-              return NotFound();
-          }
+            if (_db.ServiceInfoCategories == null)
+            {
+                return NotFound();
+            }
             var sc = _db.ServiceInfoCategories.AsNoTracking().Include(sc=>sc.AccommodationServiceInfos).AsQueryable();
 
             if (sc == null)
