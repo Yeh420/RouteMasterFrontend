@@ -450,14 +450,14 @@
 
                                 </section>
 
+                                </div>
                             </div>
                         </div>
                     </div>
+                   
                 </div>
-
             </div>
         </div>
-    </div>
 
 </div>
 
@@ -471,6 +471,64 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="~/js/Comments_AccommodationPartial.js"></script>
 
+        <script src="~/js/Comments_AccommodationPartial.js"></script>
+        <script>
+          
+            var vueApp={
+                data(){
+                    return{
+                        //Country:"",
+                        keyword:"",
+                        products:[],
+                        totalPages:1,
+                        thePage: 1,
+                        pageSize:5,
+                        filterDto: @Html.Raw(Json.Serialize(Model)),
+                        selectedGrades:[],
+                        selectedaCategories:[],
+                        selectedScore:Number,
+                        selectedsCategories:[],
+                        selectedServiceInfos:[],
+                        selectedaRegions:[],
+                        accommodationIndex:{},
+                        accommodationImage:"",
+                        accommodationDescription:"",
+                        cartProductId:[],
+                        accommodationServiceCId:[],
+                    cartItems: [],
+                    }
+                },
+                mounted: async function(){
+				    let _this = this;
+				    _this.loadProducts();
+			    },
+                computed: {
+                    hasPrevious() {
+                        return this.thePage > 1;
+                    },
+                    hasNext() {
+                        return this.thePage < this.totalPages;
+                    },
+                    pageRange() {
+                        const maxPagesToShow = 5; // Adjust the maximum number of pages to show in the pagination
+                        const middlePage = Math.floor(maxPagesToShow / 2);
+                        const startPage = Math.max(this.thePage - middlePage, 1);
+                        const endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+                        const pages = [];
+                        for (let i = startPage; i <= endPage; i++) {
+                            pages.push(i);
+                        }
+                        if (startPage > 1) {
+                            pages.unshift("...");
+                        }
+                        if (endPage < this.totalPages) {
+                            pages.push("...");
+                        }
+                        return pages;
+                    },
+                    ELLIPSIS() {
+                        return "...";
+                    },
     <script>
         var vueApp = {
             data() {
@@ -530,6 +588,7 @@
                 ELLIPSIS() {
                     return "...";
                 },
+        -------------------------------------------------------------------------
             },
             methods: {
                 initMap: function (id) {
@@ -640,7 +699,48 @@
                         const originList = response.originAddresses;
                         const destinationList = response.destinationAddresses;
                     });
+
+-------------------------------------------------------------------------
                 },
+                methods:{
+                    loadProducts:async function(){
+                        let _this = this;
+                        let request = {
+                            keyword : _this.keyword,
+                            page : _this.thePage,
+                            pageSize : _this.pageSize,
+                            grades : _this.selectedGrades,
+                            aCategory : _this.selectedaCategories,
+                            score : _this.selectedScore,
+                            sCategory: _this.selectedServiceInfos,
+                            regions: _this.selectedaRegions
+                        };
+                        console.log(request);
+                        const response =  await fetch(`https://localhost:7251/api/Accommodations`,{
+                            method:"Post",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(request)
+                        });
+                        const datas = await response.json();
+                        console.log(datas);
+                        _this.products = datas.items;
+                        _this.totalPages = datas.totalPages;
+                    },
+                    showModal:async function (id) {
+                        let _this = this;
+                        const exampleModal = document.getElementById('exampleModal')
+                        if (exampleModal) {
+                                const p = _this.products[id];
+                                _this.accommodationIndex = p;
+                                _this.accommodationImage = p.images[0] ? p.images[0].image : null;
+                                _this.accommodationServiceCId = p.services.map(function(s){
+                                    return s.serviceInfoCategoryId;
+                                });
+                                _this.$refs.childRef.commentDisplay(p.id);
+                        -------------------------------------------------------------------------
+
                 parseMinutes(timeString) {
                     const [hours, minutes] = timeString.split(' ')[0].split('h');
                     return parseInt(hours) * 60 + parseInt(minutes);
@@ -683,6 +783,7 @@
                         });
                         var parentInput = 5;
                         _this.$refs.childRef.commentDisplay(p.id, parentInput);
+                                -------------------------------------------------------------------------
 
                         _this.initMap(id);
                         const showMoreText = "...顯示更多";
@@ -711,7 +812,9 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
-                    }
+                                -------------------------------------------------------------------------
+
+                            }
                 },
                 showAllComment: function () {
                     let _this = this;
@@ -734,6 +837,8 @@
 
                 },
                 clickHandler: function (value) {
+                            -------------------------------------------------------------------------
+
                     let _this = this;
                     _this.thePage = value;
                     _this.loadProducts();
@@ -741,6 +846,81 @@
                 toggleSInfos(index) {
                     const sCategory = this.filterDto.serviceInfoes[index];
                     const sInfos = sCategory.infos;
+
+                        if (this.selectedsCategories.includes(sCategory.name)) {
+                            this.selectedServiceInfos = [...new Set([...this.selectedServiceInfos, ...sInfos])];
+                        } else {
+                            this.selectedServiceInfos = this.selectedServiceInfos.filter(item => !sInfos.includes(item));
+                        }
+                        this.showPages();
+                    },
+                    showPages:function(){
+                        let _this = this;
+                        _this.thePage = 1;
+                        _this.loadProducts();
+                    },
+                    addCart: async function (roomId) {
+                        let _this = this;
+                        let request = {
+                            roomProductId : _this.cartProductId
+                        };
+                        await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
+                            method: "Post",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(request)
+                        }).then((response)=>{
+                            response.text().then((data)=>{
+                                $('#Cart').html(data);
+                                alert("已成功加入購物車");
+                            })
+                        });
+
+                        //const data = await response.json();
+       
+                    },
+                    toggleDescription: function() {
+                        const showMoreText = "...顯示更多";
+                        const showLessText = "...顯示更少";
+                        const lines = this.temp;
+                        const s = $('#small');
+                        if (s[0]) {
+                            if(!this.showFullDescription){
+                                this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
+                            }else{
+                                this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
+                            }
+                                this.showFullDescription = !this.showFullDescription;
+                        }
+                    },
+                    createdp: async function(id){
+                        "use strict";
+                        let _this = this;
+			            const response = await fetch(`https://localhost:7251/api/RoomProducts/${id}`);
+			            const datas = await response.json();
+			            const rps = datas.items;
+			            const disabledDates = datas.disableDate;
+                        const dpInput = document.getElementById(`dp-${id}`);
+                        const pqInput = $(`#pq-${id}`);
+                        const ptInput = $(`#tp-${id}`);
+                        //let maxQuantity;
+			            var hdpkr = new HotelDatepicker(dpInput, {
+				            clearButton: true,
+				            topbarPosition: 'bottom',
+				            selectForward: true,
+				            disabledDates: disabledDates,
+				            enableCheckout: true,
+				            extraDayText: function (date, attributes) {
+					            for(var  i = 0; i < rps.length ; i++){
+						            if (date === fecha.format(new Date(rps[i].date), "YYYY-MM-DD") && attributes.class.includes("datepicker__month-day--visibleMonth")) {
+							            return `<br>$${rps[i].newPrice}`;
+						            }
+					            }
+				            },
+				            endDate: rps[rps.length-1].date
+			            });
+                            -------------------------------------------------------------------------
 
                     if (this.selectedsCategories.includes(sCategory.name)) {
                         this.selectedServiceInfos = [...new Set([...this.selectedServiceInfos, ...sInfos])];
@@ -811,11 +991,29 @@
                         endDate: rps[rps.length - 1].date
                     });
 
+                            -------------------------------------------------------------------------
+
                     dpInput.addEventListener('afterClose', function () {
                         const value = this.value;
                         const pattern = /^(\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})$/;
                         const match = pattern.exec(value);
                         let total;
+
+                            if (match) {
+                                const startDate = new Date( match[1]);
+                                const endDate = new Date( match[2]);
+        
+                                if (!isNaN(new Date(startDate)) && !isNaN(new Date(endDate))) {
+                                    total = rps.reduce((acc, item) => {
+                                        const itemDate = new Date(item.date);
+                                        if (itemDate >= startDate && itemDate < endDate) {
+                                            acc.sum += item.newPrice;
+                                            acc.quantity = Math.min(acc.quantity, item.quantity)
+                                            _this.cartProductId.push(item.id);
+                                        }
+                                        return acc;
+                                    }, { sum: 0, quantity: Infinity });
+                                            -------------------------------------------------------------------------
 
                         if (match) {
                             const startDate = new Date(match[1]);
