@@ -15,13 +15,13 @@
 
         public string? Cons { get; set; }
 
-        public DateTime CreateDate { get; set; }
+        public string CreateDate { get; set; }
 
         public string Status { get; set; }
 
         public string? ReplyMessage { get; set; }
 
-        public DateTime? ReplyDate { get; set; }
+        public string? ReplyDate { get; set; }
 
         public IEnumerable<string>? ImageList { get; set; }
 

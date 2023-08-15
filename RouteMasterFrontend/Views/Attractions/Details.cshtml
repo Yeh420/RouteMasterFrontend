@@ -173,8 +173,15 @@
 
                     @await Html.PartialAsync("_CloseAtt", Model.CloseAtt)
 
+
+    <div class="mb-5">
+        <div class="mb-3">
+            <h3>評論區<br></h3>
+            @await Html.PartialAsync("Comments_AttractionIndexPartial",Model)
+
                 </aside>
             }
+
             @if (Model.SameCategoryAtt != null && Model.SameCategoryAtt.Count() > 0)
             {
                 <aside class="border rounded mb-3">
@@ -191,6 +198,7 @@
 
                 </aside>
             }
+
         </div>
     </div>
     </div>
