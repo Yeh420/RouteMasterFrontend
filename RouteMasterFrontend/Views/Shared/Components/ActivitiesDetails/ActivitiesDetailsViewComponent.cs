@@ -22,7 +22,16 @@ namespace RouteMasterFrontend.Views.Carts.Components.ActivitiesDetails
                 .Include(c=>c.ActivityProduct)
                 .Include (c=>c.ActivityProduct.Activity)
                 .ToList();
-            return View("ActivitiesDetailsPartialView",cart);
+           
+             //return View("ActivitiesDetailsPartialView", cart);
+            if (cart.Any())
+            {
+                return View("ActivitiesDetailsPartialView", cart);
+            }
+            else
+            {
+                return Content(""); 
+            }
         }
     }
 }

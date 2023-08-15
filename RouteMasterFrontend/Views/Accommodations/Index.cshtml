@@ -472,7 +472,7 @@
                         accommodationIndex:{},
                         accommodationImage:"",
                         accommodationDescription:"",
-                        cartProductId:1,
+                        cartProductId:[],
                         accommodationServiceCId:[],
                     cartItems: [],
                     }
@@ -541,7 +541,6 @@
                         if (exampleModal) {
                                 const p = _this.products[id];
                                 _this.accommodationIndex = p;
-                                _this.cartProductId = p.id;
                                 _this.accommodationImage = p.images[0] ? p.images[0].image : null;
                                 _this.accommodationServiceCId = p.services.map(function(s){
                                     return s.serviceInfoCategoryId;
@@ -597,20 +596,26 @@
                         _this.thePage = 1;
                         _this.loadProducts();
                     },
-                    addCart: function (roomId) {
-                            let _this = this;
+                    addCart: async function (roomId) {
+                        let _this = this;
+                        let request = {
+                            roomProductId : _this.cartProductId
+                        };
+                        await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
+                            method: "Post",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(request)
+                        }).then((response)=>{
+                            response.text().then((data)=>{
+                                $('#Cart').html(data);
+                                alert("已成功加入購物車");
+                            })
+                        });
 
-                            axios({
-                                method: 'post',
-                                url: `https://localhost:7145/Carts/AddAccommodation2Cart?roomProductId=${roomId}`,
-                            }).then(response => {
-                                console.log(response.data);
-                                $('#Cart').html(response.data);
-                               alert("已成功加入購物車");
-                            }).catch(err => {
-                                console.error(err);
-                                alert("An error occurred.");
-                            });
+                        //const data = await response.json();
+       
                     },
                     toggleDescription: function() {
                         const showMoreText = "...顯示更多";
@@ -628,6 +633,7 @@
                     },
                     createdp: async function(id){
                         "use strict";
+                        let _this = this;
 			            const response = await fetch(`https://localhost:7251/api/RoomProducts/${id}`);
 			            const datas = await response.json();
 			            const rps = datas.items;
@@ -636,7 +642,6 @@
                         const pqInput = $(`#pq-${id}`);
                         const ptInput = $(`#tp-${id}`);
                         //let maxQuantity;
-
 			            var hdpkr = new HotelDatepicker(dpInput, {
 				            clearButton: true,
 				            topbarPosition: 'bottom',
@@ -666,9 +671,10 @@
                                 if (!isNaN(new Date(startDate)) && !isNaN(new Date(endDate))) {
                                     total = rps.reduce((acc, item) => {
                                         const itemDate = new Date(item.date);
-                                        if (itemDate >= startDate && itemDate <= endDate) {
+                                        if (itemDate >= startDate && itemDate < endDate) {
                                             acc.sum += item.newPrice;
                                             acc.quantity = Math.min(acc.quantity, item.quantity)
+                                            _this.cartProductId.push(item.id);
                                         }
                                         return acc;
                                     }, { sum: 0, quantity: Infinity });
