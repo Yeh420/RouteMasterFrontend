@@ -19,5 +19,7 @@
         public int Clicks { get; set; }
         public string Website { get; set; }
         public IEnumerable<AttractionIndexVM>? RelatedAttractions { get; set; }
+
+        public List<AttractionForDistsnceVM>? CloseAtt { get; set; }
     }
 }

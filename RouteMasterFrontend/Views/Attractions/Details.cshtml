@@ -77,90 +77,102 @@
                     </div>
                 </div>
 
-                <div class="mb-1">
-                    <h1><strong>@($"{Model.Name} ")</strong><span class="badge bg-info">@Model.AttractionCategory</span></h1>
-                </div>
+                <div class="m-3">
+                    <div class="mb-1">
+                        <h1><strong>@($"{Model.Name} ")</strong><span class="badge bg-info">@Model.AttractionCategory</span></h1>
+                    </div>
 
-                <div class="mb-5">
-                    <h3>@($"{Model.Region} {Model.Town}")</h3>
-                </div>
+                    <div class="mb-5">
+                        <h3>@($"{Model.Region} {Model.Town}")</h3>
+                    </div>
 
-                <div class="mb-5">
-                    <h5>
-                        @($"{Model.Score}")
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            @if (i <= Math.Round(Model.Score))
+                    <div class="mb-5">
+                        <h5>
+                            @($"{Model.Score}")
+                            @for (int i = 1; i <= 5; i++)
                             {
-                                <i class="fa-solid fa-star"></i>
+                                @if (i <= Math.Round(Model.Score))
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-regular fa-star"></i>
+                                }
                             }
-                            else
+                            @($"({Model.ScoreCount}) | 平均停留{Model.Hours}小時({Model.HoursCount}) | 平均花費{Model.Price}元({Model.PriceCount}) | 點擊次數 : {Model.Clicks}次")
+                        </h5>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5>
+                            @foreach (var tag in Model.Tags)
                             {
-                                <i class="fa-regular fa-star"></i>
+                                <span class="badge bg-primary text-white">@tag</span>
                             }
-                        }
-                        @($"({Model.ScoreCount}) | 平均停留{Model.Hours}小時({Model.HoursCount}) | 平均花費{Model.Price}元({Model.PriceCount}) | 點擊次數 : {Model.Clicks}次")
-                    </h5>
-                </div>
+                        </h5>
+                    </div>
 
-                <div class="mb-5">
-                    <h5>
-                        @foreach (var tag in Model.Tags)
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>景點介紹<br></h3>
+                        </div>
+                        @Html.Raw(Model.Description)
+                    </div>
+
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>地圖<br></h3>
+                        </div>
+
+                        @Html.Raw(Model.Website)
+                    </div>
+
+                    <div class="mb-3">
+                        @if (ViewBag.IsFavorite)
                         {
-                            <span class="badge bg-primary text-white">@tag</span>
+                            <button class="btn btn-primary" id="removeFromFavoriteButton">從我的最愛中刪除</button>
                         }
-                    </h5>
-                </div>
+                        else
+                        {
+                            <button class="btn btn-primary" id="addToFavoriteButton">加入我的最愛</button>
+                        }
 
-                <div class="mb-5">
-                    <div class="mb-3">
-                        <h3>景點介紹<br></h3>
-                    </div>
-                    @Html.Raw(Model.Description)
-                </div>
-
-                <div class="mb-5">
-                    <div class="mb-3">
-                        <h3>地圖<br></h3>
+                        <button class="btn btn-secondary" onclick="history.back()">上一頁</button>
                     </div>
 
-                    @Html.Raw(Model.Website)
-                </div>
-
-                <div class="mb-3">
-                    @if (ViewBag.IsFavorite)
-                    {
-                        <button class="btn btn-primary" id="removeFromFavoriteButton">從我的最愛中刪除</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-primary" id="addToFavoriteButton">加入我的最愛</button>
-                    }
-
-                    <button class="btn btn-secondary" onclick="history.back()">上一頁</button>
-                </div>
-
-                <div class="mb-5">
-                    <div class="mb-3">
-                        <h3>評論區<br></h3>
-                        @await Html.PartialAsync("Comments_AttractionIndexPartial",Model)
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>評論區<br></h3>
+                            @await Html.PartialAsync("Comments_AttractionIndexPartial",Model)
+                        </div>
                     </div>
+
                 </div>
+
+                
 
                 
             </div>
         </div>
 
-        <div class="col-3 border rounded ">
+        <div class="col-3 ">
             @if (Model.RelatedAttractions != null && Model.RelatedAttractions.Count() > 0)
             {
-                <aside >
+                <aside class="border rounded mb-3">
 
                     @await Html.PartialAsync("_RelatedAtt", Model.RelatedAttractions)
 
                 </aside>
             }
-            
+            @if (Model.CloseAtt != null && Model.CloseAtt.Count() > 0)
+            {
+                <aside class="border rounded mb-3">
+
+                    @await Html.PartialAsync("_CloseAtt", Model.CloseAtt)
+
+                </aside>
+            }
         </div>
     </div>
     </div>
