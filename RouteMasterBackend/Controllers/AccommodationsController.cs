@@ -82,7 +82,10 @@ namespace RouteMasterBackend.Controllers
 
             if(data.SCategory != null && data.SCategory.Length > 0)
             {
-                accommodations = accommodations.Where(a => a.AccommodationServiceInfos.All(s => data.SCategory.Contains(s.Name)));
+                foreach(var sCategory in data.SCategory)
+                {
+                    accommodations = accommodations.Where(a => a.AccommodationServiceInfos.Any(s => s.Name == sCategory));
+                }
             }
 
             if (data.Regions != null && data.Regions.Length > 0)
