@@ -16,17 +16,11 @@
             display: flex;
             flex-direction: column;
             gap: 10px; 
-            padding: 10px;           
-          
+            padding: 10px;                     
             border-radius: 10px;
             justify-content:center;
-            align-items:center;
-        
-
-        }
-
-     
-
+            align-items:center;       
+        }    
         .draggable {
             width: 100px;
             height: 50px;
@@ -37,12 +31,10 @@
             line-height: 50px;
             cursor: pointer;
         }
-
         .custom-arrow {
            
             transform: scaleY(3); 
         }
-
         .attractionDropContainer{
             width:50%;
             border: 1px solid #000;
@@ -50,7 +42,6 @@
             padding: 5px;
             border-radius: 5px;
         }
-
         #selectedAttractions{
             display: flex;
             flex-direction: column;
@@ -59,14 +50,11 @@
             max-height: 500px; 
             overflow: auto; 
         }
-
         .hide{
             display:none
-        }
-    
+        }    
     </style>
 }
-
 <hr />
 <div id="AttractionListContainer">
     @await Component.InvokeAsync("SelectAttraction")
@@ -76,8 +64,7 @@
 
 
 
-<div class="row" style="min-height: 500px; height: auto;">
-    
+<div class="row" style="min-height: 500px; height: auto;">    
     <div class="col-9 border border-secondary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
         <input type="datetime-local"  id="travelBeginDateTime" />
         <button id="createAttractionTimeSpanContainer" class="btn btn-primary" disabled>新增區塊</button>
@@ -112,8 +99,7 @@
     <div id="selectedAttractionsPreContainer"  class="col-3" style="position:relative;">
         <div id="selectedAttractions" class="border border-secondary " style="height:500px; position:relative;"></div>
         <button id="getInformations" class="btn btn-primary" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
-    </div>    
- 
+    </div>     
 
 </div>
 
@@ -424,6 +410,7 @@
                         selectAccommodationBtn.classList.add('btn', 'btn-primary');
                         selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
                         selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
+                        selectAccommodationBtn.addEventListener('click',selectAccommodationByGoogleMapsApi)
                         targetTable.classList.remove('hide');
 
 
@@ -988,6 +975,10 @@
             let extCheckboxValues= Array.from(extProBoxes).map(extProBox=>parseInt(extProBox.value));
 
 
+            //住宿商品加入購物車
+
+
+
 
             if (actCheckboxValues.length == 0 && extCheckboxValues.length==0){
                 alert('請至少選擇一項商品才可以加入購物車')
@@ -995,7 +986,7 @@
                 let cartIdFromCookie = @cartIdFromCookie;
 
 
-                //todo AccommodationProduct
+                //住宿商品放入postData
                 const postData = {
                     cartId: cartIdFromCookie,
                     activityProductIds: actCheckboxValues,
@@ -1017,6 +1008,21 @@
            
         }
 
+
+
+        //選住宿寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡
+        function selectAccommodationByGoogleMapsApi(){
+
+
+
+
+            console.log('還沒寫')
+
+
+
+
+
+        }
 
 
         document.querySelector('#callApiToAddToCart').addEventListener('click',function(){
