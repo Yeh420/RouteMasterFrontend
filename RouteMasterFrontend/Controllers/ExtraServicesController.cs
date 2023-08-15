@@ -22,29 +22,17 @@ namespace RouteMasterFrontend.Controllers
 
         // GET: ExtraServices
         public async Task<IActionResult> Index()
-        {
-            var routeMasterContext = _context.ExtraServices.Include(e => e.Attraction).Include(e => e.Region);
-            return View(await routeMasterContext.ToListAsync());
+        {           
+            return  View();
         }
 
         // GET: ExtraServices/Details/5
         public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.ExtraServices == null)
-            {
-                return NotFound();
-            }
+        {         
+         
+          
 
-            var extraService = await _context.ExtraServices
-                .Include(e => e.Attraction)
-                .Include(e => e.Region)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (extraService == null)
-            {
-                return NotFound();
-            }
-
-            return View(extraService);
+            return View();
         }
 
         // GET: ExtraServices/Create
