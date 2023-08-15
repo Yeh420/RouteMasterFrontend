@@ -171,8 +171,15 @@
 
                     @await Html.PartialAsync("_CloseAtt", Model.CloseAtt)
 
+
+    <div class="mb-5">
+        <div class="mb-3">
+            <h3>評論區<br></h3>
+            @await Html.PartialAsync("Comments_AttractionIndexPartial",Model)
+
                 </aside>
             }
+
         </div>
     </div>
     </div>
