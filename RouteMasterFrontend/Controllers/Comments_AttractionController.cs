@@ -61,14 +61,20 @@ namespace RouteMasterFrontend.Controllers
                 Content= c.Content,
                 StayHours= (int)c.StayHours,
                 Price= (int)c.Price,
-                CreateDate= c.CreateDate,
-                IsHidden= c.IsHidden,
+                CreateDate= (c.CreateDate).ToString("yyyy/MM/dd"),
+                IsHidden = c.IsHidden,
                 ImageList=proImg.Where(p=>p.Comments_AttractionId==c.Id)
                 .Select(p=>p.Image).ToList(),
 
             }).ToListAsync();
 
             return Json(records);
+        }
+
+        public IActionResult Create()
+        {
+
+            return View();
         }
     }
 }

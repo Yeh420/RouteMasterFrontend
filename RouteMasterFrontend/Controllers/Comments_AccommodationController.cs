@@ -24,34 +24,31 @@ namespace RouteMasterFrontend.Controllers
         }
 
         // GET: Comments_Accommodation
-        public async Task<ActionResult<IEnumerable<Comments_AccommodationIndexVM>>> Index([FromBody] Comments_AccommodationAjaxDTO input)
+        [HttpPost]
+        public async Task<JsonResult> Index([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            var commentDb = _context.Comments_Accommodations
+            var proLike = _context.Comment_Accommodation_Likes;
+
+            var commentDb = await _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
-                  .Include(c=>c.CommentStatus)
-                  .Where(c => c.AccommodationId == input.HotelId);
+                  .Where(c => c.AccommodationId == input.HotelId)
+                  .AsNoTracking()
+                  .OrderByDescending(c=>c.CreateDate)
+                  .Select(c => new Comments_AccommodationBriefDTO
+                  {
+                      Id = c.Id,
+                      Account = c.Member.Account,
+                      Score = c.Score,
+                      Title = c.Title,
+                      Pros = c.Pros,
+                      Cons = c.Cons,
+                      CreateDate = (c.CreateDate).ToString("yyyy/MM/dd"),
+                      TotalThumbs = proLike.Where(l => l.Comments_AccommodationId == c.Id).Count(),
+                  }).Take(3).ToListAsync();
+      
 
-            var proImg = _context.Comments_AccommodationImages;
-
-            switch (input.Manner)
-			{
-				case 0:
-					commentDb = commentDb.OrderBy(c => c.Id);
-					break;
-				case 1:
-					commentDb = commentDb.OrderByDescending(c => c.CreateDate);
-					break;
-				case 2:
-					commentDb = commentDb.OrderByDescending(c => c.Score);
-					break;
-				case 3:
-					commentDb = commentDb.OrderBy(c => c.Score);
-					break;
-			}
-            var vm = await commentDb.AsNoTracking().Select(c => c.ToIndexVM()).ToListAsync();
-
-            return Json(vm);
+            return Json(commentDb);
 		}
 
         public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
@@ -93,10 +90,10 @@ namespace RouteMasterFrontend.Controllers
                 Title = c.Title,
                 Pros = c.Pros,
                 Cons = c.Cons,
-                CreateDate = c.CreateDate,
+                CreateDate = (c.CreateDate).ToString("yyyy/MM/dd"),
                 Status = c.CommentStatus.Name,
                 ReplyMessage = c.Reply,
-                ReplyDate = c.ReplyAt,
+                ReplyDate = c.ReplyAt.HasValue ? c.ReplyAt.Value.ToString("yyyy/MM/dd") : null,
                 ImageList = proImg.Where(p => p.Comments_AccommodationId == c.Id)
                 .Select(p => p.Image).ToList(),
                 ThumbsUp = proLike.Any(l => l.Comments_AccommodationId == c.Id && l.MemberId == 1),
