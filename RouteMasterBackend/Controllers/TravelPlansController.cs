@@ -208,6 +208,7 @@ namespace RouteMasterBackend.Controllers
                     Quantity = x.Quantity,  
                 });
 
+
             if (filterExtraServiceProducts.Count() > 0)
             {
                 extraServiceProductShowOnTravel.AddRange(filterExtraServiceProducts);
@@ -222,6 +223,8 @@ namespace RouteMasterBackend.Controllers
             {
                 Id = attractionInDb.Id,
                 AttractionName = attractionInDb.Name,
+                PositionX = attractionInDb.PositionX,
+                PositionY = attractionInDb.PositionY,
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(stayHours),
                 StayHours =(int?)stayHours,
@@ -234,6 +237,56 @@ namespace RouteMasterBackend.Controllers
             return data;
          
         }
+
+
+        [HttpGet]
+        [Route("Get/ActProductInfo")]
+        public async Task<ActionResult<ActivityProductTrDto>> GetActProductInfo(int actProductId)
+        {
+            var actProductInDb= _context.ActivityProducts
+                .Include(x=>x.Activity).Include(x=>x.Activity.Attraction)
+                .Where(x => x.Id == actProductId).First();
+            var data = new ActivityProductTrDto
+            {
+                Id=actProductId,
+                ActivityName= actProductInDb.Activity.Name,
+                AttractionName= actProductInDb.Activity.Attraction.Name,
+                StartTime= actProductInDb.StartTime,
+                EndTime= actProductInDb.EndTime,
+            };
+            return data;
+        }
+
+
+
+        [HttpGet]
+        [Route("Get/ExtProductInfo")]
+        public async Task<ActionResult<ExtraServiceProductTrDto>> GetExtProductInfo(int extProductId)
+        {
+            var extProductInDb = _context.ExtraServiceProducts
+                .Include(x => x.ExtraService).Include(x => x.ExtraService.Attraction)
+                .Where(x => x.Id == extProductId).First();
+            var data = new ExtraServiceProductTrDto
+            {
+                Id = extProductId,
+                ExtraServiceName = extProductInDb.ExtraService.Name,
+                AttractionName = extProductInDb.ExtraService.Attraction.Name,          
+            };
+            return data;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // PUT: api/TravelPlans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -8,7 +8,10 @@
     <div class="container">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true" @@click="showMe(cate[0])">{{cate[0]}}</button>
+                <button class="nav-link active" id="pills-hot-tab" data-bs-toggle="pill" data-bs-target="#pills-hot" type="button" role="tab" aria-controls="pills-hot" aria-selected="true" @@click="filterTopFive">Top5</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true" @@click="showMe(cate[0])">{{cate[0]}}</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" @@click="showMe(cate[1])">{{cate[1]}}</button>
@@ -16,7 +19,7 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" @@click="showMe(cate[2])">{{cate[2]}}</button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li class="nav-item me-3" role="presentation">
                 <button class="nav-link" id="pills-about-tab" data-bs-toggle="pill" data-bs-target="#pills-about" type="button" role="tab" aria-controls="pills-about" aria-selected="false" @@click="showMe(cate[3])">{{cate[3]}}</button>
             </li>
             <li class="nav-item" role="presentation">
@@ -25,17 +28,28 @@
 
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <div class="tab-pane fade show active" id="pills-hot" role="tabpanel" aria-labelledby="pills-hot-tab">
                 <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
-                        <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <h5 class="card-title">{{item.question}}</h5>                     
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
-
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
+                    <h5 class="card-header">{{item.categoryName}}</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">{{item.question}}</h5>                      
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>                       
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
+                    </div>                   
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
@@ -43,10 +57,10 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
@@ -55,10 +69,10 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
@@ -67,16 +81,33 @@
                     <h5 class="card-header">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.answer}}</p>
-                        <p class="card-text">{{item.image}}</p>
-                        <p class="card-text">{{item.helpful}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                            快告訴我
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-
+        <!-- Modal -->
+        <div class="modal fade" id="modaltarget" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modaltargetLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modaltargetLabel">{{question}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @@click="updatethumbs(qnumber,thumbsUp)"></button>
+                    </div>
+                    <div class="modal-body">
+                       <p>{{answer}}</p>
+                        <img v-if="img" :src=`../MemberUploads/${img}` class="img-fluid">
+                    </div>
+                    <div class="modal-footer justify-content-start">
+                        <span>是否有幫助</span>
+                        <button type="button" class="btn" v-html="thumbicon" @@click="switchicon(qnumber)"></button>
+                    </div>
+                </div>
+            </div>
+        </div>       
     </div>
 </div>
 
@@ -87,6 +118,7 @@
 
 @section Scripts{
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
 
     <script>
         var vueApp = {
@@ -95,7 +127,14 @@
                     qList: [],
                     cate: ["行程", "住宿", "訂單", "帳號"],
                     cateInput: null,
-                    filter: ""
+                    filter: "",
+                    question:"",
+                    answer:"",
+                    qnumber:0,
+                    img:"",
+                    thumbsUp:false,
+                    origScore:0,
+                    thumbicon:""
                 }
             },
             mounted: function () {
@@ -106,7 +145,7 @@
                 getQuestion: async function () {
                     let _this = this;
                     var data = {};
-                    data.Name = _this.cateInput == null ? "行程" : _this.cateInput;
+                    data.Name = _this.cateInput;
                     data.Keyword = _this.filter;
 
                     const response = await fetch("https://localhost:7145/FAQ/Search", {
@@ -130,10 +169,73 @@
                     }
 
                 },
+                filterTopFive:function(){
+                    let _this = this;
+                    _this.cateInput=null;
+                    _this.getQuestion();
+                },
                 showMe: function (msg) {
                     let _this = this;
                     _this.cateInput = msg;
                     _this.getQuestion();
+                },
+                showModal:function(id){
+
+                    let _this=this;
+                    _this.thumbsUp=false;
+                    _this.thumbicon = '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
+                    //_this.thumbicon = _this.thumbsUp ? '<i class="fa-solid fa-thumbs-up fa-lg"></i>' : '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
+                    for(let i=0;i<_this.qList.length;i++){
+                        var qa = _this.qList[i];
+                        if(qa.id==id){
+                            _this.question = qa.question;                          
+                            _this.answer = qa.answer;
+                            _this.qnumber = qa.id;
+                            _this.img = qa.image;
+                            var num = _this.origScore+1;                         
+                            if (_this.origScore != 0 && num== qa.helpful) {
+                                _this.thumbicon = '<i class="fa-solid fa-thumbs-up fa-lg"></i>';
+                            }
+                            
+                          
+
+                        }
+                    }
+                },
+                switchicon:function(id){
+                    let _this = this;
+                    for (let i = 0; i < _this.qList.length; i++) {
+                        var qa = _this.qList[i];
+                        if (qa.id == id) {
+                            _this.origScore = qa.helpful;
+                            
+                        }
+                    }
+                    _this.thumbsUp = true;
+                    _this.thumbicon = '<i class="fa-solid fa-thumbs-up fa-lg"></i>';
+                    
+                    console.log(id);
+                },
+                updatethumbs: async function(id, plus){
+                    let _this = this;   
+                    if(plus){
+                        var uri = `https://localhost:7145/FAQ/UpdateHelpful?faqId=${id}`;
+                        const response = await fetch(uri, {
+                            method: "POST",
+
+                        });
+                        if (response.ok) {
+                            var result = await response.text();
+                            console.log(result);
+                            _this.cateInput = result;
+                            _this.getQuestion();
+                        }
+                        else {
+                            console.error('Error:', response.status);
+                        }
+
+                    }
+                   
                 }
 
 
