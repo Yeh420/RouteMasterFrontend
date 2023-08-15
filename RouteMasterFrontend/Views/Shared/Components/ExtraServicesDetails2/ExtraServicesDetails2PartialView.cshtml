@@ -90,20 +90,28 @@
                                             <img src="~/ExtraServiceImages/@firstItem.ExtraServiceProduct.ExtraService.Image" alt="圖片" style="max-width: 150%; height: auto;">
                                         </div>
                                     </div>
-                                    <div class="extraservice-right col-md-8">
+                                    <div class="extraservice-right col-md-4">
                                         <div class="extraservice-name" style="margin-left: 40px; font-weight: bold; font-size: 18px;">
                                             @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Name)
                                         </div>
-                                            <div class="extraservice-describtion" style="margin-left:40px;font-size:16px;margin-bottom: 5px;">
-                                            @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Description)
+                                    </div>
+                                    <div class="extraservice-right col-md-2">
+                                        <div class="extraservice-describtion" style="margin-left:40px;font-size:16px;margin-bottom: 5px;">
+                                        @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Description)
                                         </div>
-                                            <div class="extraservice-date" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                    </div>
+                                    <div class="extraservice-right col-md-1">
+                                        <div class="extraservice-date" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
                                             @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)
                                         </div>
+                                    </div>
+                                     <div class="extraservice-right col-md-2">
                                             <div class="extraservice-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
                                             數量:@group.Sum(item => item.Quantity)
-                                        </div>
-                                            <div class="extraservice-price" style="margin-left:40px;font-size:18px; color:lightseagreen; font-weight:bold;">
+                                             </div>
+                                    </div>
+
+                                        <div class="extraservice-price" style="margin-left:40px;font-size:18px; color:lightseagreen; font-weight:bold;">
                                             TWD:@Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Price)
                                         </div>
                                     </div>
@@ -115,7 +123,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            
                         }
                     </div>
                     

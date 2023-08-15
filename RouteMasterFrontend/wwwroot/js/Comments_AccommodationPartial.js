@@ -1,6 +1,7 @@
 ﻿const dec = {
     data() {
         return {
+            displayedComments:[],
             indexVM: [],
             item: {},
             isReplyed: "已回復",
@@ -8,6 +9,7 @@
             selected: 0,         
             thumbicon: [],
             hotelId: 0,
+            showAll:true,
 
 
         }
@@ -20,24 +22,25 @@
     //    _this.commentDisplay();
     //},
     methods: {
-        commentDisplay: function (id,showAll) {
+        commentDisplay: function (id,onlyThree) {
             let _this = this;
+            _this.showAll = onlyThree == null ? true : false;
             var request = {};
             if (id) {
                 _this.hotelId = id;
             }
             request.Manner = _this.selected;
             request.HotelId = _this.hotelId;
-            request.Getall = showAll == null ? true : false;
 
             axios.post("https://localhost:7145/Comments_Accommodation/ImgSearch", request).then(response => {
-                _this.indexVM = response.data;
+                _this.displayedComments = response.data;
+                _this.updateComments();
                 console.log(_this.indexVM);
                 _this.thumbicon = _this.indexVM.map(function (vm) {
-                    //console.log(vm.thumbsUp);
+                    
                     return vm.thumbsUp ? '<i class="fa-solid fa-thumbs-up fa-lg"></i>' : '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
                 })
-                //console.log(_this.thumbicon);
+                
 
                 for (let j = 0; j < _this.indexVM.length; j++) {
                     _this.item = _this.indexVM[j];
@@ -46,6 +49,15 @@
             }).catch(err => {
                 alert(err);
             });
+        },
+        updateComments: function () {
+            let _this = this;
+            if (_this.showAll) {
+                _this.indexVM = _this.displayedComments;
+            }
+            else {
+                _this.indexVM = _this.displayedComments.slice(0, 3);
+            }
         },
         likeComment: async function (commentId) {
             let _this = this;
@@ -65,7 +77,6 @@
         getImgPath: function (photo) {
             return `../MemberUploads/${photo}`;
         }
-
     },
     template: `
         <div class="container">
