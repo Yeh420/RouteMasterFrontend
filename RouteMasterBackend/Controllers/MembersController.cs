@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
+using RouteMasterFrontend.Models.ViewModels.Members;
 
 namespace RouteMasterBackend.Controllers
 {
@@ -51,7 +55,10 @@ namespace RouteMasterBackend.Controllers
                 PaymentStatusId = h.PaymentStatusId,
             }).Single();
 
+
+            
             return historyorderDTO;
+            
         }
 
         // PUT: api/Members/5
@@ -120,7 +127,6 @@ namespace RouteMasterBackend.Controllers
             return null;
         }
 
-        
 
         private bool MemberExists(int id)
         {
