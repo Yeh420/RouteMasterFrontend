@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
 using ECPay.Payment.Integration;
 using Microsoft.AspNetCore.Session;
+using RouteMasterFrontend.Models.Dto;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -203,25 +204,28 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddAccommodation2Cart( int roomProductId)
+        public IActionResult AddAccommodation2Cart([FromBody] RoomProductsDto dto)
         {
             try
             {
-                var RoomProduct = _context.RoomProducts.FirstOrDefault(r=>r.Id == roomProductId);
+                var RoomProduct = _context.RoomProducts.Where(r=> dto.roomProductId.Contains(r.Id));
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
                     //var cartIdFromCookie = 3;
-                    var cartItem = new Cart_AccommodationDetail
+                    foreach(var rp in RoomProduct)
                     {
-                        Id = 0,
-                        CartId = cartIdFromCookie,
-                        RoomProductId = RoomProduct.Id,
-                        Quantity = 1
-                    };
-                    _context.Cart_AccommodationDetails.Add(cartItem);
-                    _context.SaveChanges();
-                    Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
+                        var cartItem = new Cart_AccommodationDetail
+                        {
+                            CartId = cartIdFromCookie,
+                            RoomProductId = rp.Id,
+                            Quantity = 1
+                        };
+                        _context.Cart_AccommodationDetails.Add(cartItem);
+                    }
+                        _context.SaveChanges();
+                        Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
+
                     return ViewComponent("CartPartial");
                 }
                 else
@@ -274,7 +278,7 @@ namespace RouteMasterFrontend.Controllers
                     _context.SaveChanges();
 
                     Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
-                    return ViewComponent("CartPartial");
+                    return Json(new { success = true, message = "Successfully added to cart." });
                 }
                 else
                 {

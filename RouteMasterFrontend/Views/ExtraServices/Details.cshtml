@@ -1,54 +1,98 @@
-﻿@model RouteMasterFrontend.EFModels.ExtraService
+﻿
 
-@{
-    ViewData["Title"] = "Details";
+@section Styles{
+
 }
+<div id="app">
+    <input type="search" v-model="keyword" />
 
-<h1>Details</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>項目名稱</th>
+                <th>圖片預覽</th>
+                <th>所在區域</th>
+                <th>附屬景點</th>
+                <th>項目說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td v-model>{{extraServiceId}} </td>
+                @*<td><img v-bind:src="image" style="height:200px;" /></td>*@
+                @*<td v-model>{{regionName}} </td>*@
+                @*<td v-model>{{attractionName}} </td>*@
+                <td v-model> {{description}} </td>
+                <td v-model>{{name}} </td>
+                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="showPurchasingModal(extraServiceId)">選擇方案</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-<div>
-    <h4>ExtraService</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Attraction)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Attraction.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Region)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Region.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+    <script>
+        let baseAddress = "https://localhost:7251";
+        let vueApp = {
+            data() {
+                return {
+                    extraServiceId:7,
+                    name:"666",
+                    description:"777",
+
+
+
+
+
+                };
+            },
+            mounted: function () {
+                let _this = this;
+
+                _this.filterExtraServiceDtoes();
+            },
+            methods: {
+                filterExtraServiceDtoes: function () {
+                    let _this = this;
+                    let request = {};
+
+                    request.Keyword = _this.keyword;
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/filter`, request).then(response => {
+                        _this.extraServiceDtoes = response.data;
+
+                        for (let i = 0; i < _this.extraServiceDtoes.length; i++) {
+                            let item = _this.extraServiceDtoes[i];
+                        }
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+                showPurchasingModal: function(id){
+                    console.log('買買買買買買');
+                    console.log(id)
+
+                }
+
+
+            }
+        };
+        let app = Vue.createApp(vueApp).mount('#app');
+
+
+
+    </script>
+}

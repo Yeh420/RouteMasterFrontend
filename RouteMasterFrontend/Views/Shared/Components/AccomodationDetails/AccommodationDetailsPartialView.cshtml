@@ -19,108 +19,148 @@
         border-top: none; /* Remove border above each row */
     }
 
+    .accommodation-container-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* 將元素靠左對齊 */
+        gap: 20px; /* 設定元素之間的間距 */
+    }
     /* Optional: Add padding to the cells for better spacing */
     #cartTable3 tbody td {
         padding: 8px;
     }
 
-    /* Add this style to remove border between thead and tbody */
+    .room-item {
+        width: 350px;
+       
+    }
+    
     #cartTable3 thead th {
         border-bottom: none;
     }
+
+    .room-image img:hover {
+        transform: scale(1.2);
+        transition: transform 0.3s ease-in-out;
+    }
 </style>
-<head>
+ <head>
     <meta name="viewport" content="width=device-width" />
     @* <title>My Razor View</title>*@
     <script src="https://kit.fontawesome.com/c3bf7d3bbb.js" crossorigin="anonymous"></script>
-</head>
-    
-<div class="partial-view-container">
-    <table class="table" id="cartTable3">
-    <thead>
-        <tr>
-            <th>
-           @*     @Html.DisplayNameFor(model => model.RoomProduct.Room.Accommodation.Name)
-                @Html.DisplayNameFor(model => model.RoomProduct.Room.Name)*@
-            </th>
-            <th>
-              @*  @Html.DisplayNameFor(model => model.RoomProduct.Date)*@
-            </th>
-            <th>
-              @*  @Html.DisplayNameFor(model => model.Quantity)*@
-            </th>
-            <th>
-              @*  @Html.DisplayNameFor(model => model.RoomProduct)*@
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-                <tr data-roomProductId="@item.RoomProductId">
-            <td>
+ </head>
 
-                @Html.DisplayFor(modelItem => item.RoomProduct.Room.Accommodation.Name)
-                @Html.DisplayFor(modelItem => item.RoomProduct.Room.Name)
-               
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomProduct.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomProduct.NewPrice)
-            </td>
-            <td>
-
-
-                        <a href="#" onclick="removeFromAcc( @item.Id)">
-                            <i class="fas fa-trash-can"></i>
-                        </a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-</div>
-<script>
-    function removeFromAcc(roomProductId) {
-        $.ajax({
-            url: '/Carts/RemoveAccommodationFromCart',
-            type: 'POST',
-            data: { roomProductId: roomProductId },
-            success: function (result) {
-                if (result.success) {
-                    alert(result.message);
-                    $('#cartTable3').find('tr[data-roomProductId="' + result.roomProductId + '"]').remove();
-                    reloadCartItems();
-                } else {
-                    alert(result.message);
+<div style="display: flex; justify-content:center;">
+    <div class="partial-view-container" style="width:100%;">
+        <table class="table" id="cartTable3" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>
+                        @* @Html.DisplayNameFor(model => model.RoomProduct.Room.Accommodation.Name)
+                        @Html.DisplayNameFor(model => model.RoomProduct.Room.Name)*@
+                    </th>
+                    <th>
+                        @* @Html.DisplayNameFor(model => model.RoomProduct.Date)*@
+                    </th>
+                    <th>
+                        @* @Html.DisplayNameFor(model => model.Quantity)*@
+                    </th>
+                    <th>
+                        @* @Html.DisplayNameFor(model => model.RoomProduct)*@
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var groupitem = Model.GroupBy(item => item.RoomProduct.Id);
                 }
-            },
-            error: function () {
-                console.log('66666');
-                alert('An error occurred, unable to delete item.');
+                <tr>
+                   <td colspan="6">
+                       <div class="accommodation-container-vertical">
+                            @foreach (var group in groupitem)
+                            {
+                                var firstItem = group.First();
+                                    <div class="room" data-roomProductId="@firstItem.RoomProductId">
+                                        <div class="room-info row">
+                                            <div class="room-left col-md-3">
+                                                <div class="room-image">
+                                                     <img src="~/accommodationimages/卡位.png" alt="圖片" style="max-width: 150%; height: auto;" />
+                                                </div>
+                                            </div>
+                                            <div class="room-right col-md-8">
+                                                <div class="room-name" style="margin-left:40px; font-weight:bold; font-size:18px;">
+                                                    @Html.DisplayFor(modelItem => firstItem.RoomProduct.Room.Accommodation.Name)
+                                                    @Html.DisplayFor(modelItem => firstItem.RoomProduct.Room.Name)
+                                                </div><br>
+                                                <div class="extraservice-roomtype" style="margin-left:40px;font-size:16px;margin-bottom: 5px;">
+                                                    @Html.DisplayFor(modelItem => firstItem.RoomProduct.Room.RoomType.Name)
+                                                </div>
+                                                <div class="extraservice-date" style="margin-left:40px;font-size:14px;margin-bottom: 5px;">
+                                                    @Html.DisplayFor(modelItem => firstItem.RoomProduct.Date)
+                                                </div>
+                                                 <div class="extraservice-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                                    數量:@group.Sum(item =>item.Quantity)
+                                                </div>
+                                                <div class="extraservice-price" style="margin-left:40px;font-size:18px; color:lightseagreen; font-weight:bold;">
+                                                    TWD:@Html.DisplayFor(modelItem => firstItem.RoomProduct.NewPrice)
+                                                </div>
+                                            </div>
+                                            <div class="room-remove col-md-1" style="text-align: right;">
+                                                 <div style="margin-right: 25px;">
+                                                    <a href="#" onclick="removeFromAcc(@firstItem.Id)">
+                                                    <i class="fas fa-trash-can" style="font-size: 18px;"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                              
+                            }
+                     </div>
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+        <script>
+            function removeFromAcc(roomProductId) {
+                $.ajax({
+                    url: '/Carts/RemoveAccommodationFromCart',
+                    type: 'POST',
+                    data: { roomProductId: roomProductId },
+                    success: function (result) {
+                        if (result.success) {
+                            alert(result.message);
+                            $('#cartTable3').find('tr[data-roomProductId="' + result.roomProductId + '"]').remove();
+                            reloadCartItems();
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    error: function () {
+                        console.log('66666');
+                        alert('An error occurred, unable to delete item.');
+                    }
+                });
             }
-        });
-    }
-    function reloadCartItems() {
-        $.ajax({
-            url: '/Carts/RefreshCart',
-            type: 'GET',
-            success: function (data) {
+            function reloadCartItems() {
+                $.ajax({
+                    url: '/Carts/RefreshCart',
+                    type: 'GET',
+                    success: function (data) {
 
-                $('#Cart').html(data);
-            },
+                        $('#Cart').html(data);
+                    },
 
 
-            error: function () {
-                alert('Failed to reload cart items.');
+                    error: function () {
+                        alert('Failed to reload cart items.');
+                    }
+                });
             }
-        });
-    }
 
-</script>
+        </script>
 

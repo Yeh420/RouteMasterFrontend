@@ -975,6 +975,7 @@
             let extCheckboxValues= Array.from(extProBoxes).map(extProBox=>parseInt(extProBox.value));
 
 
+
             //住宿商品加入購物車
 
 
@@ -989,8 +990,10 @@
                 //住宿商品放入postData
                 const postData = {
                     cartId: cartIdFromCookie,
+
                     activityProductIds: actCheckboxValues,
                     extraServiceProductIds: extCheckboxValues
+
                 };
 
 
