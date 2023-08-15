@@ -1,40 +1,71 @@
-[] forgetPassword
+8/14(8/18前完成項目)   今天要生出假資料
+1.[]普通登入功能
+    [OK]登入的錯誤訊息調整
+    []登入功能錯誤不要刷新改成ajax
+    []last step 檢查程式碼邏輯
 
-[]歷史訂單
+2.[]Google登入功能
+    []Google登入的RM Logo
+    []google登入的認證方式要包含信箱 
+    []last step 檢查程式碼邏輯
+    
+3.[]index
+    []顯示名稱
+    []顯示項目調整
+    []版面
+    []last step 檢查程式碼邏輯
 
-[√]內建系統圖
+4.[]歷史訂單
+    []使用ajax呼叫到 
+    []last step 檢查程式碼邏輯
 
-8/5
-[]google登入畫面
-google登入也是要導向
+5.[]大頭貼項
+    []更改大頭貼
+    []加入其他人要做的ㄒnavbar
+    []last step 檢查程式碼邏輯
 
-8/6
-[√]goolge登入
+6.[]發送信件/更換密碼
+    []
+    []last step 檢查程式碼邏輯
 
-8/7
-[]
-[]各功能測試
-	[√]普通註冊
-		[√]上傳大頭貼
-		[√]系統大頭貼
-	[√]普通帳號登入
-	[√]登出  -- 解決頁面刷新問題
-	
+7.[]修改會員資料
+    []
+    []last step 檢查程式碼邏輯
+
+8.[]鎖定帳號
+    []
+    []last step 檢查程式碼邏輯
+
+9.[]登出
+    []登出後刪除google的資料
+    []last step 檢查程式碼邏輯
+
+10.[]演示會員資料
+    []加入圖片
+    []last step 檢查程式碼邏輯
+
+11.註冊會員
+   []
+   []last step 檢查程式碼邏輯
+
+12.[]登入時間計算
 
 
-[]更改大頭貼
-[]版面
+實作步驟
+一.登入登出
+    1.用已經設定好的帳號示範密碼錯誤
+    2.確認登入
+    3.登出一次
 
-//HistoryOrderDTO historyDTO = _context.Members
-            //     .Join(_context.Orders,
-            //     m=>m.Id,
-            //     o=>o.MemberId,
-            //     (m, o) => new {Member= m, Order= o})
-            //     .Where(mo => mo.Member.Id == id)
-            //     .Select(mo => new HistoryOrderDTO
-            //     {
-            //         MemberId = mo.Member.Id,
-            //         Account = mo.Member.Account,
-            //         PaymentStatusId = mo.Orders.PaymentStatusId,
+    4.正常註冊會員
+    5.註冊一次
+    6.立即再登入一次
 
-            //     }).ToList();
+    7.Google註冊登入
+    8.註冊並登入
+
+二.編輯會員資料
+    1.更改電話號碼
+    2.更改密碼
+    3.查看大頭貼/更改大頭貼
+    4.查詢歷史訂單
