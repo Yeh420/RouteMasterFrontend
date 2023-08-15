@@ -1,33 +1,25 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Attraction>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
 
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Image)
-                </td>
-                <td>
-                    <button class="addAtt btn btn-primary" type="button" id="addAttraction" data-name="@item.Name" data-id="@item.Id" data-positionX="@item.PositionX" data-positionY="@item.PositionY">加入</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+<div class="container mt-5">
+<div class="d-flex row overflow-auto " style="height:300px">
+    @foreach (var item in Model)
+    {
+            <div class="card col-md-2 m-1" style="width: 18rem;">
+            <img src="@item.Image" class="card-img-top">
+            <div >@item.Name</div>
+		    <div class="card-body">
+                <button class="addAtt btn btn-primary" type="button" id="addAttraction" data-name="@item.Name" data-id="@item.Id" data-positionX="@item.PositionX" data-positionY="@item.PositionY">加入</button>
+            </div>
+        </div>
+    }
+</div>
+</div>
+  
+      
+    
+
+      
+
 
