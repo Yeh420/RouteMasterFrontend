@@ -56,7 +56,7 @@ namespace RouteMasterFrontend.Controllers
 
         public async Task<JsonResult> ImgSearch([FromBody] Comments_AccommodationAjaxDTO input)
         {
-            int takeNum = 3;
+           
             var commentDb = _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
@@ -84,25 +84,25 @@ namespace RouteMasterFrontend.Controllers
                 .Include(l => l.Member);
 
             
-            var rod =await commentDb.Select(c => new Comments_AccommodationIndexDTO
+            var rod = await commentDb.Select(c => new Comments_AccommodationIndexDTO
             {
                 Id = c.Id,
-                Account=c.Member.Account,
-                HotelName=c.Accommodation.Name,
-                Score=c.Score,
-                Title=c.Title,
-                Pros=c.Pros,
-                Cons=c.Cons,
-                CreateDate=c.CreateDate,
-                Status=c.CommentStatus.Name,
-                ReplyMessage=c.Reply,
-                ReplyDate=c.ReplyAt,
-                ImageList=proImg.Where(p=>p.Comments_AccommodationId==c.Id)
-                .Select(p=>p.Image).ToList(),
-                ThumbsUp=proLike.Any(l=>l.Comments_AccommodationId==c.Id && l.MemberId==1),
-                TotalThumbs=proLike.Where(l=>l.Comments_AccommodationId== c.Id).Count(),
+                Account = c.Member.Account,
+                HotelName = c.Accommodation.Name,
+                Score = c.Score,
+                Title = c.Title,
+                Pros = c.Pros,
+                Cons = c.Cons,
+                CreateDate = c.CreateDate,
+                Status = c.CommentStatus.Name,
+                ReplyMessage = c.Reply,
+                ReplyDate = c.ReplyAt,
+                ImageList = proImg.Where(p => p.Comments_AccommodationId == c.Id)
+                .Select(p => p.Image).ToList(),
+                ThumbsUp = proLike.Any(l => l.Comments_AccommodationId == c.Id && l.MemberId == 1),
+                TotalThumbs = proLike.Where(l => l.Comments_AccommodationId == c.Id).Count(),
 
-            }).Take(takeNum).ToListAsync();
+            }).ToListAsync();
 
             return Json(rod);
         }

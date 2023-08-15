@@ -49,6 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\Comments_Attraction\" />
     <Folder Include="Views\RoomProducts\" />
     <Folder Include="wwwroot\ActivityImages\" />
     <Folder Include="wwwroot\ExtraServiceImages\" />

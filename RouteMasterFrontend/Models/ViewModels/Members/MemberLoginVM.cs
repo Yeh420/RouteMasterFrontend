@@ -8,12 +8,12 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[Key]
 		public int Id { get; set; }
 
-		[Display(Name = "帳號")]
-		[Required]
+        [Required(ErrorMessage ="您尚未填寫帳號")]
+        [Display(Name = "帳號")]
 		public string Account { get; set; }
 
-		[Required]
-		[DataType(DataType.Password)]
+        [Required(ErrorMessage = "您尚未填寫密碼")]
+        [DataType(DataType.Password)]
 		[Display(Name = "密碼")]
 		public string Password { get; set; }
 
