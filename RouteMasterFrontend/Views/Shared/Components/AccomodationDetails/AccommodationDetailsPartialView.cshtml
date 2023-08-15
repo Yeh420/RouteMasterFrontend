@@ -14,6 +14,20 @@
     .partial-view-container table td {
         border: none;
     }
+
+    #cartTable3 tbody tr {
+        border-top: none; /* Remove border above each row */
+    }
+
+    /* Optional: Add padding to the cells for better spacing */
+    #cartTable3 tbody td {
+        padding: 8px;
+    }
+
+    /* Add this style to remove border between thead and tbody */
+    #cartTable3 thead th {
+        border-bottom: none;
+    }
 </style>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -22,7 +36,7 @@
 </head>
     
 <div class="partial-view-container">
-<table class="table">
+    <table class="table" id="cartTable3">
     <thead>
         <tr>
             <th>
@@ -43,7 +57,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+                <tr data-roomProductId="@item.RoomProductId">
             <td>
 
                 @Html.DisplayFor(modelItem => item.RoomProduct.Room.Accommodation.Name)
@@ -61,12 +75,52 @@
             </td>
             <td>
 
-                    <a asp-action="Delete" asp-route-id="@item.Id">
-                        <i class="fas fa-trash-can"></i>
-                    </a>
+
+                        <a href="#" onclick="removeFromAcc( @item.Id)">
+                            <i class="fas fa-trash-can"></i>
+                        </a>
             </td>
         </tr>
 }
     </tbody>
 </table>
 </div>
+<script>
+    function removeFromAcc(roomProductId) {
+        $.ajax({
+            url: '/Carts/RemoveAccommodationFromCart',
+            type: 'POST',
+            data: { roomProductId: roomProductId },
+            success: function (result) {
+                if (result.success) {
+                    alert(result.message);
+                    $('#cartTable3').find('tr[data-roomProductId="' + result.roomProductId + '"]').remove();
+                    reloadCartItems();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function () {
+                console.log('66666');
+                alert('An error occurred, unable to delete item.');
+            }
+        });
+    }
+    function reloadCartItems() {
+        $.ajax({
+            url: '/Carts/RefreshCart',
+            type: 'GET',
+            success: function (data) {
+
+                $('#Cart').html(data);
+            },
+
+
+            error: function () {
+                alert('Failed to reload cart items.');
+            }
+        });
+    }
+
+</script>
+

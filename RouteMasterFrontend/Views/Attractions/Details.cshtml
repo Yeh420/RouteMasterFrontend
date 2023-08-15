@@ -111,6 +111,13 @@
         
         @Html.Raw(Model.Website)
     </div>
+
+    <div class="mb-5">
+        <div class="mb-3">
+            <h3>評論區<br></h3>
+            @await Html.PartialAsync("Comments_AttractionIndexPartial",Model);
+        </div>
+    </div>
     
     <div class="mb-3">
         @if (ViewBag.IsFavorite)
