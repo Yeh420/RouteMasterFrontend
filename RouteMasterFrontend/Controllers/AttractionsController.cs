@@ -147,6 +147,28 @@ namespace RouteMasterFrontend.Controllers
 
             vm.CloseAtt = sortedAttractions;
 
+
+            IEnumerable<AttractionIndexVM> sameRegionAtt = GetAttractions();
+            var region = sameRegionAtt.Where(a => a.Id == id).Select(a => a.Region).FirstOrDefault();
+
+            sameRegionAtt = sameRegionAtt.Where(a => a.Region == region && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(6);
+            
+
+            vm.SameRegionAtt = sameRegionAtt;
+
+
+            IEnumerable<AttractionIndexVM> sameCategoryAtt = GetAttractions();
+            var category = sameCategoryAtt.Where(a => a.Id == id).Select(a => a.AttractionCategory).FirstOrDefault();
+
+            sameCategoryAtt = sameCategoryAtt.Where(a => a.AttractionCategory == category && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(6);
+
+
+            vm.SameCategoryAtt = sameCategoryAtt;
+
             return View(vm);
         }
 
