@@ -10,6 +10,7 @@ using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.ViewModels.Accommodation;
 using Dapper;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -36,18 +37,18 @@ namespace RouteMasterFrontend.Controllers
 
             var temps = await _context.ServiceInfoCategories.Include(sc=>sc.AccommodationServiceInfos).ToListAsync();
 
-            foreach (var temp in temps)
+            foreach ( var temp in temps)
             {
                 ServiceDTO s = new ServiceDTO
                 {
-                    Id = temp.Id,
                     Name = temp.Name,
-                    AccommodationServiceInfos = temp.AccommodationServiceInfos
+                    Infos = temp.AccommodationServiceInfos.Select(asi => asi.Name)
                 };
 
                 dto.ServiceInfoes.Add(s);
             };
 
+            
             return View((dto));
         }
 

@@ -1,0 +1,26 @@
+﻿<div>
+
+</div>
+<div>
+</div>
+<div>
+</div>
+<div>
+</div>
+<button class="btn btn-warning" onclick="getit()">test</button>
+
+@section Scripts{
+    <script>
+        function getit(){
+            //alert("hh");
+            $.ajax({
+                 type:"Get",
+                url: "https://localhost:7251/api/Members"
+            }).done(data=>{
+                alert(data);
+            }).fail(err=>{
+                alert(err.statusText);
+            });
+        }
+    </script>
+}

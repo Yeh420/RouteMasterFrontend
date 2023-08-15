@@ -23,6 +23,7 @@ using System.IO;
 using RouteMasterFrontend.Models.Dto;
 using Microsoft.Data.SqlClient;
 using Dapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -178,7 +179,7 @@ namespace RouteMasterFrontend.Controllers
         }
 
         //會員普通登入
-        public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
+        public async Task<IActionResult> MemberLogin([FromBody] MemberLoginVM vm)
         {
             if (ModelState.IsValid == false) return View(vm);
 
@@ -551,38 +552,55 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("MyMemberIndex");
         }
 
-        //歷史訂單
-        [HttpGet]
-       public async Task<IActionResult> HistoryOrder(int? id)
+       
+       [HttpGet] 
+        public async Task<IActionResult> HistoryOrder(int? id)
         {
-            if (id == null || _context.Members == null) return NotFound();
-            
-            var member = await _context.Members.FindAsync(id);
-            if (member == null) return NotFound();
-            return View(member);
+            var historyOrders = _context.Orders
+                .Include(x => x.OrderExtraServicesDetails)
+                .Include(x => x.OrderActivitiesDetails)
+                .Include(x => x.OrderAccommodationDetails)
+                .Include(x => x.Coupons)
+                .Include(x => x.OrderHandleStatus)
+                .Include(x => x.PaymentStatus)
+                .Include(x => x.PaymentMethod);
+
+           var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
+           var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
+
+
+
+
+
+
+
+
+
+           
+            return View(historyOrders);
         }
 
-        //使用dapper做資料庫存取歷史訂單
-        [HttpGet]
-        public async Task<IActionResult> HistoryOrder()
-        {
-            ClaimsPrincipal user = HttpContext.User;
+        ////使用dapper做資料庫存取歷史訂單    
+        //[HttpGet]
+        //public async Task<IActionResult> HistoryOrder()
+        //{
+        //    ClaimsPrincipal user = HttpContext.User;
             
-            //列出與登入符合資料
-            string userAccount = user.Identity.Name;
+        //    //列出與登入符合資料
+        //    string userAccount = user.Identity.Name;
 
-            Member myMember = _context.Members.FirstOrDefault(m => m.Account == userAccount);
+        //    Member myMember = _context.Members.FirstOrDefault(m => m.Account == userAccount);
 
 
-            string connStr = _configuration.GetConnectionString("RouteMaster");
+        //    string connStr = _configuration.GetConnectionString("RouteMaster");
 
-             string sql = $@"select ord.memberid, ord.PaymentStatusId, ord.CreateDate, ord.ModifiedDate, ord.Total, m.Account, m.Email
-                            from Orders as ORD
-                            inner join Members as M on ORD.MemberId = m.Id
-                            where m.Account=@Account";
-            IEnumerable<HistoryOrderDTO> orderDTOs = new SqlConnection(connStr).Query<HistoryOrderDTO>(sql, new { Account = myMember.Account });
-            return Json(orderDTOs);
-        }
+        //     string sql = $@"select ord.memberid, ord.PaymentStatusId, ord.CreateDate, ord.ModifiedDate, ord.Total, m.Account, m.Email
+        //                    from Orders as ORD
+        //                    inner join Members as M on ORD.MemberId = m.Id
+        //                    where m.Account=@Account";
+        //    IEnumerable<HistoryOrderDTO> orderDTOs = new SqlConnection(connStr).Query<HistoryOrderDTO>(sql, new { Account = myMember.Account });
+        //    return Json(orderDTOs);
+        //}
 
         public IActionResult Test123()
         {
@@ -591,7 +609,7 @@ namespace RouteMasterFrontend.Controllers
 
 
         //註冊成功頁面
-        public IActionResult SuccessRegister()
+        public ActionResult SuccessRegister()
         {
             return View();
         }
@@ -621,6 +639,13 @@ namespace RouteMasterFrontend.Controllers
                 }
             }
             return RedirectToAction("Index", "Home");
+        }
+
+        //歷史訂單
+        //這是前後端分離，做成web api 的服務
+        public  IActionResult MemOrder()
+        {
+            return View();
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)

@@ -1,19 +1,60 @@
 ﻿
 <style>
+
     .cart-icon-link {
         display: inline-block;
-        font-size: 20px; /* 調整圖示大小 */
-        color: #333; /* 圖示顏色 */
-        text-decoration: none; /* 移除連結底線 */
+        font-size: 20px;
+        color: #333;
+        text-decoration: none;
     }
 
     .cart-icon {
         font-size: 24px;
     }
 
-    /* 購物車圖示懸停效果 */
     .cart-icon-link:hover {
-        color: #007bff; /* 懸停時的顏色 */
+        color: #007bff;
+    }
+
+    .dropdown-cart {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-cart-content {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 450px;
+        background-color: #fff;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    .dropdown-cart:hover .dropdown-cart-content {
+        display: block;
+    }
+
+    .dropdown-cart-item {
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .dropdown-cart-item:last-child {
+            border-bottom: none;
+        }
+
+    .dropdown-cart-footer {
+        padding: 10px;
+        text-align: center;
+        background-color: #f9f9f9;
+    }
+
+    .view-cart-button {
+        margin-top: 10px;
     }
 </style>
 
@@ -34,30 +75,26 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    
-
-
-<div class="dropdown">
-        <a id="cartOpen" class="cart-icon-link" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="dropdown-cart">
+        <a id="cartOpen" class="cart-icon-link" href="#">
             <i class="fas fa-shopping-cart cart-icon"></i>
         </a>
-        <ul class="dropdown-menu">
+        <div class="dropdown-cart-content">
             @if (ViewBag.CartId == null)
             {
-                <li>@await Component.InvokeAsync("EmptyCart")</li>
+                <div class="dropdown-cart-item">@await Component.InvokeAsync("EmptyCart")</div>
             }
             else
             {
-                <li>@await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })</li>
-                <li>@await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })</li>
-                <li>@await Component.InvokeAsync("AccomodationDetails", new { ViewBag.CartId })</li>
+                <div class="dropdown-cart-item">@await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })</div>
+                <div class="dropdown-cart-item">@await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })</div>
+                <div class="dropdown-cart-item">@await Component.InvokeAsync("AccomodationDetails", new { ViewBag.CartId })</div>
             }
-            <li>
-                <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Index'">
+            <div class="dropdown-cart-footer">
+                <button class="btn btn-secondary view-cart-button" onclick="window.location.href='/Carts/Index'">
                     <i class="fas fa-shopping-cart"></i> 查看購物車
                 </button>
-            </li>
-        </ul>
-</div>
-  
+            </div>
+        </div>
+    </div>
 }

@@ -1,0 +1,34 @@
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .cart-icon-link {
+        display: inline-block;
+        font-size: 20px; /* 調整圖示大小 */
+        color: #333; /* 圖示顏色 */
+        text-decoration: none; /* 移除連結底線 */
+    }
+
+    .cart-icon {
+        font-size: 24px;
+    }
+
+    /* 購物車圖示懸停效果 */
+    .cart-icon-link:hover {
+        color: #007bff; /* 懸停時的顏色 */
+    }
+</style>
+
+
+@if (User.Identity.IsAuthenticated)
+{
+
+
+
+    <div class="dropdown">
+        <a id="cartOpen" class="cart-icon-link" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-shopping-cart cart-icon"></i>
+        </a>
+        <p>empty</p>
+    </div>
+
+}
+
