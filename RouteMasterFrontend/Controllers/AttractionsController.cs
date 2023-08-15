@@ -102,8 +102,18 @@ namespace RouteMasterFrontend.Controllers
             
             // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
             bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
-            
-                
+
+            List<string> tags = Get(id).Tags;
+            IEnumerable<AttractionIndexVM> attractions = GetAttractions();
+
+            if (tags != null)
+            {
+                attractions = attractions.Where(a => a.Tags.Intersect(tags).Any() && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(5);
+            }
+
+            vm.RelatedAttractions = attractions;
 
             ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
 
