@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SqlServer.Types;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
+using RouteMasterFrontend.EFModels;
 
 namespace RouteMasterBackend.Controllers
 {
@@ -18,30 +23,54 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class AccommodationsController : ControllerBase
     {
-        private readonly RouteMasterContext _db;
+        private readonly Models.RouteMasterContext _db;
+        private readonly IConfiguration _configuration;
 
-        public AccommodationsController(RouteMasterContext context)
+        public AccommodationsController(Models.RouteMasterContext context, IConfiguration configuration)
         {
             _db = context;
+            _configuration = configuration;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ServiceInfoCategory>>> GetServiceInfoCategory()
+        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetServiceInfoCategory(double latY, double lngX, int? topN = 10)
         {
-            if (_db.ServiceInfoCategories == null)
-            {
-                return NotFound();
-            }
-            var sc = _db.ServiceInfoCategories.AsNoTracking().Include(sc=>sc.AccommodationServiceInfos).AsQueryable();
+            string connectionString = _configuration.GetConnectionString("RouteMaster");
 
-            if (sc == null)
+            using (var connection = new SqlConnection(connectionString))
             {
-                return NotFound();
-            }
+                //connection.Open();
 
-            return await sc.ToListAsync();
+                // // 建立原點的地理座標
+                // SqlGeography origin = SqlGeography.Point(latY, lngX, 4326);
+
+                // // 執行地理查詢
+                // string query = @"
+                // SELECT TOP (@TopN) *, [Location].STDistance(@Origin) AS [Distance]
+                // FROM [dbo].[Accommodations]
+                // WHERE [Location].STDistance(@Origin) IS NOT NULL
+                // ORDER BY [Location].STDistance(@Origin)";
+
+                //var accommodations = await connection.QueryAsync<AccommodationDistanceDTO>(query, new { TopN = topN, Origin = origin });
+                connection.Open();
+
+                string query = @"
+                SELECT TOP (@TopN) [Id], [AcommodationCategoryId], [PartnerId], [Name], [Description],
+                    [Grade], [RegionId], [TownId], [Address], [PositionX],
+                    [PositionY], [Website], [IndustryEmail], [PhoneNumber], [ParkingSpace],
+                    [CheckIn], [CheckOut], [Status], [Image], [CreateDate],  
+                    SQRT(POWER([PositionX] - @OriginLat, 2) + POWER([PositionY] - @OriginLng, 2)) AS [Distance]
+                FROM [dbo].[Accommodations]
+                ORDER BY [Distance]";
+
+                var accommodations = await connection.QueryAsync<AccommodationDistanceDTO>(query, new { TopN = topN, OriginLat = latY, OriginLng = lngX });
+
+                connection.Close();
+
+                return accommodations.ToList();
+            }
         }
-
+        
         [HttpPost]
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(FilterData data)
         {
@@ -127,6 +156,7 @@ namespace RouteMasterBackend.Controllers
 
             return accommodationsDTO;
         }
+
         //[HttpGet("GetFilterDTO")]
         // public async Task<ActionResult<FilterDTO>> GetFilterDTO()
         //{
@@ -138,36 +168,38 @@ namespace RouteMasterBackend.Controllers
         //        Regions = await _db.Regions.Select(r => r.Name).ToListAsync()
         //    };
         //}
+
+
         // PUT: api/Accommodations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccommodation(int id, Accommodation accommodation)
-        {
-            if (id != accommodation.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutAccommodation(int id, Accommodation accommodation)
+        //{
+        //    if (id != accommodation.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _db.Entry(accommodation).State = EntityState.Modified;
+        //    _db.Entry(accommodation).State = EntityState.Modified;
 
-            try
-            {
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AccommodationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!AccommodationExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Accommodations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -185,28 +217,28 @@ namespace RouteMasterBackend.Controllers
         //}
 
         // DELETE: api/Accommodations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAccommodation(int id)
-        {
-            if (_db.Accommodations == null)
-            {
-                return NotFound();
-            }
-            var accommodation = await _db.Accommodations.FindAsync(id);
-            if (accommodation == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteAccommodation(int id)
+        //{
+        //    if (_db.Accommodations == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var accommodation = await _db.Accommodations.FindAsync(id);
+        //    if (accommodation == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _db.Accommodations.Remove(accommodation);
-            await _db.SaveChangesAsync();
+        //    _db.Accommodations.Remove(accommodation);
+        //    await _db.SaveChangesAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        private bool AccommodationExists(int id)
-        {
-            return (_db.Accommodations?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool AccommodationExists(int id)
+        //{
+        //    return (_db.Accommodations?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }
