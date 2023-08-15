@@ -30,7 +30,7 @@ namespace RouteMasterFrontend.Controllers
         public async Task<IActionResult> Details(int? id)
         {         
          
-          
+          ViewBag.ExtraServiceId=id;
 
             return View();
         }
