@@ -2,6 +2,7 @@
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.Interfaces;
+using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
 using System;
 using System.Linq;
 using static System.Formats.Asn1.AsnWriter;
@@ -17,6 +18,24 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
         {
             _db = new RouteMasterContext();
 
+        }
+
+        public IEnumerable<AttractionForDistsnceVM> GetAllWithXY()
+        {
+            var query = _db.Attractions
+               .AsNoTracking()
+               .ToList();
+
+            var result = query
+                .Select(q => new AttractionForDistsnceVM
+                {
+                    Id = q.Id,
+                    Name = q.Name,
+                    PosX = (decimal?)q.PositionX,
+                    PosY = (decimal?)q.PositionY
+                });
+
+            return result;
         }
 
         public void AddClick(int id)
@@ -56,7 +75,8 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
                         .Where(i => i.AttractionId == q.Id)
                         .Select(i => i.Image)
                         .DefaultIfEmpty()
-                        .ToList(),
+                        .ToList()
+                        .ConvertAll(i => i ?? ""),
                     Description = q.Description,
                     Tags = q.Tags
                         .Select(t => t.Name)
