@@ -78,10 +78,10 @@
 
 <div class="row" style="min-height: 500px; height: auto;">
     
-    <div class="col-9 border border-primary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
+    <div class="col-9 border border-secondary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
         <input type="datetime-local"  id="travelBeginDateTime" />
-        <button id="createAttractionTimeSpanContainer" >新增區塊</button>
-        <button id="callApiToAddToCart" >加入購物車</button>
+        <button id="createAttractionTimeSpanContainer" class="btn btn-primary" disabled>新增區塊</button>
+        <button id="callApiToAddToCart" class="btn btn-primary">加入購物車</button>
         <div class="row">            
             <div id="dropZoneContainer" class="col-4">
 
@@ -96,9 +96,7 @@
                             <th >結束時間</th>
                         </tr>
                     </thead>
-                    <tbody id="ajaxUpdateScheduleTBody" class="w-100">
-                   
-                     
+                    <tbody id="ajaxUpdateScheduleTBody" class="w-100">                                       
                     </tbody>
                 </table>
             </div>
@@ -107,13 +105,13 @@
 
 
     <div id="sortedAttractionsPreContainer" class="col-3 hide" style="position:relative;">
-        <div id="sortedAttractions" class="border border-primary" style="height:500px"></div>
-        <button id="greedyTSP" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">計算最短路徑</button>
+        <div id="sortedAttractions" class="border border-secondary" style="height:500px"></div>
+        <button id="greedyTSP" class="btn btn-primary" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">計算最短路徑</button>
     </div>
 
     <div id="selectedAttractionsPreContainer"  class="col-3" style="position:relative;">
-        <div id="selectedAttractions" class="border border-primary " style="height:500px; position:relative;"></div>
-        <button id="getInformations" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
+        <div id="selectedAttractions" class="border border-secondary " style="height:500px; position:relative;"></div>
+        <button id="getInformations" class="btn btn-primary" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
     </div>    
  
 
@@ -145,6 +143,24 @@
         let theNextAttractionOfDropContainer;
 
         const addAttBtns = document.querySelectorAll('.addAtt');
+
+
+        const inputBeginDateTime = document.querySelector('#travelBeginDateTime');
+        const createNewBlockButton = document.querySelector('#createAttractionTimeSpanContainer');
+
+        inputBeginDateTime.addEventListener('input',function(){
+            if (inputBeginDateTime.value!==''){
+                createNewBlockButton.removeAttribute('disabled');
+            }else{
+                createNewBlockButton.setAttribute('disabled','true');
+            }
+        });
+
+
+
+
+
+
 
 
 
@@ -284,12 +300,6 @@
 
         function drag(event) {
             event.dataTransfer.setData("text", event.target.getAttribute("data-id"));
-
-
-      
-
- 
-
 
         }
 
@@ -943,8 +953,10 @@
         })
 
 
-
         document.querySelector("#createAttractionTimeSpanContainer").addEventListener('click',function(){
+            inputBeginDateTime.readOnly=true;
+
+
             let travelComponent = document.createElement('div');
             travelComponent.classList.add('travelComponent');
             travelComponent.style.position="relative";
@@ -977,28 +989,32 @@
 
 
 
+            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0){
+                alert('請至少選擇一項商品才可以加入購物車')
+            }else{
+                let cartIdFromCookie = @cartIdFromCookie;
 
 
-           let cartIdFromCookie=@cartIdFromCookie;
-
-
-            //todo AccommodationProduct
-            const postData={
-                cartId: cartIdFromCookie,
-                activityProductIds: actCheckboxValues,
-                extraServiceProductIds:extCheckboxValues
-            };
+                //todo AccommodationProduct
+                const postData = {
+                    cartId: cartIdFromCookie,
+                    activityProductIds: actCheckboxValues,
+                    extraServiceProductIds: extCheckboxValues
+                };
 
 
 
 
-            axios.post(`https://localhost:7251/api/Carts/Post/Travel`,postData)
-            .then(response=>{
-               alert('已成功加入購物車!');
-            })
-            .catch(error=>{
-                console.log(error)
-            });         
+                axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
+                    .then(response => {
+                        alert('已成功加入購物車!');
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            }
+
+           
         }
 
 
