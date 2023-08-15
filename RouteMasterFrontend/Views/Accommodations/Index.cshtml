@@ -592,6 +592,7 @@
                 ELLIPSIS() {
                     return "...";
                 },
+        -------------------------------------------------------------------------
             },
             methods: {
                 initMap: function (id) {
@@ -702,6 +703,8 @@
                         const originList = response.originAddresses;
                         const destinationList = response.destinationAddresses;
                     });
+
+-------------------------------------------------------------------------
                 },
                 methods:{
                     loadProducts:async function(){
@@ -740,6 +743,8 @@
                                     return s.serviceInfoCategoryId;
                                 });
                                 _this.$refs.childRef.commentDisplay(p.id);
+                        -------------------------------------------------------------------------
+
                 parseMinutes(timeString) {
                     const [hours, minutes] = timeString.split(' ')[0].split('h');
                     return parseInt(hours) * 60 + parseInt(minutes);
@@ -782,6 +787,7 @@
                         });
                         var parentInput = 5;
                         _this.$refs.childRef.commentDisplay(p.id, parentInput);
+                                -------------------------------------------------------------------------
 
                         _this.initMap(id);
                         const showMoreText = "...顯示更多";
@@ -810,7 +816,9 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
-                    }
+                                -------------------------------------------------------------------------
+
+                            }
                 },
                 showAllComment: function () {
                     let _this = this;
@@ -833,6 +841,8 @@
 
                 },
                 clickHandler: function (value) {
+                            -------------------------------------------------------------------------
+
                     let _this = this;
                     _this.thePage = value;
                     _this.loadProducts();
@@ -914,6 +924,8 @@
 				            },
 				            endDate: rps[rps.length-1].date
 			            });
+                            -------------------------------------------------------------------------
+
                     if (this.selectedsCategories.includes(sCategory.name)) {
                         this.selectedServiceInfos = [...new Set([...this.selectedServiceInfos, ...sInfos])];
                     } else {
@@ -983,6 +995,8 @@
                         endDate: rps[rps.length - 1].date
                     });
 
+                            -------------------------------------------------------------------------
+
                     dpInput.addEventListener('afterClose', function () {
                         const value = this.value;
                         const pattern = /^(\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})$/;
@@ -1003,6 +1017,8 @@
                                         }
                                         return acc;
                                     }, { sum: 0, quantity: Infinity });
+                                            -------------------------------------------------------------------------
+
                         if (match) {
                             const startDate = new Date(match[1]);
                             const endDate = new Date(match[2]);
