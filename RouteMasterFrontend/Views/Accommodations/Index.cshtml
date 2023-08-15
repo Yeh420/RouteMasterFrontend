@@ -348,11 +348,17 @@
                                     </p>
                                 </section>
 
+
                                 <section>
                                     <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
+
                                         顯示更多評論
                                     </a>
+                                     <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
+                                        cccccccccccccccccccccccccc
+									</div>
                                     <dec id="topthree" ref="childRef"></dec>
+
 
 
                                     <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
@@ -374,6 +380,7 @@
                                                             <label v-bind:for=`dp-${room.id}`>日期：</label>
                                                             <input v-bind:id=`dp-${room.id}` type="text" class="form-control me-2" autocomplete="off" placeholder="請選擇日期" readonly style="background:white;width:236px;box-sizing:border-box" />
                                                             <div v-bind:id=`ptInput-${room.id}` style="display:none">
+
                                                                 <div class="d-flex align-items-center">
                                                                     <label v-bind:for=`pq-${room.id}`>數量：</label>
                                                                     <input v-bind:id=`pq-${room.id}` type="number" min="1" value="1" size="2" class="form-control me-2" style="width:63px; box-sizing:border-box" />
@@ -489,6 +496,7 @@
 
                     map: null,
 
+
                 }
             },
             mounted: async function () {
@@ -513,6 +521,10 @@
                     }
                     if (startPage > 1) {
                         pages.unshift("...");
+
+                        onlyThree:"只顯示前三筆",
+
+
                     }
                     if (endPage < this.totalPages) {
                         pages.push("...");
@@ -769,6 +781,7 @@
                     if (s[0]) {
                         if (!this.showFullDescription) {
                             this.accommodationDescription = lines.join("<br>") + `<small id="small" style="color: #999">${showLessText}</small>`;
+
                         } else {
                             this.accommodationDescription = lines.slice(0, 5).join('<br>') + `<small id="small" style="color: #999">${showMoreText}</small>`;
                         }

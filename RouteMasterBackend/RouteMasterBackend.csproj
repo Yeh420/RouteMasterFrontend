@@ -23,4 +23,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RouteMasterFrontend\RouteMasterFrontend.csproj" />
+  </ItemGroup>
+
 </Project>

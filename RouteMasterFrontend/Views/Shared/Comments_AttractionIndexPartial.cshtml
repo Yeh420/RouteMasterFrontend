@@ -2,6 +2,10 @@
     .panel li {
         color: #ccc;
     }
+
+    .active {
+        color: #f90;
+    }
 </style>
 <div>@Model.Id</div>
 <div id="app">
@@ -28,22 +32,22 @@
                             <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
                             <div>{{item.isHidden}}</div>
                         </div>
-                        <div class="panel">
+                        <div class="panel d-flex">
                             <ul class="d-flex list-unstyled">
-                                <li><i class="fa fa-star fa-fw"></i></li>
-                                <li><i class="fa fa-star fa-fw"></i></li>
-                                <li><i class="fa fa-star fa-fw"></i></li>
-                                <li><i class="fa fa-star fa-fw"></i></li>
-                                <li><i class="fa fa-star fa-fw"></i></li>
+                                <li v-for="starIndex in 5" :key="starIndex">
+                                    <i class="fa fa-star fa-fw" :class="{'active':starIndex <= item.score}">
+
+                                    </i>
+                                </li>
                             </ul>
-                            <p class="card-text">{{item.score}}</p>
+                            <p class="ms-2">{{item.score}}分</p>
                         </div>
                         <p class="card-text">{{item.id}}</p>
                         <p class="card-text">{{item.content}}</p>
                         <p class="card-text">停留: {{item.stayHours}}小時</p>                      
                         <div class="d-flex">
                             <p class="me-auto">花費: {{item.price}}元</p>
-                            <p class="text-muted">{{item.createDate}}</p>                            
+                            <p><small class="text-muted">{{item.createDate}}</small></p>                           
                         </div>                                                                                     
                     </div>
                 </div>
@@ -85,6 +89,7 @@
                 indexVM:[],
                 selected:0,
                 spotId: @Html.Raw(Json.Serialize(Model.Id)),
+                starShine:0,
 
             }
         },
