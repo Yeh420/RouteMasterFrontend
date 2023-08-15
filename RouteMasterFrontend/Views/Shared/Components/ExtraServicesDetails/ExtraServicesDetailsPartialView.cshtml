@@ -4,6 +4,22 @@
 
 
 }
+<style>
+  /* Add this style to remove border lines */
+    #cartTable tbody tr {
+        border-top: none; /* Remove border above each row */
+    }
+
+    /* Optional: Add padding to the cells for better spacing */
+    #cartTable tbody td {
+        padding: 8px;
+    }
+
+    /* Add this style to remove border between thead and tbody */
+    #cartTable thead th {
+        border-bottom: none;
+    }
+</style>
 <head>
     <meta name="viewport" content="width=device-width" />
    @* <title>My Razor View</title>*@
@@ -18,17 +34,17 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ExtraServiceProduct)
+              @*  @Html.DisplayNameFor(model => model.ExtraServiceProduct)*@
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ExtraServiceProduct.Date)
+              @*  @Html.DisplayNameFor(model => model.ExtraServiceProduct.Date)*@
             </th>
             
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @*@Html.DisplayNameFor(model => model.Quantity)*@
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ExtraServiceProduct.Price)
+            @*    @Html.DisplayNameFor(model => model.ExtraServiceProduct.Price)*@
             </th>
           @*  <th>
                 @Html.DisplayNameFor(model => model.Cart)
