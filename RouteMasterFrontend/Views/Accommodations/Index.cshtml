@@ -8,7 +8,15 @@
 		  href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
 	<script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
 	<link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    @*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>*@
+    <script src="https://routes.googleapis.com/directions/v2:computeRoutes?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w" defer></script>
+
     <style>
+   /* #map{
+            width: 100%;
+            height: 400px;
+        }*/
     .currentPage{
         background-color: lightgray;
     }
@@ -325,7 +333,8 @@
                                             </p>
                                             <div class="collapse" id="collapseExample">
                                                 <div class="card card-body">
-                                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                                    @*<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>*@
+                                                    <div id="map" class="ratio ratio-16x9"></div>
                                                 </div>
                                             </div>
 
@@ -334,17 +343,19 @@
                                             <p class="fs-5" v-html="accommodationDescription" @@click="toggleDescription">
                                             </p>
                                         </section>
+
                                   <section>
-                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
+                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2">
                                         顯示更多評論
                                     </a>
+                                     <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
+                                        cccccccccccccccccccccccccc
+									</div>
                                     <dec id="topthree" ref="childRef"></dec>
                                   
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                        
-									</div>
-								</section>
 
+                                   
+								</section>
                                         <section class="mb-3 border-top pt-1">
                                             <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
 
@@ -444,17 +455,15 @@
     @section Scripts{
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-
         <script src="~/fecha-4.2.1/fecha-4.2.1/lib/fecha.js"></script>
 	    <script src="~/hotel-datepicker-main/dist/js/hotel-datepicker.js"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
                 integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
         <script src="~/js/Comments_AccommodationPartial.js"></script>
+
         <script>
-          
             var vueApp={
                 data(){
                     return{
@@ -476,6 +485,8 @@
                         accommodationDescription:"",
                         cartProductId:1,
                         accommodationServiceCId:[],
+                        map:null,
+                        onlyThree:"只顯示前三筆",
                     }
                 },
                 mounted: async function(){
@@ -511,6 +522,83 @@
                     },
                 },
                 methods:{
+                    initMap: function(id){
+                        const p = this.products[id];
+                        const location = { lat: p.positionY, lng: p.positionX };
+                        //this.map = new google.maps.Map(document.getElementById("map"), {
+                        //    // 中心點位置
+                        //    center: location, 
+                        //    zoom: 14, // 地圖縮放比例 (0-20)
+                        //    streetViewControl: true, // 是否顯示右下角街景小人
+                        //    mapTypeControl: true // 使用者能否切換地圖樣式：一般、衛星圖等
+                        //});
+
+                        //let marker = new google.maps.Marker({
+                        //    position: location,
+                        //    map: this.map,
+                        //    title: p.name
+                        //});
+                        //// info window
+                        //let infowindow = new google.maps.InfoWindow({
+                        //content: `<h6>${p.name}</h6>
+                        //          <small>${p.address}</small>` // 支援html
+                        //});
+
+                        //infowindow.open(this.map, marker);
+
+                        //// 監聽 marker click 事件
+                        //marker.addListener('click', e => {
+                        //infowindow.open(this.map, marker);
+                        //});
+
+                        //this.map.setOptions({
+                        //    styles: [
+                        //        {
+                        //            featureType: 'poi.business',
+                        //            stylers: [{
+                        //            visibility: 'off'
+                        //            }]
+                        //        }
+                        //    ]
+                        //});
+                        this.calculateDrivingTime(location, [{ lat: this.products[1].positionY, lng: this.products[1].positionX }, { lat: this.products[2].positionY, lng: this.products[2].positionX }], 'AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w')
+                        .then(sortedTimes => {
+                            if (sortedTimes !== null) {
+                                console.log('Sorted driving times:', sortedTimes);
+                            }
+                        }).catch(error => {
+                            console.error('An error occurred:', error);
+                        });
+                    },
+                    calculateDrivingTime:async function calculateDrivingTimes(originLatLng, destinationLatLngs, apiKey) {
+                      const destinationCoordinates = destinationLatLngs.map(dest => `${dest.lat},${dest.lng}`).join('|');
+                      const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${originLatLng.lat},${originLatLng.lng}&destinations=${destinationCoordinates}&key=${apiKey}`);
+                      const data = await response.json();
+
+                      if (data.status === 'OK') {
+                        const drivingTimes = data.rows[0].elements.map((element, index) => {
+                          if (element.status === 'OK') {
+                            return { index, time: element.duration.text };
+                          } else {
+                            console.error('Error calculating driving time for destination at index', index, ':', element.status);
+                            return null;
+                          }
+                        });
+
+                        return drivingTimes.filter(time => time !== null).sort((a, b) => {
+                          const aMinutes = this.parseMinutes(a.time);
+                          const bMinutes = this.parseMinutes(b.time);
+                          return aMinutes - bMinutes;
+                        });
+                      } else {
+                        console.error('Error:', data.status);
+                        return null;
+                      }
+                    },
+                    parseMinutes(timeString) {
+                      const [hours, minutes] = timeString.split(' ')[0].split('h');
+                      return parseInt(hours) * 60 + parseInt(minutes);
+                    },
                     loadProducts:async function(){
                         let _this = this;
                         let request = {
@@ -538,7 +626,8 @@
                     },
                     showModal:async function (id) {
                         let _this = this;
-                        const exampleModal = document.getElementById('exampleModal')
+                        const exampleModal = document.getElementById('exampleModal');
+                         const swcollapse2=document.getElementById("swcollapse2");
                         if (exampleModal) {
                                 const p = _this.products[id];
                                 _this.accommodationIndex = p;
@@ -547,9 +636,19 @@
                                 _this.accommodationServiceCId = p.services.map(function(s){
                                     return s.serviceInfoCategoryId;
                                 });
-                                var parentInput=5;
-                                _this.$refs.childRef.commentDisplay(p.id, parentInput);
 
+                                const isCollapsed = swcollapse2.classList.contains('collapsed');
+                                if(isCollapsed){
+                                    _this.$refs.childRef.commentDisplay(p.id,_this.onlyThree);
+                                    console.log("收起來");
+                                }
+                                else{
+                                    _this.$refs.childRef.commentDisplay(p.id);
+                                      console.log("打開");
+                                }
+                                
+
+                                _this.initMap(id);
                                 const showMoreText = "...顯示更多";
                                 const showLessText = "...顯示更少";
                                 const lines = _this.temp = p.description.split('\n');
@@ -577,27 +676,7 @@
                                 _this.accommodationImage = imgSrc;
                             })
                         }
-                    },
-                    showAllComment:function(){
-                        let _this=this;
-                    const swcollapse2=document.getElementById("swcollapse2");
-                    const collapse2 = document.getElementById("collapse2");
-                    const topthree = document.getElementById("topthree");
-
-                    const isCollapsed = swcollapse2.classList.contains('collapsed');
-                    if (isCollapsed) {
-                        // Collapse 已展開，這裡可以執行相關程式碼
-                        topthree.style.display = 'block';
-                        console.log("close");
-
-                    }
-                    else {
-                        _this.$refs.childRef.commentDisplay();                      
-                        topthree.style.display = 'none';
-                        console.log("open");
-                    }
-                    
-                    },
+                    },                    
                     clickHandler:function(value){
                         let _this = this;
                         _this.thePage = value;

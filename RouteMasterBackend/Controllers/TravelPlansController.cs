@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MessagePack.Formatters;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -276,7 +277,21 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+        [HttpGet]
+        [Route("Get/CalculateTransportTime")]
+        public async Task<ActionResult<TransportTimeTrDto>> GetDateTime(TimeSpan latestEndTime, int timeValue)
+        {
+            int minuteValue=timeValue/60;
+            var data = new TransportTimeTrDto
+            {
+                StartTime = latestEndTime,
+                EndTime = latestEndTime.Add(TimeSpan.FromMinutes(minuteValue)),
+            };
 
+
+            return data;
+
+        }
 
 
 
