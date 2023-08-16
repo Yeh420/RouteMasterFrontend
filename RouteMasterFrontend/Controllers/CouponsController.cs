@@ -33,11 +33,11 @@ namespace RouteMasterFrontend.Controllers
             {
                 if (coupon.StartDate < now && now < coupon.EndDate)
                 {
-                    coupon.valuable = true;
+                    coupon.Valuable = true;
                 }
                 else
                 {
-                    coupon.valuable = false;
+                    coupon.Valuable = false;
                 }
             }
 
@@ -69,8 +69,8 @@ namespace RouteMasterFrontend.Controllers
             }
         }
         public bool IsActive { get; set; }
-        public bool? valuable { get; set; }
+        public bool? Valuable { get; set; }
 
-        public bool used { get; set; } = false;
+        public bool Selected { get; set; } = false;
     }
 }
