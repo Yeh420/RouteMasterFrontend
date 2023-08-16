@@ -364,9 +364,7 @@ namespace RouteMasterFrontend.Controllers
             Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
-            {
-               
-                    
+            {              
                 return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
@@ -515,7 +513,7 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 return View(vm);
             }
-            return RedirectToAction("MyMemberIndex");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet] 
