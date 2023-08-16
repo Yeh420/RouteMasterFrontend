@@ -9,7 +9,7 @@
         public string Content { get; set; }
         public int StayHours { get; set; }
         public int Price { get; set; }
-        public DateTime CreateDate { get; set; }
+        public string CreateDate { get; set; }
         public bool IsHidden { get; set; }
 
         public IEnumerable<string>? ImageList { get; set; }

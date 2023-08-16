@@ -1,0 +1,12 @@
+﻿@model List<RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionForDistsnceVM>
+
+<div class="related-attractions my-3 mx-2">
+    <h3 style="color:hotpink"><i class="fa-solid fa-location-dot"></i> 附近景點</h3>
+    <hr>
+    <ul>
+        @foreach (var attraction in Model)
+        {
+            <li class="mb-3" onclick="location.href='@Url.Action("Details", new { id = attraction.Id })'"><h5>@attraction.Name</h5></li>
+        }
+    </ul>
+</div>
