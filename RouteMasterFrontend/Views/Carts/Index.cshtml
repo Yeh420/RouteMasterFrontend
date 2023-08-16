@@ -17,10 +17,12 @@
         font-size:16px;
         color: darkgray; 
     }
-
+</style>
 
 <div class="container">
+   
     <div id="accordion">
+        
         <div class="card">
             <div class="card-header" id="headingOne">
                 <h5 class="mb-0">
@@ -31,7 +33,7 @@
             </div>
             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
                 <div class="card-body">
-                    @await Component.InvokeAsync("ExtraServicesDetails2", new { ViewBag.CartId })
+                    @await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })
                     @await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })
                     @await Component.InvokeAsync("AccomodationDetails", new {ViewBag.CartId })
                     @await Html.PartialAsync("Coupons")
@@ -44,6 +46,11 @@
                 <i class="fas fa-shopping-cart"></i>前往結帳
             </button>
         </div>
+    </div>
+</div>
+
+        
+   
        @* <div class="card">
             <div class="card-header" id="headingTwo">
                 <h5 class="mb-0">
@@ -143,4 +150,4 @@
 
         </div>
     </div>
-</div>
+        </div>*@
