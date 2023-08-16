@@ -46,5 +46,34 @@ namespace RouteMasterBackend.Controllers
 
             return resultData;
         }
+
+
+        [HttpPost("Id")]
+        public async Task<ExtraServiceVuePageIndexDto> GetTargetExtraService(int extraServiceId)
+        {
+            var data = _context.ExtraServices.Include(x => x.Region).Include(x => x.Attraction).Where(x=>x.Id==extraServiceId).First();
+
+
+            var resultData = new ExtraServiceVuePageIndexDto
+            {
+                Id = data.Id,
+                Name = data.Name,
+                Image = "/ExtraServiceImages/" + data.Image,
+                Description = data.Description,
+                RegionName = data.Region.Name,
+                AttractionName =data.Attraction.Name
+            };
+
+           
+
+
+
+
+
+            return resultData;
+        }
+
+
     }
+    
 }

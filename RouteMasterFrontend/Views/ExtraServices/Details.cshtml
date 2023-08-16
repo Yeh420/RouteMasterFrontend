@@ -1,33 +1,24 @@
-﻿
+﻿@{
+    var extraServiceId = ViewBag.ExtraServiceId;
+}
 
 @section Styles{
 
 }
 <div id="app">
-    <input type="search" v-model="keyword" />
+    <div>        
+        <div v-model>{{name}}</div>
+        <img v-bind:src="image" />
+        <div v-model>{{regionName}}</div>
+        <div v-model>{{attractionName}}</div>
+        <div v-model>{{description}}</div>
+    </div>
+    <button id="selectProductSolution" @@click="showPurchasingModal(extraServiceId)">選擇方案</button>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>項目名稱</th>
-                <th>圖片預覽</th>
-                <th>所在區域</th>
-                <th>附屬景點</th>
-                <th>項目說明</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td v-model>{{extraServiceId}} </td>
-                @*<td><img v-bind:src="image" style="height:200px;" /></td>*@
-                @*<td v-model>{{regionName}} </td>*@
-                @*<td v-model>{{attractionName}} </td>*@
-                <td v-model> {{description}} </td>
-                <td v-model>{{name}} </td>
-                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="showPurchasingModal(extraServiceId)">選擇方案</button></td>
-            </tr>
-        </tbody>
-    </table>
+
+
+
+    
 </div>
 
 
@@ -47,34 +38,36 @@
         let vueApp = {
             data() {
                 return {
-                    extraServiceId:7,
-                    name:"666",
-                    description:"777",
-
-
-
-
+                    extraServiceId: @extraServiceId,
+                    name:"",
+                    description:"",
+                    image:"",
+                    attractionName:"",
+                    regionName:"",
 
                 };
             },
             mounted: function () {
                 let _this = this;
 
-                _this.filterExtraServiceDtoes();
+                _this.getTargetExtraServiceDto();
             },
             methods: {
-                filterExtraServiceDtoes: function () {
+                getTargetExtraServiceDto: function () {
                     let _this = this;
                     let request = {};
 
-                    request.Keyword = _this.keyword;
+                   
 
-                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/filter`, request).then(response => {
-                        _this.extraServiceDtoes = response.data;
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/Id?extraServiceId=${_this.extraServiceId}`).then(response => {
+                   
 
-                        for (let i = 0; i < _this.extraServiceDtoes.length; i++) {
-                            let item = _this.extraServiceDtoes[i];
-                        }
+                        _this.extraServiceId = response.data.id
+                        _this.name = response.data.name;
+                        _this.description = response.data.description;
+                        _this.image = response.data.image;
+                        _this.attractionName = response.data.attractionName
+                        _this.regionName = response.data.regionName;
 
 
                     }).catch(err => {
@@ -84,6 +77,7 @@
                 showPurchasingModal: function(id){
                     console.log('買買買買買買');
                     console.log(id)
+             
 
                 }
 

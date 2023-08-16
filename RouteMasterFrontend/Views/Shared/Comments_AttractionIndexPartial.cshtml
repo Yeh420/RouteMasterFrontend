@@ -10,27 +10,41 @@
 <div>@Model.Id</div>
 <div id="app">
     <div class="container">
-        <div class="row mb-2" style="width:20%">
-            @*<a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>*@         
-            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
-                <option value="0" selected>排序選擇</option>
-                <option value="1">最新留言</option>
-                <option value="2">星星評分高至低</option>
-                <option value="3">星星評分低至高</option>
-                <option value="4">停留時間由高至低</option>
-                <option value="5">花費由高至低</option>    
-            </select>
-
+        <div class="row mb-2">
+            <div class="col-3">
+                <select v-model="selected" id="commentOrder" class="ms-1" @@change="commentDisplay">
+                    <option value="0" selected>排序選擇</option>
+                    <option value="1">最新留言</option>
+                    <option value="2">星星評分高至低</option>
+                    <option value="3">星星評分低至高</option>
+                    <option value="4">停留時間由高至低</option>
+                    <option value="5">花費由高至低</option>
+                </select>
+            </div>     
+            <div class="col-3 ms-auto text-end">
+                <a asp-controller="Comments_Attraction" asp-action="Create" asp-route-id="@Model.Id">撰寫評論</a>
+            </div>
         </div>
        
-           <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
             <div class="row g-0">
                 <div class="col-md-7">
                     <div class="card-header">{{item.account}}</div>
                     <div class="card-body">
                         <div class="d-flex">
                             <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
-                            <div>{{item.isHidden}}</div>
+                           @* <div>{{item.isHidden}}</div>*@
+                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" @@click="labelComment(item.id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                                </svg>
+                           </a>
+
+                          
+                        
+                               
+                            
+                            
                         </div>
                         <div class="panel d-flex">
                             <ul class="d-flex list-unstyled">
@@ -70,14 +84,66 @@
                             </button>
                         </div>
                     </template>
-                    <template v-else>
+                    <template v-else-if="item.imageList.length===1">                     
+                        <img v-bind:src="getImgPath(item.imageList[0])" class="img-fluid rounded-start">
+                    </template>
+                    <template v-else="item.imageList.length<1">
                         <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
                     </template>
                 </div>
             </div>
         </div>
-       
-    </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">檢舉評論</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @@click="clearPick"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" v-model="pick" :value="1">
+                            <label class="form-check-label" for="gridRadios1">
+                                誤導性或垃圾內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" v-model="pick" :value="2">
+                            <label class="form-check-label" for="gridRadios2">
+                                仇恨或騷擾/濫用內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" v-model="pick" :value="3">
+                            <label class="form-check-label" for="gridRadios3">
+                                暴力或令人反感的內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios4" v-model="pick" :value="4">
+                            <label class="form-check-label" for="gridRadios4">
+                                有害的危險行為
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios5" v-model="pick" :value="5">
+                            <label class="form-check-label" for="gridRadios5">
+                                符合上述多個選項
+                            </label>
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-danger" @@click="fillCheck">我要檢舉</button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>      
 </div>
 
 <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
@@ -89,6 +155,9 @@
                 indexVM:[],
                 selected:0,
                 spotId: @Html.Raw(Json.Serialize(Model.Id)),
+                pick:"",
+                commentid:0,
+                
               
 
             }
@@ -121,6 +190,43 @@
                     console.error('Error:', response.status);
                 }
             },
+            getImgPath: function (photo) {            
+                return `@Url.Content("~/MemberUploads/${photo}")`;
+    
+            },
+            labelComment:function(id){
+                let _this = this;
+                _this.commentid=id;
+                console.log(_this.commentid);
+            },
+            fillCheck: async function(){
+                let _this = this;
+                if(_this.pick){
+                    console.log(this.pick);
+                    var uri = `https://localhost:7145/Comments_Attraction/ReportComment?targetId=${_this.commentid}&reasonId=${_this.pick}`;
+                    const response = await fetch(uri, {
+                        method: "POST",
+
+                    });
+                    if (response.ok) {
+                        var result = await response.text();
+                        console.log(result);
+                       
+                    }
+                    else {
+                        console.error('Error:', response.status);
+                    }
+                }
+                else{
+                    alert("沒有挑選");
+                }
+            },
+            clearPick:function(){
+                let _this = this;
+                _this.pick="";
+                console.log(_this.pick);
+            }
+
         }
 
     }
