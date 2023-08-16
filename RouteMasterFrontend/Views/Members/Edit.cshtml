@@ -1,15 +1,37 @@
 ﻿@model RouteMasterFrontend.EFModels.Member
-
 @{
     ViewData["Title"] = "Edit";
 }
+<style>
 
+    .col-md-8 {
+        display: grid; 
+        grid-template-columns: auto auto auto;
+    }
+
+    .form-group{
+        display: grid; grid-template-columns: auto 1fr auto;
+    }
+
+    .control-label{
+        justify-self:start;
+        text-align:center;
+    }
+
+    .form-group .form-control {
+        justify-self:end;
+        width:350px;
+        text-align: center;
+    }
+
+
+</style>
 <h1>Edit</h1>
 
 <h4>Member</h4>
 <hr />
-<div class="row">
-    <div class="row container">
+<div class="container">
+    <div class="row">
     <div class="col-md-2">
         <nav class="navbar bg-body-tertiary">
             <div class="container-fluid">
@@ -32,59 +54,58 @@
             </div>
         </nav>
     </div>
-
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control" style="justify-items:end"/>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group" >
                 <label asp-for="LastName" class="control-label"></label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+                <div class="form-group" >
                 <label asp-for="Account" class="control-label"></label>
                 <input asp-for="Account" class="form-control" />
                 <span asp-validation-for="Account" class="text-danger"></span>
             </div>
-            
-            <div class="form-group">
+
+                <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label asp-for="CellPhoneNumber" class="control-label"></label>
                 <input asp-for="CellPhoneNumber" class="form-control" />
                 <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label asp-for="Address" class="control-label"></label>
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label asp-for="Gender" class="control-label"></label>
                 <input asp-for="Gender" class="form-control" />
                 <span asp-validation-for="Gender" class="text-danger"></span>
             </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label asp-for="Birthday" class="control-label"></label>
                 <input asp-for="Birthday" class="form-control" />
                 <span asp-validation-for="Birthday" class="text-danger"></span>
             </div>
-            
-            <div class="form-group form-check">
+
+                <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsConfirmed" /> @Html.DisplayNameFor(model => model.IsConfirmed)
                 </label>
             </div>
-            <div class="form-group form-check">
+                <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
                 </label>
