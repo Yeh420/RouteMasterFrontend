@@ -19,8 +19,15 @@ namespace RouteMasterFrontend.Views.Carts.Components.AccomodationDetails
             .Include(c => c.RoomProduct.Room)
             .Include(c => c.RoomProduct.Room.Accommodation)
             .ToList();
-            return View("AccommodationDetailsPartialView",cart);
-         }
+            if (cart.Any())
+            {
+                return View("AccommodationDetailsPartialView", cart);
+            }
+            else
+            {
+                return Content(""); // 返回一个空的内容
+            }
+        }
     
     }
     
