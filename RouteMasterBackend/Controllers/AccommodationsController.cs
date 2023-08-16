@@ -15,7 +15,6 @@ using Microsoft.SqlServer.Types;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
 using RouteMasterFrontend.EFModels;
-using RouteMasterContext = RouteMasterBackend.Models.RouteMasterContext;
 
 namespace RouteMasterBackend.Controllers
 {
@@ -25,16 +24,20 @@ namespace RouteMasterBackend.Controllers
     public class AccommodationsController : ControllerBase
     {
         private readonly Models.RouteMasterContext _db;
+        private readonly IConfiguration _configuration;
 
-        public AccommodationsController(Models.RouteMasterContext context)
+        public AccommodationsController(Models.RouteMasterContext context, IConfiguration configuration)
         {
             _db = context;
+            _configuration = configuration;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetServiceInfoCategory(double lngX, double latY, int? topN = 10)
         {
-            using (var connection = _db.Database.GetDbConnection())
+            string connectionString = _configuration.GetConnectionString("RouteMaster");
+
+            using (var connection = new SqlConnection(connectionString))
             {
                 //connection.Open();
 
