@@ -52,6 +52,7 @@
                     @await Component.InvokeAsync("ExtraServicesDetails2", new { ViewBag.CartId })
                     @await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })
                     @await Component.InvokeAsync("AccomodationDetails", new {ViewBag.CartId })
+                    @await Html.PartialAsync("Coupons")
                 </div>
             </div>
         </div>

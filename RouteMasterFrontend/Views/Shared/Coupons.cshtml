@@ -1,0 +1,62 @@
+﻿
+
+<div id="app">
+
+    <div v-for="coupon in coupons" class="border border-warning rounded my-2 p-3 d-flex">
+        
+        <div>
+            <h3>折扣數 : {{ coupon.Discount }}% !!!</h3>
+            <h5>可用日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
+            <p v-if="!coupon.valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <b>抱歉，這張優惠券目前無法使用</b></p>
+        </div>
+        <div class="ml-auto justify-content-center align-items-center d-flex">
+            <button :disabled="!coupon.valuable" :class="{'btn': true, 'btn-warning': !coupon.used, 'btn-danger': coupon.used}" id="useCouponBtn" v-on:click="UseCoupon"><i class="fa-solid fa-truck-fast"></i> 使用優惠券</button>
+        </div>
+        
+    </div>
+    
+</div>
+
+<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+
+<script>
+    const app = Vue.createApp({
+        data(){
+            return{
+                coupons:[]
+            }
+        },
+        mounted: function () {
+            let _this = this;
+            _this.ShowCoupons();
+        },
+        methods: {
+            ShowCoupons:async function(){
+                let _this = this;
+                var data = {};
+                var uri = "https://localhost:7145/Coupons/GetAllCoupons";
+                const response = await fetch(uri, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    _this.coupons = await response.json();
+                    console.log(_this.coupons);
+
+                }
+                else {
+                    console.error('Error:', response.status);
+                }
+            },
+            UseCoupon(index) {
+                console.log("use coupon")
+                this.coupons[index].used = true;
+            }
+        }
+    })
+
+    app.mount("#app")
+</script>
