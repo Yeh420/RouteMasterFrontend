@@ -10,16 +10,16 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="MemberLogin">
+        <form asp-action="MemberLogin" id="loginForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group" class="form-group mb-3">
                 <label asp-for="Account" class="control-label"></label>
-                <input asp-for="Account" class="form-control" />
+                <input asp-for="Account" class="form-control" id="Account" />
                 <span asp-validation-for="Account" class="text-danger"></span>
             </div>
             <div class="form-group" class="form-group mb-3">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" id="Password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -45,6 +45,7 @@
                  data-shape="rectangular"
                  data-logo_alignment="left">
             </div>
+            <button class="btn btn-warning" onclick="login()">test</button>
         </form>
     </div>
 </div>
@@ -55,4 +56,38 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function(){
+           $('#loginForm').submit(function (event) {
+                event.preventDefault();
+
+            const formData = {
+                    Account: $('#Account').val(), 
+                    Password: $('#Password').val()
+            };
+
+            fetch("https://localhost:7145/Members/MemberLogin", {
+                method:"POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data){
+                        if (data.success) {
+                            window.location.href = 'https://localhost:7145/Members/MyMemberIndex';
+                }else{
+                    alert("帳密錯誤");
+                }
+            })
+                    .catch(error => {
+                        console.error('An error occurred:', error);
+                    });
+           });
+        });
+    </script>
 }

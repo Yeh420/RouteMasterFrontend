@@ -78,19 +78,6 @@ namespace RouteMasterBackend.Models
         public virtual DbSet<Transportation> Transportations { get; set; }
         public virtual DbSet<TravelPlan> TravelPlans { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                IConfigurationRoot config = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-
-                optionsBuilder.UseSqlServer(config.GetConnectionString("RouteMaster"));
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Accommodation>(entity =>
@@ -121,35 +108,35 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Accommodations)
                     .HasForeignKey(d => d.AcommodationCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accommoda__Acomm__47A6A41B");
+                    .HasConstraintName("FK__Accommoda__Acomm__3493CFA7");
 
                 entity.HasOne(d => d.Partner)
                     .WithMany(p => p.Accommodations)
                     .HasForeignKey(d => d.PartnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accommoda__Partn__489AC854");
+                    .HasConstraintName("FK__Accommoda__Partn__3587F3E0");
 
                 entity.HasOne(d => d.Region)
                     .WithMany(p => p.Accommodations)
                     .HasForeignKey(d => d.RegionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accommoda__Regio__498EEC8D");
+                    .HasConstraintName("FK__Accommoda__Regio__367C1819");
 
                 entity.HasOne(d => d.Town)
                     .WithMany(p => p.Accommodations)
                     .HasForeignKey(d => d.TownId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accommoda__TownI__4A8310C6");
+                    .HasConstraintName("FK__Accommoda__TownI__37703C52");
 
                 entity.HasMany(d => d.AccommodationServiceInfos)
                     .WithMany(p => p.Accommodations)
                     .UsingEntity<Dictionary<string, object>>(
                         "AccommodationServiceInfosAccommodation",
                         l => l.HasOne<AccommodationServiceInfo>().WithMany().HasForeignKey("AccommodationServiceInfoId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__ServiceIn__Accom__0F2D40CE"),
-                        r => r.HasOne<Accommodation>().WithMany().HasForeignKey("AccommodationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Accommoda__Accom__4C6B5938"),
+                        r => r.HasOne<Accommodation>().WithMany().HasForeignKey("AccommodationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Accommoda__Accom__395884C4"),
                         j =>
                         {
-                            j.HasKey("AccommodationId", "AccommodationServiceInfoId").HasName("PK__Accommod__DE629F1B77C9796B");
+                            j.HasKey("AccommodationId", "AccommodationServiceInfoId").HasName("PK__Accommod__DE629F1B6B6BE9BB");
 
                             j.ToTable("AccommodationServiceInfos_Accommodations");
                         });
@@ -167,7 +154,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.AccommodationImages)
                     .HasForeignKey(d => d.AccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accommoda__Accom__46B27FE2");
+                    .HasConstraintName("FK__Accommoda__Accom__339FAB6E");
             });
 
             modelBuilder.Entity<AccommodationServiceInfo>(entity =>
@@ -208,19 +195,19 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Activities)
                     .HasForeignKey(d => d.ActivityCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Activitie__Activ__4E53A1AA");
+                    .HasConstraintName("FK__Activitie__Activ__3B40CD36");
 
                 entity.HasOne(d => d.Attraction)
                     .WithMany(p => p.Activities)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Activitie__Attra__4F47C5E3");
+                    .HasConstraintName("FK__Activitie__Attra__3C34F16F");
 
                 entity.HasOne(d => d.Region)
                     .WithMany(p => p.Activities)
                     .HasForeignKey(d => d.RegionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Activitie__Regio__503BEA1C");
+                    .HasConstraintName("FK__Activitie__Regio__3D2915A8");
             });
 
             modelBuilder.Entity<ActivityCategory>(entity =>
@@ -240,7 +227,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ActivityImages)
                     .HasForeignKey(d => d.ActivityId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ActivityI__Activ__51300E55");
+                    .HasConstraintName("FK__ActivityI__Activ__3E1D39E1");
             });
 
             modelBuilder.Entity<ActivityProduct>(entity =>
@@ -251,12 +238,12 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ActivityProducts)
                     .HasForeignKey(d => d.ActivityId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ActivityP__Activ__5224328E");
+                    .HasConstraintName("FK__ActivityP__Activ__3F115E1A");
             });
 
             modelBuilder.Entity<Administrator>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Administ__A9D105349D615D0C")
+                entity.HasIndex(e => e.Email, "UQ__Administ__A9D1053491A28778")
                     .IsUnique();
 
                 entity.Property(e => e.ConfirmCode).HasMaxLength(300);
@@ -285,7 +272,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Administrators)
                     .HasForeignKey(d => d.PermissionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Administr__Permi__531856C7");
+                    .HasConstraintName("FK__Administr__Permi__40058253");
             });
 
             modelBuilder.Entity<Attraction>(entity =>
@@ -310,29 +297,29 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Attractions)
                     .HasForeignKey(d => d.AttractionCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Attractio__Attra__55F4C372");
+                    .HasConstraintName("FK__Attractio__Attra__42E1EEFE");
 
                 entity.HasOne(d => d.Region)
                     .WithMany(p => p.Attractions)
                     .HasForeignKey(d => d.RegionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Attractio__Regio__56E8E7AB");
+                    .HasConstraintName("FK__Attractio__Regio__43D61337");
 
                 entity.HasOne(d => d.Town)
                     .WithMany(p => p.Attractions)
                     .HasForeignKey(d => d.TownId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Attractio__TownI__57DD0BE4");
+                    .HasConstraintName("FK__Attractio__TownI__44CA3770");
 
                 entity.HasMany(d => d.Tags)
                     .WithMany(p => p.Attractions)
                     .UsingEntity<Dictionary<string, object>>(
                         "TagsAttraction",
-                        l => l.HasOne<AttractionTag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Tags_Attr__TagId__15DA3E5D"),
-                        r => r.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Tags_Attr__Attra__14E61A24"),
+                        l => l.HasOne<AttractionTag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Tags_Attr__TagId__02C769E9"),
+                        r => r.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__Tags_Attr__Attra__01D345B0"),
                         j =>
                         {
-                            j.HasKey("AttractionId", "TagId").HasName("PK__Tags_Att__0CB582C0E8746D79");
+                            j.HasKey("AttractionId", "TagId").HasName("PK__Tags_Att__0CB582C0A6BB6766");
 
                             j.ToTable("Tags_Attractions");
                         });
@@ -357,7 +344,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.AttractionClicks)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Attractio__Attra__540C7B00");
+                    .HasConstraintName("FK__Attractio__Attra__40F9A68C");
             });
 
             modelBuilder.Entity<AttractionImage>(entity =>
@@ -370,7 +357,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.AttractionImages)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Attractio__Attra__55009F39");
+                    .HasConstraintName("FK__Attractio__Attra__41EDCAC5");
             });
 
             modelBuilder.Entity<AttractionTag>(entity =>
@@ -384,7 +371,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Carts)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Carts__MemberId__5E8A0973");
+                    .HasConstraintName("FK__Carts__MemberId__4B7734FF");
             });
 
             modelBuilder.Entity<CartAccommodationDetail>(entity =>
@@ -395,13 +382,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CartAccommodationDetails)
                     .HasForeignKey(d => d.CartId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Acco__CartI__58D1301D");
+                    .HasConstraintName("FK__Cart_Acco__CartI__45BE5BA9");
 
                 entity.HasOne(d => d.RoomProduct)
                     .WithMany(p => p.CartAccommodationDetails)
                     .HasForeignKey(d => d.RoomProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Acco__RoomP__59C55456");
+                    .HasConstraintName("FK__Cart_Acco__RoomP__46B27FE2");
             });
 
             modelBuilder.Entity<CartActivitiesDetail>(entity =>
@@ -412,13 +399,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CartActivitiesDetails)
                     .HasForeignKey(d => d.ActivityProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Acti__Activ__5AB9788F");
+                    .HasConstraintName("FK__Cart_Acti__Activ__47A6A41B");
 
                 entity.HasOne(d => d.Cart)
                     .WithMany(p => p.CartActivitiesDetails)
                     .HasForeignKey(d => d.CartId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Acti__CartI__5BAD9CC8");
+                    .HasConstraintName("FK__Cart_Acti__CartI__489AC854");
             });
 
             modelBuilder.Entity<CartExtraServicesDetail>(entity =>
@@ -429,13 +416,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CartExtraServicesDetails)
                     .HasForeignKey(d => d.CartId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Extr__CartI__5CA1C101");
+                    .HasConstraintName("FK__Cart_Extr__CartI__498EEC8D");
 
                 entity.HasOne(d => d.ExtraServiceProduct)
                     .WithMany(p => p.CartExtraServicesDetails)
                     .HasForeignKey(d => d.ExtraServiceProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Cart_Extr__Extra__5D95E53A");
+                    .HasConstraintName("FK__Cart_Extr__Extra__4A8310C6");
             });
 
             modelBuilder.Entity<CommentAccommodationLike>(entity =>
@@ -452,13 +439,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CommentAccommodationLikes)
                     .HasForeignKey(d => d.CommentsAccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comment_A__Comme__5F7E2DAC");
+                    .HasConstraintName("FK__Comment_A__Comme__4C6B5938");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.CommentAccommodationLikes)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comment_A__Membe__607251E5");
+                    .HasConstraintName("FK__Comment_A__Membe__4D5F7D71");
             });
 
             modelBuilder.Entity<CommentStatus>(entity =>
@@ -490,19 +477,19 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CommentsAccommodations)
                     .HasForeignKey(d => d.AccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Accom__625A9A57");
+                    .HasConstraintName("FK__Comments___Accom__4F47C5E3");
 
                 entity.HasOne(d => d.CommentStatus)
                     .WithMany(p => p.CommentsAccommodations)
                     .HasForeignKey(d => d.CommentStatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Comme__634EBE90");
+                    .HasConstraintName("FK__Comments___Comme__503BEA1C");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.CommentsAccommodations)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Membe__6442E2C9");
+                    .HasConstraintName("FK__Comments___Membe__51300E55");
             });
 
             modelBuilder.Entity<CommentsAccommodationImage>(entity =>
@@ -519,7 +506,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CommentsAccommodationImages)
                     .HasForeignKey(d => d.CommentsAccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Comme__6166761E");
+                    .HasConstraintName("FK__Comments___Comme__4E53A1AA");
             });
 
             modelBuilder.Entity<CommentsAttraction>(entity =>
@@ -536,13 +523,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CommentsAttractions)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Attra__662B2B3B");
+                    .HasConstraintName("FK__Comments___Attra__531856C7");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.CommentsAttractions)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Membe__671F4F74");
+                    .HasConstraintName("FK__Comments___Membe__540C7B00");
             });
 
             modelBuilder.Entity<CommentsAttractionImage>(entity =>
@@ -559,7 +546,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.CommentsAttractionImages)
                     .HasForeignKey(d => d.CommentsAttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comments___Comme__65370702");
+                    .HasConstraintName("FK__Comments___Comme__5224328E");
             });
 
             modelBuilder.Entity<Coupon>(entity =>
@@ -587,13 +574,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ExtraServices)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ExtraServ__Attra__69FBBC1F");
+                    .HasConstraintName("FK__ExtraServ__Attra__56E8E7AB");
 
                 entity.HasOne(d => d.Region)
                     .WithMany(p => p.ExtraServices)
                     .HasForeignKey(d => d.RegionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ExtraServ__Regio__6AEFE058");
+                    .HasConstraintName("FK__ExtraServ__Regio__57DD0BE4");
             });
 
             modelBuilder.Entity<ExtraServiceImage>(entity =>
@@ -606,7 +593,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ExtraServiceImages)
                     .HasForeignKey(d => d.ExtraServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ExtraServ__Extra__681373AD");
+                    .HasConstraintName("FK__ExtraServ__Extra__55009F39");
             });
 
             modelBuilder.Entity<ExtraServiceProduct>(entity =>
@@ -617,7 +604,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ExtraServiceProducts)
                     .HasForeignKey(d => d.ExtraServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ExtraServ__Extra__690797E6");
+                    .HasConstraintName("FK__ExtraServ__Extra__55F4C372");
             });
 
             modelBuilder.Entity<Faq>(entity =>
@@ -646,7 +633,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Faqs)
                     .HasForeignKey(d => d.FaqcategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FAQs__FAQCategor__6BE40491");
+                    .HasConstraintName("FK__FAQs__FAQCategor__58D1301D");
             });
 
             modelBuilder.Entity<Faqcategory>(entity =>
@@ -664,21 +651,21 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.FavoriteAttractions)
                     .HasForeignKey(d => d.AttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FavoriteA__Attra__6CD828CA");
+                    .HasConstraintName("FK__FavoriteA__Attra__59C55456");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.FavoriteAttractions)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FavoriteA__Membe__6DCC4D03");
+                    .HasConstraintName("FK__FavoriteA__Membe__5AB9788F");
             });
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Members__A9D1053443BF756B")
+                entity.HasIndex(e => e.Email, "UQ__Members__A9D10534F57FED95")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Account, "UQ__Members__B0C3AC46A2DE5401")
+                entity.HasIndex(e => e.Account, "UQ__Members__B0C3AC465D8E8340")
                     .IsUnique();
 
                 entity.Property(e => e.Account)
@@ -736,7 +723,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.MemberImages)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__MemberIma__Membe__6EC0713C");
+                    .HasConstraintName("FK__MemberIma__Membe__5BAD9CC8");
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -751,37 +738,31 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CouponsId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__CouponsI__7849DB76");
+                    .HasConstraintName("FK__Orders__CouponsI__65370702");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__MemberId__793DFFAF");
+                    .HasConstraintName("FK__Orders__MemberId__662B2B3B");
 
                 entity.HasOne(d => d.OrderHandleStatus)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.OrderHandleStatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__OrderHan__7A3223E8");
+                    .HasConstraintName("FK__Orders__OrderHan__671F4F74");
 
                 entity.HasOne(d => d.PaymentMethod)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.PaymentMethodId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__PaymentM__7B264821");
+                    .HasConstraintName("FK__Orders__PaymentM__681373AD");
 
                 entity.HasOne(d => d.PaymentStatus)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.PaymentStatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__PaymentS__7C1A6C5A");
-
-                entity.HasOne(d => d.TravelPlan)
-                    .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.TravelPlanId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Orders__TravelPl__7D0E9093");
+                    .HasConstraintName("FK__Orders__PaymentS__690797E6");
             });
 
             modelBuilder.Entity<OrderAccommodationDetail>(entity =>
@@ -802,19 +783,19 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.OrderAccommodationDetails)
                     .HasForeignKey(d => d.AccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderAcco__Accom__6FB49575");
+                    .HasConstraintName("FK__OrderAcco__Accom__5CA1C101");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderAccommodationDetails)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderAcco__Order__70A8B9AE");
+                    .HasConstraintName("FK__OrderAcco__Order__5D95E53A");
 
                 entity.HasOne(d => d.RoomProduct)
                     .WithMany(p => p.OrderAccommodationDetails)
                     .HasForeignKey(d => d.RoomProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderAcco__RoomP__719CDDE7");
+                    .HasConstraintName("FK__OrderAcco__RoomP__5E8A0973");
             });
 
             modelBuilder.Entity<OrderActivitiesDetail>(entity =>
@@ -829,19 +810,19 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.OrderActivitiesDetails)
                     .HasForeignKey(d => d.ActivityId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderActi__Activ__72910220");
+                    .HasConstraintName("FK__OrderActi__Activ__5F7E2DAC");
 
                 entity.HasOne(d => d.ActivityProduct)
                     .WithMany(p => p.OrderActivitiesDetails)
                     .HasForeignKey(d => d.ActivityProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderActi__Activ__73852659");
+                    .HasConstraintName("FK__OrderActi__Activ__607251E5");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderActivitiesDetails)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderActi__Order__74794A92");
+                    .HasConstraintName("FK__OrderActi__Order__6166761E");
             });
 
             modelBuilder.Entity<OrderExtraServicesDetail>(entity =>
@@ -856,19 +837,19 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.OrderExtraServicesDetails)
                     .HasForeignKey(d => d.ExtraServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderExtr__Extra__756D6ECB");
+                    .HasConstraintName("FK__OrderExtr__Extra__625A9A57");
 
                 entity.HasOne(d => d.ExtraServiceProduct)
                     .WithMany(p => p.OrderExtraServicesDetails)
                     .HasForeignKey(d => d.ExtraServiceProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderExtr__Extra__76619304");
+                    .HasConstraintName("FK__OrderExtr__Extra__634EBE90");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderExtraServicesDetails)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderExtr__Order__7755B73D");
+                    .HasConstraintName("FK__OrderExtr__Order__6442E2C9");
             });
 
             modelBuilder.Entity<OrderHandleStatus>(entity =>
@@ -888,17 +869,17 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.PackageTours)
                     .HasForeignKey(d => d.PackageCouponId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PackageTo__Packa__03BB8E22");
+                    .HasConstraintName("FK__PackageTo__Packa__70A8B9AE");
 
                 entity.HasMany(d => d.Activities)
                     .WithMany(p => p.PackageTours)
                     .UsingEntity<Dictionary<string, object>>(
                         "PackageActivity",
-                        l => l.HasOne<Activity>().WithMany().HasForeignKey("ActivityId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAc__Activ__7E02B4CC"),
-                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAc__Packa__7EF6D905"),
+                        l => l.HasOne<Activity>().WithMany().HasForeignKey("ActivityId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAc__Activ__6AEFE058"),
+                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAc__Packa__6BE40491"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "ActivityId").HasName("PK__PackageA__95FB0D5468E06230");
+                            j.HasKey("PackageTourId", "ActivityId").HasName("PK__PackageA__95FB0D540B6C04EE");
 
                             j.ToTable("PackageActivities");
                         });
@@ -907,11 +888,11 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.PackageTours)
                     .UsingEntity<Dictionary<string, object>>(
                         "PackageAttraction",
-                        l => l.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAt__Attra__7FEAFD3E"),
-                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAt__Packa__00DF2177"),
+                        l => l.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAt__Attra__6CD828CA"),
+                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageAt__Packa__6DCC4D03"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "AttractionId").HasName("PK__PackageA__2C0A63F82BCD0554");
+                            j.HasKey("PackageTourId", "AttractionId").HasName("PK__PackageA__2C0A63F8A7B66135");
 
                             j.ToTable("PackageAttractions");
                         });
@@ -920,11 +901,11 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.PackageTours)
                     .UsingEntity<Dictionary<string, object>>(
                         "PackageExtraService",
-                        l => l.HasOne<ExtraService>().WithMany().HasForeignKey("ExtraServiceId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageEx__Extra__01D345B0"),
-                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageEx__Packa__02C769E9"),
+                        l => l.HasOne<ExtraService>().WithMany().HasForeignKey("ExtraServiceId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageEx__Extra__6EC0713C"),
+                        r => r.HasOne<PackageTour>().WithMany().HasForeignKey("PackageTourId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PackageEx__Packa__6FB49575"),
                         j =>
                         {
-                            j.HasKey("PackageTourId", "ExtraServiceId").HasName("PK__PackageE__0943AA625E030956");
+                            j.HasKey("PackageTourId", "ExtraServiceId").HasName("PK__PackageE__0943AA62245DBF88");
 
                             j.ToTable("PackageExtraServices");
                         });
@@ -932,7 +913,7 @@ namespace RouteMasterBackend.Models
 
             modelBuilder.Entity<Partner>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Partners__A9D1053439BF761C")
+                entity.HasIndex(e => e.Email, "UQ__Partners__A9D10534F0BA11DB")
                     .IsUnique();
 
                 entity.Property(e => e.ConfirmCode).HasMaxLength(300);
@@ -1007,13 +988,13 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.ReportedAttractionComments)
                     .HasForeignKey(d => d.CommentAttractionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ReportedA__Comme__0A688BB1");
+                    .HasConstraintName("FK__ReportedA__Comme__7755B73D");
 
                 entity.HasOne(d => d.ReportReason)
                     .WithMany(p => p.ReportedAttractionComments)
                     .HasForeignKey(d => d.ReportReasonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ReportedA__Repor__0B5CAFEA");
+                    .HasConstraintName("FK__ReportedA__Repor__7849DB76");
             });
 
             modelBuilder.Entity<Room>(entity =>
@@ -1028,23 +1009,23 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Rooms)
                     .HasForeignKey(d => d.AccommodationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Rooms__Accommoda__0E391C95");
+                    .HasConstraintName("FK__Rooms__Accommoda__7B264821");
 
                 entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.Rooms)
                     .HasForeignKey(d => d.RoomTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Rooms__RoomTypeI__0F2D40CE");
+                    .HasConstraintName("FK__Rooms__RoomTypeI__7C1A6C5A");
 
                 entity.HasMany(d => d.RoomServiceInfos)
                     .WithMany(p => p.Rooms)
                     .UsingEntity<Dictionary<string, object>>(
                         "RoomServiceInfosRoom",
-                        l => l.HasOne<RoomServiceInfo>().WithMany().HasForeignKey("RoomServiceInfoId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__RoomServi__RoomS__1209AD79"),
-                        r => r.HasOne<Room>().WithMany().HasForeignKey("RoomId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__RoomServi__RoomI__11158940"),
+                        l => l.HasOne<RoomServiceInfo>().WithMany().HasForeignKey("RoomServiceInfoId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__RoomServi__RoomS__7EF6D905"),
+                        r => r.HasOne<Room>().WithMany().HasForeignKey("RoomId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__RoomServi__RoomI__7E02B4CC"),
                         j =>
                         {
-                            j.HasKey("RoomId", "RoomServiceInfoId").HasName("PK__RoomServ__B47A76135D39470F");
+                            j.HasKey("RoomId", "RoomServiceInfoId").HasName("PK__RoomServ__B47A7613667669D4");
 
                             j.ToTable("RoomServiceInfos_Rooms");
                         });
@@ -1060,7 +1041,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.RoomImages)
                     .HasForeignKey(d => d.RoomId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RoomImage__RoomI__0C50D423");
+                    .HasConstraintName("FK__RoomImage__RoomI__793DFFAF");
             });
 
             modelBuilder.Entity<RoomProduct>(entity =>
@@ -1073,7 +1054,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.RoomProducts)
                     .HasForeignKey(d => d.RoomId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RoomProdu__RoomI__0D44F85C");
+                    .HasConstraintName("FK__RoomProdu__RoomI__7A3223E8");
             });
 
             modelBuilder.Entity<RoomServiceInfo>(entity =>
@@ -1113,7 +1094,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Schedules)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Schedules__Membe__12FDD1B2");
+                    .HasConstraintName("FK__Schedules__Membe__7FEAFD3E");
             });
 
             modelBuilder.Entity<ServiceInfoCategory>(entity =>
@@ -1140,7 +1121,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.SystemMessages)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__SystemMes__Membe__13F1F5EB");
+                    .HasConstraintName("FK__SystemMes__Membe__00DF2177");
             });
 
             modelBuilder.Entity<Town>(entity =>
@@ -1153,7 +1134,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Towns)
                     .HasForeignKey(d => d.RegionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Towns__RegionId__16CE6296");
+                    .HasConstraintName("FK__Towns__RegionId__03BB8E22");
             });
 
             modelBuilder.Entity<Transportation>(entity =>
@@ -1176,7 +1157,7 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.Transportations)
                     .HasForeignKey(d => d.TravelPlanId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transport__Trave__17C286CF");
+                    .HasConstraintName("FK__Transport__Trave__04AFB25B");
             });
 
             modelBuilder.Entity<TravelPlan>(entity =>
@@ -1189,17 +1170,17 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.TravelPlans)
                     .HasForeignKey(d => d.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TravelPla__Membe__18B6AB08");
+                    .HasConstraintName("FK__TravelPla__Membe__05A3D694");
 
                 entity.HasMany(d => d.ActivityProducts)
                     .WithMany(p => p.TravelPlans)
                     .UsingEntity<Dictionary<string, object>>(
                         "PlanActivity",
-                        l => l.HasOne<ActivityProduct>().WithMany().HasForeignKey("ActivityProductId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanActiv__Activ__04AFB25B"),
-                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanActiv__Trave__05A3D694"),
+                        l => l.HasOne<ActivityProduct>().WithMany().HasForeignKey("ActivityProductId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanActiv__Activ__719CDDE7"),
+                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanActiv__Trave__72910220"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "ActivityProductId").HasName("PK__PlanActi__EB02F9A075F78EA7");
+                            j.HasKey("TravelPlanId", "ActivityProductId").HasName("PK__PlanActi__EB02F9A024A38EAD");
 
                             j.ToTable("PlanActivities");
                         });
@@ -1208,11 +1189,11 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.TravelPlans)
                     .UsingEntity<Dictionary<string, object>>(
                         "PlanAttraction",
-                        l => l.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanAttra__Attra__0697FACD"),
-                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanAttra__Trave__078C1F06"),
+                        l => l.HasOne<Attraction>().WithMany().HasForeignKey("AttractionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanAttra__Attra__73852659"),
+                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanAttra__Trave__74794A92"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "AttractionId").HasName("PK__PlanAttr__99DDD1EEABC25F7C");
+                            j.HasKey("TravelPlanId", "AttractionId").HasName("PK__PlanAttr__99DDD1EE2BD7CB57");
 
                             j.ToTable("PlanAttractions");
                         });
@@ -1221,11 +1202,11 @@ namespace RouteMasterBackend.Models
                     .WithMany(p => p.TravelPlans)
                     .UsingEntity<Dictionary<string, object>>(
                         "PlanExtraService",
-                        l => l.HasOne<ExtraServiceProduct>().WithMany().HasForeignKey("ExtraServiceProductId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanExtra__Extra__0880433F"),
-                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanExtra__Trave__09746778"),
+                        l => l.HasOne<ExtraServiceProduct>().WithMany().HasForeignKey("ExtraServiceProductId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanExtra__Extra__756D6ECB"),
+                        r => r.HasOne<TravelPlan>().WithMany().HasForeignKey("TravelPlanId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__PlanExtra__Trave__76619304"),
                         j =>
                         {
-                            j.HasKey("TravelPlanId", "ExtraServiceProductId").HasName("PK__PlanExtr__4FFE2B658070A3BB");
+                            j.HasKey("TravelPlanId", "ExtraServiceProductId").HasName("PK__PlanExtr__4FFE2B6533EF175B");
 
                             j.ToTable("PlanExtraServices");
                         });

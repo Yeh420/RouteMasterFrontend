@@ -4,14 +4,55 @@
 
 
 }
+<style>
+    #cartTable2 tbody tr {
+        border-top: none;
+    }
+    /* Optional: Add padding to the cells for better spacing */
+    #cartTable2 tbody td {
+        padding: 8px;
+        border-bottom:none;
+    }
+
+    /* Add this style to remove border between thead and tbody */
+    #cartTable2 thead th {
+        border-bottom: none;
+    }
+
+    .activities-container-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px; 
+    }
+    .activity-item{
+        width:350px;
+    }
+
+    .activity-image img:hover{
+        transform:scale(1.2);
+        transition: transform 0.3s ease-in-out;
+    }
+ 
+
+    .item-datetime {
+        white-space: nowrap; /* Prevent line breaks */
+    }
+
+    #cartTable2 thead th {
+        border-bottom:none;
+    }
+   
+</style>
 <head>
     <meta name="viewport" content="width=device-width" />
     @* <title>My Razor View</title>*@
     <script src="https://kit.fontawesome.com/c3bf7d3bbb.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 
-
-<div class="partial-view-container">
+<div style="display: flex; justify-content: center;">
+<div class="partial-view-container" style="width:100%;">
     <table class="table" id="cartTable2">
     <thead>
             <tr>
@@ -30,7 +71,9 @@
                 <th>
                     <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
                 </th>
-                <th></th>
+                <th>
+
+                </th>
             </tr>
        @* <tr>
             <th>
@@ -52,38 +95,77 @@
      
       
     </thead>
-    <tbody>
-@foreach (var item in Model) {
-         <tr data-activitiesid="@item.Id">
-            <td>
-            @Html.DisplayFor(modelItem => item.ActivityProduct.Activity.Name)
-           </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActivityProduct.StartTime) ~
-                    @Html.DisplayFor(modelItem => item.ActivityProduct.EndTime)
-            </td>
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActivityProduct.Price)
-            </td>
-           @* <td>
-                @Html.DisplayFor(modelItem => item.Cart.Id)
-            </td>*@
-            <td>
+            <tbody>
+                @{
+                    var groupitems = Model.GroupBy(item => item.ActivityProduct.Id);
+                }
+                <tr>
+                    <td colspan="8">
+                        <div class="activities-container-vertical">
+                            @foreach (var group in groupitems)
+                            {
+                                var firstItem = group.First();
+                                <div class="activity-item" data-activitiesid="@firstItem.Id">
+                                    <div class="activity-info row">
+                                        <div class="activity-left col-md-3">
+                                            <div class="activity-image">
+                                                <img src="~/ActivityImages/@firstItem.ActivityProduct.Activity.Image" alt="圖片" style="max-width: 150%; height: auto;">
+                                            </div>
+                                        </div>
+                                        <div class="activity-right col-md-8">
+                                            <div class="activity-name" style="font-weight: bold; font-size: 18px; margin-left: 40px;">
+                                                @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Name)
+                                            </div>
+                                            <div class="activity-description" style="font-size: 16px; margin-left: 40px; margin-top: 5px;">
+                                                @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Description)
+                                            </div>
+                                            <div class="activity-datetime" style="font-size: 14px; color: dimgrey; margin-left: 40px; margin-top: 5px;">
+                                                <span class="item-datetime">
+                                                    @Html.DisplayFor(modelItem => firstItem.ActivityProduct.StartTime) ~
+                                                    @Html.DisplayFor(modelItem => firstItem.ActivityProduct.EndTime)
+                                                </span>
+                                            </div>
+                                            <div class="activity-quantity" style="font-size: 14px; color: dimgrey; margin-left: 40px; margin-top: 5px;">
+                                                數量: @group.Sum(item => item.Quantity)
+                                            </div>
+                                            <div class="activity-price" style="font-size: 18px; color: lightseagreen; font-weight: bold; margin-left: 40px; margin-top: 5px;">
+                                                TWD: @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Price)
+                                            </div>
+                                        </div>
+                                        <div class="activity-remove col-md-1" style="text-align: right;">
+                                            <div style="margin-right: 25px;">
+                                                <a href="#" onclick="removeFromCartAct(@firstItem.Id)">
+                                                    <i class="fas fa-trash-can" style="font-size: 18px;"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
 
-            <a href="#" onclick="removeFromCartAct( @item.Id)">
-                <i class="fas fa-trash-can"></i>
-            </a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table></div>
+</table>
+</div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Format date as HH:mm
+    $(document).ready(function () {
+        $(".item-datetime").each(function () {
+            var dateTime = $(this).text();
+            var formattedTime = moment(dateTime).format("HH:mm");
+            $(this).html(formattedTime.replace('~', '<br>'));
+        });
+    });
 
+    // Your removeFromCartAct function here
+    function removeFromCartAct(itemId) {
+        // Your code to remove from cart
+    }
+</script>
 <script>
     function removeFromCartAct(activitiesId) {
         // 發送 AJAX 請求

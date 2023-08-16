@@ -20,6 +20,12 @@ using System.Runtime.Intrinsics.X86;
 using static System.Net.Mime.MediaTypeNames;
 using Google.Apis.Auth;
 using System.IO;
+using RouteMasterFrontend.Models.Dto;
+using Microsoft.Data.SqlClient;
+using Dapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using static Google.Apis.Requests.BatchRequest;
+using RouteMasterFrontend.Models.ViewModels.Carts;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -28,12 +34,14 @@ namespace RouteMasterFrontend.Controllers
         private readonly RouteMasterContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
+        private readonly IConfiguration _configuration;
 
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
+            _configuration = configuration;
         }
 
         // GET: Members/Edit/5
@@ -88,17 +96,272 @@ namespace RouteMasterFrontend.Controllers
         }
 
 
+        //會員普通登入
+        [HttpGet]
+        public async Task<IActionResult> MemberLogin()
+        {
+            return View();
+        }
+
+        //會員普通登入
+        public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
+        {
+            if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
+
+            //帳密IsExist
+            Result result = ValidLogin(vm);           
+            if (result.IsSuccess != true) return BadRequest(new { success = false, message = "Invalid input" });
+           
+            //設定使用者登入資訊
+            const bool rememberMe = false;
+            var member = _context.Members.First(m => m.Account == vm.Account);
+
+            //圖片可在優化位置
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, vm.Account),
+                //new Claim("memberImage", member.Image),
+                //new Claim("id",member.Id.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //identity.AddClaim(new Claim("memberImage", member.Image));
+
+            //設定驗證資訊
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = rememberMe,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+            authProperties);
+
+            Response.Cookies.Append("Id", member.Id.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddHours(2)
+            });
+
+            //購物車
+            var memberid = _context.Members.Where(m => m.Account == vm.Account).FirstOrDefault()?.Id;
+            if (memberid != null)
+            {
+                var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                if (cart != null)
+                {
+                    int cartId = cart.Id;
+
+
+                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(2)
+                    });
+                }
+                else
+                {
+                    var newCart = new Cart
+                    {
+                        MemberId = memberid.Value
+                    };
+
+                    _context.Carts.Add(newCart);
+                    _context.SaveChanges();
+
+                    int cartId = newCart.Id;
+
+
+                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(2)
+                    });
+                }
+
+            }
+
+            //轉成ajax呼叫
+            return Ok(new { success = true, message = "Login successful" });
+
+        }
+
+        //Google登入
+        public async Task<IActionResult> GoogleLogin()
+        {
+            string? formCredential = Request.Form["credential"]; //回傳憑證
+            string? formToken = Request.Form["g_csrf_token"]; //回傳令牌
+            string? cookiesToken = Request.Cookies["g_csrf_token"]; //Cookie 令牌
+
+            //驗證Google Token
+            GoogleJsonWebSignature.Payload? payload = VerifyGoogleToken(formCredential, formToken, cookiesToken).Result;
+            if (payload == null)
+            {
+                //驗證失敗
+                ViewData["info"] = "驗證Google授權失敗";
+            }
+            else
+            {
+                ViewData["info"] = "驗證 Google 授權成功" + "<br>";
+                ViewData["info"] += "Email:" + payload.Email + "<br>";
+                ViewData["info"] += "Name:" + payload.Name + "<br>";
+                ViewData["info"] += "Picture:" + payload.Picture;
+            }
+
+
+            //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
+            if (_context.Members.Any(m => m.Email == payload.Email))
+            {
+                var member = _context.Members.First((m => m.Email == payload.Email));
+                const bool rememberMe = false;
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, payload.Name),
+                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要可以加其他資料
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = rememberMe,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+                };
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                    authProperties);
+
+                Response.Cookies.Append("Id", member.Id.ToString(), new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddHours(2)
+                });
+
+                //購物車功能
+                var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+
+                if (memberid != null)
+                {
+                    var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                    if (cart != null)
+                    {
+                        int cartId = cart.Id;
+
+
+                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddHours(2)
+                        });
+                    }
+                    else
+                    {
+                        var newCart = new Cart
+                        {
+                            MemberId = memberid.Value
+                        };
+
+                        _context.Carts.Add(newCart);
+                        _context.SaveChanges();
+
+                        int cartId = newCart.Id;
+
+
+                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddHours(2)
+                        });
+                    }
+
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                MemberImage img = new MemberImage();
+
+                Result result = RegisterGoogleMember(payload, img);
+
+                if (result.IsSuccess)
+                {
+                    const bool rememberMe = false;
+                    var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, payload.Name),  
+                    //new Claim(ClaimTypes.Email, payload.Email)
+                };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = rememberMe,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
+                    };
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                        authProperties);
+
+
+
+                    //購物車功能
+                    var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
+                    if (memberid != null)
+                    {
+                        var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
+                        if (cart != null)
+                        {
+                            int cartId = cart.Id;
+
+
+                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddHours(2)
+                            });
+                        }
+                        else
+                        {
+                            var newCart = new Cart
+                            {
+                                MemberId = memberid.Value
+                            };
+
+                            _context.Carts.Add(newCart);
+                            _context.SaveChanges();
+
+                            int cartId = newCart.Id;
+
+
+                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddHours(2)
+                            });
+                        }
+
+                    }
+
+                    return RedirectToAction("Index", "Home");
+
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                    return View(payload);
+                }
+            }
+
+        }
+
+
         //會員資料頁
         [HttpGet]
-        public IActionResult MyMemberIndex2()
+        public IActionResult MyMemberIndex()
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
+            var member = _context.Members;
 
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
-
-            Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
+            
+            Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
             {
@@ -108,43 +371,17 @@ namespace RouteMasterFrontend.Controllers
             }
             return RedirectToAction("MemberLogin", "Members");
         }
-
+   
         [HttpGet]
-        //上傳系統圖片 -- 有空時應該改去後台管理系統
-        public IActionResult UploadSystemImages()
+        public async Task<IActionResult> MemberRegister()
         {
-            return View();
-        }
-
-        //上傳系統內建大頭貼
-        [HttpPost]
-        public IActionResult UploadSystemImages(IFormFile[] files)
-        {
-            if (files != null && files.Length > 0)
-            {
-                foreach (var file in files)
-                {
-                    string path = Path.Combine(_environment.WebRootPath, "SystemImages");
-                    string fileName = SaveUploadFile(path, file);
-                    SystemImage img = new SystemImage();
-                    img.Image = fileName;
-                    _context.SystemImages.Add(img);
-                    _context.SaveChanges();
-                }
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
-        //註冊會員
-        [HttpGet]
-        public IActionResult MemberRegister()
-        {
+            var towns = await _context.Towns.ToListAsync();
+            ViewBag.TownList = new SelectList(towns,"城市");
             return View();
         }
 
         //註冊會員
         [HttpPost]
-
         public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
 
         {
@@ -189,300 +426,8 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
-        //註冊成功頁面
-        public IActionResult SuccessRegister()
-        {
-            return View();
-        }
-
-
-        //會員普通登入
-        [HttpGet]
-        public async Task<IActionResult> MemberLogin()
-        {
-            return View();
-        }
-
-        //會員普通登入
-        public async Task<IActionResult> MemberLogin(MemberLoginVM vm)
-        {
-            if (ModelState.IsValid == false) return View(vm);
-
-            Result result = ValidLogin(vm);
-
-            if (result.IsSuccess != true)
-            {
-                ModelState.AddModelError("", result.ErrorMessage); return View(vm);
-            }
-
-            const bool rememberMe = false;
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, vm.Account),
-
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = rememberMe,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
-            };
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                authProperties);
-
-            var memberid = _context.Members.Where(m => m.Account == vm.Account).FirstOrDefault()?.Id;
-            if (memberid != null)
-            {
-                var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
-                if (cart != null)
-                {
-                    int cartId = cart.Id;
-
-                   
-                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                    {
-                        Expires = DateTimeOffset.UtcNow.AddHours(2)
-                    });
-                }
-                else
-                {
-                    var newCart = new Cart
-                    {
-                        MemberId = memberid.Value
-                    };
-
-                    _context.Carts.Add(newCart);
-                    _context.SaveChanges();
-
-                    int cartId = newCart.Id;
-
-                  
-                    Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                    {
-                        Expires = DateTimeOffset.UtcNow.AddHours(2)
-                    });
-                }
-                
-            }
-
-            return RedirectToAction("MyMemberIndex2", "Members");
-        }
-
-
-        //Google登入
-        public async Task<IActionResult> GoogleLogin()
-        {
-            string? formCredential = Request.Form["credential"]; //回傳憑證
-            string? formToken = Request.Form["g_csrf_token"]; //回傳令牌
-            string? cookiesToken = Request.Cookies["g_csrf_token"]; //Cookie 令牌
-
-            //驗證Google Token
-            GoogleJsonWebSignature.Payload? payload = VerifyGoogleToken(formCredential, formToken, cookiesToken).Result;
-             if (payload == null)
-            {
-                //驗證失敗
-                ViewData["info"] = "驗證Google授權失敗";
-            }
-            else
-            {
-                ViewData["info"] = "驗證 Google 授權成功" + "<br>";
-                ViewData["info"] += "Email:" + payload.Email + "<br>";
-                ViewData["info"] += "Name:" + payload.Name + "<br>";
-                ViewData["info"] += "Picture:" + payload.Picture;
-            }
-            
-             //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
-             if(_context.Members.Any(m => m.Email == payload.Email))
-            {
-                const bool rememberMe = false;
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
-                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
-                };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
-
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = rememberMe,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
-                };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                    authProperties);
-                
-                //購物車功能
-                var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
-
-
-
-                if (memberid != null)
-                {
-                    var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
-                    if (cart != null)
-                    {
-                        int cartId = cart.Id;
-
-
-                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                        {
-                            Expires = DateTimeOffset.UtcNow.AddHours(2)
-                        });
-                    }
-                    else
-                    {
-                        var newCart = new Cart
-                        {
-                            MemberId = memberid.Value
-                        };
-
-                        _context.Carts.Add(newCart);
-                        _context.SaveChanges();
-
-                        int cartId = newCart.Id;
-
-
-                        Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                        {
-                            Expires = DateTimeOffset.UtcNow.AddHours(2)
-                        });
-                    }
-
-                }
-
-                return RedirectToAction("MyMemberIndex", "Members");
-            }
-            else
-            {
-                MemberImage img = new MemberImage();
-
-                Result result = RegisterGoogleMember(payload, img);
-
-                if (result.IsSuccess)
-                {
-                    const bool rememberMe = false;
-                    var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
-                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
-                };
-
-                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
-
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = rememberMe,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2)
-                    };
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                        authProperties);
-
-                    //購物車功能
-                    var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
-                    if (memberid != null)
-                    {
-                        var cart = _context.Carts.FirstOrDefault(x => x.MemberId == memberid);
-                        if (cart != null)
-                        {
-                            int cartId = cart.Id;
-
-
-                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                            {
-                                Expires = DateTimeOffset.UtcNow.AddHours(2)
-                            });
-                        }
-                        else
-                        {
-                            var newCart = new Cart
-                            {
-                                MemberId = memberid.Value
-                            };
-
-                            _context.Carts.Add(newCart);
-                            _context.SaveChanges();
-
-                            int cartId = newCart.Id;
-
-
-                            Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
-                            {
-                                Expires = DateTimeOffset.UtcNow.AddHours(2)
-                            });
-                        }
-
-                    }
-
-                    return RedirectToAction("MyMemberIndex", "Members");
-                    
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, result.ErrorMessage);
-                    return View(payload);
-                }
-            }
-            
-        }
-
         
-        private async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string? formCredential, string? formToken, string? cookiesToken)
-        {
-            // 檢查空值
-            if (formCredential == null || formToken == null && cookiesToken == null) return null;
-
-            GoogleJsonWebSignature.Payload? payload;
-            try
-            {
-                // 驗證 token
-                if (formToken != cookiesToken)
-                {
-                    return null;
-                }
-
-                // 驗證憑證
-                IConfiguration Config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
-                string GoogleApiClientId = Config.GetSection("GoogleApiClientId").Value;
-                var settings = new GoogleJsonWebSignature.ValidationSettings()
-                {
-                    Audience = new List<string>() { GoogleApiClientId }
-                };
-                payload = await GoogleJsonWebSignature.ValidateAsync(formCredential, settings);
-                if (!payload.Issuer.Equals("accounts.google.com") && !payload.Issuer.Equals("https://accounts.google.com"))
-                {
-                    return null;
-                }
-                if (payload.ExpirationTimeSeconds == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    DateTime now = DateTime.Now.ToUniversalTime();
-                    DateTime expiration = DateTimeOffset.FromUnixTimeSeconds((long)payload.ExpirationTimeSeconds).DateTime;
-                    if (now > expiration)
-                    {
-                        return null;
-                    }
-                }
-            }
-            catch
-            {
-                return null;
-            }
-            return payload;
-        }
-
-
+    
         //會員登出
         [HttpGet]
         public async Task<IActionResult> Logout()
@@ -492,6 +437,7 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("LogoutSuccess", "Members");
         }
 
+        //登出成功畫面
         public async Task<IActionResult> LogoutSuccess()
         {
             return View();
@@ -526,13 +472,13 @@ namespace RouteMasterFrontend.Controllers
             return View("MemberLogin");
         }
 
-        //更改密碼       
+        //忘記密碼/更改密碼       
         public IActionResult MemberResetPassword()
         {
             return View();
         }
         
-        //更改密碼 
+        //忘記密碼/更改密碼 
         [HttpPost]
         public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
         {
@@ -556,7 +502,6 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
-        
         [HttpPost]
         public ActionResult EditPassword(MemberEditPasswordVM vm)
         {
@@ -573,21 +518,99 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("MyMemberIndex");
         }
 
-
-        [HttpGet]
-       public async Task<IActionResult> HistoryOrder(int? id)
+        [HttpGet] 
+        public async Task<IActionResult> HistoryOrder(int? id)
         {
-            if (id == null || _context.Members == null) return NotFound();
-            
-            var member = await _context.Members.FindAsync(id);
-            if (member == null) return NotFound();
-            return View(member);
+            var historyOrders = _context.Orders
+                .Include(x => x.OrderExtraServicesDetails)
+                .Include(x => x.OrderActivitiesDetails)
+                .Include(x => x.OrderAccommodationDetails)
+                .Include(x => x.Coupons)
+                .Include(x => x.OrderHandleStatus)
+                .Include(x => x.PaymentStatus)
+                .Include(x => x.PaymentMethod);
+
+           var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
+           var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
+
+
+
+
+
+
+
+
+
+           
+            return View(historyOrders);
         }
 
-        [HttpPost]
-        public IActionResult HistoryOrder() 
+        ////使用dapper做資料庫存取歷史訂單    
+        //[HttpGet]
+        //public async Task<IActionResult> HistoryOrder()
+        //{
+        //    ClaimsPrincipal user = HttpContext.User;
+            
+        //    //列出與登入符合資料
+        //    string userAccount = user.Identity.Name;
+
+        //    Member myMember = _context.Members.FirstOrDefault(m => m.Account == userAccount);
+
+
+        //    string connStr = _configuration.GetConnectionString("RouteMaster");
+
+        //     string sql = $@"select ord.memberid, ord.PaymentStatusId, ord.CreateDate, ord.ModifiedDate, ord.Total, m.Account, m.Email
+        //                    from Orders as ORD
+        //                    inner join Members as M on ORD.MemberId = m.Id
+        //                    where m.Account=@Account";
+        //    IEnumerable<HistoryOrderDTO> orderDTOs = new SqlConnection(connStr).Query<HistoryOrderDTO>(sql, new { Account = myMember.Account });
+        //    return Json(orderDTOs);
+        //}
+
+        public IActionResult Test123()
         {
-            return View(); 
+            return View();
+        }
+
+
+        //註冊成功頁面
+        public ActionResult SuccessRegister()
+        {
+            return View();
+        }
+
+
+        [HttpGet]
+        //上傳系統圖片 -- 有空時應該改去後台管理系統
+        public IActionResult UploadSystemImages()
+        {
+            return View();
+        }
+
+        //上傳系統內建大頭貼
+        [HttpPost]
+        public IActionResult UploadSystemImages(IFormFile[] files)
+        {
+            if (files != null && files.Length > 0)
+            {
+                foreach (var file in files)
+                {
+                    string path = Path.Combine(_environment.WebRootPath, "SystemImages");
+                    string fileName = SaveUploadFile(path, file);
+                    SystemImage img = new SystemImage();
+                    img.Image = fileName;
+                    _context.SystemImages.Add(img);
+                    _context.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        //歷史訂單
+        //這是前後端分離，做成web api 的服務
+        public  IActionResult MemOrder()
+        {
+            return View();
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -672,47 +695,32 @@ namespace RouteMasterFrontend.Controllers
         private Result ValidLogin(MemberLoginVM vm)
         {
             var db = new RouteMasterContext();
-
-            //Result resultAttempt = LockAccountIfFailedAttemptsExceeded(vm.Account);
-            //if (resultAttempt.IsSuccess)
-            //{
-            //    return resultAttempt; // 帳號已鎖定，返回錯誤結果m
-            //}
-
-
             var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
-            int failedAttempts = 0;
-            if (member == null)
-            {
-
-                return Result.Failure("帳密有錯");
-            }
-            else
-            {
-                var claims = new List<Claim>();
-                {
-                    new Claim(ClaimTypes.Name, member.Account);
-                    new Claim("LastName", member.LastName);
-                    new Claim("Id", member.Id.ToString());
-                };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-            }
-            //if(member.IsSuspended)  --有沒有停權
-
             var salt = _hashUtility.GetSalt();
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
-            if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
+            //帳號先，後密碼
+            if (member != null && string.Compare(hashPassword, member.EncryptedPassword) == 0)
             {
-                return Result.Success();
-
+                return Result.Success();               
             }
             else
             {
-                return Result.Failure("帳密有誤");
+                return Result.Failure("帳密有錯");
             }
+            
+            ////var salt = _hashUtility.GetSalt();
+            ////var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
+
+            //if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
+            //{
+            //    return Result.Success();
+            //}
+            //else
+            //{   
+            //    return Result.Failure("帳密有誤");
+            //}
+            
         }
 
         //上傳圖片
@@ -738,6 +746,49 @@ namespace RouteMasterFrontend.Controllers
             return newFileName;
         }
 
+        private async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string? formCredential, string? formToken, string? cookiesToken)
+        {
+            // 檢查預防空值
+            if (formCredential == null || formToken == null && cookiesToken == null) return null;
+
+            GoogleJsonWebSignature.Payload? payload;
+            try
+            {
+                // 驗證 token，預防令牌值被竄改，兩者必須是來自同一次請求的令牌
+                if (formToken != cookiesToken) return null;
+ 
+                // 取得GoolgeApiClientId
+                IConfiguration Config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
+                string GoogleApiClientId = Config.GetSection("GoogleApiClientId").Value;
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { GoogleApiClientId }
+                };
+                payload = await GoogleJsonWebSignature.ValidateAsync(formCredential, settings);
+                if (!payload.Issuer.Equals("accounts.google.com") && !payload.Issuer.Equals("https://accounts.google.com"))
+                {
+                    return null;
+                }
+                if (payload.ExpirationTimeSeconds == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    DateTime now = DateTime.Now.ToUniversalTime();
+                    DateTime expiration = DateTimeOffset.FromUnixTimeSeconds((long)payload.ExpirationTimeSeconds).DateTime;
+                    if (now > expiration)
+                    {
+                        return null;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return payload;
+        }
 
 
         //會員是否存在
@@ -831,11 +882,11 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name + DateTime.Now,
+                Account = payload.Name+DateTime.Now.ToString("FFFFFFF"),
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
-                Birthday= DateTime.Now,
+                Birthday= DateTime.Today,
                 Gender= false,
                 Image= imageFile,
                 IsConfirmed = false,

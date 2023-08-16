@@ -24,6 +24,12 @@
             color: #fff;
             border-color: #007bff;
         }
+
+        .attraction, .pointer {
+            cursor: pointer;
+        }
+
+        
     </style>
     
 }
@@ -57,8 +63,8 @@
                     @foreach (var category in categories)
                     {
                         <div>
-                            <input type="checkbox" id="category_@category" name="category" value="@category" @(s_category != null && s_category.Contains(category) ? "checked" : "")>
-                            <label for="category_@category">@category</label>
+                            <input type="checkbox" class="pointer" id="category_@category" name="category" value="@category" @(s_category != null && s_category.Contains(category) ? "checked" : "")>
+                            <label for="category_@category" class="pointer">@category</label>
                         </div>
                     }
                 </div>
@@ -69,8 +75,8 @@
                     @foreach (var tag in tags)
                     {
                         <div>
-                            <input type="checkbox" id="tag_@tag" name="tag" value="@tag" @(s_tag != null && s_tag.Contains(tag) ? "checked" : "")>
-                            <label for="tag_@tag">@tag</label>
+                            <input type="checkbox" class="pointer" id="tag_@tag" name="tag" value="@tag" @(s_tag != null && s_tag.Contains(tag) ? "checked" : "")>
+                            <label for="tag_@tag" class="pointer">@tag</label>
                         </div>
                     }
                 </div>
@@ -81,22 +87,23 @@
                     @foreach (var region in regions)
                     {
                         <div>
-                            <input type="checkbox" id="region_@region" name="region" value="@region" @(s_region != null && s_region.Contains(region) ? "checked" : "")>
-                            <label for="region_@region">@region</label>
+                            <input type="checkbox" class="pointer" id="region_@region" name="region" value="@region" @(s_region != null && s_region.Contains(region) ? "checked" : "")>
+                            <label for="region_@region" class="pointer">@region</label>
                         </div>
                     }
                 </div>
 
                 <div class="mb-3 col">
                     <label>排序</label>
-                    <select name="order" class="form-select" >
+                    <select name="order" class="form-select pointer" >
                         <option value="">請選擇排序方式</option>
                         <!option value="click" @(s_order == "click" ? "selected" : "")>人氣最高</!option>
+                        <!option value="clickInThirty" @(s_order == "clickInThirty" ? "selected" : "")>近期熱門</!option>
                         <!option value="score" @(s_order == "score" ? "selected" : "")>評分最高</!option>
                         <!option value="hours" @(s_order == "hours" ? "selected" : "")>停留時間從短到長</!option>
-                        <!option value="hoursDesc" @(s_order == "hoursDesc" ? "selected" : "")>停留時間從長到短</!option>
+                        <!option  value="hoursDesc" @(s_order == "hoursDesc" ? "selected" : "")>停留時間從長到短</!option>
                         <!option value="price" @(s_order == "price" ? "selected" : "")>花費從低到高</!option>
-                        <!option value="priceDesc" @(s_order == "priceDesc" ? "selected" : "")>花費從高到低</!option>
+                        <!option  value="priceDesc" @(s_order == "priceDesc" ? "selected" : "")>花費從高到低</!option>
                     </select>
 
                 </div>
@@ -117,17 +124,17 @@
     <div class="container w-75">
         @foreach (var item in Model)
         {
-            <div class="row mb-4 border rounded" style="height:250px" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">
+            <div class="row mb-4 border rounded attraction" style="height:250px" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">
                 
 
                 
-                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-left" style="object-fit: cover;">
+                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-start" style="object-fit: cover;">
                 
                 
 
                 <div class="col-8 d-flex flex-column justify-content-between  py-3">
 
-                    <h2>@($"{item.Name} ")<span class="badge badge-info text-white">@item.AttractionCategory</span></h2>
+                    <h2>@($"{item.Name} ")<span class="badge bg-info text-white">@item.AttractionCategory</span></h2>
                     <p>@item.DescriptionText</p>
 
                     <div class="mb-0">
@@ -138,11 +145,11 @@
                             {
                                 @if (i <= Math.Round(item.Score))
                                 {
-                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa fa-star fa-fw" style="color:#f90"></i>
                                 }
                                 else
                                 {
-                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa fa-star fa-fw" style="color:#ccc"></i>
                                 }
                             }
                             @($"({item.ScoreCount}) | 平均停留{item.Hours}小時({item.HoursCount}) | 平均花費{item.Price}元({item.PriceCount})")
@@ -150,7 +157,7 @@
                         <h5>
                             @foreach (var tag in item.Tags)
                             {
-                                <span class="badge badge-primary text-white">@tag</span>
+                                <span class="badge bg-primary text-white">@tag</span>
                             }
                         </h5>
                     </div>
@@ -189,10 +196,18 @@
         $(document).ready(function() {
             // 預設收合搜尋表單
             $('.formContainer').hide();
+
+            $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-down"></i>`);
         });
 
         $("#toggleForm").click(function(){
             $(".formContainer").toggle();
+
+            if ($(".formContainer").is(":visible")) {
+                $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-up"></i>`);
+            } else {
+                $('#toggleForm').html(`篩選及排序 <i class="fa-solid fa-caret-down"></i>`);
+            }
         })
 
         $("#clear").click(function () {

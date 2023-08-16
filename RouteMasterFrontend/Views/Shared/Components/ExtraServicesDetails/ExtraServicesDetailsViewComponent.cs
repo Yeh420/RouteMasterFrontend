@@ -28,7 +28,15 @@ namespace RouteMasterFrontend.Views.Carts.Components.ExtraServicesDetails
                 .Include(c => c.ExtraServiceProduct.ExtraService) // Load the ExtraService within ExtraServiceProduct
                 .ToList(); ;
             // 使用 View 屬性設定要回傳的檢視名稱
-            return View("ExtraServicesDetailsPartialView", cart);
+          
+            if (cart.Any())
+            {
+                return View("ExtraServicesDetailsPartialView", cart);
+            }
+            else
+            { 
+                return Content("");
+            }
         }
     }
 }

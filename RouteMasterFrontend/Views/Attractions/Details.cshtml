@@ -1,0 +1,291 @@
+﻿@model RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionDetailVM
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@section Styles{
+    <style>
+        p {
+            font-size:1.4em;
+        }
+        iframe {
+            width: 100%;
+        }
+
+        .related-attractions li {
+            color: darkblue;
+        }
+
+
+        .related-attractions li:hover{
+            color:dodgerblue;
+            cursor:pointer;
+        } 
+    </style>
+}
+
+
+
+<div class="container-fluid my-5">
+    <div class="row">
+        <div class="col-9">
+            <div class="">
+
+                <div class="mb-5">
+                    <div id="carouselExampleIndicators" class="carousel slide">
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < Model.Images.Count(); i++)
+                            {
+                                if (i == 0)
+                                {
+                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to=@i class="active" aria-current="true" aria-label="Slide @(i+1)"></button>
+                                }
+                                else
+                                {
+                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to=@i aria-label="Slide @(i+1)"></button>
+                                }
+                            }
+
+                        </div>
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < Model.Images.Count(); i++)
+                            {
+                                if (i == 0)
+                                {
+                                    <div class="carousel-item active">
+                                        <img src="~/AttractionImages/@Model.Images[i]" class="d-block w-100" style="height:500px; object-fit:cover" alt="...">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="carousel-item">
+                                        <img src="~/AttractionImages/@Model.Images[i]" class="d-block w-100" style="height:500px; object-fit:cover" alt="...">
+                                    </div>
+                                }
+                            }
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="m-3">
+                    <div class="mb-1">
+                        <h1><strong>@($"{Model.Name} ")</strong><span class="badge bg-info">@Model.AttractionCategory</span></h1>
+                    </div>
+
+                    <div class="mb-5">
+                        <h3>@($"{Model.Region} {Model.Town}")</h3>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5>
+                            @($"{Model.Score}")
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                @if (i <= Math.Round(Model.Score))
+                                {
+                                    <i class="fa fa-star fa-fw" style="color:#f90"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-star fa-fw" style="color:#ccc"></i>
+                                }
+                            }
+                            @($"({Model.ScoreCount}) | 平均停留{Model.Hours}小時({Model.HoursCount}) | 平均花費{Model.Price}元({Model.PriceCount}) | 點擊次數 : {Model.Clicks}次")
+                        </h5>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5>
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <span class="badge bg-primary text-white">@tag</span>
+                            }
+                        </h5>
+                    </div>
+
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>景點介紹<br></h3>
+                        </div>
+                        @Html.Raw(Model.Description)
+                    </div>
+
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>地圖<br></h3>
+                        </div>
+
+                        @Html.Raw(Model.Website)
+                    </div>
+
+                    
+
+                    <div class="mb-5">
+                        <div class="mb-3">
+                            <h3>評論區<br></h3>
+                            @await Html.PartialAsync("Comments_AttractionIndexPartial",Model)
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @if (ViewBag.IsFavorite)
+                        {
+                            <button class="btn btn-primary" id="removeFromFavoriteButton">從我的最愛中刪除</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" id="addToFavoriteButton">加入我的最愛</button>
+                        }
+
+                        <button class="btn btn-secondary" onclick="history.back()">上一頁</button>
+                    </div>
+
+                </div>
+
+                
+
+                
+            </div>
+        </div>
+
+        <div class="col-3 ">
+            @if (Model.RelatedAttractions != null && Model.RelatedAttractions.Count() > 0)
+            {
+                <aside class="border rounded mb-3">
+
+                    @await Html.PartialAsync("_RelatedAtt", Model.RelatedAttractions)
+
+                </aside>
+            }
+            @if (Model.CloseAtt != null && Model.CloseAtt.Count() > 0)
+            {
+                <aside class="border rounded mb-3">
+
+                    @await Html.PartialAsync("_CloseAtt", Model.CloseAtt)
+
+                </aside>
+            }
+
+            @if (Model.SameCategoryAtt != null && Model.SameCategoryAtt.Count() > 0)
+            {
+                <aside class="border rounded mb-3">
+
+                    @await Html.PartialAsync("_SameCategoryAtt", Model.SameCategoryAtt)
+
+                </aside>
+            }
+            @if (Model.SameRegionAtt != null && Model.SameRegionAtt.Count() > 0)
+            {
+                <aside class="border rounded mb-3">
+
+                    @await Html.PartialAsync("_SameRegionAtt", Model.SameRegionAtt)
+
+                </aside>
+            }
+
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+@section Scripts{
+    
+    <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin = "anonymous" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.getElementById("addToFavoriteButton").addEventListener("click", function () {
+            var attractionId = @Model.Id;
+
+            $.ajax({
+                url: '@Url.Action("AddToFavorite", "Attractions")',
+                type: 'POST',
+                data: { id: attractionId },
+                success: function (result) {
+                    // console.log("AJAX success:", result);
+
+                    
+
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: null,
+                            text: '已加入我的最愛!',
+                            confirmButtonText: '確認'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                        //alert("已加入最愛");
+                    } else {
+                        Swal.fire({
+                            title: '登入後才可以使用此功能',
+                            text: "請問您要登入嗎?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            cancelButtonText: '取消',
+                            confirmButtonText: '登入'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("MemberLogin", "Members")';
+                            }
+                        })
+                        //var loginConfirmation = confirm("請先登入。是否前往登入頁面？");
+                        //if (loginConfirmation) {
+                        //    window.location.href = '@Url.Action("MemberLogin", "Members")';
+                        //}
+                    }
+                }
+            });
+        });
+
+        
+    </script>
+
+    <script>
+        document.getElementById("removeFromFavoriteButton").addEventListener("click", function () {
+            var attractionId = @Model.Id;
+
+            $.ajax({
+                url: '@Url.Action("RemoveFromFavorite", "Attractions")', // 修改为正确的URL
+                type: 'POST',
+                data: { id: attractionId },
+                success: function (result) {
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: null,
+                            text: '已從我的最愛中刪除',
+                            confirmButtonText: '確認'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        // 处理登录逻辑
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SqlServer.Types;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
+using RouteMasterFrontend.EFModels;
 
 namespace RouteMasterBackend.Controllers
 {
@@ -18,42 +23,131 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class AccommodationsController : ControllerBase
     {
-        private readonly RouteMasterContext _context;
+        private readonly Models.RouteMasterContext _db;
 
-        public AccommodationsController(RouteMasterContext context)
+        public AccommodationsController(Models.RouteMasterContext context)
         {
-            _context = context;
+            _db = context;
         }
 
-        // GET: api/Accommodations
         [HttpGet]
-        public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(string? keyword, int page = 1, int pageSize = 3)
+        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetAccommodations(double lngX, double latY, int topN = 10)
         {
-            if (_context.Accommodations == null)
+            var datas = await _db.Accommodations
+                //.Include(a => a.AcommodationCategory)
+                //.Include(a => a.Rooms)
+                //.ThenInclude(r => r.RoomProducts)
+                //.AsNoTracking()
+                .Select(data => new AccommodationDistanceDTO
+                {
+                    Id = data.Id,
+                    ACategory = data.AcommodationCategory.Name,
+                    Name = data.Name,
+                    Grade = data.Grade,
+                    Address = data.Address,
+                    CheckIn = data.CheckIn,
+                    CheckOut = data.CheckOut,
+                    PositionX = data.PositionX,
+                    PositionY = data.PositionY,
+                    Image = data.Image,
+                    Distance = Math.Sqrt(
+                Math.Pow((double)(lngX - data.PositionX), 2) +
+                Math.Pow((double)(latY - data.PositionY), 2)) * 111,
+                    Rooms = data.Rooms
+                })
+                .OrderBy(a => Math.Sqrt(
+                Math.Pow((double)(lngX - a.PositionX), 2) +
+                Math.Pow((double)(latY - a.PositionY), 2))).Take(topN).ToListAsync();
+
+
+
+            //var accommodations = new List<AccommodationDistanceDTO>();
+            //foreach(var data in datas)
+            //{
+            //    var dto = new AccommodationDistanceDTO
+            //    {
+            //        Id = data.Id,
+            //        ACategory =  data.AcommodationCategory.Name,
+            //        Name = data.Name,
+            //        Grade = data.Grade,
+            //        Address = data.Address,
+            //        CheckIn = data.CheckIn,
+            //        CheckOut = data.CheckOut,
+            //        Image = data.Image,
+            //        Distance = CalcDistance(lngX, latY, data.PositionX, data.PositionY),
+            //        Rooms = data.Rooms
+            //        //RoomProducts = _db.RoomProducts.Select
+            //    };
+            //    accommodations.Add(dto);
+            //}
+            return datas;
+        }
+
+        private double CalcDistance(double lngX, double latY, double? positionX, double? positionY)
+        {
+           return Math.Sqrt(
+                Math.Pow((double)(lngX - positionX), 2) +
+                Math.Pow((double)(latY - positionY), 2)) * 111;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(FilterData data)
+        {
+            
+            if (_db.Accommodations == null)
             {
                 return NotFound();
             }
-            var accommodations = _context.Accommodations
+            var accommodations = _db.Accommodations.AsNoTracking()
                     .Include(a => a.CommentsAccommodations)
                     .Include(a => a.AccommodationImages)
                     .Include(a => a.Rooms)
-                    .Include(a => a.AccommodationServiceInfos).AsQueryable();
-            if (!string.IsNullOrEmpty(keyword))
+                    .Include(a => a.AccommodationServiceInfos)
+                    .AsQueryable();
+
+            if (!string.IsNullOrEmpty(data.Keyword))
             {
 	            accommodations = accommodations.Where(p => 
-                    p.Name.Contains(keyword)||
-                    p.Description.Contains(keyword)||
-                    p.Address.Contains(keyword)||
-                    p.AccommodationServiceInfos.Where(s=>s.Name.Contains(keyword)).Any()
+                    p.Name.Contains(data.Keyword) ||
+                    p.Description.Contains(data.Keyword) ||
+                    p.Address.Contains(data.Keyword) ||
+                    p.AccommodationServiceInfos.Where(s=>s.Name.Contains(data.Keyword)).Any()
                 );
-
             }
+
+            if (data.Grades != null && data.Grades.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Grades.Contains(a.Grade));
+            };
+
+            if (data.ACategory != null && data.ACategory.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.ACategory.Contains(a.AcommodationCategory.Name));
+            };
+            if(data.score != null)
+            {
+                accommodations = accommodations.Where(a => a.CommentsAccommodations.Average(ca=>ca.Score) >= data.score);
+            }
+
+            if(data.SCategory != null && data.SCategory.Length > 0)
+            {
+                foreach(var sCategory in data.SCategory)
+                {
+                    accommodations = accommodations.Where(a => a.AccommodationServiceInfos.Any(s => s.Name == sCategory));
+                }
+            }
+
+            if (data.Regions != null && data.Regions.Length > 0)
+            {
+                accommodations = accommodations.Where(a => data.Regions.Contains(a.Region.Name));
+            };
+
             #region
             //分頁
             int totalCount = accommodations.Count(); //總共幾筆 ex:10
-            int totalPage = (int)Math.Ceiling(totalCount / (double)pageSize); //計算總共幾頁 ex:4
+            int totalPage = (int)Math.Ceiling(totalCount / (double)data.PageSize); //計算總共幾頁 ex:4
 
-            accommodations = accommodations.Skip(pageSize * (page - 1)).Take(pageSize);
+            accommodations = accommodations.Skip(data.PageSize * (data.Page - 1)).Take(data.PageSize);
             //page = 0*3 take 1,2,3
             //page = 1*3 take 4,5,6
             //page = 2*3 take 7,8,9
@@ -83,93 +177,88 @@ namespace RouteMasterBackend.Controllers
             return accommodationsDTO;
         }
 
-        // GET: api/Accommodations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Accommodation>> GetAccommodation(int id)
-        {
-          if (_context.Accommodations == null)
-          {
-              return NotFound();
-          }
-            var accommodation = await _context.Accommodations.FindAsync(id);
+        //[HttpGet("GetFilterDTO")]
+        // public async Task<ActionResult<FilterDTO>> GetFilterDTO()
+        //{
+        //    return new FilterDTO
+        //    {
+        //        Grades = await _db.Accommodations.Select(a => a.Grade).Distinct().ToListAsync(),
+        //        AcommodationCategories = await _db.AcommodationCategories.Select(ac=>ac.Name).ToListAsync(),
+        //        ServiceInfoCategories = await _db.ServiceInfoCategories.Select(sc=>sc.Name).ToListAsync(),
+        //        Regions = await _db.Regions.Select(r => r.Name).ToListAsync()
+        //    };
+        //}
 
-            if (accommodation == null)
-            {
-                return NotFound();
-            }
-
-            return accommodation;
-        }
 
         // PUT: api/Accommodations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccommodation(int id, Accommodation accommodation)
-        {
-            if (id != accommodation.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutAccommodation(int id, Accommodation accommodation)
+        //{
+        //    if (id != accommodation.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(accommodation).State = EntityState.Modified;
+        //    _db.Entry(accommodation).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AccommodationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!AccommodationExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Accommodations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Accommodation>> PostAccommodation(Accommodation accommodation)
-        {
-          if (_context.Accommodations == null)
-          {
-              return Problem("Entity set 'RouteMasterContext.Accommodations'  is null.");
-          }
-            _context.Accommodations.Add(accommodation);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Accommodation>> PostAccommodation(Accommodation accommodation)
+        //{
+        //  if (_db.Accommodations == null)
+        //  {
+        //      return Problem("Entity set 'RouteMasterContext.Accommodations'  is null.");
+        //  }
+        //    _db.Accommodations.Add(accommodation);
+        //    await _db.SaveChangesAsync();
 
-            return CreatedAtAction("GetAccommodation", new { id = accommodation.Id }, accommodation);
-        }
+        //    return CreatedAtAction("GetAccommodation", new { id = accommodation.Id }, accommodation);
+        //}
 
         // DELETE: api/Accommodations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAccommodation(int id)
-        {
-            if (_context.Accommodations == null)
-            {
-                return NotFound();
-            }
-            var accommodation = await _context.Accommodations.FindAsync(id);
-            if (accommodation == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteAccommodation(int id)
+        //{
+        //    if (_db.Accommodations == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var accommodation = await _db.Accommodations.FindAsync(id);
+        //    if (accommodation == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.Accommodations.Remove(accommodation);
-            await _context.SaveChangesAsync();
+        //    _db.Accommodations.Remove(accommodation);
+        //    await _db.SaveChangesAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        private bool AccommodationExists(int id)
-        {
-            return (_context.Accommodations?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool AccommodationExists(int id)
+        //{
+        //    return (_db.Accommodations?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }

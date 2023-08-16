@@ -1,22 +1,35 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Policy;
+using System.Text;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using ECPay.Payment.Integration;
+using Microsoft.AspNetCore.Session;
+using RouteMasterFrontend.Models.Dto;
 
 namespace RouteMasterFrontend.Controllers
 {
+    
     public class CartsController : Controller
     {
+        private readonly HttpClient _httpClient;
         private readonly RouteMasterContext _context;
-
+        private const string MerchantID = "3002607";
+        private const string PaymentApiUrl = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
+        private const string HashKey = "pwFHCqoQZGmho4w6"; 
+        private const string HashIV = "EkRm7iFT261dpevs";
         public CartsController(RouteMasterContext context)
         {
             _context = context;
         }
       
         // GET: Carts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index2()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
@@ -25,15 +38,74 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-        [HttpGet]
-        public IActionResult IndexGET()
+      
+        public IActionResult Index()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
-            // 將讀取的值存入 ViewData
-            ViewData["CartId"] = cartIdFromCookie;
+            using (var context = new RouteMasterContext())
+            {
+                var cartDetailsDto = new CartDetailDto
+                {
+                    ExtraServices = context.Cart_ExtraServicesDetails
+                   .Where(c => c.CartId == cartIdFromCookie)
+                   .Include(c => c.ExtraServiceProduct)
+                   .Include(c => c.ExtraServiceProduct.ExtraService)
+                   .Select(cartDetail => new Cart_ExtraServicesDetailDto
+                       {
+                           Id = cartDetail.Id,
+                           Name = cartDetail.ExtraServiceProduct.ExtraService.Name,
+                           Description = cartDetail.ExtraServiceProduct.ExtraService.Description,
+                           Price = cartDetail.ExtraServiceProduct.Price,
+                           Date = cartDetail.ExtraServiceProduct.Date,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "/ExtraServiceImages/"+cartDetail.ExtraServiceProduct.ExtraService.Image,
+                    })
+                    .ToList(),
 
-            return View();
+                    Accommodations = context.Cart_AccommodationDetails
+                    .Where(c => c.CartId == cartIdFromCookie)
+                    .Include(c => c.RoomProduct)
+                    .Include(c => c.RoomProduct.Room)
+                    .Include(c => c.RoomProduct.Room.Accommodation)
+                    .Include(c => c.RoomProduct.Room.RoomType)
+                    .Select(cartDetail => new Cart_AccommodationDetailDto
+                           {
+                           Id = cartDetail.Id,
+                           RoomName = cartDetail.RoomProduct.Room.Name,
+                           AccommodationName = cartDetail.RoomProduct.Room.Accommodation.Name,
+                           RoomTypeName = cartDetail.RoomProduct.Room.RoomType.Name,
+                           Price = cartDetail.RoomProduct.NewPrice,
+                           Date = cartDetail.RoomProduct.Date,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "123" 
+                       })
+                        .ToList(),
+
+                    Activities = context.Cart_ActivitiesDetails
+                       .Where(c => c.CartId == cartIdFromCookie)
+                       .Include(c => c.ActivityProduct)
+                       .Include(c => c.ActivityProduct.Activity)
+                       .Select(cartDetail => new Cart_ActivitiesDetailDto
+                       {
+                           Id = cartDetail.Id,
+                           ActivityName = cartDetail.ActivityProduct.Activity.Name,
+                           Description = cartDetail.ActivityProduct.Activity.Description,
+                           Price = cartDetail.ActivityProduct.Price,
+                           StartTime = cartDetail.ActivityProduct.StartTime,
+                           EndTime = cartDetail.ActivityProduct.EndTime,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "/ActivityImages/"+cartDetail.ActivityProduct.Activity.Image,
+                       })
+                       .ToList()
+                        };
+
+                ViewData["CartId"] = cartIdFromCookie;
+                ViewData["CartDetailsDto"] = cartDetailsDto;
+                return View(cartDetailsDto);
+            }
+
+           
         }
 
         public IActionResult Info()
@@ -92,10 +164,11 @@ namespace RouteMasterFrontend.Controllers
 
 			return extraServicesDetails;
 		}
-        public IActionResult AddExtraService2Cart(int extraserviceId)
+        public IActionResult AddExtraService2Cart(int extraserviceId, int quantity)
         {
             try
             {
+
                
                 var extraServiceProduct = _context.ExtraServiceProducts
                     .FirstOrDefault(p => p.Id == extraserviceId);
@@ -108,7 +181,7 @@ namespace RouteMasterFrontend.Controllers
                     {
                         CartId = cartIdFromCookie,
                         ExtraServiceProductId = extraserviceId,
-                        Quantity = 1
+                        Quantity = quantity
                     };
 
 
@@ -188,46 +261,53 @@ namespace RouteMasterFrontend.Controllers
                 .ToList();
             return accomodationDetails;
         }
-        public IActionResult AddAccommodation2Cart(int accommodationId)
+
+        [HttpPost]
+        public IActionResult AddAccommodation2Cart([FromBody] RoomProductsDto dto)
         {
             try
             {
-                var RoomProduct=_context.RoomProducts.FirstOrDefault(r=>r.Id==accommodationId);
+                var RoomProduct = _context.RoomProducts.Where(r=> dto.roomProductId.Contains(r.Id));
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                    var cartItem = new Cart_AccommodationDetail
+                    //var cartIdFromCookie = 3;
+                    foreach(var rp in RoomProduct)
                     {
-                        CartId = cartIdFromCookie,
-                        RoomProductId = RoomProduct.Id,
-                        Quantity = 1
-                    };
-                    _context.Cart_AccommodationDetails.Add(cartItem);
-                    _context.SaveChanges();
-                    Response.Cookies.Append("cartId",cartIdFromCookie.ToString());
-                    return Json(new { success = true, message = "Successfully added to cart" });
+                        var cartItem = new Cart_AccommodationDetail
+                        {
+                            CartId = cartIdFromCookie,
+                            RoomProductId = rp.Id,
+                            Quantity = 1
+                        };
+                        _context.Cart_AccommodationDetails.Add(cartItem);
+                    }
+                        _context.SaveChanges();
+                        Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
+
+                    return ViewComponent("CartPartial");
                 }
                 else
                 {
                     return Json(new { success = false, message = "Product not found." });
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                return Json(new { success = false, message = "Failed to add to cart." });
+                return Json(new { success = false, message = "Failed to add to cart."+ex });
             }
         }
-        public IActionResult RemoveAccommodationFromCart(int accommodationId)
+        public IActionResult RemoveAccommodationFromCart(int roomProductId)
         {
             try
             {
                 var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.Id==accommodationId);
+                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.Id== roomProductId);
                 if (cartItem != null)
                 {
                     _context.Cart_AccommodationDetails.Remove(cartItem);
                     _context.SaveChanges();
-                    return Json(new {success=true, message="Successfully removed from cart.", accommodationId=accommodationId});
+                    return Json(new {success=true, message="Successfully removed from cart.", roomProductId = roomProductId });
                 }
                 else
                 {
@@ -239,7 +319,7 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "Failed to remove from the cart." });
             }
         }
-        public IActionResult AddActivitiesDetail2Cart(int activitiesId)
+        public IActionResult AddActivitiesDetail2Cart(int activitiesId, int quantity)
         {
             try
             {
@@ -251,7 +331,7 @@ namespace RouteMasterFrontend.Controllers
                     {
                         CartId = cartIdFromCookie,
                         ActivityProductId = activitiesProduct.Id,
-                        Quantity = 1
+                        Quantity = quantity
                     };
                     _context.Cart_ActivitiesDetails.Add(cartItem);
                     _context.SaveChanges();
@@ -366,10 +446,11 @@ namespace RouteMasterFrontend.Controllers
                 return View("Checkout");
             }
             ProcessCheckout(memberId, note);
-
-            return View("ConfirmCheckout");
+            return RedirectToAction("Index", "Ecpay");
+          
         }
 
+      
         private void ProcessCheckout(int memberId, string?note)
         {
             var cart = GetCartInfo(memberId);
@@ -387,9 +468,12 @@ namespace RouteMasterFrontend.Controllers
             // 創建新訂單
             CreateOrder(memberId, note);
 
-            EmptyCart(memberId);
+            TempData["MemberIdForEmptyCart"] = memberId;
+
+            //EmptyCart(memberId);
 
         }
+
 
         private void CreateOrder(int memberId, string note)
         {
@@ -401,7 +485,6 @@ namespace RouteMasterFrontend.Controllers
 
             if (!allowCheckout)
             {
-                
                 return;
             }
 
@@ -409,21 +492,20 @@ namespace RouteMasterFrontend.Controllers
             {
                 try
                 {
+                    var cartTotal = CalculateCartTotal(cart);
 
-                    int cartTotal = CalculateCartTotal(cart);
                     var order = new Order
                     {
                         MemberId = memberId,
                         PaymentMethodId = 1,
                         PaymentStatusId = 1,
-                        OrderHandleStatusId =1,
-                        CouponsId =1,
+                        OrderHandleStatusId = 1,
+                        CouponsId = 1,
                         CreateDate = DateTime.Now,
-                        ModifiedDate = null, 
-                        Total=cartTotal
-                      
-                       
+                        ModifiedDate = null,
+                        Total = cartTotal
                     };
+
                     _context.Orders.Add(order);
                     _context.SaveChanges();
 
@@ -431,14 +513,13 @@ namespace RouteMasterFrontend.Controllers
                     {
 
                         var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
-                        var accommodationId=_context.Rooms.Where(x=>x.Id==roomId).First().AccommodationId;
-
+                        var accommodationId = _context.Rooms.Where(x => x.Id == roomId).First().AccommodationId;
                         var accommodationName = _context.Accommodations.Where(x => x.Id == accommodationId).First().Name;
                         var RoomType = _context.Rooms.Where(x => x.Id == roomId).First().RoomTypeId;
-                        var RoomName= _context.Rooms.Where(x=>x.Id==roomId).First().Name;
-                        var RoomPrice=_context.Rooms.Where(x=>x.Id==roomId).First().Price;
-                        var Quantity = _context.Rooms.Where(x => x.Id == roomId).First().Quantity;
-                        TimeSpan checkinTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckIn??TimeSpan.Zero;
+                        var RoomName = _context.Rooms.Where(x => x.Id == roomId).First().Name;
+                        var RoomPrice = _context.Rooms.Where(x => x.Id == roomId).First().Price;
+                        var Quantity = accommodationItem.Quantity;
+                        TimeSpan checkinTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckIn ?? TimeSpan.Zero;
                         var Checkin = DateTime.Today.Add(checkinTimeSpan);
                         TimeSpan checkoutTimeSpan = _context.Accommodations.Where(x => x.Id == accommodationId).First().CheckOut ?? TimeSpan.Zero;
                         var Checkout = DateTime.Today.Add(checkoutTimeSpan);
@@ -453,29 +534,181 @@ namespace RouteMasterFrontend.Controllers
                             RoomName = RoomName,
                             CheckIn = Checkin,
                             CheckOut = Checkout,
-                            RoomPrice = RoomPrice,
+                            RoomPrice = RoomPrice*Quantity,
                             Quantity = Quantity,
                             Note = note
                         };
-
                         _context.OrderAccommodationDetails.Add(accommodationDetail);
                         _context.SaveChanges();
-                    }
-             
 
-                    transaction.Commit();
+                    }
+                    foreach (var extraservicesDetail in cart.Cart_ExtraServicesDetails)
+                    {
+                        var extraservicesProductsId = _context.ExtraServices.Where(x=>x.Id==extraservicesDetail.ExtraServiceProductId).First().Id;
+                        var extraServicesId = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Id;
+                        var extraServiceName= _context.ExtraServices.Where(x=>x.Id==extraservicesProductsId).First().Name;   
+                        var date = _context.ExtraServiceProducts.Where(X=>X.Id==extraservicesProductsId).First().Date;
+                        var price = _context.ExtraServiceProducts.Where(x => x.Id == extraservicesProductsId).First().Price;
+                        var quantity = extraservicesDetail.Quantity;
+
+                        var extraserviceDetails = new OrderExtraServicesDetail
+                        {
+                            OrderId = order.Id,
+                            ExtraServiceId = extraServicesId,
+                            ExtraServiceName = extraServiceName,
+                            ExtraServiceProductId = extraservicesDetail.ExtraServiceProductId,
+                            Date = date,
+                            Price = price * quantity,
+                            Quantity = quantity 
+                        };
+                        _context.OrderExtraServicesDetails.Add(extraserviceDetails);
+                        _context.SaveChanges();
+
+
+                        var extraservicesProducts = _context.ExtraServiceProducts.FirstOrDefault(x => x.Id == extraservicesProductsId);
+                        if (extraservicesProducts != null)
+                        {
+                            extraservicesProducts.Quantity -= quantity;
+                            _context.SaveChanges();
+                        }
+
+                    }
+                    foreach (var activitiesDetail in cart.Cart_ActivitiesDetails)
+                    {
+                        var activityproductsId = _context.Activities.Where(x=>x.Id== activitiesDetail.ActivityProductId).First().Id;  
+                        var activityId = _context.Activities.Where(x=>x.Id==activityproductsId).First().Id;
+                        var activitiesName = _context.Activities.Where(X => X.Id == activityproductsId).First().Name;
+                        var date = _context.ActivityProducts.Where(x=>x.Id==activityproductsId).First().Date;
+                        var startTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().StartTime;
+                        var endTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().EndTime;
+                        var price = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Price;
+                        var quantity = activitiesDetail.Quantity;
+
+                        var activitiesDetails = new OrderActivitiesDetail
+                        {
+                            OrderId = order.Id,
+                            ActivityId = activityproductsId,
+                            ActivityName = activitiesName,
+                            ActivityProductId = activitiesDetail.ActivityProductId,
+                            Date = date,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                            Price = price*quantity,
+                            Quantity = quantity,
+
+                        };
+                        _context.OrderActivitiesDetails.Add(activitiesDetails);
+                        _context.SaveChanges();
+
+                        var activitiesProducts = _context.ActivityProducts.FirstOrDefault(x=>x.Id== activityproductsId);
+                        if(activitiesProducts != null)
+                        {
+                            activitiesProducts.Quantity -= quantity;
+                            _context.SaveChanges();
+                        }
+
+                    }
+
+                    transaction.Commit();                   
                 }
                 catch (DbUpdateException ex)
                 {
-                    
                     var innerException = ex.InnerException;
-
-                    
-
                     transaction.Rollback();
                 }
             }
         }
+
+        //[HttpPost]
+        //public IActionResult ReturnUrl([FromForm] Dictionary<string, string> formData)
+        //{
+        //    string merchantTradeNo = Guid.NewGuid().ToString("N").Substring(0, 20);
+        //    string tradeDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        //    string paymentType = "aio";
+        //    string tradeDesc = "Sample Transaction";
+        //    string itemNames = "Item1#Item2";
+        //    string returnURL = "https://yourwebsite.com/payment/callback";
+        //    string choosePayment = "All";
+
+        //    string checkMacValue = $"HashKey={HashKey}&MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&PaymentDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={HashIV}";
+
+        //    using (SHA256 sha256 = SHA256.Create())
+        //    {
+        //        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(checkMacValue));
+        //        string checkMac = BitConverter.ToString(hashBytes).Replace("-", "").ToUpper();
+
+        //        string queryString = HttpUtility.UrlEncode($"MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&MerchantTradeDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={checkMac}&EncryptType=1");
+
+        //        var redirectUrl = $"{PaymentApiUrl}?{queryString}";
+
+        //        // 使用 JsonResult 返回 JSON 數據
+        //        return new JsonResult(new { redirectUrl });
+        //    }
+        //}
+
+      
+
+
+        //    private void PrepareAndExecutePayment(Order order)
+        //    {
+        //        var paymentParameters = new Dictionary<string, string>
+        //{
+        //            { "MerchantID", "3002607" },
+        //            { "MerchantTradeNo", order.Id.ToString() },
+        //            { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
+        //            { "PaymentType", "aio" },
+        //            { "TotalAmount", order.Total.ToString() },
+
+        //        };
+        //        var checkMacValue = BuildCheckMacValue(paymentParameters);
+        //        paymentParameters.Add("CheckMacValue", checkMacValue);
+
+        //        var content = new FormUrlEncodedContent(paymentParameters);
+        //        using (var client = new HttpClient())
+        //        {
+        //            var response = client.PostAsync(PaymentApiUrl, content).Result;
+        //            if (response.IsSuccessStatusCode)
+        //            {
+        //                Console.WriteLine("Payment successful");
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("Payment failed");
+        //            }
+        //        }
+
+        //    }
+
+        //    private string BuildCheckMacValue(Dictionary<string, string> parameters)
+        //    {
+        //        string szCheckMacValue = String.Format("HashKey={0}{1}&HashIV={2}",
+        //            HashKey, string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}")), HashIV);
+        //        szCheckMacValue = HttpUtility.UrlEncode(szCheckMacValue).ToLower();
+
+        //        using (SHA256 sha256 = SHA256Managed.Create())
+        //        {
+        //            byte[] bytes = Encoding.UTF8.GetBytes(szCheckMacValue);
+        //            byte[] hashBytes = sha256.ComputeHash(bytes);
+        //            szCheckMacValue = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+        //        }
+
+        //        return szCheckMacValue;
+        //    }
+
+        //    private string GetPaymentRedirectUrl(Order order)
+        //    {
+        //        string PaymentBaseUrl = "https://localhost:7145/Carts/CheckoutPost";
+        //        var paymentUrl = PaymentBaseUrl + "?orderId=" + order.Id +
+        //            "&totalAmount=" + order.Total +
+        //            "&memberId=" + order.MemberId +
+        //            "&paymentMethodId=" + order.PaymentMethodId +
+        //            "&paymentStatusId=" + order.PaymentStatusId +
+        //            "&orderHandleStatusId=" + order.OrderHandleStatusId +
+        //            "&couponsId=" + order.CouponsId +
+        //            "&createDate=" + order.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") +
+        //            "&modifiedDate=" + (order.ModifiedDate.HasValue ? order.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "");
+        //        return paymentUrl;
+        //    }
 
         private int CalculateCartTotal(Cart cart)
         {
@@ -484,26 +717,40 @@ namespace RouteMasterFrontend.Controllers
             {
                 var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
                 var RoomPrice = _context.Rooms.Where(x => x.Id == roomId).First().Price;
-
                 int roomTotal = RoomPrice * accommodationItem.Quantity;
                 total += roomTotal;
             }
-           
+            foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
+            {
 
+                var extraservicesProductsId = _context.ExtraServices.Where(x => x.Id == extraserviceItem.ExtraServiceProductId).First().Id;
+                var extraServicesId = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Id;
+                var extraServiceName = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Name;
+                var date = _context.ExtraServiceProducts.Where(X => X.Id == extraservicesProductsId).First().Date;
+                var price = _context.ExtraServiceProducts.Where(x => x.Id == extraservicesProductsId).First().Price;
+                var quantity = extraserviceItem.Quantity;
+
+                int extraServicesTotal = price * quantity;
+                total += extraServicesTotal;
+            }
+            foreach(var activityItem in cart.Cart_ActivitiesDetails)
+            {
+                var activityproductsId = _context.Activities.Where(x => x.Id == activityItem.ActivityProductId).First().Id;
+                var activityId = _context.Activities.Where(x => x.Id == activityproductsId).First().Id;
+                var activitiesName = _context.Activities.Where(X => X.Id == activityproductsId).First().Name;
+                var date = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Date;
+                var startTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().StartTime;
+                var endTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().EndTime;
+                var price = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Price;
+               var quantity = activityItem.Quantity;
+
+                int activityTotal = price * quantity;
+                total += activityTotal;
+            }
             return total;
         }
 
-        //private void CreateOrder(int memberId, Cart cart)
-        //{
-        //    var order = new Order
-        //    {
-        //        MemberId = memberId,
-        //        TravelPlanId = cart..TravelPlanId
-        //        Total = cart.Total,
-        //        CreateDate = DateTime.Now,
-
-        //    };
-        //}
+   
 
         //public void CreateOrder(int memberId, int travelPlanId, int paymentMethodId, int couponsId, List<ord> accommodationItems, List<ActivityOrderItem> activityItems, List<ExtraServiceOrderItem> extraServiceItems)
         //{
@@ -615,41 +862,8 @@ namespace RouteMasterFrontend.Controllers
             _context.Carts.Remove(cart);
             _context.SaveChanges();
         }
-
-
-        public IActionResult AddAccomodation2Cart(int accomodationId)
-        {
-
-            try
-            {
-                var RoomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == accomodationId);
-                if(RoomProduct!= null)
-                {
-                    var cartItem = new Cart_AccommodationDetail
-                    {
-                        CartId = 1,
-                        RoomProductId = RoomProduct.Id,
-                        Quantity = 1
-                    };
-                    _context.Cart_AccommodationDetails.Add(cartItem);
-                    _context.SaveChanges();
-					// 加入購物車成功後回傳 JSON 物件
-					return Json(new { success = true, message = "Successfully added to cart." });
-				}
-				else
-				{
-					// 找不到對應的 ExtraServiceProduct，回傳錯誤訊息
-					return Json(new { success = false, message = "Product not found." });
-				}
-			}
-			catch
-			{
-				// 加入購物車失敗時回傳 JSON 物件
-				return Json(new { success = false, message = "Failed to add to cart." });
-			}
-		
-            
-        }
+   
+        
         private int GetMemberIdByAccount(string Account)
 		{
 
@@ -846,7 +1060,36 @@ namespace RouteMasterFrontend.Controllers
           return (_context.Carts?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        [HttpPost]
+        public IActionResult UpdateQuantity(int extraServiceId, int accommodationId, int activityId, int quantity)
+        {
+            try
+            {
+                var extraServiceProduct = _context.ExtraServiceProducts.FirstOrDefault(e => e.Id == extraServiceId);
+                var accomodationProduct =_context.RoomProducts.FirstOrDefault(r => r.Id == accommodationId);
+                var activityProduct = _context.ActivityProducts.FirstOrDefault(a => a.Id == activityId);
 
+                if (extraServiceProduct != null)
+                {
+                    extraServiceProduct.Quantity = quantity;
+                }
+                if (accomodationProduct != null)
+                {
+                    accomodationProduct.Quantity = quantity;
+                }
+                if (activityProduct != null)
+                {
+                    activityProduct.Quantity = quantity;
+                }
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "數量已更新。" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
+            }
+        }
        
     }
 }
