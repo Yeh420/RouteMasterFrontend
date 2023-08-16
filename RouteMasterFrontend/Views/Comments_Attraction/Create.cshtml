@@ -51,7 +51,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="panel mb-3">
                 <div class="tip">請點選分數</div>
@@ -63,16 +63,6 @@
                     <li><i class="fa fa-star fa-fw"></i></li>
                     <li><i class="fa fa-star fa-fw"></i></li>                
                 </ul>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="MemberId" class="control-label"></label>
-                <input asp-for="MemberId" class="form-control" />
-               @* <span asp-validation-for="MemberId" class="text-danger"></span>*@
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AttractionId" class="control-label"></label>
-                <input asp-for="AttractionId" class="form-control" />
-              @*  <span asp-validation-for="AttractionId" class="text-danger"></span>*@
             </div>
             <div class="form-group d-none">
                 <label asp-for="Score" class="control-label"></label>

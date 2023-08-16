@@ -456,13 +456,13 @@ namespace RouteMasterFrontend.Controllers
             return View("MemberLogin");
         }
 
-        //更改密碼       
+        //忘記密碼/更改密碼       
         public IActionResult MemberResetPassword()
         {
             return View();
         }
         
-        //更改密碼 
+        //忘記密碼/更改密碼 
         [HttpPost]
         public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
         {
