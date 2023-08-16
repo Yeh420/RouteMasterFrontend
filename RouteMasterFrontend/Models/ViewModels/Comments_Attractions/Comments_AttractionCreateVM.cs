@@ -6,8 +6,6 @@ namespace RouteMasterFrontend.Models.ViewModels.Comments_Attractions
     public class Comments_AttractionCreateVM
     {
         public int Id { get; set; }
-        public int MemberId { get; set; }
-        public int AttractionId { get; set; }
         public int Score { get; set; }
 
         [Display(Name = "評論內文")]
