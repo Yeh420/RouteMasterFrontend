@@ -33,7 +33,7 @@ namespace RouteMasterBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetServiceInfoCategory(double latY, double lngX, int? topN = 10)
+        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetServiceInfoCategory(double lngX, double latY, int? topN = 10)
         {
             string connectionString = _configuration.GetConnectionString("RouteMaster");
 
@@ -55,13 +55,9 @@ namespace RouteMasterBackend.Controllers
                 connection.Open();
 
                 string query = @"
-                SELECT TOP (@TopN) [Id], [AcommodationCategoryId], [PartnerId], [Name], [Description],
-                    [Grade], [RegionId], [TownId], [Address], [PositionX],
-                    [PositionY], [Website], [IndustryEmail], [PhoneNumber], [ParkingSpace],
-                    [CheckIn], [CheckOut], [Status], [Image], [CreateDate],  
-                    SQRT(POWER([PositionX] - @OriginLat, 2) + POWER([PositionY] - @OriginLng, 2)) AS [Distance]
-                FROM [dbo].[Accommodations]
-                ORDER BY [Distance]";
+SELECT TOP (@TopN) a.*,SQRT(POWER([PositionX] - @OriginLng, 2) + POWER([PositionY] - @OriginLat, 2)) AS [Distance]
+FROM [dbo].[Accommodations] a
+ORDER BY [Distance]";
 
                 var accommodations = await connection.QueryAsync<AccommodationDistanceDTO>(query, new { TopN = topN, OriginLat = latY, OriginLng = lngX });
 
