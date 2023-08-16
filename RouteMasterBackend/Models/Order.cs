@@ -16,7 +16,6 @@ namespace RouteMasterBackend.Models
 
         public int Id { get; set; }
         public int MemberId { get; set; }
-        public int TravelPlanId { get; set; }
         public int PaymentMethodId { get; set; }
         public int PaymentStatusId { get; set; }
         public int OrderHandleStatusId { get; set; }
@@ -30,7 +29,6 @@ namespace RouteMasterBackend.Models
         public virtual OrderHandleStatus OrderHandleStatus { get; set; }
         public virtual PaymentMethod PaymentMethod { get; set; }
         public virtual PaymentStatus PaymentStatus { get; set; }
-        public virtual TravelPlan TravelPlan { get; set; }
         public virtual ICollection<OrderAccommodationDetail> OrderAccommodationDetails { get; set; }
         public virtual ICollection<OrderActivitiesDetail> OrderActivitiesDetails { get; set; }
         public virtual ICollection<OrderExtraServicesDetail> OrderExtraServicesDetails { get; set; }

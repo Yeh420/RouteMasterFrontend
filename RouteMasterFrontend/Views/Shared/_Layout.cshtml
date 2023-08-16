@@ -1,4 +1,12 @@
-﻿ <!DOCTYPE html>
+﻿@{
+    var memberIdCookie = Context.Request.Cookies["Id"];    
+}
+
+
+
+
+
+<!DOCTYPE html>
 
 <html lang="zh-tw">
 <head>
@@ -92,7 +100,7 @@
                                 {
                                     var userAccount = User.Identity.Name;
                                     <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Edit" asp-route-id="@memberIdCookie">會員專區</a>
                                     </li>
                                     <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="FavoriteAtt">最愛景點</a>

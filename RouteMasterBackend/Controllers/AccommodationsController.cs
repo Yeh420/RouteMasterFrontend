@@ -24,53 +24,72 @@ namespace RouteMasterBackend.Controllers
     public class AccommodationsController : ControllerBase
     {
         private readonly Models.RouteMasterContext _db;
-        private readonly IConfiguration _configuration;
 
-        public AccommodationsController(Models.RouteMasterContext context, IConfiguration configuration)
+        public AccommodationsController(Models.RouteMasterContext context)
         {
             _db = context;
-            _configuration = configuration;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetServiceInfoCategory(double latY, double lngX, int? topN = 10)
+        public async Task<ActionResult<List<AccommodationDistanceDTO>>> GetAccommodations(double lngX, double latY, int topN = 10)
         {
-            string connectionString = _configuration.GetConnectionString("RouteMaster");
+            var datas = await _db.Accommodations
+                //.Include(a => a.AcommodationCategory)
+                //.Include(a => a.Rooms)
+                //.ThenInclude(r => r.RoomProducts)
+                //.AsNoTracking()
+                .Select(data => new AccommodationDistanceDTO
+                {
+                    Id = data.Id,
+                    ACategory = data.AcommodationCategory.Name,
+                    Name = data.Name,
+                    Grade = data.Grade,
+                    Address = data.Address,
+                    CheckIn = data.CheckIn,
+                    CheckOut = data.CheckOut,
+                    PositionX = data.PositionX,
+                    PositionY = data.PositionY,
+                    Image = data.Image,
+                    Distance = Math.Sqrt(
+                Math.Pow((double)(lngX - data.PositionX), 2) +
+                Math.Pow((double)(latY - data.PositionY), 2)) * 111,
+                    Rooms = data.Rooms
+                })
+                .OrderBy(a => Math.Sqrt(
+                Math.Pow((double)(lngX - a.PositionX), 2) +
+                Math.Pow((double)(latY - a.PositionY), 2))).Take(topN).ToListAsync();
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                //connection.Open();
 
-                // // 建立原點的地理座標
-                // SqlGeography origin = SqlGeography.Point(latY, lngX, 4326);
 
-                // // 執行地理查詢
-                // string query = @"
-                // SELECT TOP (@TopN) *, [Location].STDistance(@Origin) AS [Distance]
-                // FROM [dbo].[Accommodations]
-                // WHERE [Location].STDistance(@Origin) IS NOT NULL
-                // ORDER BY [Location].STDistance(@Origin)";
-
-                //var accommodations = await connection.QueryAsync<AccommodationDistanceDTO>(query, new { TopN = topN, Origin = origin });
-                connection.Open();
-
-                string query = @"
-                SELECT TOP (@TopN) [Id], [AcommodationCategoryId], [PartnerId], [Name], [Description],
-                    [Grade], [RegionId], [TownId], [Address], [PositionX],
-                    [PositionY], [Website], [IndustryEmail], [PhoneNumber], [ParkingSpace],
-                    [CheckIn], [CheckOut], [Status], [Image], [CreateDate],  
-                    SQRT(POWER([PositionX] - @OriginLat, 2) + POWER([PositionY] - @OriginLng, 2)) AS [Distance]
-                FROM [dbo].[Accommodations]
-                ORDER BY [Distance]";
-
-                var accommodations = await connection.QueryAsync<AccommodationDistanceDTO>(query, new { TopN = topN, OriginLat = latY, OriginLng = lngX });
-
-                connection.Close();
-
-                return accommodations.ToList();
-            }
+            //var accommodations = new List<AccommodationDistanceDTO>();
+            //foreach(var data in datas)
+            //{
+            //    var dto = new AccommodationDistanceDTO
+            //    {
+            //        Id = data.Id,
+            //        ACategory =  data.AcommodationCategory.Name,
+            //        Name = data.Name,
+            //        Grade = data.Grade,
+            //        Address = data.Address,
+            //        CheckIn = data.CheckIn,
+            //        CheckOut = data.CheckOut,
+            //        Image = data.Image,
+            //        Distance = CalcDistance(lngX, latY, data.PositionX, data.PositionY),
+            //        Rooms = data.Rooms
+            //        //RoomProducts = _db.RoomProducts.Select
+            //    };
+            //    accommodations.Add(dto);
+            //}
+            return datas;
         }
-        
+
+        private double CalcDistance(double lngX, double latY, double? positionX, double? positionY)
+        {
+           return Math.Sqrt(
+                Math.Pow((double)(lngX - positionX), 2) +
+                Math.Pow((double)(latY - positionY), 2)) * 111;
+        }
+
         [HttpPost]
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(FilterData data)
         {
@@ -85,6 +104,7 @@ namespace RouteMasterBackend.Controllers
                     .Include(a => a.Rooms)
                     .Include(a => a.AccommodationServiceInfos)
                     .AsQueryable();
+
             if (!string.IsNullOrEmpty(data.Keyword))
             {
 	            accommodations = accommodations.Where(p => 
