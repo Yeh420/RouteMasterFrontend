@@ -17,7 +17,7 @@ namespace RouteMasterFrontend.Controllers
 
         public async Task<ContentResult> GetAllCoupons()
         {
-            var now = DateTime.Now;
+            var now = DateTime.Now.Date;
 
             List<Coupon> coupons = await _db.Coupons.Select(c => new Coupon
             {
@@ -31,13 +31,13 @@ namespace RouteMasterFrontend.Controllers
 
             foreach(var coupon in coupons)
             {
-                if (coupon.StartDate < now && now < coupon.EndDate)
+                if (coupon.StartDate.Date <= now && now <= coupon.EndDate.Date)
                 {
-                    coupon.valuable = true;
+                    coupon.Valuable = true;
                 }
                 else
                 {
-                    coupon.valuable = false;
+                    coupon.Valuable = false;
                 }
             }
 
@@ -69,8 +69,8 @@ namespace RouteMasterFrontend.Controllers
             }
         }
         public bool IsActive { get; set; }
-        public bool? valuable { get; set; }
+        public bool? Valuable { get; set; }
 
-        public bool used { get; set; } = false;
+        public bool Selected { get; set; } = false;
     }
 }
