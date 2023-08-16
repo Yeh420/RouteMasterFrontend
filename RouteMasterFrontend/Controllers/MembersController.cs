@@ -24,6 +24,7 @@ using RouteMasterFrontend.Models.Dto;
 using Microsoft.Data.SqlClient;
 using Dapper;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -94,83 +95,6 @@ namespace RouteMasterFrontend.Controllers
         }
 
 
-        //會員資料頁
-        [HttpGet]
-        public IActionResult MyMemberIndex2()
-        {
-            //抓會員登入資訊
-            ClaimsPrincipal user = HttpContext.User;
-            var member = _context.Members;
-
-            //列出與登入符合資料
-            string userAccount = user.Identity.Name;
-            
-            Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
-
-            if (user.Identity.IsAuthenticated)
-            {
-               
-                    
-                return View(myMember);
-            }
-            return RedirectToAction("MemberLogin", "Members");
-        }
-
-        
-        [HttpGet]
-        public IActionResult MemberRegister()
-        {
-            return View();
-        }
-
-        //註冊會員
-        [HttpPost]
-
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
-
-        {
-            MemberImage img = new MemberImage();
-            
-            if (ModelState.IsValid)
-            {
-                if (facePhoto != null && facePhoto.Length > 0)
-                {
-                    string path = Path.Combine(_environment.WebRootPath, "MemberUploads");
-                    string fileName = SaveUploadFile(path, facePhoto);
-                    img.Image = fileName;
-                    img.Name = "未命名";
-                    vm.Image = fileName;
-                }
-                else
-                {
-                    string newFileName = vm.Image;
-                    img.Image = newFileName;
-                    img.Name = "未命名";
-                    vm.Image = newFileName;
-                }
-            }
-            else
-            {
-                return View(vm);
-            }
-           
-
-
-            Result result = RegisterMember(vm, img);
-
-            if (result.IsSuccess)
-            {
-                return View("MemberLogin");
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, result.ErrorMessage);
-                return View(vm);
-            }
-
-        }
-
-
         //會員普通登入
         [HttpGet]
         public async Task<IActionResult> MemberLogin()
@@ -179,32 +103,27 @@ namespace RouteMasterFrontend.Controllers
         }
 
         //會員普通登入
-        public async Task<IActionResult> MemberLogin([FromBody] MemberLoginVM vm)
+        public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
         {
-            if (ModelState.IsValid == false) return View(vm);
+            if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
 
-            Result result = ValidLogin(vm);
-
-            if (result.IsSuccess != true)
-            {
-                ModelState.AddModelError("", result.ErrorMessage); return View(vm);
-            }
-
+            //帳密IsExist
+            Result result = ValidLogin(vm);           
+            if (result.IsSuccess != true) return BadRequest(new { success = false, message = "Invalid input" });
+           
+            //設定使用者登入資訊
             const bool rememberMe = false;
             var member = _context.Members.FirstOrDefault(m => m.Account == vm.Account);
-
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-
                 //new Claim("memberImage", member.Image),
                 //new Claim("id",member.Id.ToString())
             };
-
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             //identity.AddClaim(new Claim("memberImage", member.Image));
 
-
+            //設定驗證資訊
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = rememberMe,
@@ -214,6 +133,7 @@ namespace RouteMasterFrontend.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                 authProperties);
 
+            //購物車
             var memberid = _context.Members.Where(m => m.Account == vm.Account).FirstOrDefault()?.Id;
             if (memberid != null)
             {
@@ -222,7 +142,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     int cartId = cart.Id;
 
-                   
+
                     Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
                     {
                         Expires = DateTimeOffset.UtcNow.AddHours(2)
@@ -240,18 +160,19 @@ namespace RouteMasterFrontend.Controllers
 
                     int cartId = newCart.Id;
 
-                  
+
                     Response.Cookies.Append("CartId", cartId.ToString(), new CookieOptions
                     {
                         Expires = DateTimeOffset.UtcNow.AddHours(2)
                     });
                 }
-                
+
             }
 
-            return RedirectToAction("MyMemberIndex2", "Members");
-        }
+            //轉成ajax呼叫
+            return Ok(new { success = true, message = "Login successful" });
 
+        }
 
         //Google登入
         public async Task<IActionResult> GoogleLogin()
@@ -262,7 +183,7 @@ namespace RouteMasterFrontend.Controllers
 
             //驗證Google Token
             GoogleJsonWebSignature.Payload? payload = VerifyGoogleToken(formCredential, formToken, cookiesToken).Result;
-             if (payload == null)
+            if (payload == null)
             {
                 //驗證失敗
                 ViewData["info"] = "驗證Google授權失敗";
@@ -274,9 +195,10 @@ namespace RouteMasterFrontend.Controllers
                 ViewData["info"] += "Name:" + payload.Name + "<br>";
                 ViewData["info"] += "Picture:" + payload.Picture;
             }
-            
-             //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
-             if(_context.Members.Any(m => m.Email == payload.Email))
+
+
+            //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
+            if (_context.Members.Any(m => m.Email == payload.Email))
             {
                 const bool rememberMe = false;
                 var claims = new List<Claim>
@@ -296,11 +218,9 @@ namespace RouteMasterFrontend.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                     authProperties);
-                
+
                 //購物車功能
                 var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
-
-
 
                 if (memberid != null)
                 {
@@ -336,7 +256,7 @@ namespace RouteMasterFrontend.Controllers
 
                 }
 
-                return RedirectToAction("MyMemberIndex2", "Members");
+                return RedirectToAction("MyMemberIndex", "Members");
             }
             else
             {
@@ -401,8 +321,8 @@ namespace RouteMasterFrontend.Controllers
 
                     }
 
-                    return RedirectToAction("MyMemberIndex2", "Members");
-                    
+                    return RedirectToAction("MyMemberIndex", "Members");
+
                 }
                 else
                 {
@@ -410,58 +330,88 @@ namespace RouteMasterFrontend.Controllers
                     return View(payload);
                 }
             }
-            
+
         }
 
-        
-        private async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string? formCredential, string? formToken, string? cookiesToken)
+
+        //會員資料頁
+        [HttpGet]
+        public IActionResult MyMemberIndex()
         {
-            // 檢查空值
-            if (formCredential == null || formToken == null && cookiesToken == null) return null;
+            //抓會員登入資訊
+            ClaimsPrincipal user = HttpContext.User;
+            var member = _context.Members;
 
-            GoogleJsonWebSignature.Payload? payload;
-            try
+            //列出與登入符合資料
+            string userAccount = user.Identity.Name;
+            
+            Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
+
+            if (user.Identity.IsAuthenticated)
             {
-                // 驗證 token
-                if (formToken != cookiesToken)
-                {
-                    return null;
-                }
+               
+                    
+                return View(myMember);
+            }
+            return RedirectToAction("MemberLogin", "Members");
+        }
+   
+        [HttpGet]
+        public async Task<IActionResult> MemberRegister()
+        {
+            var towns = await _context.Towns.ToListAsync();
+            ViewBag.TownList = new SelectList(towns,"城市");
+            return View();
+        }
 
-                // 驗證憑證
-                IConfiguration Config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
-                string GoogleApiClientId = Config.GetSection("GoogleApiClientId").Value;
-                var settings = new GoogleJsonWebSignature.ValidationSettings()
+        //註冊會員
+        [HttpPost]
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
+
+        {
+            MemberImage img = new MemberImage();
+            
+            if (ModelState.IsValid)
+            {
+                if (facePhoto != null && facePhoto.Length > 0)
                 {
-                    Audience = new List<string>() { GoogleApiClientId }
-                };
-                payload = await GoogleJsonWebSignature.ValidateAsync(formCredential, settings);
-                if (!payload.Issuer.Equals("accounts.google.com") && !payload.Issuer.Equals("https://accounts.google.com"))
-                {
-                    return null;
-                }
-                if (payload.ExpirationTimeSeconds == null)
-                {
-                    return null;
+                    string path = Path.Combine(_environment.WebRootPath, "MemberUploads");
+                    string fileName = SaveUploadFile(path, facePhoto);
+                    img.Image = fileName;
+                    img.Name = "未命名";
+                    vm.Image = fileName;
                 }
                 else
                 {
-                    DateTime now = DateTime.Now.ToUniversalTime();
-                    DateTime expiration = DateTimeOffset.FromUnixTimeSeconds((long)payload.ExpirationTimeSeconds).DateTime;
-                    if (now > expiration)
-                    {
-                        return null;
-                    }
+                    string newFileName = vm.Image;
+                    img.Image = newFileName;
+                    img.Name = "未命名";
+                    vm.Image = newFileName;
                 }
             }
-            catch
+            else
             {
-                return null;
+                return View(vm);
             }
-            return payload;
+           
+
+
+            Result result = RegisterMember(vm, img);
+
+            if (result.IsSuccess)
+            {
+                return View("MemberLogin");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(vm);
+            }
+
         }
 
-
+        
+    
         //會員登出
         [HttpGet]
         public async Task<IActionResult> Logout()
@@ -471,6 +421,7 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("LogoutSuccess", "Members");
         }
 
+        //登出成功畫面
         public async Task<IActionResult> LogoutSuccess()
         {
             return View();
@@ -535,7 +486,6 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
-        
         [HttpPost]
         public ActionResult EditPassword(MemberEditPasswordVM vm)
         {
@@ -552,8 +502,7 @@ namespace RouteMasterFrontend.Controllers
             return RedirectToAction("MyMemberIndex");
         }
 
-       
-       [HttpGet] 
+        [HttpGet] 
         public async Task<IActionResult> HistoryOrder(int? id)
         {
             var historyOrders = _context.Orders
@@ -730,47 +679,31 @@ namespace RouteMasterFrontend.Controllers
         private Result ValidLogin(MemberLoginVM vm)
         {
             var db = new RouteMasterContext();
-
-            //Result resultAttempt = LockAccountIfFailedAttemptsExceeded(vm.Account);
-            //if (resultAttempt.IsSuccess)
-            //{
-            //    return resultAttempt; // 帳號已鎖定，返回錯誤結果m
-            //}
-
-
             var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
-            int failedAttempts = 0;
-            if (member == null)
-            {
-
-                return Result.Failure("帳密有錯");
-            }
-            //else
-            //{
-            //    var claims = new List<Claim>();
-            //    {
-            //        new Claim(ClaimTypes.Name, member.Account);
-            //        new Claim("LastName", member.LastName);
-            //        new Claim("Id", member.Id.ToString());
-            //    };
-            //    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-            //}
-            //if(member.IsSuspended)  --有沒有停權
-
             var salt = _hashUtility.GetSalt();
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
-            if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
+            //帳號先，後密碼
+            if (member != null && string.Compare(hashPassword, member.EncryptedPassword) == 0)
             {
-                return Result.Success();
-
+                return Result.Success();               
             }
             else
             {
-                return Result.Failure("帳密有誤");
+                return Result.Failure("帳密有錯");
             }
+            
+            ////var salt = _hashUtility.GetSalt();
+            ////var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
+
+            //if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
+            //{
+            //    return Result.Success();
+            //}
+            //else
+            //{   
+            //    return Result.Failure("帳密有誤");
+            //}
             
         }
 
@@ -797,6 +730,49 @@ namespace RouteMasterFrontend.Controllers
             return newFileName;
         }
 
+        private async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string? formCredential, string? formToken, string? cookiesToken)
+        {
+            // 檢查預防空值
+            if (formCredential == null || formToken == null && cookiesToken == null) return null;
+
+            GoogleJsonWebSignature.Payload? payload;
+            try
+            {
+                // 驗證 token，預防令牌值被竄改，兩者必須是來自同一次請求的令牌
+                if (formToken != cookiesToken) return null;
+ 
+                // 取得GoolgeApiClientId
+                IConfiguration Config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
+                string GoogleApiClientId = Config.GetSection("GoogleApiClientId").Value;
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { GoogleApiClientId }
+                };
+                payload = await GoogleJsonWebSignature.ValidateAsync(formCredential, settings);
+                if (!payload.Issuer.Equals("accounts.google.com") && !payload.Issuer.Equals("https://accounts.google.com"))
+                {
+                    return null;
+                }
+                if (payload.ExpirationTimeSeconds == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    DateTime now = DateTime.Now.ToUniversalTime();
+                    DateTime expiration = DateTimeOffset.FromUnixTimeSeconds((long)payload.ExpirationTimeSeconds).DateTime;
+                    if (now > expiration)
+                    {
+                        return null;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return payload;
+        }
 
 
         //會員是否存在

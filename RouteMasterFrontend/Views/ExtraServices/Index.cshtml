@@ -1,88 +1,143 @@
-﻿@model IEnumerable<RouteMasterFrontend.EFModels.ExtraService>
+﻿@section Styles{
 
-@section Styles{
-    <style>
-        .image-
-        
-        
-        {
-            width: 200px; /* 設定寬度，可以自行調整 */
-            height: 150px; /* 設定高度，可以自行調整 */
-            overflow: hidden; /* 確保圖片不會超出容器範圍 */
-        }
-
-            .image-container img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover; /* 確保圖片填滿整個容器，可能會有部分裁切 */
-            }
-    </style>
 }
+<div id="app">
+    <input type="search" v-model="keyword"/>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>項目名稱</th>
+                <th>圖片預覽</th>
+                <th>所在區域</th>
+                <th>附屬景點</th>
+                <th>項目說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in extraServiceDtoes">
+
+                <td v-model>{{item.name}} </td>
+                <td><img v-bind:src="item.image" style="height:200px;"/></td>
+                <td v-model>{{item.regionName}} </td>
+                <td v-model>{{item.attractionName}} </td>
+                <td v-model> {{item.description}} </td>
+                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button></td>
+                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button></td>
+            </tr>
+        </tbody>
+    </table>
 
 
-<p>
-    <a asp-action="Create">Create New</a>
-    <a asp-action="ExtraServiceProductsIndex">產品列表</a>
-</p>
-<table class="table">
 
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Attraction)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Region)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                    <div class="image-container">
-                        <img src="~/ExtraServiceImages/@item.Image" alt="圖片">
+
+    <div class="modal fade" id="ExtraServiceDetailModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+         aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">詳細資料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">FirstName:</label>
+                        <input class="form-control" />
                     </div>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Attraction.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Region.Name)
-            </td>
-            <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>|
-                    <a asp-action="UploadExtraServicesImages" asp-route-id="@item.Id">上傳圖片</a>|
-                    <a asp-action="CreateExtraServiceProduct" asp-route-id="@item.Id">新增產品</a>
-                    
-                
-            </td>
-               
-        </tr>
+                    <div class="form-group">
+                        <label class="form-label">LastName:</label>
+                        <input class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title:</label>
+                        <input class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">關閉</button>
+                    <button type="button" class="btn btn-primary" @@click="insert">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+   <script>
+      let baseAddress = "https://localhost:7251";
+      let  vueApp={
+          data(){
+              return{
+                 extraServiceDtoes:[],
+                 keyword:"",                 
+                 
+
+
+              };
+          },
+          mounted :function(){
+              let _this=this;
+
+              _this.filterExtraServiceDtoes();
+          },
+          methods:{
+              filterExtraServiceDtoes:function(){
+                    let _this=this;
+                    let request={};
+
+                    request.Keyword=_this.keyword;
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/filter`,request).then(response=>{
+                        _this.extraServiceDtoes=response.data;
+
+                        for (let i = 0; i < _this.extraServiceDtoes.length;i++){
+                            let item = _this.extraServiceDtoes[i];                            
+                        }
+
+
+                    }).catch(err=>{
+                        alert(err);
+                    })                   
+              },
+              showDetailsModal:function(id){
+                  //modal改成詳細資料
+                  console.log(id);
+                   this.getExtraServiceDetails(id);
+               $('#ExtraServiceDetailModal').modal("show");
+              },
+           
+           
+              getExtraServiceDetails:function(id){
+                  //將modal資料內容改掉
+                  console.log('再來啊!')
+                  console.log(id)
+              },
+              goToPurchasingPage:function(itemId){
+                    console.log('買起來')
+                    let newUrl = '/ExtraServices/Details/'+itemId
+                    window.location.href=newUrl;
+
+                    //瀏覽器設定容易有問題
+                    //window.open(newUrl, '_blank');
+              },
+          }
+      };
+      let app=Vue.createApp(vueApp).mount('#app');
+
+
+
+   </script>
 }
-    </tbody>
-</table>

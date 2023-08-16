@@ -10,17 +10,20 @@
 <div>@Model.Id</div>
 <div id="app">
     <div class="container">
-        <div class="row mb-2" style="width:20%">
-            @*<a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>*@         
-            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
-                <option value="0" selected>排序選擇</option>
-                <option value="1">最新留言</option>
-                <option value="2">星星評分高至低</option>
-                <option value="3">星星評分低至高</option>
-                <option value="4">停留時間由高至低</option>
-                <option value="5">花費由高至低</option>    
-            </select>
-
+        <div class="row mb-2">
+            <div class="col-3">
+                <select v-model="selected" id="commentOrder" class="ms-1" @@change="commentDisplay">
+                    <option value="0" selected>排序選擇</option>
+                    <option value="1">最新留言</option>
+                    <option value="2">星星評分高至低</option>
+                    <option value="3">星星評分低至高</option>
+                    <option value="4">停留時間由高至低</option>
+                    <option value="5">花費由高至低</option>
+                </select>
+            </div>     
+            <div class="col-3 ms-auto text-end">
+                <a asp-controller="Comments_Attraction" asp-action="Create" asp-route-id="@Model.Id">撰寫評論</a>
+            </div>
         </div>
        
            <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
@@ -70,7 +73,10 @@
                             </button>
                         </div>
                     </template>
-                    <template v-else>
+                    <template v-else-if="item.imageList.length===1">                     
+                        <img v-bind:src="getImgPath(item.imageList[0])" class="img-fluid rounded-start">
+                    </template>
+                    <template v-else="item.imageList.length<1">
                         <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
                     </template>
                 </div>
@@ -120,6 +126,10 @@
                 else {
                     console.error('Error:', response.status);
                 }
+            },
+            getImgPath: function (photo) {            
+                return `@Url.Content("~/MemberUploads/${photo}")`;
+    
             },
         }
 

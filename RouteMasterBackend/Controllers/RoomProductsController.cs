@@ -56,6 +56,7 @@ namespace RouteMasterBackend.Controllers
             var dto  = new RoomProductsDTO();
             dto.Items = await ablerp.Select(rp => new RoomProductDTOItem
 			{
+                Id = rp.Id,
 				Date = new string($"{rp.Date.Year}-{rp.Date.Month:D2}-{rp.Date.Day:D2}"),
 				NewPrice = rp.NewPrice,
 				Quantity = rp.Quantity,

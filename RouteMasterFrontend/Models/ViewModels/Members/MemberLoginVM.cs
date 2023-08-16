@@ -15,6 +15,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
         [Required(ErrorMessage = "您尚未填寫密碼")]
         [DataType(DataType.Password)]
 		[Display(Name = "密碼")]
+		//[StringLength(20,ErrorMessage ="密碼至少6個字",MinimumLength =6)]
 		public string Password { get; set; }
 
 		public string? image { get; set; }
