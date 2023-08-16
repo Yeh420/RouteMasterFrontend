@@ -219,7 +219,7 @@
 
 
                     this.calendarDates = [];
-                    for (let i = 0; i < this.firstDay; i++) {
+                    for (let i = 0; i < this.firstDay; i++) {                        
                         this.calendarDates.push({ date: null, price: null });
                     }
                     for (let i = 1; i <= this.daysInMonth; i++) {
@@ -240,36 +240,26 @@
 
 
                     axios.post(`${baseAddress}/api/ExtraServiceVuePage/getProducts`, postData)
-                    .then(response=>{
-                        console.log('下面是response')
-                        console.log(response)
+                    .then(response=>{               
 
                         for(let i=0;i<response.data.length;i++){
-                                let dateFromIso=new Date(response.data[i].date)
-                 
+                                let dateFromIso = new Date(response.data[i].date);                               
                                 for (let j = 0; j < this.calendarDates.length;j++){
-               
-                                    if (this.calendarDates[j].date== dateFromIso){
-                                        console.log('真的有相等啦是在靠夭喔')
-                              
-                                        this.calendarDates[j].price = response.data[i].price
-                                    }else{
-                                        this.calendarDates[j].price=8;
-                                    }
+                                    if (this.calendarDates[j].date!==null){
+                                        if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
+                                            console.log('真的有相等啦是在靠夭喔')
+
+                                            this.calendarDates[j].price = response.data[i].price
+                                        }                                      
+                                    }                                                   
                                 }
                         }
-
-
-
                             console.log(this.calendarDates)
                     }).catch(err=>{
                         console.log('錯了啦')
                         console.log(err);
-                    })
-
-
-                  
-                }
+                    })                  
+                },
 
 
 
