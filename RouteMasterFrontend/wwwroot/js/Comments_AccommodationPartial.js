@@ -116,11 +116,12 @@
                         <hr/>
                     <div class="card-body">
                         <h5 class="card-title">標題: {{item.title}}</h5>
-                        <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.hotelName}}</p>
+                         <div class="d-flex">
+                              <p class="card-text">編號: {{item.id}}-{{item.hotelName}}</p>
+                              <p class="card-text ms-auto">{{item.score}}分</p>
+                         </div>
                         <p class="card-text">優點: {{item.pros}}</p>
-                        <p class="card-text">缺點: {{item.cons}}</p>
-                        <p class="card-text">{{item.score}}</p>
+                        <p class="card-text">缺點: {{item.cons}}</p>                     
                         <div class="d-flex">
                             <button type="button" v-html="thumbicon[index]" @click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                             </button>

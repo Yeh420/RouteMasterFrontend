@@ -18,5 +18,12 @@
         public int PriceCount { get; set; }
         public int Clicks { get; set; }
         public string Website { get; set; }
+        public IEnumerable<AttractionIndexVM>? RelatedAttractions { get; set; }
+
+        public IEnumerable<AttractionIndexVM>? SameRegionAtt { get; set; }
+
+        public List<AttractionForDistsnceVM>? CloseAtt { get; set; }
+
+        public IEnumerable<AttractionIndexVM>? SameCategoryAtt { get; set; }
     }
 }

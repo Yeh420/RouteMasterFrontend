@@ -7,15 +7,16 @@ using RouteMasterFrontend.Models.Interfaces;
 using RouteMasterFrontend.Models.Services;
 using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
 using RouteMasterFrontend.Models.ViewModels.Members;
+using System.Collections.Generic;
 using System.Drawing.Printing;
 
 namespace RouteMasterFrontend.Controllers
 {
     public class AttractionsController : Controller
     {
-        public IActionResult Index(AttractionCriteria criteria, int page = 1)
+        public async Task<IActionResult> Index(AttractionCriteria criteria, int page = 1)
         {
-            IEnumerable<AttractionIndexVM> attractions = GetAttractions();
+            IEnumerable<AttractionIndexVM> attractions = await GetAttractions();
 
             ViewBag.Categories = attractions.Select(a => a.AttractionCategory).Distinct().ToList();
             ViewBag.Tags = attractions.SelectMany(a => a.Tags).Distinct().ToList();
@@ -94,7 +95,7 @@ namespace RouteMasterFrontend.Controllers
             return View(attractions);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             AddClick(id);
             AttractionDetailVM vm = Get(id);
@@ -102,29 +103,102 @@ namespace RouteMasterFrontend.Controllers
             
             // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
             bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
+            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
+
+            List<string> tags = Get(id).Tags;
+            IEnumerable<AttractionIndexVM> attractions = await GetAttractions();
+
+            if (tags != null)
+            {
+                attractions = attractions.Where(a => a.Tags.Intersect(tags).Any() && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(6);
+            }
+
+            vm.RelatedAttractions = attractions;
+
+            var repo = new AttractionEFRepository();
+            IEnumerable<AttractionForDistsnceVM> atts = repo.GetAllWithXY();
+
+            var targetX = atts.Where(a => a.Id == id).Select(a => a.PosX).FirstOrDefault();
+            var targetY = atts.Where(a => a.Id == id).Select(a => a.PosY).FirstOrDefault();
+
+            List<AttractionForDistsnceVM> sortedAttractions = atts
+                .Where(a => a.Id != id) // Exclude the target attraction itself
+                .ToList();
+
+            foreach (var attraction in sortedAttractions)
+            {
+                if (targetY.HasValue && targetX.HasValue && attraction.PosX.HasValue && attraction.PosY.HasValue)
+                {
+                    decimal distance = CalculateDistance(targetY.Value, targetX.Value, attraction.PosY.Value, attraction.PosX.Value);
+                    attraction.Distance = distance;
+                }
+                else
+                {
+                    attraction.Distance = decimal.MaxValue;
+                }
+            }
+
+            sortedAttractions = sortedAttractions
+                .OrderBy(a => a.Distance) // Sort attractions by distance
+                .Take(6)
+                .ToList();
+
+            vm.CloseAtt = sortedAttractions;
+
+
+            IEnumerable<AttractionIndexVM> sameRegionAtt = await GetAttractions();
+            var region = sameRegionAtt.Where(a => a.Id == id).Select(a => a.Region).FirstOrDefault();
+
+            sameRegionAtt = sameRegionAtt.Where(a => a.Region == region && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(6);
             
-                
 
-            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
+            vm.SameRegionAtt = sameRegionAtt;
+
+
+            IEnumerable<AttractionIndexVM> sameCategoryAtt = await GetAttractions();
+            var category = sameCategoryAtt.Where(a => a.Id == id).Select(a => a.AttractionCategory).FirstOrDefault();
+
+            sameCategoryAtt = sameCategoryAtt.Where(a => a.AttractionCategory == category && a.Id != id)
+                    .OrderByDescending(a => a.ClicksInThirty)
+                    .Take(6);
+
+
+            vm.SameCategoryAtt = sameCategoryAtt;
 
             return View(vm);
         }
 
-        public IActionResult Details2(int id)
+        public static decimal CalculateDistance(decimal lat1, decimal lon1, decimal lat2, decimal lon2)
         {
-            AddClick(id);
-            AttractionDetailVM vm = Get(id);
+            double earthRadius = 6371.0; // Earth's radius in kilometers
 
+            double lat1Rad = DegreesToRadians((double)lat1);
+            double lon1Rad = DegreesToRadians((double)lon1);
+            double lat2Rad = DegreesToRadians((double)lat2);
+            double lon2Rad = DegreesToRadians((double)lon2);
 
-            // 在這裡檢查景點是否已加入最愛，並將結果傳遞到視圖
-            bool isFavorite = CheckIfFavorite(id); // 需要實現這個方法來檢查是否已加入最愛
+            double deltaLat = lat2Rad - lat1Rad;
+            double deltaLon = lon2Rad - lon1Rad;
 
+            double a = Math.Pow(Math.Sin(deltaLat / 2), 2) +
+                       Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * Math.Pow(Math.Sin(deltaLon / 2), 2);
 
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-            ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
+            decimal distance = (decimal)(earthRadius * c); // Distance in kilometers
 
-            return View(vm);
+            return distance;
         }
+
+        public static double DegreesToRadians(double degrees)
+        {
+            return degrees * Math.PI / 180.0;
+        }
+
 
         private bool CheckIfFavorite(int id)
         {
@@ -232,12 +306,16 @@ namespace RouteMasterFrontend.Controllers
             return service.Get(id).ToDetailVM();
         }
 
-        private IEnumerable<AttractionIndexVM> GetAttractions()
+        private async Task<IEnumerable<AttractionIndexVM>> GetAttractions()
         {
             IAttractionRepository repo = new AttractionEFRepository();
             AttractionService service = new AttractionService(repo);
 
-            return service.Search().Select(dto => dto.ToIndexVM());
+            var dtos = service.Search();
+            var vms = dtos.Select(dto => dto.ToIndexVM());
+
+            return vms;
+
         }
     }
 }

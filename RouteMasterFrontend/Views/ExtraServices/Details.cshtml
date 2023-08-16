@@ -1,54 +1,92 @@
-﻿@model RouteMasterFrontend.EFModels.ExtraService
-
-@{
-    ViewData["Title"] = "Details";
+﻿@{
+    var extraServiceId = ViewBag.ExtraServiceId;
 }
 
-<h1>Details</h1>
+@section Styles{
 
-<div>
-    <h4>ExtraService</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Attraction)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Attraction.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Region)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Region.Name)
-        </dd>
-    </dl>
+}
+<div id="app">
+    <div>        
+        <div v-model>{{name}}</div>
+        <img v-bind:src="image" />
+        <div v-model>{{regionName}}</div>
+        <div v-model>{{attractionName}}</div>
+        <div v-model>{{description}}</div>
+    </div>
+    <button id="selectProductSolution" @@click="showPurchasingModal(extraServiceId)">選擇方案</button>
+
+
+
+
+    
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+    <script>
+        let baseAddress = "https://localhost:7251";
+        let vueApp = {
+            data() {
+                return {
+                    extraServiceId: @extraServiceId,
+                    name:"",
+                    description:"",
+                    image:"",
+                    attractionName:"",
+                    regionName:"",
+
+                };
+            },
+            mounted: function () {
+                let _this = this;
+
+                _this.getTargetExtraServiceDto();
+            },
+            methods: {
+                getTargetExtraServiceDto: function () {
+                    let _this = this;
+                    let request = {};
+
+                   
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/Id?extraServiceId=${_this.extraServiceId}`).then(response => {
+                   
+
+                        _this.extraServiceId = response.data.id
+                        _this.name = response.data.name;
+                        _this.description = response.data.description;
+                        _this.image = response.data.image;
+                        _this.attractionName = response.data.attractionName
+                        _this.regionName = response.data.regionName;
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+                showPurchasingModal: function(id){
+                    console.log('買買買買買買');
+                    console.log(id)
+             
+
+                }
+
+
+            }
+        };
+        let app = Vue.createApp(vueApp).mount('#app');
+
+
+
+    </script>
+}
