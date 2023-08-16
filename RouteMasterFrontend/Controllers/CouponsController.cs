@@ -17,7 +17,7 @@ namespace RouteMasterFrontend.Controllers
 
         public async Task<ContentResult> GetAllCoupons()
         {
-            var now = DateTime.Now;
+            var now = DateTime.Now.Date;
 
             List<Coupon> coupons = await _db.Coupons.Select(c => new Coupon
             {
@@ -31,7 +31,7 @@ namespace RouteMasterFrontend.Controllers
 
             foreach(var coupon in coupons)
             {
-                if (coupon.StartDate < now && now < coupon.EndDate)
+                if (coupon.StartDate.Date <= now && now <= coupon.EndDate.Date)
                 {
                     coupon.Valuable = true;
                 }

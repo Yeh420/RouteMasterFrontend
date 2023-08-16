@@ -2,14 +2,14 @@
 
 <div id="app">
 
-    <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex">
+    <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex justify-content-between">
         
         <div>
             <h3>折扣數 : {{ coupon.Discount }}% !!!</h3>
             <h5>可用日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
             <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <b>抱歉，這張優惠券目前無法使用</b></p>
         </div>
-        <div class="ml-auto justify-content-center align-items-center d-flex">
+        <div class=" justify-content-center align-items-center d-flex">
             <button :disabled="!coupon.Valuable" :class="{'btn': true, 'btn-warning': !coupon.Selected, 'btn-danger': coupon.Selected}" v-on:click="UseCoupon(index)">
                 <i class="fa-solid" :class="{'fa-truck-fast': !coupon.Selected, 'fa-check-circle': coupon.Selected}"></i>
                 {{ coupon.Selected ? '優惠券已選取' : '使用優惠券' }}
