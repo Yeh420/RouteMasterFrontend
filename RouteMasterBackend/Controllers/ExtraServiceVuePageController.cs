@@ -62,17 +62,24 @@ namespace RouteMasterBackend.Controllers
                 Description = data.Description,
                 RegionName = data.Region.Name,
                 AttractionName =data.Attraction.Name
-            };
-
-           
-
-
-
-
-
+            };         
             return resultData;
         }
+        [HttpPost("getProducts")]
+        public async Task<IEnumerable<ExtraServiceProductInCalenderDto>>GetProducts(ExtraServiceProductSelectCriteria criteria)
+        {
+            var extProductsInDb=_context.ExtraServiceProducts.Where(x=>x.ExtraServiceId==criteria.ExtraServiceId).Where(x=>x.Date.Year==criteria.CurrentYear&&x.Date.Month==criteria.CurrentMonth);
 
+            var resultData = extProductsInDb.Select(x => new ExtraServiceProductInCalenderDto
+            {
+                Id=x.Id,
+                Date=x.Date,
+                Price=x.Price,
+                Quantity=x.Quantity,    
+            });
+            
+            return resultData;
+        }
 
     }
     
