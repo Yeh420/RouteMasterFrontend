@@ -59,7 +59,7 @@ namespace RouteMasterFrontend.Controllers
                   .Include(c => c.Accommodation)
                   .Include(c => c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
-
+          
             switch (input.Manner)
             {
                 case 0:
