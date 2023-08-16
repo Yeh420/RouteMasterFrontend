@@ -126,6 +126,52 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<string> ReportComment(int targetId, int reasonId)
+        {
+            ReportedAttractionComment report = new ReportedAttractionComment
+            {
+                CommentAttractionId = targetId,
+                ReportReasonId = reasonId,
+                IsHandled = true,
+            };
+            _context.ReportedAttractionComments.Add(report);
+            _context.SaveChanges();
+
+            var targetComment = _context.ReportedAttractionComments
+                .Any(r => r.CommentAttractionId == targetId && r.IsHandled == true);
+
+            var commentDb = _context.Comments_Attractions
+                .Include(c=>c.Attraction)
+                .Where(c => c.Id == targetId);
+               
+            int reviewerId=commentDb.Select(c=>c.MemberId).FirstOrDefault();
+            string spot =commentDb.Select(c=>c.Attraction.Name).First();
+
+            if (targetComment)
+            {
+                SystemMessage reportNotice = new SystemMessage
+                {
+                    MemberId = 1, //記得改成user.Identity.name
+                    Content=$"已收到您在{spot}評論區對某評論的檢舉，RouteMaster團隊將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
+                    IsRead=false,
+                };
+
+                SystemMessage reportSus = new SystemMessage
+                {
+                    MemberId = reviewerId,
+                    Content = $"您在{spot}評論區的評論，因涉及不良內容，已遭檢舉，審核檢舉成功後，該評論將遭下架。",
+                    IsRead = false,
+
+                };
+                _context.SystemMessages.AddRange(reportNotice, reportSus);
+                _context.SaveChanges() ;
+
+                return "檢舉通知已寄出";
+            }
+            return "檢舉失敗";
+        }
+
         private string SaveUploadedFile(string path, IFormFile file1)
         {
             // 如果沒有上傳檔案或檔案是空的,就不處理, 傳回 string.empty
