@@ -4,7 +4,7 @@
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
    "FilterSchemas": false,
-   "IncludeConnectionString": true,
+   "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "Models",
@@ -288,7 +288,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "laptop-cduhr4vv\\yeh420sql.RouteMaster.dbo",
+   "UiHint": "desktop-paksetb.RouteMaster.dbo",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
