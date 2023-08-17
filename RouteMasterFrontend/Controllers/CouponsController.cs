@@ -19,19 +19,21 @@ namespace RouteMasterFrontend.Controllers
         {
             var now = DateTime.Now.Date;
 
-            List<Coupon> coupons = await _db.Coupons.Select(c => new Coupon
-            {
-                Id = c.Id,
-                Code = c.Code,
-                Discount = c.Discount,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                IsActive = c.IsActive,
-            }).ToListAsync();
+            List<Coupon> coupons = await _db.Coupons
+                .OrderBy(c=>c.EndDate)
+                .Select(c => new Coupon
+                {
+                    Id = c.Id,
+                    Code = c.Code,
+                    Discount = c.Discount,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    IsActive = c.IsActive,
+                }).ToListAsync();
 
             foreach(var coupon in coupons)
             {
-                if (coupon.StartDate.Date <= now && now <= coupon.EndDate.Date)
+                if (coupon.StartDate.Date <= now && now <= coupon.EndDate.Date && coupon.IsActive == true)
                 {
                     coupon.Valuable = true;
                 }
