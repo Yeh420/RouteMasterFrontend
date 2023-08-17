@@ -171,7 +171,7 @@
             mounted: function () {
                 let _this = this;
 
-                _this.getTargetExtraServiceDto();
+                _this.getTargetActivityDto();
                 _this.updateCalendar();
             },
             computed: {
@@ -183,7 +183,7 @@
                 }
             },
             methods: {
-                getTargetExtraServiceDto: function () {
+                getTargetActivityDto: function () {
                     let _this = this;
                     let request = {};
 
@@ -222,11 +222,11 @@
                 generateCalendarDates: function () {
                     this.calendarDates = [];
                     for (let i = 0; i < this.firstDay; i++) {
-                        this.calendarDates.push({ date: null, price: null, quantity: 0, id: 0, selected: false });
+                        this.calendarDates.push({ date: null, highestPrice: null, actProducts:[], selected: false });
                     }
                     for (let i = 1; i <= this.daysInMonth; i++) {
                         const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
-                        this.calendarDates.push({ date: currentDate, price: null, quantity: 0, id: 0, selected: false });
+                        this.calendarDates.push({ date: currentDate, highestPrice: null, actProducts:[], selected: false });
                     }
                     //console.log(this.calendarDates)
                     const postData = {
@@ -238,18 +238,19 @@
 
                     axios.post(`${baseAddress}/api/ActivityVuePage/getProducts`, postData)
                         .then(response => {
-                            //console.log('response啦')
-                            //console.log(response)
+                            console.log('response啦')
+                            console.log(response)
+                     
+
+
 
                             for (let i = 0; i < response.data.length; i++) {
                                 let dateFromIso = new Date(response.data[i].date);
                                 for (let j = 0; j < this.calendarDates.length; j++) {
                                     if (this.calendarDates[j].date !== null) {
                                         if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
-
-                                            this.calendarDates[j].price = response.data[i].price
-                                            this.calendarDates[j].quantity = response.data[i].quantity
-                                            this.calendarDates[j].id = response.data[i].id
+                                const newActProduct = { id:response.data[i].id, price: response.data[i].price, quantity: response.data[i].quantity,startTime:response.data[] };
+                                this.calendarDates[j].actProducts.push(newActProduct)                                   
                                         }
                                     }
                                 }
