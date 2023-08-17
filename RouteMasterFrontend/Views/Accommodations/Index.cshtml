@@ -308,19 +308,8 @@
                                     </p>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
-                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
-
-                                        顯示更多評論
-                                    </a>
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                        cccccccccccccccccccccccccc
-                                    </div>
-                                    <dec id="topthree" ref="childRef"></dec>
-
-
-
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                    </div>
+                                    
+                                    <dec ref="childRef"></dec>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -591,8 +580,8 @@
                         _this.accommodationServiceCId = p.services.map(function (s) {
                             return s.serviceInfoCategoryId;
                         });
-                        var parentInput = 5;
-                        _this.$refs.childRef.commentDisplay(p.id, parentInput);
+
+                        _this.$refs.childRef.commentBrief(p.id);
                         const showMoreText = "...顯示更多";
                         const showLessText = "...顯示更少";
                         const lines = _this.temp = p.description.split('\n');

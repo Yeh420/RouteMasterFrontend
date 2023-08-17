@@ -4,10 +4,10 @@
 <h1>@ViewData["Title"]</h1>
 
 <div id="dec">
-    <div class="container" id="brief">
-        <div class="row row-cols-3 g-2">
+    <div class="container">
+        <div class="row row-cols-3 g-2 mt-2" id="brief">
             <div v-for="(text, num) in bfVM" :key="num" class="col">
-                <div class="card h-100">
+                <div class="card overflow-auto" style="max-height: 180px;">
                     <div class="card-body">
                         <h5 class="card-title">{{text.account}}</h5>
                         <div class="d-flex">
@@ -15,68 +15,51 @@
                             <p class="card-text"><i class="fa-solid fa-thumbs-up"></i> {{text.totalThumbs}}</p>
                         </div>
                         
-                        <p class="card-text">{{text.pros}}</p>
-                        <p class="card-text">{{text.cons}}</p>
+                        <p class="card-text" v-if="text.pros">{{"優點:" + text.pros}}</p>
+                        <p class="card-text" v-if="text.cons">{{"缺點:" +text.cons}}</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" id="colla" @@click="showAll">
             顯示更多
         </a>
         <div class="collapse" id="collapseExample">
-        <div class="row mb-2" style="width:20%">
-            <a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>
-            <label for="commentOrder">排序選擇:</label>
-            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
-                <option value="0" selected>請選擇</option>
-                <option value="1">最新留言</option>
-                <option value="2">星星評分高至低</option>
-                <option value="3">星星評分低至高</option>
-            </select>
-        </div>
-            <div class="row g-4">
-                <div v-for="(item, index) in indexVM" :key="index" class="col-4">               
-                    <div class="card">
-                        <template v-if="item.imageList.length>1">
-                            <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
-                                <div class="carousel-inner mx-auto my-auto w-50">
-                                    <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
-                                        <img v-bind:src="getImgPath(photo)" class="d-block card-img-top ">
-                                    </div>
-
-                                </div>
-                                <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <img src="~/MemberUploads/RouteMaster.png" class="img-fluid card-img-top">
-                        </template>
-                        <hr />
+            <div class="row mb-2">
+                <div class="col-3">
+                    <select v-model="selected" id="commentOrder" @@change="commentDisplay">
+                        <option value="0" selected>排序選擇</option>
+                        <option value="1">最新留言</option>
+                        <option value="2">星星評分高至低</option>
+                        <option value="3">星星評分低至高</option>
+                    </select>
+                </div>
+                <div class="col-3 ms-auto text-end">
+                    <a asp-controller="Comments_Accommodation" asp-action="Create" asp-route-id="hotelId">撰寫評論</a>
+                </div>
+            </div>
+            <div v-for="(item, index) in indexVM" :key="index" class="card mb-3 overflow-auto" style="max-height:350px;">
+                <div class="row g-0">
+                    <div class="col-md-8">
+                        <div class="card-header">{{item.account}}</div>
                         <div class="card-body">
-                            <h5 class="card-title">標題: {{item.title}}</h5>
                             <div class="d-flex">
-                              <p class="card-text">編號: {{item.id}}-{{item.hotelName}}</p>
-                              <p class="card-text ms-auto">{{item.score}}分</p>
+                                <h4 class="card-title me-auto">標題: {{item.title}}</h4>
+                                <div>{{item.score}}分</div>
                             </div>
-                            <p class="card-text">優點: {{item.pros}}</p>
-                            <p class="card-text">缺點: {{item.cons}}</p>
-                            <div class="d-flex">
+                            <p class="card-text" v-if="item.pros">{{"優點:" + item.pros}}</p>
+                            <p class="card-text" v-if="item.cons">{{"缺點:" + item.cons}}</p>
+
+                            <div class="d-flex mt-2">
                                 <button type="button" v-html="thumbicon[index]" @@click="likeComment(item.id)" class="btn btn-outline-dark me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                                 </button>
                                 <p class="card-text me-auto"> {{item.totalThumbs}}</p>
                                 <p><small class="text-muted">{{item.createDate}}</small></p>
                             </div>
+
+                            <hr />
                             <template v-if="item.status===isReplyed">
-                                <hr />
                                 <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
                                         :data-bs-target='"#collapseExample"+index' @@showReply(item.id)>
                                     看回覆訊息
@@ -91,9 +74,36 @@
                             </template>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <template v-if="item.imageList.length>1">
+                            <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
+                                <div class="carousel-inner w-100 mx-auto my-auto">
+                                    <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
+                                        <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                    </div>
+
+                                </div>
+                                <button class="carousel-control-prev" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" :data-bs-target='"#carousel"+ index' data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </template>
+                        <template v-else-if="item.imageList.length===1">
+                            <img v-bind:src="getImgPath(item.imageList[0])" class="img-fluid rounded-start">
+                        </template>
+                        <template v-else>
+                            <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
+       
         
 
     </div>
@@ -120,6 +130,7 @@
                     selected: 0,
                     hotelId: 1, //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                     thumbicon: [],
+                    
 
                    
 
@@ -129,13 +140,30 @@
             mounted: function () {
                 let _this = this;
                 _this.commentBrief();
+               
             },
             methods: {
+                showAll:function(){
+                    let _this=this;
+                    _this.commentDisplay();
+                    const colla=document.getElementById('colla');
+                    const collapseExample = document.getElementById('collapseExample');
+                    const brief=document.getElementById("brief");
+
+                    const isCollapsed = colla.classList.contains('collapsed');
+                    if (!isCollapsed){
+                        brief.style.display = 'none';
+                    }
+                    else{
+                        brief.style.display = 'block';
+                    }
+                   
+                },
                 commentBrief:function(id){
                     var request={};
                     let _this = this;
                     if(id){
-                        _this._this.hotelId = id;
+                      _this.hotelId = id;
                     }
                     request.Manner = _this.selected;
                     request.HotelId = _this.hotelId;
