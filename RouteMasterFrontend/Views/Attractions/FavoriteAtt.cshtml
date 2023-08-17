@@ -47,11 +47,11 @@
                             {
                                 @if (i <= Math.Round(item.Score))
                                 {
-                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa fa-star fa-fw" style="color:#f90"></i>
                                 }
                                 else
                                 {
-                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa fa-star fa-fw" style="color:#ccc"></i>
                                 }
                             }
                             @($"({item.ScoreCount}) | 平均停留{item.Hours}小時({item.HoursCount}) | 平均花費{item.Price}元({item.PriceCount})")
