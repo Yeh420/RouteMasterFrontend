@@ -8,7 +8,7 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script> *@
+    @*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script> *@
 
     <style>
         .currentPage {
@@ -117,150 +117,157 @@
     </noscript>
 }
 <div id="app" v-cloak>
-    <div class="d-flex">
-        <aside class="main-left border py-1 px-3">
-            <div>
-                過透以下分類搜尋：
-            </div>
-            <div>
-                <h5>住宿評等</h5>
-                <small>包含星級與其他類評等</small>
-                <ul>
-                    <li v-for="(grade, index) in filterDto.grades">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="grades" v-bind:id="'grade' + index" v-model="selectedGrades" v-bind:value="grade" @@change="showPages">
-                            <label class="form-check-label" v-bind:for="'grade' + index"> {{grade}} 星級</label>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h5>住宿類型</h5>
-                <ul>
-                    <li v-for="(aCategory,index) in filterDto.acommodationCategories">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="aCategory" v-bind:id="'aCategory' + index" v-model="selectedaCategories" v-bind:value="aCategory" @@change="showPages" />
-                            <label class="form-check-label" v-bind:for="'aCategory' + index"> {{aCategory}}</label>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h5>評論分數</h5>
-                <ul>
-                    <li v-for="(score, index) in filterDto.commentSorce">
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" name="score" v-bind:id="'score' + index" v-model="selectedScore" v-bind:value="score" @@change="showPages" />
-                            <label class="form-check-label" v-bind:for="'score' + index"> {{score}} 分以上</label>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h5>設施與服務</h5>
-                <ul>
-                    <li v-for="(sCategory, index) in filterDto.serviceInfoes">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="sCategory" v-bind:id="'sCategory' + index" v-model="selectedsCategories" v-bind:value="sCategory.name" @@change="toggleSInfos(index)">
-                            <label class="form-check-label" v-bind:for="'sCategory' + index">{{ sCategory.name }}</label>
-                            <div class="ms-4" v-for="(sInfo, sIndex) in sCategory.infos">
-                                <input type="checkbox" class="form-check-input" name="sInfo" v-bind:id="'sInfo' + index + '-' + sIndex" v-model="selectedServiceInfos" v-bind:value="sInfo" @@change="showPages">
-                                <label class="form-check-label" v-bind:for="'sInfo' + index + '-' + sIndex">{{ sInfo }}</label>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h5>直轄縣市</h5>
-                <ul>
-                    <li v-for="(region, index) in filterDto.regions">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="region" v-bind:id="'region' + index" v-model="selectedaRegions" v-bind:value="region" @@change="showPages" />
-                            <label class="form-check-label" v-bind:for="'region' + index"> {{region}} </label>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-        <div class="main-right ms-auto">
-            <nav class="d-flex row">
-                <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="showPages">
-                <div class="d-flex col-3 ms-auto">
-                    <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
-                    <select class="form-select w-33" v-model="pageSize" aria-label="Small select example" @@change="showPages">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                    </select>
-                    <label for="page" class="form-label mb-0 ms-2 d-flex align-items-center">筆</label>
-                </div>
-            </nav>
-            <table id="imgTable" class="w-100">
-                <thead>
-                    <tr>
-                        <th>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(product, index) in products" :key="product.id">
-                        <td>
-                            <div class="row mb-2">
-                                <div class="col">
-                                    <div class="card mb-3 h200">
-                                        <div class="row g-0 ">
-                                            <div class="wh220">
-                                                <img class="card-img card-img-left h-100 w-100" src="~/AccommodationImages/卡位.png" alt="尚未建立住所照片" />
-                                            </div>
-                                            <div class="col-9">
-                                                <div class="card-body w-100">
-                                                    <div class="d-flex align-items-center">
-                                                        <h5 class="card-title m-0">
-                                                            {{product.name}}
-                                                        </h5>
-                                                        <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+    <div v-if="toggle">
+        <div id="RecommendMap" class="ratio ratio-16x9"></div>
+        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所"/>
+    </div>
+    <div v-else>
+        <div class="d-flex">
+            <aside class="main-left border py-1 px-3">
+                <div>
+                    過透以下分類搜尋：
+                </div>
+                <div>
+                    <h5>住宿評等</h5>
+                    <small>包含星級與其他類評等</small>
+                    <ul>
+                        <li v-for="(grade, index) in filterDto.grades">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="grades" v-bind:id="'grade' + index" v-model="selectedGrades" v-bind:value="grade" @@change="showPages">
+                                <label class="form-check-label" v-bind:for="'grade' + index"> {{grade}} 星級</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>住宿類型</h5>
+                    <ul>
+                        <li v-for="(aCategory,index) in filterDto.acommodationCategories">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="aCategory" v-bind:id="'aCategory' + index" v-model="selectedaCategories" v-bind:value="aCategory" @@change="showPages" />
+                                <label class="form-check-label" v-bind:for="'aCategory' + index"> {{aCategory}}</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>評論分數</h5>
+                    <ul>
+                        <li v-for="(score, index) in filterDto.commentSorce">
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="score" v-bind:id="'score' + index" v-model="selectedScore" v-bind:value="score" @@change="showPages" />
+                                <label class="form-check-label" v-bind:for="'score' + index"> {{score}} 分以上</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>設施與服務</h5>
+                    <ul>
+                        <li v-for="(sCategory, index) in filterDto.serviceInfoes">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="sCategory" v-bind:id="'sCategory' + index" v-model="selectedsCategories" v-bind:value="sCategory.name" @@change="toggleSInfos(index)">
+                                <label class="form-check-label" v-bind:for="'sCategory' + index">{{ sCategory.name }}</label>
+                                <div class="ms-4" v-for="(sInfo, sIndex) in sCategory.infos">
+                                    <input type="checkbox" class="form-check-input" name="sInfo" v-bind:id="'sInfo' + index + '-' + sIndex" v-model="selectedServiceInfos" v-bind:value="sInfo" @@change="showPages">
+                                    <label class="form-check-label" v-bind:for="'sInfo' + index + '-' + sIndex">{{ sInfo }}</label>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>直轄縣市</h5>
+                    <ul>
+                        <li v-for="(region, index) in filterDto.regions">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="region" v-bind:id="'region' + index" v-model="selectedaRegions" v-bind:value="region" @@change="showPages" />
+                                <label class="form-check-label" v-bind:for="'region' + index"> {{region}} </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <div class="main-right ms-auto">
+                <nav class="d-flex row">
+                    <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="showPages">
+                    <div class="d-flex col-3 ms-auto">
+                        <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
+                        <select class="form-select w-33" v-model="pageSize" aria-label="Small select example" @@change="showPages">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                        </select>
+                        <label for="page" class="form-label mb-0 ms-2 d-flex align-items-center">筆</label>
+                    </div>
+                </nav>
+                <table id="imgTable" class="w-100">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(product, index) in products" :key="product.id">
+                            <td>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <div class="card mb-3 h200">
+                                            <div class="row g-0 ">
+                                                <div class="wh220">
+                                                    <img class="card-img card-img-left h-100 w-100" v-bind:src="product.image" style="object-fit:cover" alt="尚未建立住所照片" />
+                                                </div>
+                                                <div class="col-9">
+                                                    <div class="card-body w-100">
+                                                        <div class="d-flex align-items-center">
+                                                            <h5 class="card-title m-0">
+                                                                {{product.name}}
+                                                            </h5>
+                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                        </div>
+                                                        <p class="card-text">
+                                                            <small class="text-muted">
+                                                                {{product.address}}
+                                                            </small>
+                                                        </p>
+                                                        <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(product.id)" />
                                                     </div>
-                                                    <p class="card-text">
-                                                        <small class="text-muted">
-                                                            {{product.address}}
-                                                        </small>
-                                                    </p>
-                                                    <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(index)" />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+        <hr />
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center flex-wrap mt-2 mb-4">
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(1)">&lt;&lt;</a>
+                </li>
+                <li v-if="hasPrevious" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage-1)">&lt;</a>
+                </li>
+                <li v-for="(value, index) in pageRange" :key="index" class="page-item">
+                    <a v-if="value === ELLIPSIS" class="page-link d-flex align-items-center">{{ value }}</a>
+                    <a v-else :class="{'page-link': true, 'currentPage': value === thePage}" href="#" @@click="clickHandler(value)">{{ value }}</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(thePage+1)">&gt;</a>
+                </li>
+                <li v-if="hasNext" class="page-item">
+                    <a class="page-link" href="#" @@click="clickHandler(totalPages)">&gt;&gt;</a>
+                </li>
+            </ul>
+        </nav>
     </div>
-    <hr />
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center flex-wrap mt-2 mb-4">
-            <li v-if="hasPrevious" class="page-item">
-                <a class="page-link" href="#" @@click="clickHandler(1)">&lt;&lt;</a>
-            </li>
-            <li v-if="hasPrevious" class="page-item">
-                <a class="page-link" href="#" @@click="clickHandler(thePage-1)">&lt;</a>
-            </li>
-            <li v-for="(value, index) in pageRange" :key="index" class="page-item">
-                <a v-if="value === ELLIPSIS" class="page-link d-flex align-items-center">{{ value }}</a>
-                <a v-else :class="{'page-link': true, 'currentPage': value === thePage}" href="#" @@click="clickHandler(value)">{{ value }}</a>
-            </li>
-            <li v-if="hasNext" class="page-item">
-                <a class="page-link" href="#" @@click="clickHandler(thePage+1)">&gt;</a>
-            </li>
-            <li v-if="hasNext" class="page-item">
-                <a class="page-link" href="#" @@click="clickHandler(totalPages)">&gt;&gt;</a>
-            </li>
-        </ul>
-    </nav>
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -308,19 +315,8 @@
                                     </p>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
-                                    <a data-bs-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="swcollapse2" @@click="showAllComment">
-
-                                        顯示更多評論
-                                    </a>
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                        cccccccccccccccccccccccccc
-                                    </div>
-                                    <dec id="topthree" ref="childRef"></dec>
-
-
-
-                                    <div class="collapse overflow-hidden" id="collapse2" style="height:150px">
-                                    </div>
+                                    
+                                    <dec ref="childRef"></dec>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -449,11 +445,23 @@
                     accommodationServiceCId: [],
                     cartItems: [],
                     map: null,
+                    toggle: false,
                 }
             },
-            mounted: async function () {
+            mounted:function () {
                 let _this = this;
-                _this.loadProducts();
+                if(_this.toggle){
+                    // 等待 Google Maps API 加载完成
+                    if (typeof google === 'undefined') {
+                        setTimeout(function() {
+                            _this.RecommendAccommodation(1, 1, "");
+                        }, 100);
+                        return;
+                    }
+                }
+                else{
+                    _this.loadProducts();
+                }
             },
             computed: {
                 hasPrevious() {
@@ -484,8 +492,8 @@
                 },
             },
             methods: {
-                initMap: function (id) {
-                    const p = this.products[id];
+                initMap: function () {
+                    const p = this.accommodationIndex;
                     const location = { lat: p.positionY, lng: p.positionX };
                     this.map = new google.maps.Map(document.getElementById("map"), {
                         // 中心點位置
@@ -523,9 +531,9 @@
                             }
                         ]
                     });
-                    this.calculateDrivingTime(location, [{ lat: this.products[1].positionY, lng: this.products[1].positionX }, { lat: this.products[2].positionY, lng: this.products[2].positionX }])
+                    //this.calculateDrivingTime(location, [{ lat: this.products[1].positionY, lng: this.products[1].positionX }, { lat: this.products[2].positionY, lng: this.products[2].positionX }])
                 },
-                calculateDrivingTime: function calculateDrivingTimes(originLatLng, destinationLatLngs/* , apiKey */) {
+                calculateDrivingTime: function calculateDrivingTimes(originLatLng, destinationLatLngs) {
                     const bounds = new google.maps.LatLngBounds();
                     const markersArray = [];
 
@@ -585,14 +593,17 @@
                     let _this = this;
                     const exampleModal = document.getElementById('exampleModal')
                     if (exampleModal) {
-                        const p = _this.products[id];
-                        _this.accommodationIndex = p;
+                        const response = await fetch(`https://localhost:7251/api/Accommodations/${id}`)
+                        const result = await response.json();
+                        const p = _this.accommodationIndex = result;
+                        console.log(p);
+
                         _this.accommodationImage = p.images[0] ? p.images[0].image : null;
                         _this.accommodationServiceCId = p.services.map(function (s) {
                             return s.serviceInfoCategoryId;
                         });
-                        var parentInput = 5;
-                        _this.$refs.childRef.commentDisplay(p.id, parentInput);
+
+                        _this.$refs.childRef.commentBrief(p.id);
                         const showMoreText = "...顯示更多";
                         const showLessText = "...顯示更少";
                         const lines = _this.temp = p.description.split('\n');
@@ -662,18 +673,20 @@
                     let request = {
                         roomProductId: _this.cartProductId
                     };
-                    await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
-                        method: "Post",
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(request)
-                    }).then((response) => {
-                        response.text().then((data) => {
-                            $('#Cart').html(data);
-                            alert("已成功加入購物車");
-                        })
-                    });
+
+                    window.opener.postMessage(request, window.location.origin);
+                    //await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
+                    //    method: "Post",
+                    //    headers: {
+                    //        'Content-Type': 'application/json'
+                    //    },
+                    //    body: JSON.stringify(request)
+                    //}).then((response) => {
+                    //    response.text().then((data) => {
+                    //        $('#Cart').html(data);
+                    //        alert("已成功加入購物車");
+                    //    })
+                    //});
                 },
                 showPages: function () {
                     let _this = this;
@@ -764,11 +777,81 @@
                         }
                     }, false);
                 },
+                RecommendAccommodation: async function(x, y, name){
+                    x = 121.125709533691;
+                    y = 22.7907829284668;
+                    name = "龜山島";
+                    const location = { lat: y, lng: x };
+                    let _this = this;
+                    let modal = new bootstrap.Modal(document.getElementById("exampleModal"));
+
+                    this.map = new google.maps.Map(document.getElementById("RecommendMap"), {
+                        // 中心點位置
+                        center: location,
+                        zoom: 14, // 地圖縮放比例 (0-20)
+                        streetViewControl: true, // 是否顯示右下角街景小人
+                        mapTypeControl: true // 使用者能否切換地圖樣式：一般、衛星圖等
+                    });
+
+                    const response = await fetch(`https://localhost:7251/api/Accommodations?lngX=${x}&latY=${y}&topN=10`)
+                    const result = await response.json();
+
+                    _this.products = result;
+
+                    console.log(result);
+                    result.forEach( r => {
+                        let latLng = new google.maps.LatLng(r.positionY, r.positionX);
+
+                        let marker = new google.maps.Marker({
+                        position: latLng,
+                        //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
+                        map: _this.map,
+                        animation: google.maps.Animation.BOUNCE, // DROP掉下來、BOUNCE一直彈跳
+                        draggable: true // true、false可否拖拉
+                        });
+
+                        let infowindow = new google.maps.InfoWindow({
+                            content: `<h6>${r.name}</h6>
+                                                    <small>${r.address}</small>` // 支援html
+                        });
+
+                        infowindow.open(_this.map, marker);
+
+                        marker.addListener('mouseover', e => {
+                            infowindow.open(_this.map, marker);
+                        });
+
+                        marker.addListener('mouseover', e => {
+                            infowindow.open(_this.map, marker);
+                        });
+
+                        marker.addListener('click', e => {
+                            _this.showModal(r.id)
+                            modal.show();
+                        });
+
+                    });
+
+                    this.map.setOptions({
+                        styles: [
+                            {
+                                featureType: 'poi.business',
+                                stylers: [{
+                                    visibility: 'off'
+                                }]
+                            }
+                        ]
+                    });
+
+                    alert("已幫你挑選10間精選住所")
+
+                }
             },
             components: {
                 dec
             }
         }
         var app = Vue.createApp(vueApp).mount("#app");
+
     </script>
 }

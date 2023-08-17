@@ -1016,14 +1016,24 @@
         //選住宿寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡
         function selectAccommodationByGoogleMapsApi(){
 
+            var newWindow = window.open("https://localhost:7145/accommodations/index", "_blank");
+            console.log(this.getAttribute("positionx"))
+            // 监听新窗口的消息事件
+            window.addEventListener("message", function(event) {
+                if (event.source === newWindow && event.origin === window.location.origin) {
+                    // 在这里处理从新窗口传回的消息
+                    var returnedResult = event.data;
+                    console.log("接收到返回的结果：" + returnedResult);
+                    alert("接收到返回的结果：" + returnedResult);
+                }
+            });
 
-
-
-            console.log('還沒寫')
-
-
-
-
+            // 在新窗口中执行操作
+            newWindow.addEventListener("load", function() {
+                // 调用新窗口中定义的函数，并将结果传回到原始窗口
+                var result = newWindow.app.RecommendAccommodation();
+                newWindow.postMessage(result, window.location.origin);
+            });
 
         }
 
