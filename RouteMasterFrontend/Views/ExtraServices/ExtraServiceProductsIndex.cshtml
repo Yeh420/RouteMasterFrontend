@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.ExtraServiceProduct>
 
 @{
-    ViewData["Title"] = "ExtraServiceProductsIndex";
+    int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
+
+
 
 <h1>ExtraServiceProductsIndex</h1>
 
@@ -92,10 +94,17 @@
     function addToCart(extraserviceId) {
         var quantity = parseInt($("#quantityInput").val()); 
 
+
         $.ajax({
-            url: '/Carts/AddExtraService2Cart',
-            type: 'Post',
-            data: { extraserviceId: extraserviceId, quantity: quantity },
+            url: 'https://localhost:7251/api/Carts/addextraservice',
+            type: 'POST',
+            contentType: 'application/json', // 發送JSON資料
+            data: JSON.stringify({
+                extraserviceId: extraserviceId,
+                quantity: quantity,
+                cartId: @cartIdFromCookie,
+
+            }), 
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
@@ -107,8 +116,8 @@
                 alert('An error occurred while adding to cart.');
             }
         });
-    }
 
+    }
 
     function reloadCartItems() {       
         $.ajax({
@@ -118,8 +127,6 @@
               
                 $('#Cart').html(data);             
             },
-
-
             error: function () {
                 alert('Failed to reload cart items.');
             }

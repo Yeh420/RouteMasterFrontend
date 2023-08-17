@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.ActivityProduct>
 
 @{
-    ViewData["Title"] = "ActivityProductIndex";
+    int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
+
+
 
 <h1>ActivityProductIndex</h1>
 
@@ -97,12 +99,24 @@
 
 
     });
-    function addToCart1(activitiesId) {
+    function addToCart1(activityid) {
+        
+
+     
+
+
+
         var quantity = parseInt($("#quantityInput").val());
+        
         $.ajax({
-            url: '/Carts/AddActivitiesDetail2Cart',
+            url: 'https://localhost:7251/api/Carts/addactivity',
             type: 'Post',
-            data: { activitiesId: activitiesId, quantity: quantity },
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                activityid: activityid,
+                quantity: quantity,
+                cartId: @cartIdFromCookie,
+            }),
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
