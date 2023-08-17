@@ -9,7 +9,6 @@
         width: 100px;
         height: 100px;
         border-radius: 50%;
-        
     }
 </style>
 
@@ -24,13 +23,15 @@
         </ul>
     </div>
 </nav>
-    @{
-        if (User.Identity.IsAuthenticated){
-    <div class="memberphoto position-absolute top-50 end-0 translate-middle-y">
-        <img src="@Url.Content(imagePath)" alt="會員圖片" class="member-image" />
-    </div>
+@{
+    if (User.Identity.IsAuthenticated)
+    {
+        <div class="memberphoto position-absolute top-50 end-0 translate-middle-y">
+            <img src="@Url.Content(imagePath)" alt="會員圖片" class="member-image" />
+        </div>
     }
-    else{
+    else
+    {
         <div></div>
     }
-    }
+}
