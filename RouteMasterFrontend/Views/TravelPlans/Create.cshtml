@@ -549,6 +549,7 @@
                         selectAccommodationBtn.classList.add('btn', 'btn-primary');
                         selectAccommodationBtn.setAttribute('positionX', response.data.positionX);
                         selectAccommodationBtn.setAttribute('positionY', response.data.positionY);
+                        selectAccommodationBtn.addEventListener('click', selectAccommodationByGoogleMapsApi)
                         targetTable.classList.remove('hide');
 
 
