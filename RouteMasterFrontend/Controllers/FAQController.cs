@@ -20,6 +20,10 @@ namespace RouteMasterFrontend.Controllers
         {
             return View();
         }
+        public IActionResult IndexSPA()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<JsonResult> Search([FromBody] FAQAjaxDTO input)

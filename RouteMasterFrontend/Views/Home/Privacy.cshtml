@@ -28,13 +28,16 @@
         <div class="collapse" id="collapseExample">
             <div class="row mb-2">
                 <div class="col-3">
-                    <select v-model="selected" id="commentOrder" @@change="commentDisplay">
+                    <select v-model="selected" id="commentOrder" @@change="commentDisplay()">
                         <option value="0" selected>排序選擇</option>
                         <option value="1">最新留言</option>
                         <option value="2">星星評分高至低</option>
                         <option value="3">星星評分低至高</option>
                     </select>
                 </div>
+
+                <div v-model>{{selected}}</div>
+                <div v-model>{{hotelId}}</div>
                 <div class="col-3 ms-auto text-end">
                     <a asp-controller="Comments_Accommodation" asp-action="Create" asp-route-id="hotelId">撰寫評論</a>
                 </div>
@@ -165,8 +168,8 @@
                     if(id){
                       _this.hotelId = id;
                     }
-                    request.Manner = _this.selected;
-                    request.HotelId = _this.hotelId;
+                    request.Manner = this.selected;
+                    request.HotelId = this.hotelId;
 
                     axios.post("https://localhost:7145/Comments_Accommodation/Index",request).then(response=>{
                         _this.bfVM = response.data;
@@ -178,12 +181,9 @@
                     });
 
                 },
-                commentDisplay: function (id) {
+                commentDisplay: function () {
                     let _this = this;
-                    var request = {};
-                    if (id) {
-                        _this.hotelId = id;
-                    }
+                    var request = {};               
                     request.Manner = _this.selected;
                     request.HotelId = _this.hotelId;
 

@@ -83,6 +83,7 @@ namespace RouteMasterFrontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int id, Comments_AttractionCreateVM vm, List<IFormFile> file1)
         {
+            ViewBag.spotId=id;
             if(ModelState.IsValid)
             {
                 Comments_Attraction commentDb = new Comments_Attraction
@@ -126,7 +127,7 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
-        [HttpPost]
+      
         public async Task<string> ReportComment(int targetId, int reasonId)
         {
             ReportedAttractionComment report = new ReportedAttractionComment
