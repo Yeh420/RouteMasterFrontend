@@ -1017,14 +1017,15 @@
         function selectAccommodationByGoogleMapsApi(){
 
             var newWindow = window.open("https://localhost:7145/accommodations/index", "_blank");
-
+            console.log(this.getAttribute("positionx"))
             // 监听新窗口的消息事件
             window.addEventListener("message", function(event) {
-                //if (event.source === newWindow && event.origin === window.location.origin) {
+                if (event.source === newWindow && event.origin === window.location.origin) {
                     // 在这里处理从新窗口传回的消息
                     var returnedResult = event.data;
                     console.log("接收到返回的结果：" + returnedResult);
-                //}
+                    alert("接收到返回的结果：" + returnedResult);
+                }
             });
 
             // 在新窗口中执行操作

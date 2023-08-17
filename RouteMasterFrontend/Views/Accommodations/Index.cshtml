@@ -233,7 +233,7 @@
                                                                 {{product.address}}
                                                             </small>
                                                         </p>
-                                                        <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(index)" />
+                                                        <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(product.id)" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -451,7 +451,6 @@
             mounted:function () {
                 let _this = this;
                 if(_this.toggle){
-                    
                     // 等待 Google Maps API 加载完成
                     if (typeof google === 'undefined') {
                         setTimeout(function() {
@@ -493,8 +492,8 @@
                 },
             },
             methods: {
-                initMap: function (id) {
-                    const p = this.products[id];
+                initMap: function () {
+                    const p = this.accommodationIndex;
                     const location = { lat: p.positionY, lng: p.positionX };
                     this.map = new google.maps.Map(document.getElementById("map"), {
                         // 中心點位置
@@ -532,7 +531,7 @@
                             }
                         ]
                     });
-                    this.calculateDrivingTime(location, [{ lat: this.products[1].positionY, lng: this.products[1].positionX }, { lat: this.products[2].positionY, lng: this.products[2].positionX }])
+                    //this.calculateDrivingTime(location, [{ lat: this.products[1].positionY, lng: this.products[1].positionX }, { lat: this.products[2].positionY, lng: this.products[2].positionX }])
                 },
                 calculateDrivingTime: function calculateDrivingTimes(originLatLng, destinationLatLngs) {
                     const bounds = new google.maps.LatLngBounds();
@@ -594,8 +593,11 @@
                     let _this = this;
                     const exampleModal = document.getElementById('exampleModal')
                     if (exampleModal) {
-                        const p = _this.products[id];
-                        _this.accommodationIndex = p;
+                        const response = await fetch(`https://localhost:7251/api/Accommodations/${id}`)
+                        const result = await response.json();
+                        const p = _this.accommodationIndex = result;
+                        console.log(p);
+
                         _this.accommodationImage = p.images[0] ? p.images[0].image : null;
                         _this.accommodationServiceCId = p.services.map(function (s) {
                             return s.serviceInfoCategoryId;
@@ -671,18 +673,20 @@
                     let request = {
                         roomProductId: _this.cartProductId
                     };
-                    await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
-                        method: "Post",
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(request)
-                    }).then((response) => {
-                        response.text().then((data) => {
-                            $('#Cart').html(data);
-                            alert("已成功加入購物車");
-                        })
-                    });
+
+                    window.opener.postMessage(request, window.location.origin);
+                    //await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
+                    //    method: "Post",
+                    //    headers: {
+                    //        'Content-Type': 'application/json'
+                    //    },
+                    //    body: JSON.stringify(request)
+                    //}).then((response) => {
+                    //    response.text().then((data) => {
+                    //        $('#Cart').html(data);
+                    //        alert("已成功加入購物車");
+                    //    })
+                    //});
                 },
                 showPages: function () {
                     let _this = this;
@@ -795,7 +799,7 @@
                     _this.products = result;
 
                     console.log(result);
-                    result.forEach((r, index) => {
+                    result.forEach( r => {
                         let latLng = new google.maps.LatLng(r.positionY, r.positionX);
 
                         let marker = new google.maps.Marker({
@@ -822,7 +826,7 @@
                         });
 
                         marker.addListener('click', e => {
-                            _this.showModal(index)
+                            _this.showModal(r.id)
                             modal.show();
                         });
 
@@ -841,8 +845,6 @@
 
                     alert("已幫你挑選10間精選住所")
 
-                    //var returnData = 456;
-                    //window.opener.postMessage(returnData, window.location.origin);
                 }
             },
             components: {

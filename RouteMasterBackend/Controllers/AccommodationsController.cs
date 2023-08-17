@@ -69,20 +69,14 @@ namespace RouteMasterBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AccommodtaionsDTO>> GetAccommodations(int id)
         {
-            
-            if (_db.Accommodations == null)
-            {
-                return NotFound();
-            }
-
-            var a = await _db.Accommodations
+            var accommodations = _db.Accommodations
                     .Include(a => a.CommentsAccommodations)
                     .Include(a => a.AccommodationImages)
                     .Include(a => a.Rooms)
                     .Include(a => a.AccommodationServiceInfos)
-                    .FirstOrDefaultAsync(a => a.Id == id);
+                    .Where(a => a.Id == id);
 
-            AccommodtaionsDTO accommodationsDTO = new AccommodtaionsDTO
+            var dto = await accommodations.Select(a=>new AccommodtaionsDTO
             {
                 Id = a.Id,
                 Name = a.Name,
@@ -97,9 +91,9 @@ namespace RouteMasterBackend.Controllers
                 Comments = a.CommentsAccommodations,
                 Rooms = a.Rooms,
                 Services = a.AccommodationServiceInfos
-            };
-
-            return accommodationsDTO;
+            }).FirstAsync();
+            
+            return dto;
         }
 
         [HttpPost]
