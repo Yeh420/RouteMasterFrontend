@@ -100,7 +100,6 @@
         <div id="selectedAttractions" class="border border-secondary " style="height:500px; position:relative;"></div>
         <button id="getInformations" class="btn btn-primary" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);">取得資料</button>
     </div>     
-
 </div>
 
 
@@ -127,6 +126,8 @@
 
         let theCurrentAttractionOfDropContainer;
         let theNextAttractionOfDropContainer;
+        let roomProducts = [];
+
 
         const addAttBtns = document.querySelectorAll('.addAtt');
 
@@ -994,7 +995,7 @@
 
                     activityProductIds: actCheckboxValues,
                     extraServiceProductIds: extCheckboxValues
-
+                    // roomProducts
                 };
 
 
@@ -1016,28 +1017,52 @@
 
         //選住宿寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡
         function selectAccommodationByGoogleMapsApi(){
+            const y = Number(this.getAttribute("positionx"));
+            const x = Number(this.getAttribute("positiony"));
 
-            var newWindow = window.open("https://localhost:7145/accommodations/index", "_blank");
-            console.log(this.getAttribute("positionx"))
+            const name = this.parentNode.firstChild.textContent;
+
+            var newWindow = window.open("https://localhost:7145/accommodations/index?Recommend=", "_blank");
+
             // 监听新窗口的消息事件
             window.addEventListener("message", function(event) {
                 if (event.source === newWindow && event.origin === window.location.origin) {
                     // 在这里处理从新窗口传回的消息
-                    var returnedResult = event.data;
-                    console.log("接收到返回的结果：" + returnedResult);
-                    alert("接收到返回的结果：" + returnedResult);
+                    var response = JSON.parse(event.data);
+                    response.roomProductId.map(function(id){
+                        let rp = {
+                            id : id,
+                            quantity : response.quantity
+                        };
+                        CheckRoomProducts(rp);
+                    })
                 }
             });
 
             // 在新窗口中执行操作
             newWindow.addEventListener("load", function() {
                 // 调用新窗口中定义的函数，并将结果传回到原始窗口
-                var result = newWindow.app.RecommendAccommodation();
-                newWindow.postMessage(result, window.location.origin);
+                var result = newWindow.app.RecommendAccommodation(x, y, name);
             });
 
         }
 
+        function CheckRoomProducts(rp){
+           
+            // 检查是否存在具有相同 id 的物件
+            var existingProduct = roomProducts.find(function(product) {
+              return product.id === rp.id;
+            });
+
+            if (existingProduct) {
+              // 如果已存在，将数量相加
+              existingProduct.quantity += rp.quantity;
+            } else {
+              // 如果不存在，添加新物件到数组
+              roomProducts.push(rp);
+            }
+
+        }
 
         document.querySelector('#callApiToAddToCart').addEventListener('click',function(){
             addToCartByCallWebApi();
