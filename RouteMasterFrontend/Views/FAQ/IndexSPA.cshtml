@@ -1,11 +1,8 @@
 ﻿
 
 <div id="app">
-    <div class="container">
-        <div class="row">
-            <h1>{{filter}}</h1>
-        </div>
-        <div class="row g-0">
+    <div class="container">       
+        <div class="row row-cols-md-auto ms-1">
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio1" v-model="filter" value="1" @@change="getMessage">
                 <label class="form-check-label" for="radio1">
@@ -24,9 +21,14 @@
                     全部
                 </label>
             </div>
+            <div class="form-check form-switch">
+           <input class="form-check-input" type="checkbox" role="switch" id="readall" @@change="allRead">
+           <label class="form-check-label" for="readall">全部已讀</label>
         </div>
-        <div class="row row-cols-2 mt-1 g-2">
-            <div class="card mb-3 col" v-for="(item,index) in indexVM" :key="item.id">
+            
+        </div>
+        <div class="row mt-1 g-2">
+            <div class="card mb-3 col-6" v-for="(item,index) in indexVM" :key="item.id">
                 <h5 class="card-header">{{item.category}}</h5>
                 <div class="card-body">
                     <p class="card-text">{{item.id}}</p>
@@ -61,7 +63,26 @@
                 _this.getMessage();
              
             },
-            methods: {              
+            methods: {    
+                allRead:function(){
+                    let _this = this;
+                    const one = document.getElementById("readall");
+                    const isLaunched= one.checked;
+                    if(isLaunched){
+                        fetch("https://localhost:7145/SystemMessage/MarkAllAsRead", {
+                            method: "POST",
+                        }).then(response => response.text())
+                            .then(result => {
+
+                                console.log(result);
+                                _this.getMessage();
+                            }
+                            ).catch(error => {
+                                console.error('There was a problem with the fetch operation:', error);
+                            });
+                       
+                    }
+                },
                 updateSW:function(msgId){
                     let _this = this;
                     console.log(msgId);
