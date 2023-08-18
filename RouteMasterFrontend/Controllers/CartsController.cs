@@ -38,7 +38,13 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-      
+
+
+        public IActionResult IndexVue()
+        {  
+            return View();
+        }
+    
         public IActionResult Index()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
