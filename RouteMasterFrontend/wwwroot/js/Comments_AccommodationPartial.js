@@ -45,12 +45,12 @@
             });
 
         },
-        commentDisplay: function (id) {
+        commentDisplay: function () {
             let _this = this;
             var request = {};
-            if (id) {
-                _this.hotelId = id;
-            }
+            //if (id) {
+            //    _this.hotelId = id;
+            //}
             request.Manner = _this.selected;
             request.HotelId = _this.hotelId;
 
@@ -108,10 +108,10 @@
             </div>
         </div>
         
-        <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" id="colla" @click="showAll">
+        <a data-bs-toggle="collapse" href="#collapseSW" role="button" aria-expanded="false" aria-controls="collapseSW" id="colla" @click="showAll">
             顯示更多
         </a>
-        <div class="collapse" id="collapseExample">
+        <div class="collapse" id="collapseSW">
             <div class="row mb-2">
                 <div class="col-3">
                     <select v-model="selected" id="commentOrder" @change="commentDisplay">
@@ -132,7 +132,7 @@
                         <div class="card-body">
                             <div class="d-flex">
                                 <h4 class="card-title me-auto">標題: {{item.title}}</h4>
-                                <div>{{item.score}}分</div>
+                                <div>{{item.score}}<i class="fa fa-star fa-fw" style="color:#f90;"></i></div>
                             </div>
                             <p class="card-text" v-if="item.pros">{{"優點:" + item.pros}}</p>
                             <p class="card-text" v-if="item.cons">{{"缺點:" + item.cons}}</p>
@@ -147,10 +147,10 @@
                             <hr />
                             <template v-if="item.status===isReplyed">
                                 <button type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
-                                        :data-bs-target='"#collapseExample"+index' @showReply(item.id)>
+                                        :data-bs-target='"#collapseMsg"+index' @showReply(item.id)>
                                     看回覆訊息
                                 </button>
-                                <div class="collapse mt-3" :id='"collapseExample" + index'>
+                                <div class="collapse mt-3" :id='"collapseMsg" + index'>
                                     <div class="card card-body">
                                         <h5>來自{{item.hotelName}}的回覆:</h5>
                                         <p>{{item.replyMessage}}</p>

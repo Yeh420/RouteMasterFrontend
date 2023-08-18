@@ -4,7 +4,18 @@ namespace RouteMasterBackend.DTOs
 {
 	public class AccommodtaionsDTO
 	{
-        public List<AccommodtaionsDTOItem> Items { get; set; }
-        public int TotalPages { get; set; }
-	}
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public double? Grade { get; set; }
+        public string Address { get; set; }
+        public double? PositionX { get; set; }
+        public double? PositionY { get; set; }
+        public TimeSpan? CheckIn { get; set; }
+        public TimeSpan? CheckOut { get; set; }
+        public IEnumerable<AccommodationImage> Images { get; set; }
+        public IEnumerable<CommentsAccommodation> Comments { get; set; }
+        public IEnumerable<Room> Rooms { get; set; }
+        public IEnumerable<AccommodationServiceInfo> Services { get; set; }
+    }
 }
