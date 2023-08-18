@@ -63,6 +63,7 @@ namespace RouteMasterFrontend.Controllers
                     })
                     .ToList(),
 
+
                     Accommodations = context.Cart_AccommodationDetails
                     .Where(c => c.CartId == cartIdFromCookie)
                     .Include(c => c.RoomProduct)

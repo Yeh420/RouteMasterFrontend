@@ -30,27 +30,13 @@ namespace RouteMasterFrontend.Controllers
 		}
 
         // GET: ActivitiesE
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            IActivityRepository repo = new ActivitiesListEFRepository(_context);
-            ActivityService service = new ActivityService(repo);
-            ActivityListCriteria criteria = new ActivityListCriteria();
-            var activitiesInDb = service.Search(criteria).Select(a => a.ToListVM());
-            return View(activitiesInDb);
+
+            return View();
         }
 
 
-
-        //Dapper 供參
-        //public async Task<IActionResult> Index()
-        //{
-
-        //    IActivityRepository repo = new ActivitiesListDapperRepository();
-        //    ActivityService service = new ActivityService(repo);
-        //    ActivityListCriteria criteria = new ActivityListCriteria();
-        //    var activitiesInDb = service.Search(criteria).Select(a => a.ToListVM());
-        //    return View(activitiesInDb);
-        //}
 
 
 
@@ -68,22 +54,10 @@ namespace RouteMasterFrontend.Controllers
         // GET: Activities/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Activities == null)
-            {
-                return NotFound();
-            }
 
-            var activity = await _context.Activities
-                .Include(a => a.ActivityCategory)
-                .Include(a => a.Attraction)
-                .Include(a => a.Region)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
+            ViewBag.ActivityId = id;
 
-            return View(activity);
+            return View();
         }
 
         // GET: Activities/Create

@@ -125,11 +125,13 @@
                                                     @Html.DisplayFor(modelItem => firstItem.ActivityProduct.EndTime)
                                                 </span>
                                             </div>
-                                            <div class="activity-quantity" style="font-size: 14px; color: dimgrey; margin-left: 40px; margin-top: 5px;">
-                                                數量: @group.Sum(item => item.Quantity)
+                                            <div class="activity-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                                數量:
+                                                <span class="quantity">@group.Sum(item => item.Quantity)</span>
+
                                             </div>
                                             <div class="activity-price" style="font-size: 18px; color: lightseagreen; font-weight: bold; margin-left: 40px; margin-top: 5px;">
-                                                TWD: @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Price)
+                                                TWD:  <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ActivityProduct.Price)</span>
                                             </div>
                                         </div>
                                         <div class="activity-remove col-md-1" style="text-align: right;">

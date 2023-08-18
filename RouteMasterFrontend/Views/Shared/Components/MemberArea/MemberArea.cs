@@ -12,7 +12,7 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
             _context = context;
         }
 
-        public IViewComponentResult Invoke(int pagecase)
+        public IViewComponentResult Invoke(int pagecase=0)
         {
             
 
