@@ -268,21 +268,21 @@ namespace RouteMasterFrontend.Controllers
         {
             try
             {
-                var RoomProduct = _context.RoomProducts.Where(r=> dto.roomProductId.Contains(r.Id));
+                var RoomProduct = _context.RoomProducts.Where(r=> dto.RoomProductId.Contains(r.Id));
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                    //var cartIdFromCookie = 3;
-                    foreach(var rp in RoomProduct)
-                    {
-                        var cartItem = new Cart_AccommodationDetail
+                     
+                        foreach(var rp in RoomProduct)
                         {
-                            CartId = cartIdFromCookie,
-                            RoomProductId = rp.Id,
-                            Quantity = 1
-                        };
-                        _context.Cart_AccommodationDetails.Add(cartItem);
-                    }
+                            var cartItem = new Cart_AccommodationDetail
+                            {
+                                CartId = cartIdFromCookie,
+                                RoomProductId = rp.Id,
+                                Quantity = dto.Quantity
+                            };
+                            _context.Cart_AccommodationDetails.Add(cartItem);
+                        }
                         _context.SaveChanges();
                         Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
 
