@@ -15,14 +15,14 @@
     <script src="~/lib/datatables/js/jquery.datatables.min.js"></script>
     <script>
         var memberId = "1";
-       $(d function getit(){
-            
+        $(d function getit() {
+
             $.ajax({
-                 type:"Get",
+                type: "Get",
                 url: `https://localhost:7251/api/Members/${memberId}`
-            }).done(data=>{
+            }).done(data => {
                 alert(JSON.stringify(data));
-            }).fail(err=>{
+            }).fail(err => {
                 alert(err.statusText);
             });
         }

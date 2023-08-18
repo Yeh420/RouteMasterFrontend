@@ -2,15 +2,21 @@
 
 <div id="app">
 
-    <div v-for="coupon in coupons" class="border border-warning rounded my-2 p-3 d-flex">
+    <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex" :class="{'border-3' : coupon.Selected}">
         
-        <div>
-            <h3>折扣數 : {{ coupon.Discount }}% !!!</h3>
-            <h5>可用日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
-            <p v-if="!coupon.valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <b>抱歉，這張優惠券目前無法使用</b></p>
+        <div class=" justify-content-center align-items-center d-flex">
+            <h1><i class="fa-solid fa-gift" style="color:orange"></i></h1>
         </div>
-        <div class="ml-auto justify-content-center align-items-center d-flex">
-            <button :disabled="!coupon.valuable" :class="{'btn': true, 'btn-warning': !coupon.used, 'btn-danger': coupon.used}" id="useCouponBtn" v-on:click="UseCoupon"><i class="fa-solid fa-truck-fast"></i> 使用優惠券</button>
+        <div class="ms-3 me-auto">
+            <h3>折扣數 : {{ coupon.Discount }}% off !!</h3>
+            <h5 style="color: lightseagreen;">有效日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
+            <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <strong>抱歉，這張優惠券目前無法使用，請確認有效日期。</strong></p>
+        </div>
+        <div class=" justify-content-center align-items-center d-flex">
+            <button :disabled="!coupon.Valuable" :class="{'btn': true, 'btn-warning': !coupon.Selected, 'btn-danger': coupon.Selected}" v-on:click="UseCoupon(index)">
+                <i class="fa-solid" :class="{'fa-truck-fast': !coupon.Selected, 'fa-check-circle': coupon.Selected}"></i>
+                {{ coupon.Selected ? '優惠券已選取' : '使用優惠券' }}
+            </button>
         </div>
         
     </div>
@@ -51,9 +57,22 @@
                     console.error('Error:', response.status);
                 }
             },
-            UseCoupon(index) {
-                console.log("use coupon")
-                this.coupons[index].used = true;
+            UseCoupon: function (index) {
+                console.log("use coupon");
+                // Reset previously selected coupons
+                this.coupons.forEach((coupon, i) => {
+                    if (i !== index) {
+                        coupon.Selected = false;
+                    }
+                });
+                // Toggle selected state for the clicked coupon
+                this.coupons[index].Selected = !this.coupons[index].Selected;
+
+                const selectedCouponId = this.coupons[index].Id;
+                if (this.coupons[index].Selected){
+                    console.log("Selected Coupon ID:", selectedCouponId);
+                }
+                
             }
         }
     })

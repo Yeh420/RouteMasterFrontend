@@ -1,3 +1,62 @@
-﻿@section Scripts{
+﻿
 
+<div id="app">
+    <div class="container">
+        <div class="row">
+            <h1>heLLO WORLD</h1>
+        </div>
+        <div class="row row-cols-2 mt-3 g-2">
+            <div class="card mb-3 col" v-for="(item,index) in indexVM">
+                <h5 class="card-header">{{item.category}}</h5>
+                <div class="card-body">
+                    <h5 class="card-title">{{item.content}}</h5>
+                    <p class="card-text">{{item.isRead}}</p>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">狀態</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+   
+</div>
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+    <script>
+        const vueApp = {
+            data() {
+                return {
+                    indexVM:[],
+                }
+            },
+            mounted: function () {
+                let _this = this;
+                _this.getMessage();
+             
+            },
+            methods: {
+              
+                getMessage: function () {
+                    let _this = this;
+
+                    fetch("https://localhost:7145/SystemMessage/Index", {
+                        method: "POST",
+                    }).then(response => response.json())
+                        .then(result => {
+                            _this.indexVM=result;
+                            console.log(_this.indexVM);
+                        }
+                        ).catch(error => {
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                },
+               
+            }
+        }
+        var app = Vue.createApp(vueApp).mount("#app");
+    </script>
 }

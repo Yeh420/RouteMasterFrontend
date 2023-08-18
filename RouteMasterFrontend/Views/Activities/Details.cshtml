@@ -99,28 +99,40 @@
             </div>
             <div class="calendar" id="calendar">
                 <div v-for="(dateObj, index) in calendarDates" :key="date">
-                    <div class="day-container" v-bind:class="{'disabled':dateObj.price==null,'selected':dateObj.selected==true}"
+                    <div class="day-container" v-bind:class="{'disabled':dateObj.highestPrice==null,'selected':dateObj.selected==true}"
                          v-bind:data-id="dateObj.id "
                          v-bind:data-quantity="dateObj.quantity" @@click="selectDate(dateObj)">
                         <template v-if="dateObj.date === null">
                             <div class="day other-month"></div>
                         </template>
-                        <template v-else-if="dateObj.price !== null">
-                            <div class="day">{{ dateObj.date.getDate() }}</div>
-                            <span class="price">{{ dateObj.price }}</span>
-                        </template>
+                        <template v-else-if="dateObj.highestPrice !== null">
+                           <div class="day">{{ dateObj.date.getDate() }}</div>
+                           <span class="price">{{ dateObj.highestPrice }}</span>
+                       </template>
                         <template v-else>
                             <div class="day">{{ dateObj.date.getDate() }}</div>
                         </template>
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>
         <div id="buyingContainer" class="col-6">
             <br />
-            <h3>選擇方案</h3>
+            <h3>選擇梯次</h3>
+            <div v-for="(productObj,index) in selectedProductsArray":key="id">
+                
+                <button @@click="selectTheTargetPatchProduct(productObj)">{{productObj.startTime}}</button>
+                <div>{{productObj.id}}</div>
+                <div>{{productObj.price}}</div>
+                <div>{{productObj.quantity}}</div>
+                <div>{{productObj.startTime}}</div>
+                <div>{{productObj.endeTime}}</div>
+            </div>
             <br />
+
+            <div>{{selectedProductsArray}}</div>
             <div>{{selectedDate}}</div>
+            
             <div>產品編號:{{selectedProductId}}</div>
             <div>價格:{{selectedPrice}}</div>
             <div>可購買數量:{{selectedQuantity}}</div>
@@ -164,7 +176,7 @@
                     calendarDates: [],
                     currentMonth: Number("8"),
                     currentYear: Number("2023"),
-
+                    selectedProductsArray:[],
 
                 };
             },
@@ -222,7 +234,7 @@
                 generateCalendarDates: function () {
                     this.calendarDates = [];
                     for (let i = 0; i < this.firstDay; i++) {
-                        this.calendarDates.push({ date: null, highestPrice: null, actProducts:[], selected: false });
+                        this.calendarDates.push({ date: null, highestPrice: 0, actProducts:[], selected: false });
                     }
                     for (let i = 1; i <= this.daysInMonth; i++) {
                         const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
@@ -248,13 +260,27 @@
                                 let dateFromIso = new Date(response.data[i].date);
                                 for (let j = 0; j < this.calendarDates.length; j++) {
                                     if (this.calendarDates[j].date !== null) {
-                                        if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
-                                const newActProduct = { id:response.data[i].id, price: response.data[i].price, quantity: response.data[i].quantity,startTime:response.data[] };
-                                this.calendarDates[j].actProducts.push(newActProduct)                                   
+                                        if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) 
+                                        {
+                                            const newActProduct = { id: response.data[i].id, price: response.data[i].price, quantity: response.data[i].quantity, startTime: response.data[i].startTime, endeTime: response.data[i].endTime };
+                                this.calendarDates[j].actProducts.push(newActProduct)
+
+
+                                            if(this.calendarDates[j].highestPrice==null){
+                                                this.calendarDates[j].highestPrice = response.data[i].price
+                                            }
+
+
+
+                                            if (response.data[i].price > this.calendarDates[j].highestPrice) {
+                                                this.calendarDates[j].highestPrice = response.data[i].price
+                                            }
                                         }
                                     }
                                 }
                             }
+
+                            
                             console.log(this.calendarDates)
                         }).catch(err => {
                             console.log(err);
@@ -266,12 +292,22 @@
                     }
 
                     this.selectedDate = dateObj.date.getMonth() + "月" + dateObj.date.getDate() + "日";
-                    this.selectedProductId = dateObj.id;
-                    this.selectedPrice = dateObj.price;
-                    this.selectedQuantity = dateObj.quantity;
-                    this.inputQuantity = 1;
+                    this.selectedProductsArray = dateObj.actProducts;                 
                     dateObj.selected = true;
                 },
+                selectTheTargetPatchProduct: function (productObj) {
+
+                    this.selectedProductId=productObj.id;
+                    this.selectedPrice = productObj.price;
+                    this.selectedQuantity = productObj.quantity;
+                    this.inputQuantity=1;
+                   
+
+
+
+                },
+
+
                 addToCart: function () {
                     //加入購物車
                     const postData = {

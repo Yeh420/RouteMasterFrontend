@@ -11,9 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using RouteMasterBackend.DTOs;
 using RouteMasterBackend.Models;
 using RouteMasterFrontend.Models.ViewModels.Members;
+using Microsoft.AspNetCore.Cors;
 
 namespace RouteMasterBackend.Controllers
 {
+    [EnableCors("AllowAny")]
     [Route("api/[controller]")]
     [ApiController]
     public class MembersController : ControllerBase
@@ -49,16 +51,13 @@ namespace RouteMasterBackend.Controllers
           {
                 return null;
           }
-            OrderDTO historyorderDTO = _context.Orders.Where(h => h.Id == id).Select(h => new OrderDTO
+            OrderDTO historyorderDTO = _context.Orders.Where(h => h.MemberId == id).Select(h => new OrderDTO
             {
                 Id = h.Id,
                 PaymentStatusId = h.PaymentStatusId,
             }).Single();
-
-
-            
+  
             return historyorderDTO;
-            
         }
 
         // PUT: api/Members/5

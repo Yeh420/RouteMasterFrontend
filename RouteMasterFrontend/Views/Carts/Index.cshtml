@@ -1,4 +1,5 @@
 ﻿@model RouteMasterFrontend.Models.Dto.CartDetailDto
+
 <style>
 
     .custom-container {
@@ -51,17 +52,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var extraServiceDTO in Model.ExtraServices)
-                        {
-                            <tr>
-                                <td><img src="@Url.Content(extraServiceDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
-                                <td class="align-middle text-center">@extraServiceDTO.Name</td>
-                                <td class="align-middle text-center">@extraServiceDTO.Description</td>
-                                <td class="align-middle text-center">@extraServiceDTO.Date</td>
-                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@extraServiceDTO.Price</td>
-                                <td class="align-middle text-center">@extraServiceDTO.Quantity</td>
-                            </tr>
-                        }
+                            @{
+                                var groupedExtraServices = Model.ExtraServices
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupedExtraServices)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@Url.Content(group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                    </td>
+                                    <td class="align-middle text-center">@group.First().Name</td>
+                                    <td class="align-middle text-center">@group.First().Description</td>
+                                    <td class="align-middle text-center">@group.First().Date</td>
+                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="quantity">@group.Sum(item => item.Quantity)</span>
+                                    </td>
+                                </tr>
+                            }
                         @foreach (var accommodationDTO in Model.Accommodations)
                         {
                             <tr>
@@ -73,19 +84,32 @@
                                 <td class="align-middle text-center">@accommodationDTO.Quantity</td>
                             </tr>
                         }
-                        @foreach (var activityDTO in Model.Activities)
+
+                            @{
+                                var groupActivities = Model.Activities
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupActivities)
                         {
                             <tr>
-                                <td><img src="@Url.Content(activityDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
-                                <td class="align-middle text-center">@activityDTO.ActivityName</td>
-                                <td class="align-middle text-center">@activityDTO.Description</td>
-                                <td class="align-middle text-center">@activityDTO.StartTime ~ @activityDTO.EndTime </td>
-                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@activityDTO.Price</td>
-                                <td class="align-middle text-center">@activityDTO.Quantity</td>
+                                    <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                    <td class="align-middle text-center">@group.First().ActivityName</td>
+                                    <td class="align-middle text-center">@group.First().Description</td>
+                                    <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
+                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                        </td>
+                                   
+                                    <td class="align-middle text-center">
+                                        <span class="quantity">@group.First().Quantity</span>
+                                        </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+
+                
+
                 <div class="d-flex justify-content-end">
                     <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
                         <i class="fas fa-shopping-cart"></i>前往結帳
@@ -94,8 +118,21 @@
               
                    </div>
                 </div>
+
+
+               
+
             </div>
 
+        </div>
+    </div>
+
+    <div class="card-body  d-flex ">
+        <div class="container custom-container ms-0" style="width:60%">
+            @await Html.PartialAsync("Coupons")
+        </div>
+        <div style="width:38%" class="container custom-container me-0">
+            預留結帳區域
         </div>
     </div>
         </div>

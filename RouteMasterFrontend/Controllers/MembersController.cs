@@ -364,9 +364,7 @@ namespace RouteMasterFrontend.Controllers
             Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
-            {
-               
-                    
+            {              
                 return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
@@ -515,7 +513,7 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 return View(vm);
             }
-            return RedirectToAction("MyMemberIndex");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet] 
@@ -533,15 +531,6 @@ namespace RouteMasterFrontend.Controllers
            var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
            var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
 
-
-
-
-
-
-
-
-
-           
             return View(historyOrders);
         }
 
@@ -612,6 +601,15 @@ namespace RouteMasterFrontend.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MembersNavbar([FromBody]Abc dto)
+        {
+            var page = dto.pagecase;
+            return ViewComponent("MemberArea", page);
+        }
+
+      
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {
