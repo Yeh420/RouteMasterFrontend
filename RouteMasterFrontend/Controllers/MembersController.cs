@@ -531,15 +531,6 @@ namespace RouteMasterFrontend.Controllers
            var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
            var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
 
-
-
-
-
-
-
-
-
-           
             return View(historyOrders);
         }
 
