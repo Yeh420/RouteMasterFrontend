@@ -27,6 +27,122 @@
 </style>
 <template>
     <div id="app">
+        <div class="container custom-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-hover fixed-row-height" style="vertical-align: middle; align-items: center;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="align-middle text-center">名稱</th>
+                                <th class="align-middle text-center">描述</th>
+                                <th class="align-middle text-center">日期</th>
+                                <th class="align-middle text-center">價格</th>
+                                <th class="align-middle text-center">數量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="group in groupedExtraServices" :key="group.key.Id">
+                                <td>
+                                    <input type="checkbox" v-model="group.selected" />
+                                </td>
+                                <td>
+                                    <img :src="group.firstItem.ImageUrl" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                </td>
+                                <td class="align-middle text-center">{{ group.firstItem.Name }}</td>
+                                <td class="align-middle text-center">{{ group.firstItem.Description }}</td>
+                                <td class="align-middle text-center">{{ group.firstItem.Date }}</td>
+                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                    <span>$</span>{{ group.price }}
+                                </td>
+                                <td class="align-middle text-center">
+                                    {{ group.quantity }}
+                                </td>
+                            </tr>
+                            <tr v-for="accommodation in accommodations" :key="accommodation.Id">
+                                <td>
+                                    <input type="checkbox" v-model="accommodation.selected" />
+                                </td>
+                                <td>
+                                    <img :src="accommodation.ImageUrl" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                </td>
+                                <td class="align-middle text-center">{{ accommodation.AccommodationName }}</td>
+                                <td class="align-middle text-center">{{ accommodation.RoomName }} {{ accommodation.RoomTypeName }}</td>
+                                <td class="align-middle text-center">{{ accommodation.Date }}</td>
+                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                    ${{ accommodation.Price }}
+                                </td>
+                                <td class="align-middle text-center">{{ accommodation.Quantity }}</td>
+                            </tr>
+                            <tr v-for="group in groupedActivities" :key="group.key.Id">
+                                <td>
+                                    <input type="checkbox" v-model="group.selected" />
+                                </td>
+                                <td>
+                                    <img :src="group.firstItem.ImageUrl" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                </td>
+                                <td class="align-middle text-center">{{ group.firstItem.ActivityName }}</td>
+                                <td class="align-middle text-center">{{ group.firstItem.Description }}</td>
+                                <td class="align-middle text-center">{{ group.firstItem.StartTime }} ~ {{ group.firstItem.EndTime }}</td>
+                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                    ${{ group.price }}
+                                </td>
+                                <td class="align-middle text-center">
+                                    {{ group.quantity }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-secondary" @@click="checkout">
+                            <i class="fas fa-shopping-cart"></i>前往結帳 (總價：${{ totalPrice }})
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    let baseAddress = "https://localhost:7251";
+    let vueApp = {
+        data() {
+            return {
+              
+                selectAll: false,
+                items: [],
+           
+            };
+        },
+        computed: {
+            totalPrice() {
+                return this.items.reduce((total, item) => {
+                    return total + (item.selected ? item.price * item.quantity : 0);
+                }, 0);
+            },
+        },
+        mounted: function () {
+            axios.get(baseAddress + '/Index')
+                .then(response => {
+                    // Parse the response and assign the data
+                });
+        },
+        methods: {
+            toggleAll() {
+                this.items.forEach((item) => (item.selected = this.selectAll));
+            },
+            checkout() {
+                console.log('Proceeding to checkout with total price:', this.totalPrice);
+            },
+        }
+    };
+
+    let app = Vue.createApp(vueApp).mount('#app');
+</script>
+
+<template>
+    <div id="app">
         <table class="table table-hover">
             <thead>
                 <tr>

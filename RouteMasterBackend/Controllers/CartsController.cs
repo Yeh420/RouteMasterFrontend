@@ -91,17 +91,31 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var extraServiceProduct = _context.ExtraServiceProducts
-                    .FirstOrDefault(p => p.Id == dto.extraserviceId);
+                .FirstOrDefault(p => p.Id == dto.extraserviceId);
 
-                var cartItem = new CartExtraServicesDetail
+                var existingCartItem = _context.CartExtraServicesDetails
+                .FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
+
+                if (existingCartItem != null)
                 {
-                    CartId = dto.cartId,
-                    ExtraServiceProductId = dto.extraserviceId,
-                    Quantity = dto.quantity,
-                };
 
-                _context.CartExtraServicesDetails.Add(cartItem);
-                _context.SaveChanges();
+                    existingCartItem.Quantity += dto.quantity;
+                }
+                else
+                {
+
+                    var cartItem = new CartExtraServicesDetail
+                    {
+                        CartId = dto.cartId,
+                        ExtraServiceProductId = dto.extraserviceId,
+                        Quantity = dto.quantity,
+                    };
+
+
+
+                    _context.CartExtraServicesDetails.Add(cartItem);
+                }
+                    _context.SaveChanges();
  
 
                 return Ok(new { success = true, message = "Successfully added to cart." });
@@ -119,22 +133,23 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == dto.activityid);
-
-                //if(activitiesProduct == null)
-                //{
-                //    return NotFound(new { success = false, message = "Product Not found." });
-                //}
-               //var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["CartId"] ?? "0");
-               var cartItem = new CartActivitiesDetail
+                var activitiesCartItems = _context.CartActivitiesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ActivityProductId == dto.activityid);
+                if(activitiesCartItems != null)
                 {
-                    CartId = dto.cartId,
-                    ActivityProductId = dto.activityid,
-                    Quantity = dto.quantity,
-                };
-                _context.CartActivitiesDetails.Add(cartItem);
+                    activitiesCartItems.Quantity += dto.quantity;
+                }
+                else
+                {
+                    var cartItem = new CartActivitiesDetail
+                    {
+                        CartId = dto.cartId,
+                        ActivityProductId = dto.activityid,
+                        Quantity = dto.quantity,
+                    };
+                    _context.CartActivitiesDetails.Add(cartItem);
+                }           
                 _context.SaveChanges();
-              
-
+             
                 return Ok(new { success = true, message = "Succesfully added to cart." });
             }
             catch(Exception ex)
@@ -149,17 +164,21 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var roomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == dto.roomproductId);
-                if(roomProduct == null)
+                var roomProductCartItems = _context.CartAccommodationDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.RoomProductId == dto.roomproductId);
+                if(roomProductCartItems != null)
                 {
-                    return NotFound(new { success = false, message = "Product Not Found." });
+                    roomProductCartItems.Quantity += dto.quantity;
                 }
-                var cartitem = new CartAccommodationDetail
+                else
                 {
-                    CartId = dto.cartId,
-                    RoomProductId = dto.roomproductId,
-                    Quantity = dto.quantity,
-                };
-                _context.CartAccommodationDetails.Add(cartitem);
+                    var cartItem = new CartAccommodationDetail
+                    {
+                        CartId = dto.cartId,
+                        RoomProductId = dto.roomproductId,
+                        Quantity = dto.quantity,
+                    };
+                    _context.CartAccommodationDetails.Add(cartItem);
+                }          
                 _context.SaveChanges();
                 return Ok(new { success = true, message = "Succesfully added to cart." });
 

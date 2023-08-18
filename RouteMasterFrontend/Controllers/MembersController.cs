@@ -602,6 +602,15 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult MembersNavbar([FromBody]Abc dto)
+        {
+            var page = dto.pagecase;
+            return ViewComponent("MemberArea", page);
+        }
+
+      
+
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {
             var salt = _hashUtility.GetSalt();
