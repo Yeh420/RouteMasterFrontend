@@ -273,14 +273,14 @@
 
 
                                             if (response.data[i].price > this.calendarDates[j].highestPrice) {
-                                                this.calendarDates[j].highestPrice = data[i].price
+                                                this.calendarDates[j].highestPrice = response.data[i].price
                                             }
                                         }
                                     }
                                 }
                             }
 
-
+                            
                             console.log(this.calendarDates)
                         }).catch(err => {
                             console.log(err);
