@@ -25,7 +25,10 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
                     return View("MemOrder");
                 case 2:
                     var modelVM = new MemberEditPasswordVM();
-                    return View("EditPassword", modelVM);       
+                    return View("EditPassword", modelVM);
+                case 3:
+                    return View("_MessagePartial");
+
             }
 
             var model = new MemberEditPasswordVM();
