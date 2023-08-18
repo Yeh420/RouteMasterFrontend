@@ -531,15 +531,6 @@ namespace RouteMasterFrontend.Controllers
            var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
            var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
 
-
-
-
-
-
-
-
-
-           
             return View(historyOrders);
         }
 
@@ -610,6 +601,15 @@ namespace RouteMasterFrontend.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MembersNavbar([FromBody]Abc dto)
+        {
+            var page = dto.pagecase;
+            return ViewComponent("MemberArea", page);
+        }
+
+      
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {

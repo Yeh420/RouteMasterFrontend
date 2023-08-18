@@ -101,11 +101,13 @@
                                             @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)
                                         </div>
                                             <div class="extraservice-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
-                                            數量:@group.Sum(item => item.Quantity)
-                                        </div>
+                                                數量:
+                                                <span class="quantity">@group.Sum(item => item.Quantity)</span>
+
+                                            </div>
                                             <div class="extraservice-price" style="margin-left:40px;font-size:18px; color:lightseagreen; font-weight:bold;">
-                                            TWD:@Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Price)
-                                        </div>
+                                                TWD: <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ExtraServiceProduct.Price)</span>
+                                            </div>
                                     </div>
                                     <div class="extraservice-remove col-md-1" style="text-align: right;">
                                         <div style="margin-right: 25px;">

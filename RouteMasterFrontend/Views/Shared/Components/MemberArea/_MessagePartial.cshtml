@@ -1,0 +1,35 @@
+﻿
+<h2>Memeber xxx 您好</h2>
+
+
+<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+<script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+<script>
+    const vueApp={
+        data(){
+            return{
+
+            }
+        },
+        mounted:function(){
+            let _this = this;
+            _this.getMessage();
+        },
+        methods:{
+            getMessage:function(){
+
+
+                fetch("https://localhost:7145/SystemMessage/Index",{
+                    method:"POST",
+                }).then(response=>response.json())
+                .then(result=>{
+                    console.log(result);
+                }
+                ).catch(error=>{
+                        console.error('There was a problem with the fetch operation:', error);
+                });
+            }
+        }
+    }
+    var app = Vue.createApp(vueApp).mount("#app");
+</script>

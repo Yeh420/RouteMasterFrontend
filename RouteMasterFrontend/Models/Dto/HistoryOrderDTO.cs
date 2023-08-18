@@ -11,5 +11,11 @@
         public DateTime CreateDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int Total { get; set; }
+
+        
+    }
+    public class Abc
+    {
+        public int pagecase { get; set; }
     }
 }

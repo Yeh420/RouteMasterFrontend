@@ -67,8 +67,45 @@
     3.查看大頭貼/更改大頭貼
     4.查詢歷史訂單
 
-
+    5778875757
 -------------------------------------------------------------------
 
 可優化部分
 1.Edit
+
+@*<div>
+    <a asp-action="MemOrder" asp-route-id="@Model?.Id">歷史訂單</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="HistoryOrder" asp-route-id="@Model?.Id">歷史訂單</a> |
+    <button class="btn btn-warning" onclick="getOrder()">查詢歷史訂單</button>
+</div>*@
+
+
+
+會員中心的清單列:使用div show and hide
+就效能來說，一個是顯示的資料量不多
+再來是就算顯示的資料量多龐大，也可以自己設定資料量
+用ajax來顯示show more
+
+
+model用一個，其他的可以用ajax呼叫
+
+
+vm轉成ajax的欄位驗證問題
+目前解決方法:
+1.使用components，去渲染部分畫面
+2.使用wwwroot/js/jquery-validation 去寫驗證欄位
+
+
+<Form>以及submit都是會造成刷新頁面
+
+如果要改成ajax 必須preventdafault
+
+
+partial view  & viewcomponent的差別
+
+p 為靜態去做變動， c為動態的去做變動，因此p的前端頁面如果有做判斷會比較亂，但如果用c去做的話，可以把邏輯都寫到
+ivoke裡面
+
+搞清楚renderaction & renderpartial的差別，這是core才改成的建議方式
+
