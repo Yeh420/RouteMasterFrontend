@@ -79,6 +79,7 @@
                 transform: translate(-50%, -50%);
                 color: lightgray;
                 /* 可以自行調整顏色 */
+
             }
     </style>
 }
@@ -101,7 +102,7 @@
                 <div v-for="(dateObj, index) in calendarDates" :key="date">
                     <div class="day-container" v-bind:class="{'disabled':dateObj.highestPrice==null,'selected':dateObj.selected==true}"
                          v-bind:data-id="dateObj.id "
-                         v-bind:data-quantity="dateObj.quantity" @@click="selectDate(dateObj)">
+                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.highestPrice != null && selectDate(dateObj)">
                         <template v-if="dateObj.date === null">
                             <div class="day other-month"></div>
                         </template>
@@ -119,20 +120,15 @@
         <div id="buyingContainer" class="col-6">
             <br />
             <h3>選擇梯次</h3>
-            <div v-for="(productObj,index) in selectedProductsArray":key="id">
-                
-                <button @@click="selectTheTargetPatchProduct(productObj)">{{productObj.startTime}}</button>
-                <div>{{productObj.id}}</div>
-                <div>{{productObj.price}}</div>
-                <div>{{productObj.quantity}}</div>
-                <div>{{productObj.startTime}}</div>
-                <div>{{productObj.endeTime}}</div>
-            </div>
-            <br />
+        
+            <div class="d-flex row">
+                <div v-for="(productObj,index) in selectedProductsArray" :key="id" class="col-3">
+                    <button class="btn btn-primary " @@click="selectTheTargetPatchProduct(productObj)">{{productObj.startTime}}</button>
+                </div>
+            </div>                                  
+            <br />  
 
-            <div>{{selectedProductsArray}}</div>
-            <div>{{selectedDate}}</div>
-            
+            <div>{{selectedDate}}</div>            
             <div>產品編號:{{selectedProductId}}</div>
             <div>價格:{{selectedPrice}}</div>
             <div>可購買數量:{{selectedQuantity}}</div>
@@ -142,6 +138,35 @@
             <button @@click="addToCart()" class="btn btn-primary">加入購物車</button>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -234,7 +259,7 @@
                 generateCalendarDates: function () {
                     this.calendarDates = [];
                     for (let i = 0; i < this.firstDay; i++) {
-                        this.calendarDates.push({ date: null, highestPrice: 0, actProducts:[], selected: false });
+                        this.calendarDates.push({ date: null, highestPrice: null, actProducts:[], selected: false });
                     }
                     for (let i = 1; i <= this.daysInMonth; i++) {
                         const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
