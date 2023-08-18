@@ -12,7 +12,7 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
             _context = context;
         }
 
-        public IViewComponentResult Invoke(int pagecase)
+        public IViewComponentResult Invoke(int pagecase=0)
         {
             
 
@@ -25,7 +25,10 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
                     return View("MemOrder");
                 case 2:
                     var modelVM = new MemberEditPasswordVM();
-                    return View("EditPassword", modelVM);       
+                    return View("EditPassword", modelVM);
+                case 3:
+                    return View("_MessagePartial");
+
             }
 
             var model = new MemberEditPasswordVM();

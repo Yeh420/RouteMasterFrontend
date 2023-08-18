@@ -43,24 +43,26 @@
         <div class="col-md-2">
             <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid" >
-                <button data-number="0" id="memberData">會員資料</button>
+                <button data-number="0">會員資料</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button id="1">歷史訂單</button>
+                <button data-number="1">歷史訂單</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button id="2">更改密碼</button>
+                <button data-number="2">更改密碼</button>
             </div>
             </nav> 
         </div>
 
         @*渲染nav*@
-        <div class="col-md-8">
-            @await Component.InvokeAsync("MemberArea")
+
+        <div class="col-md-8" id="memberNavbar">
+        @await Component.InvokeAsync("MemberArea")
+
         </div>
        </div>
 
@@ -68,11 +70,28 @@
 @section Scripts{
 
     <script>
+        //var arg = document.querySelector('#memberData').getAttribute('data-number')
         var buttons = document.getElementsByTagName("button");
-        buttons.click = function(){
-            
+
+        //console.log(buttons);
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener("click", function () {
+                var arg = this.getAttribute('data-number');
+                console.log(arg);
+            $.ajax({
+                type:"post",
+                data: JSON.stringify({ pagecase: arg }),
+                contentType:"application/json",
+                url: "https://localhost:7145/Members/MembersNavbar",
+                }).done(function (response){
+                    
+                    var memberArea = $("#memberNavbar");
+                    memberArea.html(response);
+                }).fail(function(err){
+                    console.log('err')
+                });
+            });
         }
-        var arg=document.querySelector('#memberData').getAttribute('data-number')
 
     </script>
 
