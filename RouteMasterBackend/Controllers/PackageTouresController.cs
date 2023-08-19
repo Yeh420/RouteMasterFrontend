@@ -1,37 +1,58 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MessagePack.Formatters;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.ProjectModel;
-using RouteMasterFrontend.EFModels;
-using System;
-using static RouteMasterFrontend.Views.Shared.Components.PackageToursSlideShow.PackageToursSlideShowViewComponent.PaackageTourSlideShowDto;
+using Microsoft.VisualBasic;
+using NuGet.Packaging;
+using RouteMasterBackend.DTOs;
+using RouteMasterBackend.Models;
+using static RouteMasterBackend.DTOs.PackageToursDto;
 
-namespace RouteMasterFrontend.Views.Shared.Components.PackageToursSlideShow
+
+namespace RouteMasterBackend.Controllers
 {
-    public class PackageToursSlideShowViewComponent:ViewComponent
+    [EnableCors("AllowAny")]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PackageTouresController : ControllerBase
     {
         private readonly RouteMasterContext _context;
-        public PackageToursSlideShowViewComponent(RouteMasterContext context)
+
+
+    
+        public PackageTouresController(RouteMasterContext context)
         {
             _context = context;
         }
 
-        public IViewComponentResult Invoke()
+
+ 
+
+
+
+        [HttpGet]
+        public async Task<IEnumerable<PackageToursDto>> GetAllPackageTours()
         {
             var packageInDb = _context.PackageTours
-                .Include(x => x.Activities)
-                .Include(x => x.Attractions)
-                .Include(x => x.ExtraServices)
-                .AsQueryable();
+               .Include(x => x.Activities)
+               .Include(x => x.Attractions)
+               .Include(x => x.ExtraServices)
+               .AsQueryable();
 
 
-            var model = new List<PaackageTourSlideShowDto>();
+            var model = new List<PackageToursDto>();
 
 
 
 
             foreach (var item in packageInDb)
             {
-                var data = new PaackageTourSlideShowDto();
+                var data = new PackageToursDto();
                 data.Id = item.Id;
                 data.PackageActList = new List<actDtoInPackage>(); // 初始化集合
                 data.PackageAttList = new List<attDtoInPackage>();
@@ -78,31 +99,9 @@ namespace RouteMasterFrontend.Views.Shared.Components.PackageToursSlideShow
 
 
 
-            return View("_PackageToursPartial", model);
-        }
-        public class PaackageTourSlideShowDto
-        {
-            public int Id { get; set; }
-            public List<actDtoInPackage>? PackageActList { get; set; }
-            public List<attDtoInPackage>? PackageAttList { get; set; }
-            public List<extDtoInPackage>? PackageExtList { get; set; }
-            public class actDtoInPackage
-            {
-                public int ActId { get; set; }
-                public string? ActName { get; set; }
-            }
 
-            public class attDtoInPackage
-            {
-                public int AttId { get; set; }
-                public string? AttName { get; set; }
-            }
+            return model;
 
-            public class extDtoInPackage
-            {
-                public int ExtId { get; set; }
-                public string? ExtName { get; set; }
-            }
         }
     }
 }
