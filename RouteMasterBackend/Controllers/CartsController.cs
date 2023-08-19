@@ -271,6 +271,7 @@ namespace RouteMasterBackend.Controllers
 				}
 
 			}
+
             if(dto.extraServiceProductIds!=null)
             {
 				for (int i = 0; i < dto.extraServiceProductIds.Length; i++)
@@ -282,6 +283,21 @@ namespace RouteMasterBackend.Controllers
 						Quantity = 1
 					};
 					cart.CartExtraServicesDetails.Add(cartExtraServiceDetails);
+					_context.SaveChanges();
+				}
+			}			
+
+            if(dto.roomProducts!=null)
+            {
+				for (int i = 0; i < dto.roomProducts.Length; i++)
+				{
+					var cartAccommodationDetails = new CartAccommodationDetail()
+					{
+						CartId = dto.cartId,
+						RoomProductId = dto.roomProducts[i].Id,
+						Quantity = dto.roomProducts[i].Quantity
+                    };
+					cart.CartAccommodationDetails.Add(cartAccommodationDetails);
 					_context.SaveChanges();
 				}
 			}			

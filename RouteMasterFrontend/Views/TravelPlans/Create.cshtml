@@ -983,19 +983,29 @@
 
 
 
-            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0){
+            roomProducts = [{
+                id : 2,
+                quantity : 2
+            }, {
+                id: 34,
+                quantity: 3
+            }, {
+                id: 108,
+                quantity: 5
+            }]
+            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0  && roomProducts.length ==0){
                 alert('請至少選擇一項商品才可以加入購物車')
             }else{
                 let cartIdFromCookie = @cartIdFromCookie;
-
 
                 //住宿商品放入postData
                 const postData = {
                     cartId: cartIdFromCookie,
 
                     activityProductIds: actCheckboxValues,
-                    extraServiceProductIds: extCheckboxValues
-                    // roomProducts
+                    extraServiceProductIds: extCheckboxValues,
+                    roomProducts : roomProducts
+
                 };
 
 
