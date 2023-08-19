@@ -101,7 +101,7 @@
                 <div v-for="(dateObj, index) in calendarDates" :key="date">
                     <div class="day-container" v-bind:class="{'disabled':dateObj.price==null,'selected':dateObj.selected==true}"
                          v-bind:data-id="dateObj.id "
-                         v-bind:data-quantity="dateObj.quantity" @@click="selectDate(dateObj)">
+                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.price!=null&&selectDate(dateObj)">
                         <template v-if="dateObj.date === null">
                             <div class="day other-month"></div>
                         </template>

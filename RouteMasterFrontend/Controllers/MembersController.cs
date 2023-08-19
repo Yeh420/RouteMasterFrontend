@@ -26,6 +26,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using static Google.Apis.Requests.BatchRequest;
 using RouteMasterFrontend.Models.ViewModels.Carts;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -121,7 +122,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 new Claim(ClaimTypes.Name, vm.Account),
                 //new Claim("memberImage", member.Image),
-                //new Claim("id",member.Id.ToString())
+                new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             //identity.AddClaim(new Claim("memberImage", member.Image));
@@ -182,6 +183,7 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        //加入id到claim
         //Google登入
         public async Task<IActionResult> GoogleLogin()
         {
@@ -284,6 +286,7 @@ namespace RouteMasterFrontend.Controllers
                     var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, payload.Name),  
+                    //
                     //new Claim(ClaimTypes.Email, payload.Email)
                 };
 
@@ -356,7 +359,7 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
-            var member = _context.Members;
+            
 
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
@@ -501,10 +504,12 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPassword(MemberEditPasswordVM vm)
+        public ActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
         {
-            if (ModelState.IsValid == false) return View(vm);
-
+            if (ModelState.IsValid == false)
+            {
+                return Json(new { success = false, message = "输入数据无效，请检查输入。" });
+            }
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
@@ -513,7 +518,9 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 return View(vm);
             }
-            return RedirectToAction("Index", "Home");
+
+            return ViewComponent("MemberArea");
+            
         }
 
         [HttpGet] 
@@ -601,6 +608,15 @@ namespace RouteMasterFrontend.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MembersNavbar([FromBody]Abc dto)
+        {
+            var page = dto.pagecase;
+            return ViewComponent("MemberArea", page);
+        }
+
+      
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {
