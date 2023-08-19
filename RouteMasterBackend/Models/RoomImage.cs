@@ -9,7 +9,7 @@ namespace RouteMasterBackend.Models
     {
         public int Id { get; set; }
         public int RoomId { get; set; }
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         public virtual Room Room { get; set; }
     }
