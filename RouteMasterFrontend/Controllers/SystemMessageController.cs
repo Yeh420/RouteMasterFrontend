@@ -65,5 +65,20 @@ namespace RouteMasterFrontend.Controllers
             return result;
             
         }
+
+        [HttpPost]
+        public async Task<string> MarkAllAsRead()
+        {
+            var targetMsg= await _context.SystemMessages
+                .Where(m=>m.IsRead == false)
+                .ToListAsync();
+            foreach( var item in targetMsg )
+            {
+                item.IsRead = true;
+            }
+            await _context.SaveChangesAsync();
+
+            return "全已讀修改完成";
+        }
     }
 }
