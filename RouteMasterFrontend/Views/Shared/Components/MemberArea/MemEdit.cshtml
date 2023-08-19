@@ -1,0 +1,139 @@
+﻿@model RouteMasterFrontend.EFModels.Member
+@{
+    ViewData["Title"] = "Edit";
+}
+@{
+    var memberIdCookie = Context.Request.Cookies["Id"];
+}
+<style>
+
+    .col-md-8 {
+        display: grid;
+        grid-template-columns: auto auto auto;
+    }
+
+    .form-group {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+    }
+
+    .control-label {
+        justify-self: start;
+        text-align: center;
+    }
+
+    .form-group .form-control {
+        justify-self: end;
+        width: 350px;
+        text-align: center;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+</style>
+
+<div class="container">
+    <div class="row">
+   
+        <div class="col-md-8" id="EditMember">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label>帳戶：</label>
+                    <input asp-for="Account" class="form-control" />
+                    <span asp-validation-for="Account" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>名：</label>
+                    <input asp-for="FirstName" class="form-control" style="justify-items:end" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>姓：</label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>信箱：</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>電話：</label>
+                    <input asp-for="CellPhoneNumber" class="form-control" />
+                    <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>住址：</label>
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>性別：</label>
+                    <input asp-for="Gender" class="form-control" />
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>生日：</label>
+                    <input asp-for="Birthday" class="form-control" />
+                    <span asp-validation-for="Birthday" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsSuscribe" />廣告訂閱
+                    </label>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="確認儲存" class="btn btn-danger" />
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var memberId = "1";
+        $(d function getit() {
+
+            $.ajax({
+                type: "Get",
+                url: `https://localhost:7251/api/Members/${memberId}`
+            }).done(data => {
+                alert(JSON.stringify(data));
+            }).fail(err => {
+                alert(err.statusText);
+            });
+        }
+    </script>
+
+    <script>
+                  $(document).ready(function () {
+            // 当按钮被点击时
+            $("#EditPassword").click(function () {
+
+                $.ajax({
+                    url: '@Url.Action("EditPassword")', // 替换为正确的 URL
+                    type: 'GET',
+                    success: function (data) {
+                        // 用加载的部分视图替换 div 的内容
+                        $("#EditPassword").html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+}

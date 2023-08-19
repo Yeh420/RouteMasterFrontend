@@ -1,0 +1,21 @@
+﻿@model IEnumerable<RouteMasterFrontend.Views.Shared.Components.PackageToursSlideShow.PackageToursSlideShowViewComponent.PaackageTourSlideShowDto>
+
+
+
+
+@foreach(var item in Model){
+    <div>@item.Id</div>
+    @foreach(var act in item.PackageActList)
+    {
+        <div>@act.ActName</div>
+    }
+    @foreach (var att in item.PackageAttList)
+    {
+        <div>@att.AttName</div>
+    }
+    @foreach (var ext in item.PackageExtList)
+    {
+        <div>@ext.ExtName</div>
+    }
+
+}

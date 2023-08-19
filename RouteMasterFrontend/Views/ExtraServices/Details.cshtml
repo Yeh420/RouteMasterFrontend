@@ -1,9 +1,9 @@
 ﻿@{
     var extraServiceId = ViewBag.ExtraServiceId;
+    var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
 
 @section Styles{
-
     <style>
         .date-picker {
             width: 300px;
@@ -84,40 +84,52 @@
 }
 <div id="app">
     <div>        
-        <div v-model>{{name}}</div>
+        <div>{{name}}</div>
         <img v-bind:src="image" />
-        <div v-model>{{regionName}}</div>
-        <div v-model>{{attractionName}}</div>
-        <div v-model>{{description}}</div>
+        <div>{{regionName}}</div>
+        <div>{{attractionName}}</div>
+        <div>{{description}}</div>
     </div>
-    <button id="selectProductSolution" @@click="showPurchasingModal(extraServiceId)">選擇方案</button>
-    <div class="date-picker">
-        <div class="header">
-            <button id="prevMonth" @@click="changeMonth(-1)">&lt;</button>
-            <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
-            <button id="nextMonth" @@click="changeMonth(1)">&gt;</button>
-        </div>
-        <div class="calendar" id="calendar">
-            <div v-for="(dateObj, index) in calendarDates" :key="date">
-                <div class="day-container" v-bind:class="{'disabled':dateObj.price==null}">
-                    <template v-if="dateObj.date === null">
-                        <div class="day other-month"></div>
-                    </template>
-                    <template v-else-if="dateObj.price !== null">
-                        <div class="day">{{ dateObj.date.getDate() }}</div>
-                        <span class="price">{{ dateObj.price }}</span>
-                    </template>
-                    <template v-else>
-                        <div class="day">{{ dateObj.date.getDate() }}</div>
-                    </template>
-                </div>                       
+    <div class="row">
+        <div class="date-picker col-6">
+            <div class="header">
+                <button id="prevMonth" @@click="changeMonth(-1)">&lt;</button>
+                <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
+                <button id="nextMonth" @@click="changeMonth(1)">&gt;</button>
+            </div>
+            <div class="calendar" id="calendar">
+                <div v-for="(dateObj, index) in calendarDates" :key="date">
+                    <div class="day-container" v-bind:class="{'disabled':dateObj.price==null,'selected':dateObj.selected==true}"
+                         v-bind:data-id="dateObj.id "
+                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.price!=null&&selectDate(dateObj)">
+                        <template v-if="dateObj.date === null">
+                            <div class="day other-month"></div>
+                        </template>
+                        <template v-else-if="dateObj.price !== null">
+                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                            <span class="price">{{ dateObj.price }}</span>
+                        </template>
+                        <template v-else>
+                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-
-
-
-    
+        <div id="buyingContainer" class="col-6">
+            <br />
+            <h3>選擇方案</h3>
+            <br />
+            <div>{{selectedDate}}</div>
+            <div>產品編號:{{selectedProductId}}</div>
+            <div>價格:{{selectedPrice}}</div>
+            <div>可購買數量:{{selectedQuantity}}</div>
+            <div>
+                <input v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+            </div>
+            <button @@click="addToCart()" class="btn btn-primary">加入購物車</button>
+        </div>
+    </div>      
 </div>
 
 
@@ -143,9 +155,12 @@
                     image:"",
                     attractionName:"",
                     regionName:"",
-
-
-
+                    cartId: @cartIdFromCookie,
+                    selectedDate:"請選擇日期",
+                    selectedProductId:"",
+                    selectedPrice:"",
+                    selectedQuantity:"",
+                    inputQuantity:"",
                     calendarDates: [],
                     currentMonth:Number("8"),
                     currentYear:Number("2023"),
@@ -170,9 +185,7 @@
             methods: {
                 getTargetExtraServiceDto: function () {
                     let _this = this;
-                    let request = {};
-
-                   
+                    let request = {};                  
 
                     axios.post(`${baseAddress}/api/ExtraServiceVuePage/Id?extraServiceId=${_this.extraServiceId}`).then(response => {
                    
@@ -188,13 +201,7 @@
                     }).catch(err => {
                         alert(err);
                     })
-                },
-                showPurchasingModal: function(id){
-                    console.log('買買買買買買');
-                    console.log(id)
-             
-
-                },
+                },             
                 changeMonth:function(change){
                     this.currentMonth+=change;
                     if (this.currentMonth<1){
@@ -209,29 +216,19 @@
                     this.updateCalendar();
                 },
                 updateCalendar: function(){
-                    console.log('updateCalendar7788899999');
+                    //console.log('updateCalendar7788899999');
                     this.generateCalendarDates();
                 },
-                generateCalendarDates:function(){
-
-
-                   
-
-
+                generateCalendarDates:function(){                
                     this.calendarDates = [];
-                    for (let i = 0; i < this.firstDay; i++) {                        
-                        this.calendarDates.push({ date: null, price: null });
+                    for (let i = 0; i < this.firstDay; i++) {
+                        this.calendarDates.push({ date: null, price: null, quantity: 0, id: 0, selected :false});
                     }
                     for (let i = 1; i <= this.daysInMonth; i++) {
                         const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);                        
-                        this.calendarDates.push({ date: currentDate, price: null });
+                        this.calendarDates.push({ date: currentDate, price: null,quantity:0,id:0,selected:false });
                     }
-
-
-
-                    console.log(this.calendarDates)
-
-
+                    //console.log(this.calendarDates)
                     const postData={
                         extraServiceId: this.extraServiceId,
                         currentMonth: this.currentMonth,
@@ -241,37 +238,53 @@
 
                     axios.post(`${baseAddress}/api/ExtraServiceVuePage/getProducts`, postData)
                     .then(response=>{               
+                        //console.log('response啦')
+                            //console.log(response)
 
                         for(let i=0;i<response.data.length;i++){
                                 let dateFromIso = new Date(response.data[i].date);                               
                                 for (let j = 0; j < this.calendarDates.length;j++){
                                     if (this.calendarDates[j].date!==null){
                                         if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
-                                            console.log('真的有相等啦是在靠夭喔')
-
+                                            
                                             this.calendarDates[j].price = response.data[i].price
+                                            this.calendarDates[j].quantity = response.data[i].quantity
+                                            this.calendarDates[j].id=response.data[i].id
                                         }                                      
                                     }                                                   
                                 }
                         }
                             console.log(this.calendarDates)
-                    }).catch(err=>{
-                        console.log('錯了啦')
+                    }).catch(err=>{                        
                         console.log(err);
                     })                  
                 },
+                selectDate: function (dateObj) {
+                    for (let i = 0; i < this.calendarDates.length;i++){
+                        this.calendarDates[i].selected=false;
+                    }
+                  
+                    this.selectedDate = dateObj.date.getMonth()+"月"+dateObj.date.getDate()+"日";
+                    this.selectedProductId = dateObj.id;
+                    this.selectedPrice = dateObj.price;
+                    this.selectedQuantity = dateObj.quantity;
+                    this.inputQuantity = 1;
+                    dateObj.selected=true;                                    
+                },
+                addToCart:function(){
+                    //加入購物車
+                    const postData={
+                        cartId:this.cartId,
+                        extProductId: this.selectedProductId,
+                        quantity: this.inputQuantity
+                    }   
+                    console.log(postData);
 
 
-
-
-                
-
-
+                    console.log('加購物車啦')
+                },             
             }
         };
         let app = Vue.createApp(vueApp).mount('#app');
-
-
-
     </script>
 }

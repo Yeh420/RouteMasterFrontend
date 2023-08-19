@@ -1,15 +1,27 @@
 ﻿
-<button class="btn btn-warning" onclick="getit()">test</button>
+<button class="btn btn-warning" onclick="getit()">歷史訂單</button>
+
+<table>
+    <tr>
+        <td>id</td>
+        <td>paymentStatusId</td>
+
+    </tr>
+
+
+</table>
 
 @section Scripts{
+    <script src="~/lib/datatables/js/jquery.datatables.min.js"></script>
     <script>
-        function getit(){
-            //alert("hh");
+        var memberId = "1";
+       $(d function getit(){
+            
             $.ajax({
                  type:"Get",
-                url: "https://localhost:7251/api/Members"
+                url: `https://localhost:7251/api/Members/${memberId}`
             }).done(data=>{
-                alert(data);
+                alert(JSON.stringify(data));
             }).fail(err=>{
                 alert(err.statusText);
             });

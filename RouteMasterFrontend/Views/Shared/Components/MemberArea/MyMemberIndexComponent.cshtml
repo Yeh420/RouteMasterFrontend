@@ -1,0 +1,153 @@
+﻿@model RouteMasterFrontend.EFModels.Member
+
+@{
+    ViewData["Title"] = "MyMemberIndexComponent";
+}
+
+<style>
+    .col-md-2 {
+        position: absolute;
+        border-width: medium;
+        border-style: double;
+        border-color: gray;
+        border-radius: 20px;
+        padding: 10px;
+        line-height: 40px;
+        background-color: #81C0C0;
+    }
+
+        .col-md-2 navbar {
+            background-color: aliceblue;
+        }
+
+    .col-md-9 {
+        position: relative;
+        border-width: medium;
+        border-style: double;
+        border-color: gray;
+        border-radius: 20px;
+        left: 400px;
+    }
+
+</style>
+
+<div>
+    <h4>會員中心</h4>
+    <hr />
+    <dl class="row container">
+        <div class="col-md-2">
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="https://localhost:7145/Members/MyMemberIndex">會員資料</a>
+                </div>
+            </nav>
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="https://localhost:7145/Comments_Accommodation/PartialPage">歷史訂單</a>
+                </div>
+            </nav>
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="https://localhost:7145/Members/MemberResetPassword">更改密碼</a>
+                </div>
+            </nav>
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-action="Edit" asp-route-id="@Model?.Id">更改會員資料</a>
+                </div>
+            </nav>
+        </div>
+
+        @*渲染nav*@
+        <div>
+            @await Component.InvokeAsync("MemberArea",new{pagecase=1})          
+        </div>
+
+
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.FirstName)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.LastName)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.LastName)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.Account)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Account)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.Email)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Email)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.CellPhoneNumber)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.CellPhoneNumber)
+                </div>
+                <div class="col-6" id="editPassword">
+                    @Html.DisplayNameFor(model => model.Address)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Address)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.Gender)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Gender)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.Birthday)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Birthday)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.CreateDate)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.CreateDate)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.Image)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.Image)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.IsSuspended)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.IsSuspended)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayNameFor(model => model.IsSuscribe)
+                </div>
+                <div class="col-6">
+                    @Html.DisplayFor(model => model.IsSuscribe)
+                </div>
+
+            </div>
+
+        </div>
+    </dl>
+</div>
+@*<div>
+    <a asp-action="MemOrder" asp-route-id="@Model?.Id">歷史訂單</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="HistoryOrder" asp-route-id="@Model?.Id">歷史訂單</a> |
+    <button class="btn btn-warning" onclick="getOrder()">查詢歷史訂單</button>
+</div>*@
+

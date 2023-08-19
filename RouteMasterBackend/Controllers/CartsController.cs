@@ -22,67 +22,55 @@ namespace RouteMasterBackend.Controllers
             _context = context;
         }
 
-        [HttpGet("Index")]
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<CartItemsDto> LoadCartItems(int cartId, int quantity)
         {
-            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
-                var cartDetailsDto = new CartDetailDto
-                {
-                    ExtraServices = _context.CartExtraServicesDetails
-                   .Where(c => c.CartId == cartIdFromCookie)
-                   .Include(c => c.ExtraServiceProduct)
-                   .Include(c => c.ExtraServiceProduct.ExtraService)
-                   .Select(cartDetail => new Cart_ExtraServicesDetailDto
-                   {
-                       Id = cartDetail.Id,
-                       Name = cartDetail.ExtraServiceProduct.ExtraService.Name,
-                       Description = cartDetail.ExtraServiceProduct.ExtraService.Description,
-                       Price = cartDetail.ExtraServiceProduct.Price,
-                       Date = cartDetail.ExtraServiceProduct.Date,
-                       Quantity = cartDetail.Quantity,
-                       ImageUrl = "/ExtraServiceImages/" + cartDetail.ExtraServiceProduct.ExtraService.Image,
-                   })
-                    .ToList(),
 
-                    Accommodations = _context.CartAccommodationDetails
-                    .Where(c => c.CartId == cartIdFromCookie)
-                    .Include(c => c.RoomProduct)
-                    .Include(c => c.RoomProduct.Room)
-                    .Include(c => c.RoomProduct.Room.Accommodation)
-                    .Include(c => c.RoomProduct.Room.RoomType)
-                    .Select(cartDetail => new Cart_AccommodationDetailDto
+            var data = new CartItemsDto();
+            data.cartId= cartId;
+            data.ActivityCartItems = await _context.CartActivitiesDetails
+                    .Where(x => x.CartId == cartId)
+                    .Select(x => new ActivityCartItem
                     {
-                        Id = cartDetail.Id,
-                        RoomName = cartDetail.RoomProduct.Room.Name,
-                        AccommodationName = cartDetail.RoomProduct.Room.Accommodation.Name,
-                        RoomTypeName = cartDetail.RoomProduct.Room.RoomType.Name,
-                        Price = cartDetail.RoomProduct.NewPrice,
-                        Date = cartDetail.RoomProduct.Date,
-                        Quantity = cartDetail.Quantity,
-                        ImageUrl = "123"
+                        imgUrl = x.ActivityProduct.Activity.Image,
+                        Name = x.ActivityProduct.Activity.Name,
+                        Description = x.ActivityProduct.Activity.Description,
+                        startTime = x.ActivityProduct.StartTime,
+                        endTime = x.ActivityProduct.EndTime,
+                        Price = x.ActivityProduct.Price,
+                        Quantity = quantity
                     })
-                        .ToList(),
+                    .ToListAsync();
+            data.AccommodationCartItems = await _context.CartAccommodationDetails
+                 .Where(x => x.CartId == cartId)
+                 .Select(x => new AccommodationCartItem
+                 {
+                     imgUrl = "123",
+                     AccommodationName = x.RoomProduct.Room.Accommodation.Name,
+                     RoomTypeName = x.RoomProduct.Room.RoomType.Name,
+                     Date = x.RoomProduct.Date,
+                     Quantity = quantity,
+                     Price = x.RoomProduct.NewPrice,
 
-                    Activities = _context.CartActivitiesDetails
-                       .Where(c => c.CartId == cartIdFromCookie)
-                       .Include(c => c.ActivityProduct)
-                       .Include(c => c.ActivityProduct.Activity)
-                       .Select(cartDetail => new Cart_ActivitiesDetailDto
-                       {
-                           Id = cartDetail.Id,
-                           ActivityName = cartDetail.ActivityProduct.Activity.Name,
-                           Description = cartDetail.ActivityProduct.Activity.Description,
-                           Price = cartDetail.ActivityProduct.Price,
-                           StartTime = cartDetail.ActivityProduct.StartTime,
-                           EndTime = cartDetail.ActivityProduct.EndTime,
-                           Quantity = cartDetail.Quantity,
-                           ImageUrl = "/ActivityImages/" + cartDetail.ActivityProduct.Activity.Image,
-                       })
-                       .ToList()
-                };
-                return Ok(new { CartId = cartIdFromCookie, CartDetails = cartDetailsDto });
+                 })
+                 .ToListAsync();
 
+            data.ExtraServiceCartItems = await _context.CartExtraServicesDetails
+                .Where(x => x.CartId == cartId)
+                .Select(x => new ExtraServiceCartItem
+                {
+                    Name = x.ExtraServiceProduct.ExtraService.Name,
+                    ImgUrl = x.ExtraServiceProduct.ExtraService.Image,
+                    Description = x.ExtraServiceProduct.ExtraService.Description,
+                    Date = x.ExtraServiceProduct.Date,
+                    Price = x.ExtraServiceProduct.Price,
+                    Quantity = quantity,
+                })
+                .ToListAsync();
+        
+            return data;
+           
         }
 
         [HttpPost("addextraservice")]
@@ -91,23 +79,32 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var extraServiceProduct = _context.ExtraServiceProducts
-                    .FirstOrDefault(p => p.Id == dto.extraserviceId);
+                .FirstOrDefault(p => p.Id == dto.extraserviceId);
 
-                if (extraServiceProduct == null)
+                var existingCartItem = _context.CartExtraServicesDetails
+                .FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
+
+                if (existingCartItem != null)
                 {
-                    return NotFound(new { success = false, message = "Product Not found." });
+
+                    existingCartItem.Quantity += dto.quantity;
                 }
-                var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["CartId"] ?? "0");
-                var cartItem = new CartExtraServicesDetail
+                else
                 {
-                    CartId = cartIdFromCookie,
-                    ExtraServiceProductId = dto.extraserviceId,
-                    Quantity = dto.quantity,
-                };
 
-                _context.CartExtraServicesDetails.Add(cartItem);
-                _context.SaveChanges();
-                Response.Cookies.Append("CartId", cartIdFromCookie.ToString());
+                    var cartItem = new CartExtraServicesDetail
+                    {
+                        CartId = dto.cartId,
+                        ExtraServiceProductId = dto.extraserviceId,
+                        Quantity = dto.quantity,
+                    };
+
+
+
+                    _context.CartExtraServicesDetails.Add(cartItem);
+                }
+                    _context.SaveChanges();
+ 
 
                 return Ok(new { success = true, message = "Successfully added to cart." });
             }
@@ -118,7 +115,140 @@ namespace RouteMasterBackend.Controllers
                 return BadRequest(new { success = false, message = "Failed to add to cart.", error = ex.Message });
             }
         }
+        [HttpPost("addactivity")]
+        public IActionResult AddActivitiesDetail2Cart([FromBody]AddActivityDto dto)
+        {
+            try
+            {
+                var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == dto.activityid);
+                var activitiesCartItems = _context.CartActivitiesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ActivityProductId == dto.activityid);
+                if(activitiesCartItems != null)
+                {
+                    activitiesCartItems.Quantity += dto.quantity;
+                }
+                else
+                {
+                    var cartItem = new CartActivitiesDetail
+                    {
+                        CartId = dto.cartId,
+                        ActivityProductId = dto.activityid,
+                        Quantity = dto.quantity,
+                    };
+                    _context.CartActivitiesDetails.Add(cartItem);
+                }           
+                _context.SaveChanges();
+             
+                return Ok(new { success = true, message = "Succesfully added to cart." });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Failed to add to cart.", error = ex.Message });
+            }
+        }
 
+        [HttpPost("addAccommodation")]
+        public IActionResult AddAccommodation2Cart([FromBody]AddAccommodationDto dto)
+        {
+            try
+            {
+                var roomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == dto.roomproductId);
+                var roomProductCartItems = _context.CartAccommodationDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.RoomProductId == dto.roomproductId);
+                if(roomProductCartItems != null)
+                {
+                    roomProductCartItems.Quantity += dto.quantity;
+                }
+                else
+                {
+                    var cartItem = new CartAccommodationDetail
+                    {
+                        CartId = dto.cartId,
+                        RoomProductId = dto.roomproductId,
+                        Quantity = dto.quantity,
+                    };
+                    _context.CartAccommodationDetails.Add(cartItem);
+                }          
+                _context.SaveChanges();
+                return Ok(new { success = true, message = "Succesfully added to cart." });
+
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(new { success = false, message = "Failed to add to cart.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("updateExtraServicequantity")]
+        public IActionResult UpdateExtraServiceQuantity([FromBody] UpdateExtQuantityDto dto)
+        {
+            try
+            {
+              
+                var cartItem = _context.CartExtraServicesDetails
+                    .FirstOrDefault(item => item.CartId == dto.CartId && item.ExtraServiceProductId == dto.ExtraServiceProductId);
+
+                if (cartItem == null)
+                {
+                    return NotFound(new { success = false, message = "Cart item not found." });
+                }
+
+                cartItem.Quantity = dto.Quantity;
+                _context.SaveChanges();
+
+                return Ok(new { success = true, message = "Successfully updated quantity." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Failed to update quantity.", error = ex.Message });
+            }
+        }
+        [HttpPut("updateActivityquantity")]
+        public IActionResult UpdateActivityQuantity([FromBody] UpdateActQuantityDto dto)
+        {
+            try
+            {
+
+                var cartItem = _context.CartActivitiesDetails
+                    .FirstOrDefault(item => item.CartId == dto.CartId && item.ActivityProductId == dto.ActivityProductId);
+
+                if (cartItem == null)
+                {
+                    return NotFound(new { success = false, message = "Cart item not found." });
+                }
+
+                cartItem.Quantity = dto.Quantity;
+                _context.SaveChanges();
+
+                return Ok(new { success = true, message = "Successfully updated quantity." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Failed to update quantity.", error = ex.Message });
+            }
+        }
+        [HttpPut("updateAccommodationquantity")]
+        public IActionResult UpdateAccommodationQuantity([FromBody] UpdateAccoQuantityDto dto)
+        {
+            try
+            {
+
+                var cartItem = _context.CartAccommodationDetails
+                    .FirstOrDefault(item => item.CartId == dto.CartId && item.RoomProductId == dto.RoomProductId);
+
+                if (cartItem == null)
+                {
+                    return NotFound(new { success = false, message = "Cart item not found." });
+                }
+
+                cartItem.Quantity = dto.Quantity;
+                _context.SaveChanges();
+
+                return Ok(new { success = true, message = "Successfully updated quantity." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Failed to update quantity.", error = ex.Message });
+            }
+        }
         [HttpPost("Post/Travel")]
         public void AddItemToCart(TravelProductDto dto)
         {
