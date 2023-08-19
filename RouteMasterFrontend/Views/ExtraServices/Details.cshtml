@@ -1,33 +1,135 @@
-﻿
+﻿@{
+    var extraServiceId = ViewBag.ExtraServiceId;
+    var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
+}
 
 @section Styles{
+    <style>
+        .date-picker {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 50px auto;
+        }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .other-month {
+            color: #ccc;
+        }
+
+        .day-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 0.5px solid transparent;
+            transition: border 0.3s ease-in-out;
+        }
+
+            .day-container:hover {
+                border-color: #ccc;
+                /* 使用者懸停時，邊框顏色變為 #ccc */
+            }
+
+
+        .price {
+            font-size: 0.8em;
+        }
+
+
+        .disabled {
+            opacity: 0.5;
+            /* 設置透明度為 50% */
+            position: relative;
+        }
+
+            .disabled::after {
+                content: 'x';
+                /* 在日期元素的後面添加一個 "x" 標記 */
+                position: absolute;
+                top: 80%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: lightgray;
+                /* 可以自行調整顏色 */
+            }
+    </style>
 }
 <div id="app">
-    <input type="search" v-model="keyword" />
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>項目名稱</th>
-                <th>圖片預覽</th>
-                <th>所在區域</th>
-                <th>附屬景點</th>
-                <th>項目說明</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td v-model>{{extraServiceId}} </td>
-                @*<td><img v-bind:src="image" style="height:200px;" /></td>*@
-                @*<td v-model>{{regionName}} </td>*@
-                @*<td v-model>{{attractionName}} </td>*@
-                <td v-model> {{description}} </td>
-                <td v-model>{{name}} </td>
-                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="showPurchasingModal(extraServiceId)">選擇方案</button></td>
-            </tr>
-        </tbody>
-    </table>
+    <div>        
+        <div>{{name}}</div>
+        <img v-bind:src="image" />
+        <div>{{regionName}}</div>
+        <div>{{attractionName}}</div>
+        <div>{{description}}</div>
+    </div>
+    <div class="row">
+        <div class="date-picker col-6">
+            <div class="header">
+                <button id="prevMonth" @@click="changeMonth(-1)">&lt;</button>
+                <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
+                <button id="nextMonth" @@click="changeMonth(1)">&gt;</button>
+            </div>
+            <div class="calendar" id="calendar">
+                <div v-for="(dateObj, index) in calendarDates" :key="date">
+                    <div class="day-container" v-bind:class="{'disabled':dateObj.price==null,'selected':dateObj.selected==true}"
+                         v-bind:data-id="dateObj.id "
+                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.price!=null&&selectDate(dateObj)">
+                        <template v-if="dateObj.date === null">
+                            <div class="day other-month"></div>
+                        </template>
+                        <template v-else-if="dateObj.price !== null">
+                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                            <span class="price">{{ dateObj.price }}</span>
+                        </template>
+                        <template v-else>
+                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="buyingContainer" class="col-6">
+            <br />
+            <h3>選擇方案</h3>
+            <br />
+            <div>{{selectedDate}}</div>
+            <div>產品編號:{{selectedProductId}}</div>
+            <div>價格:{{selectedPrice}}</div>
+            <div>可購買數量:{{selectedQuantity}}</div>
+            <div>
+                <input v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+            </div>
+            <button @@click="addToCart()" class="btn btn-primary">加入購物車</button>
+        </div>
+    </div>      
 </div>
 
 
@@ -47,12 +149,21 @@
         let vueApp = {
             data() {
                 return {
-                    extraServiceId:7,
-                    name:"666",
-                    description:"777",
-
-
-
+                    extraServiceId: @extraServiceId,
+                    name:"",
+                    description:"",
+                    image:"",
+                    attractionName:"",
+                    regionName:"",
+                    cartId: @cartIdFromCookie,
+                    selectedDate:"請選擇日期",
+                    selectedProductId:"",
+                    selectedPrice:"",
+                    selectedQuantity:"",
+                    inputQuantity:"",
+                    calendarDates: [],
+                    currentMonth:Number("8"),
+                    currentYear:Number("2023"),
 
 
                 };
@@ -60,39 +171,120 @@
             mounted: function () {
                 let _this = this;
 
-                _this.filterExtraServiceDtoes();
+                _this.getTargetExtraServiceDto();
+                _this.updateCalendar();
+            },
+            computed:{
+                firstDay(){
+                    return new Date(this.currentYear,this.currentMonth-1,1).getDay()
+                },
+                daysInMonth() {
+                    return new Date(this.currentYear, this.currentMonth , 0).getDate();
+                }
             },
             methods: {
-                filterExtraServiceDtoes: function () {
+                getTargetExtraServiceDto: function () {
                     let _this = this;
-                    let request = {};
+                    let request = {};                  
 
-                    request.Keyword = _this.keyword;
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/Id?extraServiceId=${_this.extraServiceId}`).then(response => {
+                   
 
-                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/filter`, request).then(response => {
-                        _this.extraServiceDtoes = response.data;
-
-                        for (let i = 0; i < _this.extraServiceDtoes.length; i++) {
-                            let item = _this.extraServiceDtoes[i];
-                        }
+                        _this.extraServiceId = response.data.id
+                        _this.name = response.data.name;
+                        _this.description = response.data.description;
+                        _this.image = response.data.image;
+                        _this.attractionName = response.data.attractionName
+                        _this.regionName = response.data.regionName;
 
 
                     }).catch(err => {
                         alert(err);
                     })
+                },             
+                changeMonth:function(change){
+                    this.currentMonth+=change;
+                    if (this.currentMonth<1){
+                        this.currentMonth=12;
+                        this.currentYear-=1;
+                    }else if(this.currentMonth >12){
+                        this.currentMonth=1;
+                        this.currentYear+=1;
+                    }
+
+
+                    this.updateCalendar();
                 },
-                showPurchasingModal: function(id){
-                    console.log('買買買買買買');
-                    console.log(id)
+                updateCalendar: function(){
+                    //console.log('updateCalendar7788899999');
+                    this.generateCalendarDates();
+                },
+                generateCalendarDates:function(){                
+                    this.calendarDates = [];
+                    for (let i = 0; i < this.firstDay; i++) {
+                        this.calendarDates.push({ date: null, price: null, quantity: 0, id: 0, selected :false});
+                    }
+                    for (let i = 1; i <= this.daysInMonth; i++) {
+                        const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);                        
+                        this.calendarDates.push({ date: currentDate, price: null,quantity:0,id:0,selected:false });
+                    }
+                    //console.log(this.calendarDates)
+                    const postData={
+                        extraServiceId: this.extraServiceId,
+                        currentMonth: this.currentMonth,
+                        currentYear: this.currentYear
+                    };
 
-                }
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/getProducts`, postData)
+                    .then(response=>{               
+                        //console.log('response啦')
+                            //console.log(response)
+
+                        for(let i=0;i<response.data.length;i++){
+                                let dateFromIso = new Date(response.data[i].date);                               
+                                for (let j = 0; j < this.calendarDates.length;j++){
+                                    if (this.calendarDates[j].date!==null){
+                                        if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
+                                            
+                                            this.calendarDates[j].price = response.data[i].price
+                                            this.calendarDates[j].quantity = response.data[i].quantity
+                                            this.calendarDates[j].id=response.data[i].id
+                                        }                                      
+                                    }                                                   
+                                }
+                        }
+                            console.log(this.calendarDates)
+                    }).catch(err=>{                        
+                        console.log(err);
+                    })                  
+                },
+                selectDate: function (dateObj) {
+                    for (let i = 0; i < this.calendarDates.length;i++){
+                        this.calendarDates[i].selected=false;
+                    }
+                  
+                    this.selectedDate = dateObj.date.getMonth()+"月"+dateObj.date.getDate()+"日";
+                    this.selectedProductId = dateObj.id;
+                    this.selectedPrice = dateObj.price;
+                    this.selectedQuantity = dateObj.quantity;
+                    this.inputQuantity = 1;
+                    dateObj.selected=true;                                    
+                },
+                addToCart:function(){
+                    //加入購物車
+                    const postData={
+                        cartId:this.cartId,
+                        extProductId: this.selectedProductId,
+                        quantity: this.inputQuantity
+                    }   
+                    console.log(postData);
 
 
+                    console.log('加購物車啦')
+                },             
             }
         };
         let app = Vue.createApp(vueApp).mount('#app');
-
-
-
     </script>
 }

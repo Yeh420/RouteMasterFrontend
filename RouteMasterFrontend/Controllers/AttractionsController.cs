@@ -14,9 +14,9 @@ namespace RouteMasterFrontend.Controllers
 {
     public class AttractionsController : Controller
     {
-        public IActionResult Index(AttractionCriteria criteria, int page = 1)
+        public async Task<IActionResult> Index(AttractionCriteria criteria, int page = 1)
         {
-            IEnumerable<AttractionIndexVM> attractions = GetAttractions();
+            IEnumerable<AttractionIndexVM> attractions = await GetAttractions();
 
             ViewBag.Categories = attractions.Select(a => a.AttractionCategory).Distinct().ToList();
             ViewBag.Tags = attractions.SelectMany(a => a.Tags).Distinct().ToList();
@@ -95,7 +95,7 @@ namespace RouteMasterFrontend.Controllers
             return View(attractions);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             AddClick(id);
             AttractionDetailVM vm = Get(id);
@@ -106,7 +106,7 @@ namespace RouteMasterFrontend.Controllers
             ViewBag.IsFavorite = isFavorite; // 將結果傳遞到視圖中
 
             List<string> tags = Get(id).Tags;
-            IEnumerable<AttractionIndexVM> attractions = GetAttractions();
+            IEnumerable<AttractionIndexVM> attractions = await GetAttractions();
 
             if (tags != null)
             {
@@ -148,7 +148,7 @@ namespace RouteMasterFrontend.Controllers
             vm.CloseAtt = sortedAttractions;
 
 
-            IEnumerable<AttractionIndexVM> sameRegionAtt = GetAttractions();
+            IEnumerable<AttractionIndexVM> sameRegionAtt = await GetAttractions();
             var region = sameRegionAtt.Where(a => a.Id == id).Select(a => a.Region).FirstOrDefault();
 
             sameRegionAtt = sameRegionAtt.Where(a => a.Region == region && a.Id != id)
@@ -159,7 +159,7 @@ namespace RouteMasterFrontend.Controllers
             vm.SameRegionAtt = sameRegionAtt;
 
 
-            IEnumerable<AttractionIndexVM> sameCategoryAtt = GetAttractions();
+            IEnumerable<AttractionIndexVM> sameCategoryAtt = await GetAttractions();
             var category = sameCategoryAtt.Where(a => a.Id == id).Select(a => a.AttractionCategory).FirstOrDefault();
 
             sameCategoryAtt = sameCategoryAtt.Where(a => a.AttractionCategory == category && a.Id != id)
@@ -306,12 +306,16 @@ namespace RouteMasterFrontend.Controllers
             return service.Get(id).ToDetailVM();
         }
 
-        private IEnumerable<AttractionIndexVM> GetAttractions()
+        private async Task<IEnumerable<AttractionIndexVM>> GetAttractions()
         {
             IAttractionRepository repo = new AttractionEFRepository();
             AttractionService service = new AttractionService(repo);
 
-            return service.Search().Select(dto => dto.ToIndexVM());
+            var dtos = service.Search();
+            var vms = dtos.Select(dto => dto.ToIndexVM());
+
+            return vms;
+
         }
     }
 }

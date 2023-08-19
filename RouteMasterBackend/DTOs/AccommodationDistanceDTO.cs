@@ -4,7 +4,17 @@ namespace RouteMasterBackend.DTOs
 {
     public class AccommodationDistanceDTO
     {
-        public Accommodation Accommodation { get; set; }
-        public double Distance { get; set; }
+        public int? Id { get; set; }
+        public string? ACategory { get; set; }
+        public string? Name { get; set; }
+        public double? Grade { get; set; }
+        public double? Score { get; set; }
+        public string? Address { get; set; }
+        public double? PositionX { get; set; }
+        public double? PositionY { get; set; }  
+        public string? Image { get; set; }
+        public double? Distance { get; set; }
+
+        public IEnumerable<AccommodationDistanceRDTO> Rooms { get; set; }
     }
 }

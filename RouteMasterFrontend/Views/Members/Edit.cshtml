@@ -1,124 +1,167 @@
 ﻿@model RouteMasterFrontend.EFModels.Member
-
 @{
     ViewData["Title"] = "Edit";
 }
+@{
+    var memberIdCookie = Context.Request.Cookies["Id"];
+}
+<style>
 
-<h1>Edit</h1>
+    .col-md-8 {
+        display: grid; 
+        grid-template-columns: auto auto auto;
+    }
 
-<h4>Member</h4>
+    .form-group{
+        display: grid; grid-template-columns: auto 1fr auto;
+    }
+
+    .control-label{
+        justify-self:start;
+        text-align:center;
+    }
+
+    .form-group .form-control {
+        justify-self:end;
+        width:350px;
+        text-align: center;
+    }
+
+    h1{
+        text-align:center;
+    }
+
+</style>
+<h1>會員中心</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="container">
+    <div class="row">
+    <div class="col-md-2" id="nav">
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="" asp-controller="Members" asp-action="Edit" asp-route-id="@memberIdCookie">會員資料</a>
+            </div>
+        </nav>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                    <a class="navbar-brand"asp-area="" asp-controller="Members" asp-action="MemOrder" asp-route-id="@memberIdCookie">歷史訂單</a>
+            </div>
+        </nav>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                    <a class="navbar-brand" href="https://localhost:7145/Members/EditPassword">更改密碼</a>
+            </div>
+        </nav>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                    <a class="navbar-brand" asp-action="Edit" asp-route-id="@Model?.Id">更改會員資料</a>
+            </div>
+        </nav>
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <button id="EditPassword" class=" navbar-brand">更改密碼partial</button>
+                </div>
+            </nav>
+            
+
+    </div>
+
+
+    <div class="col-md-8" id="EditMember" >
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Account" class="control-label"></label>
+             <div class="form-group" >
+                    <label>帳戶：</label>
                 <input asp-for="Account" class="form-control" />
                 <span asp-validation-for="Account" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="EncryptedPassword" class="control-label"></label>
-                <input asp-for="EncryptedPassword" class="form-control" />
-                <span asp-validation-for="EncryptedPassword" class="text-danger"></span>
+                <div class="form-group">
+                    <label>名：</label>
+                    <input asp-for="FirstName" class="form-control" style="justify-items:end"/>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group" >
+                    <label>姓：</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
+               
+                <div class="form-group">
+                    <label>信箱：</label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CellPhoneNumber" class="control-label"></label>
+                <div class="form-group">
+                    <label>電話：</label>
                 <input asp-for="CellPhoneNumber" class="form-control" />
                 <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
+                <div class="form-group">
+                    <label>住址：</label>
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Gender" class="control-label"></label>
+                <div class="form-group">
+                    <label>性別：</label>
                 <input asp-for="Gender" class="form-control" />
                 <span asp-validation-for="Gender" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Birthday" class="control-label"></label>
+                <div class="form-group">
+                    <label>生日：</label>
                 <input asp-for="Birthday" class="form-control" />
                 <span asp-validation-for="Birthday" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
-                <span asp-validation-for="CreateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
-            </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsConfirmed" /> @Html.DisplayNameFor(model => model.IsConfirmed)
+                        <input class="form-check-input" asp-for="IsSuscribe" />廣告訂閱
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="ConfirmCode" class="control-label"></label>
-                <input asp-for="ConfirmCode" class="form-control" />
-                <span asp-validation-for="ConfirmCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GoogleAccessCode" class="control-label"></label>
-                <input asp-for="GoogleAccessCode" class="form-control" />
-                <span asp-validation-for="GoogleAccessCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FaceBookAccessCode" class="control-label"></label>
-                <input asp-for="FaceBookAccessCode" class="form-control" />
-                <span asp-validation-for="FaceBookAccessCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LineAccessCode" class="control-label"></label>
-                <input asp-for="LineAccessCode" class="form-control" />
-                <span asp-validation-for="LineAccessCode" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSuspended" /> @Html.DisplayNameFor(model => model.IsSuspended)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="LoginTime" class="control-label"></label>
-                <input asp-for="LoginTime" class="form-control" />
-                <span asp-validation-for="LoginTime" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="確認儲存" class="btn btn-danger" />
             </div>
         </form>
     </div>
+    
+</div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var memberId = "1";
+        $(d function getit() {
+
+            $.ajax({
+                type: "Get",
+                url: `https://localhost:7251/api/Members/${memberId}`
+            }).done(data => {
+                alert(JSON.stringify(data));
+            }).fail(err => {
+                alert(err.statusText);
+            });
+        }
+    </script>
+
+    <script>
+          $(document).ready(function () {
+            // 当按钮被点击时
+            $("#EditPassword").click(function () {
+                
+                $.ajax({
+                    url: '@Url.Action("EditPassword")', // 替换为正确的 URL
+                    type: 'GET',
+                    success: function (data) {
+                        // 用加载的部分视图替换 div 的内容
+                        $("#EditPassword").html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
 }

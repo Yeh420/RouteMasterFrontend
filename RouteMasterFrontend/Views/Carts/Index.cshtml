@@ -1,120 +1,138 @@
-﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
-<head>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-@{
-    ViewData["Title"] = "Index";
-}
+﻿@model RouteMasterFrontend.Models.Dto.CartDetailDto
 
 <style>
-        .container {
-            width: 100%;
-        }
-        .partial-view-container {
-            display: inline-block; 
-            width: 900px; 
-            height: 100px;
-            margin: 10px; 
-            text-align: center; 
-             flex: 1;
-        }
-        .flex-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            flex-direction: row;    
-            flex-wrap: wrap;
-          
-        }
 
-    .collapse show{
-        position: relative;
-        display: inline-block
+    .custom-container {
+        background-color: white;
+        padding: 10px;
+        border: 1px solid white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .fixed-row-height tr {
+        height: 100px; 
+    }
+
+    .fixed-row-height thead th {
+        font-weight: bold;
+        font-size:16px;
+        color: darkgray; 
+    }
+
+
+    .fixed-row-height tbody td,
+    .fixed-row-height tbody th {
+        border-color: lightgrey; 
     }
    
 </style>
+<div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+    <div class="card-body">
+        <div class="container custom-container">
+            <!-- ExtraServices -->
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-hover fixed-row-height" style="vertical-align: middle; align-items: center;">
+                    <colgroup>
+                            <col style="width: 100px;" />
+                            <col style="width: auto;" />
+                            <col style="width: auto;" />
+                            <col class="col-md-2" /> 
+                            <col class="col-md-2" /> 
+                            <col class="col-md-2" /> 
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="align-middle text-center">名稱</th>
+                            <th class="align-middle text-center">描述</th>
+                            <th class="align-middle text-center">日期</th>
+                            <th class="align-middle text-center">價格</th>
+                            <th class="align-middle text-center">數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            @{
+                                var groupedExtraServices = Model.ExtraServices
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupedExtraServices)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@Url.Content(group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                    </td>
+                                    <td class="align-middle text-center">@group.First().Name</td>
+                                    <td class="align-middle text-center">@group.First().Description</td>
+                                    <td class="align-middle text-center">@group.First().Date</td>
+                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="quantity">@group.Sum(item => item.Quantity)</span>
+                                    </td>
+                                </tr>
+                            }
+                        @foreach (var accommodationDTO in Model.Accommodations)
+                        {
+                            <tr>
+                                <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
+                                <td class="align-middle text-center">@accommodationDTO.RoomName @accommodationDTO.RoomTypeName</td>
+                                <td class="align-middle text-center">@accommodationDTO.Date</td>
+                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@accommodationDTO.Price</td>
+                                <td class="align-middle text-center">@accommodationDTO.Quantity</td>
+                            </tr>
+                        }
+
+                            @{
+                                var groupActivities = Model.Activities
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupActivities)
+                        {
+                            <tr>
+                                    <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                    <td class="align-middle text-center">@group.First().ActivityName</td>
+                                    <td class="align-middle text-center">@group.First().Description</td>
+                                    <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
+                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                        </td>
+                                   
+                                    <td class="align-middle text-center">
+                                        <span class="quantity">@group.First().Quantity</span>
+                                        </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                
+
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
+                        <i class="fas fa-shopping-cart"></i>前往結帳
+
+                    </button>
+              
+                   </div>
+                </div>
 
 
+               
 
-<div class="container">
-    <div id="accordion">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                       購物車明細
-                    </button>
-                </h5>
             </div>
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
-                <div class="card-body">
-                    @await Component.InvokeAsync("ExtraServicesDetails2", new { ViewBag.CartId })
-                    @await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })
-                    @await Component.InvokeAsync("AccomodationDetails", new {ViewBag.CartId })
-                </div>
-            </div>
+
         </div>
-        <br />
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
-                <i class="fas fa-shopping-cart"></i>前往結帳
-            </button>
-        </div>
-       @* <div class="card">
-            <div class="card-header" id="headingTwo">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                       活動訂單明細
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" >
-                <div class="card-body">
-                    @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingThree">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                       住宿訂單明細
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" >
-                <div class="card-body">
-                    @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
-                </div>
-            </div>
-        </div>*@
     </div>
-</div>
 
-<!-- Bootstrap JavaScript -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-
-@*<p>
-    <a asp-action="Create">Create New</a>
-</p>
-```
-
-    </tbody>
-</table>*@
-
-@*<div class="container">
-    <div class="flex-container">    
-        <div class="partial-view-container">
-            @await Component.InvokeAsync("Cart_Ext", new { cartid = 23 })
+    <div class="card-body  d-flex ">
+        <div class="container custom-container ms-0" style="width:60%">
+            @await Html.PartialAsync("Coupons")
         </div>
-        <div class="partial-view-container">
-            @await Component.InvokeAsync("ActivitiesDetails", new { cartid = 1 })
-        </div>
-     
-        <div class="partial-view-container">
-            @await Component.InvokeAsync("AccomodationDetails", new { cartid = 1 })
+        <div style="width:38%" class="container custom-container me-0">
+            預留結帳區域
         </div>
     </div>
-</div>*@
+        </div>

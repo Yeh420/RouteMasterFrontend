@@ -40,114 +40,138 @@ namespace RouteMasterBackend.Controllers
                 {
                     Distance=new Distance{Text="1公尺",Value=0},
                     Duration=new Duration{Text="1分鐘",Value=0},
+                    End=new Location{Id=1,Name="龜山島"},
                     Start=new Location{Id=1,Name="龜山島"},
-                    End=new Location{Id=1,Name="龜山島"}
-                },
-                new InformationDto
-                {
-                    Distance=new Distance{Text="137 公里",Value=136581},
-                    Duration=new Duration{Text="2 小時 49 分鐘",Value=10127},
-                    Start=new Location{Id=1,Name="龜山島"},
-                    End=new Location{Id=2,Name="遠雄海洋公園"}
-                },
-                new InformationDto
-                {
-                    Distance=new Distance{Text="126 公里",Value=126410},
-                    Duration=new Duration{Text="2 小時 35 分鐘",Value=9295},
-                    Start=new Location{Id=1,Name="龜山島"},
-                    End=new Location{Id=3,Name="太魯閣"}
-                },
-                new InformationDto
-                {
-                    Distance=new Distance{Text="53.6 公里",Value=53603},
-                    Duration=new Duration{Text="1 小時 1 分鐘",Value=3677},
-                    Start=new Location{Id=1,Name="龜山島"},
-                    End=new Location{Id=4,Name="故宮博物院"}
                 },
 
                 new InformationDto
                 {
-                    Distance=new Distance{Text="53.6 公里",Value=53603},
+                    Distance=new Distance{Text="137 公里",Value=136575},
+                    Duration=new Duration{Text="2 小時 49 分鐘",Value=10126},
+                    End=new Location{Id=2,Name="遠雄海洋公園"},
+                    Start=new Location{Id=1,Name="龜山島"},
+                },
+
+                new InformationDto
+                {
+                    Distance=new Distance{Text="125 公里",Value=124620},
+                    Duration=new Duration{Text="2 小時 35 分鐘",Value=9309},
+                    End=new Location{Id=3,Name="太魯閣"},
+                    Start=new Location{Id=1,Name="龜山島"},
+                },
+
+
+                new InformationDto
+                {
+                    Distance=new Distance{Text="53.6 公里",Value=53597},
                     Duration=new Duration{Text="1 小時 1 分鐘",Value=3677},
+                    End=new Location{Id=4,Name="故宮博物院"},
+                    Start=new Location{Id=1,Name="龜山島"},
+                },
+
+
+
+
+
+
+
+                new InformationDto
+                {
+                    Distance=new Distance{Text="136 公里",Value=136411},
+                    Duration=new Duration{Text="2 小時 46 分鐘",Value=9934},
+                    End=new Location{Id=1,Name="龜山島"},
                     Start=new Location{Id=2,Name="遠雄海洋公園"},
-                    End=new Location{Id=1,Name="龜山島"}
                 },
                 new InformationDto
                 {
                     Distance=new Distance{Text="1公尺",Value=0},
                     Duration=new Duration{Text="1分鐘",Value=0},
+                    End=new Location{Id=2,Name="遠雄海洋公園"},
                     Start=new Location{Id=2,Name="遠雄海洋公園"},
-                    End=new Location{Id=2,Name="遠雄海洋公園"}
                 },
                 new InformationDto
                 {
-                    Distance=new Distance{Text="12.5 公里",Value=12454},
-                    Duration=new Duration{Text="19 分鐘",Value=1113},
+                    Distance=new Distance{Text="56.5 公里",Value=56480},
+                    Duration=new Duration{Text="1 小時 25 分鐘",Value=5104},
+                    End=new Location{Id=3,Name="太魯閣"},
                     Start=new Location{Id=2,Name="遠雄海洋公園"},
-                    End=new Location{Id=3,Name="太魯閣"}
                 },
                 new InformationDto
                 {
                     Distance=new Distance{Text="175 公里",Value=174978},
                     Duration=new Duration{Text="3 小時 19 分鐘",Value=11945},
+                    End=new Location{Id=4,Name="故宮博物院"},
                     Start=new Location{Id=2,Name="遠雄海洋公園"},
-                    End=new Location{Id=4,Name="故宮博物院"}
+                },
+
+
+
+
+
+
+                new InformationDto
+                {
+                    Distance=new Distance{Text="124 公里",Value=123932},
+                    Duration=new Duration{Text="2 小時 33 分鐘",Value=9171},
+                    End=new Location{Id=1,Name="龜山島"},
+                    Start=new Location{Id=3,Name="太魯閣"},
                 },
                 new InformationDto
                 {
-                    Distance=new Distance{Text="126 公里",Value=125627},
-                    Duration=new Duration{Text="2 小時 33 分鐘",Value=9152},
+                    Distance=new Distance{Text="55.6 公里",Value=55604},
+                    Duration=new Duration{Text="1 小時 25 分鐘",Value=5072},
+                    End=new Location{Id=2,Name="遠雄海洋公園"},
                     Start=new Location{Id=3,Name="太魯閣"},
-                    End=new Location{Id=1,Name="龜山島"}
-                },
-                new InformationDto
-                {
-                    Distance=new Distance{Text="12.0 公里",Value=11954},
-                    Duration=new Duration{Text="18 分鐘",Value=1068},
-                    Start=new Location{Id=3,Name="太魯閣"},
-                    End=new Location{Id=2,Name="遠雄海洋公園"}
                 },
                 new InformationDto
                 {
                     Distance=new Distance{Text="1公尺",Value=0},
                     Duration=new Duration{Text="1分鐘",Value=0},
+                    End=new Location{Id=3,Name="太魯閣"},
                     Start=new Location{Id=3,Name="太魯閣"},
-                    End=new Location{Id=3,Name="太魯閣"}
                 },
                 new InformationDto
                 {
-                    Distance=new Distance{Text="164 公里",Value=164188},
-                    Duration=new Duration{Text="3 小時 6 分鐘",Value=11162},
+                    Distance=new Distance{Text="162 公里",Value=162498},
+                    Duration=new Duration{Text="3 小時 6 分鐘",Value=11181},
+                    End=new Location{Id=4,Name="故宮博物院"},
                     Start=new Location{Id=3,Name="太魯閣"},
-                    End=new Location{Id=4,Name="故宮博物院"}
                 },
+
+
+
+
+
+
+
+
                 new InformationDto
                 {
-                    Distance=new Distance{Text="54.8 公里",Value=54785},
-                    Duration=new Duration{Text="1 小時 3 分鐘",Value=3773},
+                    Distance=new Distance{Text="54.8 公里",Value=54779},
+                    Duration=new Duration{Text="1 小時 3 分鐘",Value=3772},
+                    End=new Location{Id=1,Name="龜山島"},
                     Start=new Location{Id=4,Name="故宮博物院"},
-                    End=new Location{Id=1,Name="龜山島"}
                 },
                 new InformationDto
                 {
                     Distance=new Distance{Text="176 公里",Value=175541},
                     Duration=new Duration{Text="3 小時 23 分鐘",Value=12190},
+                    End=new Location{Id=2,Name="遠雄海洋公園"},
                     Start=new Location{Id=4,Name="故宮博物院"},
-                    End=new Location{Id=2,Name="遠雄海洋公園"}
                 },
                 new InformationDto
                 {
-                    Distance=new Distance{Text="165 公里",Value=165369},
-                    Duration=new Duration{Text="3 小時 9 分鐘",Value=11357},
+                    Distance=new Distance{Text="164 公里",Value=163586},
+                    Duration=new Duration{Text="3 小時 10 分鐘",Value=11372},
+                    End=new Location{Id=3,Name="太魯閣"},
                     Start=new Location{Id=4,Name="故宮博物院"},
-                    End=new Location{Id=3,Name="太魯閣"}
                 },
                 new InformationDto
                 {
                     Distance=new Distance{Text="1公尺",Value=0},
                     Duration=new Duration{Text="1分鐘",Value=0},
+                    End=new Location{Id=4,Name="故宮博物院"},
                     Start=new Location{Id=4,Name="故宮博物院"},
-                    End=new Location{Id=4,Name="故宮博物院"}
                 },
             };
 

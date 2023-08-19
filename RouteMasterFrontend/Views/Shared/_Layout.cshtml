@@ -1,4 +1,9 @@
-﻿ <!DOCTYPE html>
+﻿@{
+    var memberIdCookie = Context.Request.Cookies["Id"];    
+}
+
+
+<!DOCTYPE html>
 
 <html lang="zh-tw">
 <head>
@@ -100,6 +105,10 @@
                                     <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
                                     </li>        
+                                    <li id="Cart">                               
+                                        @await Component.InvokeAsync("CartPartial" )
+                                    </li>
+
                                 }
                                 else
                                 {
@@ -108,11 +117,6 @@
                                     </li>
                                 }
                             }
-
-                            <li id="Cart">                               
-                                @await Component.InvokeAsync("CartPartial" )
-                            </li>
-
                         </ul>
                         <a class='menu-trigger'>
                             <span>Menu</span>
@@ -126,7 +130,7 @@
     </header>
     <div class="container">
         <div>
-            @await Component.InvokeAsync("MemberArea" )
+            @await Component.InvokeAsync("FacePhotoArea")
         </div>
         <div class="row" style="margin-top:120px;">
           @RenderBody()

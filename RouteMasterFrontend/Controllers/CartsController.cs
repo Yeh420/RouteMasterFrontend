@@ -29,7 +29,7 @@ namespace RouteMasterFrontend.Controllers
         }
       
         // GET: Carts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index2()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
@@ -38,15 +38,81 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-        [HttpGet]
-        public IActionResult IndexGET()
+
+
+        public IActionResult IndexVue()
+        {  
+            return View();
+        }
+    
+        public IActionResult Index()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
-            // 將讀取的值存入 ViewData
-            ViewData["CartId"] = cartIdFromCookie;
+            using (var context = new RouteMasterContext())
+            {
+                var cartDetailsDto = new CartDetailDto
+                {
+                    ExtraServices = context.Cart_ExtraServicesDetails
+                   .Where(c => c.CartId == cartIdFromCookie)
+                   .Include(c => c.ExtraServiceProduct)
+                   .Include(c => c.ExtraServiceProduct.ExtraService)
+                   .Select(cartDetail => new Cart_ExtraServicesDetailDto
+                       {
+                           Id = cartDetail.Id,
+                           Name = cartDetail.ExtraServiceProduct.ExtraService.Name,
+                           Description = cartDetail.ExtraServiceProduct.ExtraService.Description,
+                           Price = cartDetail.ExtraServiceProduct.Price,
+                           Date = cartDetail.ExtraServiceProduct.Date,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "/ExtraServiceImages/"+cartDetail.ExtraServiceProduct.ExtraService.Image,
+                    })
+                    .ToList(),
 
-            return View();
+
+                    Accommodations = context.Cart_AccommodationDetails
+                    .Where(c => c.CartId == cartIdFromCookie)
+                    .Include(c => c.RoomProduct)
+                    .Include(c => c.RoomProduct.Room)
+                    .Include(c => c.RoomProduct.Room.Accommodation)
+                    .Include(c => c.RoomProduct.Room.RoomType)
+                    .Select(cartDetail => new Cart_AccommodationDetailDto
+                           {
+                           Id = cartDetail.Id,
+                           RoomName = cartDetail.RoomProduct.Room.Name,
+                           AccommodationName = cartDetail.RoomProduct.Room.Accommodation.Name,
+                           RoomTypeName = cartDetail.RoomProduct.Room.RoomType.Name,
+                           Price = cartDetail.RoomProduct.NewPrice,
+                           Date = cartDetail.RoomProduct.Date,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "123" 
+                       })
+                        .ToList(),
+
+                    Activities = context.Cart_ActivitiesDetails
+                       .Where(c => c.CartId == cartIdFromCookie)
+                       .Include(c => c.ActivityProduct)
+                       .Include(c => c.ActivityProduct.Activity)
+                       .Select(cartDetail => new Cart_ActivitiesDetailDto
+                       {
+                           Id = cartDetail.Id,
+                           ActivityName = cartDetail.ActivityProduct.Activity.Name,
+                           Description = cartDetail.ActivityProduct.Activity.Description,
+                           Price = cartDetail.ActivityProduct.Price,
+                           StartTime = cartDetail.ActivityProduct.StartTime,
+                           EndTime = cartDetail.ActivityProduct.EndTime,
+                           Quantity = cartDetail.Quantity,
+                           ImageUrl = "/ActivityImages/"+cartDetail.ActivityProduct.Activity.Image,
+                       })
+                       .ToList()
+                        };
+
+                ViewData["CartId"] = cartIdFromCookie;
+                ViewData["CartDetailsDto"] = cartDetailsDto;
+                return View(cartDetailsDto);
+            }
+
+           
         }
 
         public IActionResult Info()
@@ -208,21 +274,21 @@ namespace RouteMasterFrontend.Controllers
         {
             try
             {
-                var RoomProduct = _context.RoomProducts.Where(r=> dto.roomProductId.Contains(r.Id));
+                var RoomProduct = _context.RoomProducts.Where(r=> dto.RoomProductId.Contains(r.Id));
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                    //var cartIdFromCookie = 3;
-                    foreach(var rp in RoomProduct)
-                    {
-                        var cartItem = new Cart_AccommodationDetail
+                     
+                        foreach(var rp in RoomProduct)
                         {
-                            CartId = cartIdFromCookie,
-                            RoomProductId = rp.Id,
-                            Quantity = 1
-                        };
-                        _context.Cart_AccommodationDetails.Add(cartItem);
-                    }
+                            var cartItem = new Cart_AccommodationDetail
+                            {
+                                CartId = cartIdFromCookie,
+                                RoomProductId = rp.Id,
+                                Quantity = dto.Quantity
+                            };
+                            _context.Cart_AccommodationDetails.Add(cartItem);
+                        }
                         _context.SaveChanges();
                         Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
 
@@ -1001,7 +1067,36 @@ namespace RouteMasterFrontend.Controllers
           return (_context.Carts?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        [HttpPost]
+        public IActionResult UpdateQuantity(int extraServiceId, int accommodationId, int activityId, int quantity)
+        {
+            try
+            {
+                var extraServiceProduct = _context.ExtraServiceProducts.FirstOrDefault(e => e.Id == extraServiceId);
+                var accomodationProduct =_context.RoomProducts.FirstOrDefault(r => r.Id == accommodationId);
+                var activityProduct = _context.ActivityProducts.FirstOrDefault(a => a.Id == activityId);
 
+                if (extraServiceProduct != null)
+                {
+                    extraServiceProduct.Quantity = quantity;
+                }
+                if (accomodationProduct != null)
+                {
+                    accomodationProduct.Quantity = quantity;
+                }
+                if (activityProduct != null)
+                {
+                    activityProduct.Quantity = quantity;
+                }
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "數量已更新。" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
+            }
+        }
        
     }
 }

@@ -6,33 +6,47 @@
     .active {
         color: #f90;
     }
+
+    .pointer {
+        cursor: pointer;
+    }
 </style>
 <div>@Model.Id</div>
 <div id="app">
     <div class="container">
-        <div class="row mb-2" style="width:20%">
-            @*<a asp-controller="Comments_Accommodation" asp-action="Create">Create New</a>*@         
-            <select v-model="selected" id="commentOrder" class="ms-3" @@change="commentDisplay">
-                <option value="0" selected>排序選擇</option>
-                <option value="1">最新留言</option>
-                <option value="2">星星評分高至低</option>
-                <option value="3">星星評分低至高</option>
-                <option value="4">停留時間由高至低</option>
-                <option value="5">花費由高至低</option>    
-            </select>
-
+        <div class="row mb-2">
+            <div class="col-3">
+                <select v-model="selected" id="commentOrder" class="ms-1" @@change="commentDisplay">
+                    <option value="0" selected>排序選擇</option>
+                    <option value="1">最新留言</option>
+                    <option value="2">星星評分高至低</option>
+                    <option value="3">星星評分低至高</option>
+                    <option value="4">停留時間由高至低</option>
+                    <option value="5">花費由高至低</option>
+                </select>
+            </div>     
+            <div class="col-3 ms-auto text-end">
+                <a asp-controller="Comments_Attraction" asp-action="Create" asp-route-id="@Model.Id">撰寫評論</a>
+            </div>
         </div>
        
-           <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
             <div class="row g-0">
                 <div class="col-md-7">
                     <div class="card-header">{{item.account}}</div>
                     <div class="card-body">
                         <div class="d-flex">
                             <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
-                            <div>{{item.isHidden}}</div>
+                           @* <div>{{item.isHidden}}</div>*@
+                            <a v-if="item.edit" data-bs-toggle="modal" data-bs-target="#exampleModal" class="pointer" style="color:black" @@click="labelComment(item.id)" data-bs-placement="bottom" title="檢舉">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                                </svg>
+                           </a>
+                          
                         </div>
                         <div class="panel d-flex">
+                            <p>{{item.score}}</p>
                             <ul class="d-flex list-unstyled">
                                 <li v-for="starIndex in 5" :key="starIndex">
                                     <i class="fa fa-star fa-fw" :class="{'active':starIndex <= item.score}">
@@ -40,14 +54,12 @@
                                     </i>
                                 </li>
                             </ul>
-                            <p class="ms-2">{{item.score}}分</p>
+                            <p class="card-text ms-3">| {{ "停留" + item.stayHours + "小時"}} | {{ "花費" + item.price + "元"}}</p>
                         </div>
                         <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.content}}</p>
-                        <p class="card-text">停留: {{item.stayHours}}小時</p>
-                        <div class="d-flex">                          
-                            <p class="me-auto">花費: {{item.price}}元</p>
-                            <p><small class="text-muted">{{item.createDate}}</small></p>                           
+                        <p class="card-text">{{item.content}}</p>                       
+                        <div class="d-flex mt-1">                          
+                            <p class="ms-auto"><small class="text-muted">{{item.createDate}}</small></p>                           
                         </div>                                                                                     
                     </div>
                 </div>
@@ -70,27 +82,83 @@
                             </button>
                         </div>
                     </template>
-                    <template v-else>
+                    <template v-else-if="item.imageList.length===1">                     
+                        <img v-bind:src="getImgPath(item.imageList[0])" class="img-fluid rounded-start">
+                    </template>
+                    <template v-else="item.imageList.length<1">
                         <img src="~/MemberUploads/RouteMaster.png" class="img-fluid rounded-start">
                     </template>
                 </div>
             </div>
         </div>
-       
-    </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">檢舉評論</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @@click="clearPick"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" v-model="pick" :value="1">
+                            <label class="form-check-label" for="gridRadios1">
+                                誤導性或垃圾內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" v-model="pick" :value="2">
+                            <label class="form-check-label" for="gridRadios2">
+                                仇恨或騷擾/濫用內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" v-model="pick" :value="3">
+                            <label class="form-check-label" for="gridRadios3">
+                                暴力或令人反感的內容
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios4" v-model="pick" :value="4">
+                            <label class="form-check-label" for="gridRadios4">
+                                有害的危險行為
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios5" v-model="pick" :value="5">
+                            <label class="form-check-label" for="gridRadios5">
+                                符合上述多個選項
+                            </label>
+                        </div>
+                        <div class="mt-2">                         
+                            <button type="button" class="btn btn-danger" @@click="fillCheck">我要檢舉</button>
+                           @* <button v-else type="button" class="btn btn-success " >檢舉已送出</button>*@
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>      
 </div>
 
 <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
 <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const vueApp={
         data(){
             return{
                 indexVM:[],
+                comm:{},
                 selected:0,
                 spotId: @Html.Raw(Json.Serialize(Model.Id)),
-              
-
+                pick:"",
+                commentid:0,              
+                            
             }
         },
         mounted: function () {
@@ -98,6 +166,14 @@
             _this.commentDisplay();
         },
         methods:{
+            sweetAlert:function(){
+                Swal.fire(
+                    '已成功檢舉',
+                    'RouteMaster團隊將進一步審核',
+                    'success'
+                );
+                console.log("good");
+            },
             commentDisplay: async function(){
                 let _this=this;
                 var data={};
@@ -115,12 +191,62 @@
                 if (response.ok) {
                     _this.indexVM = await response.json();
                     console.log(_this.indexVM);
-                   
+                    for (let i = 0; i < _this.indexVM.length;i++){
+                        _this.comm = _this.indexVM[i];
+                        _this.comm.edit=true;
+                    }
+                 
+                  
                 }
                 else {
                     console.error('Error:', response.status);
                 }
             },
+            getImgPath: function (photo) {            
+                return `@Url.Content("~/MemberUploads/${photo}")`;
+    
+            },
+            labelComment:function(id){
+                let _this = this;
+                _this.commentid=id;
+                console.log(_this.commentid);
+                
+            },
+            fillCheck: function(){
+                let _this = this;
+                if(_this.pick){
+                    console.log(_this.pick);
+                    console.log(_this.commentid);
+                    var uri = `https://localhost:7145/Comments_Attraction/ReportComment?targetId=${_this.commentid}&reasonId=${_this.pick}`;
+
+                    fetch(uri, {
+                        method: "POST"
+                    })
+                        .then(response => response.text()) // 使用 response.text() 獲取回傳的字串
+                        .then(result => {
+                            console.log(result); // 在控制台中輸出後端回傳的字串
+                            if (_this.comm.id == _this.commentid) {
+                                _this.comm.edit = false;
+                            }
+                                $('#exampleModal').modal('hide');
+                            _this.sweetAlert();
+
+                        })
+                        .catch(error => {
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                } else {
+                    alert("沒有挑選");
+                }
+
+            },
+            clearPick:function(){
+                let _this = this;
+                _this.pick="";
+                console.log(_this.pick);
+                
+            },
+
         }
 
     }

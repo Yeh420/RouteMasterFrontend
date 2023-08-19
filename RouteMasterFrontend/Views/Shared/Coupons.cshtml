@@ -1,0 +1,81 @@
+﻿
+
+<div id="app">
+
+    <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex" :class="{'border-3' : coupon.Selected}">
+        
+        <div class=" justify-content-center align-items-center d-flex">
+            <h1><i class="fa-solid fa-gift" style="color:orange"></i></h1>
+        </div>
+        <div class="ms-3 me-auto">
+            <h3>折扣數 : {{ coupon.Discount }}% off !!</h3>
+            <h5 style="color: lightseagreen;">有效日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
+            <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <strong>抱歉，這張優惠券目前無法使用，請確認有效日期。</strong></p>
+        </div>
+        <div class=" justify-content-center align-items-center d-flex">
+            <button :disabled="!coupon.Valuable" :class="{'btn': true, 'btn-warning': !coupon.Selected, 'btn-danger': coupon.Selected}" v-on:click="UseCoupon(index)">
+                <i class="fa-solid" :class="{'fa-truck-fast': !coupon.Selected, 'fa-check-circle': coupon.Selected}"></i>
+                {{ coupon.Selected ? '優惠券已選取' : '使用優惠券' }}
+            </button>
+        </div>
+        
+    </div>
+    
+</div>
+
+<script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+
+<script>
+    const app = Vue.createApp({
+        data(){
+            return{
+                coupons:[]
+            }
+        },
+        mounted: function () {
+            let _this = this;
+            _this.ShowCoupons();
+        },
+        methods: {
+            ShowCoupons:async function(){
+                let _this = this;
+                var data = {};
+                var uri = "https://localhost:7145/Coupons/GetAllCoupons";
+                const response = await fetch(uri, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    _this.coupons = await response.json();
+                    console.log(_this.coupons);
+
+                }
+                else {
+                    console.error('Error:', response.status);
+                }
+            },
+            UseCoupon: function (index) {
+                console.log("use coupon");
+                // Reset previously selected coupons
+                this.coupons.forEach((coupon, i) => {
+                    if (i !== index) {
+                        coupon.Selected = false;
+                    }
+                });
+                // Toggle selected state for the clicked coupon
+                this.coupons[index].Selected = !this.coupons[index].Selected;
+
+                const selectedCouponId = this.coupons[index].Id;
+                if (this.coupons[index].Selected){
+                    console.log("Selected Coupon ID:", selectedCouponId);
+                }
+                
+            }
+        }
+    })
+
+    app.mount("#app")
+</script>

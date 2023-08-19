@@ -59,7 +59,7 @@ namespace RouteMasterFrontend.Controllers
                   .Include(c => c.Accommodation)
                   .Include(c => c.CommentStatus)
                   .Where(c => c.AccommodationId == input.HotelId);
-
+          
             switch (input.Manner)
             {
                 case 0:
@@ -115,6 +115,15 @@ namespace RouteMasterFrontend.Controllers
                 .Include(l => l.Member)
                 .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
             // @@l.MemberAccount==user.Identity.name
+
+            var info = _context.Comments_Accommodations
+                   .Include(c => c.Member)
+                   .Where(c => c.Id == input.CommentId)
+                   .Select(c => c.ToFilterDto());
+
+            int id = info.Select(c => c.MemberId).First();
+            var title = info.Select(c => c.CommentTitle).First();
+
             if (proLike==null)
             {
                 //建立按讚紀錄
@@ -128,13 +137,7 @@ namespace RouteMasterFrontend.Controllers
                 _context.Comment_Accommodation_Likes.Add(like);
                 await _context.SaveChangesAsync();
 
-                var info = _context.Comments_Accommodations
-                    .Include(c => c.Member)
-                    .Where(c => c.Id == input.CommentId)
-                    .Select(c => c.ToFilterDto());
-
-                int id = info.Select(c => c.MemberId).First();
-                var title = info.Select(c=>c.CommentTitle).First();
+               
 
 
                 //按讚通知生成
@@ -155,6 +158,21 @@ namespace RouteMasterFrontend.Controllers
                 //刪除按讚紀錄
                 _context.Comment_Accommodation_Likes.Remove(proLike);
                 await _context.SaveChangesAsync();
+
+                //刪除通知
+                var matchContent = $"按讚人對您標題為:{title}的評論按讚"; //記得按讚人改user.Identity.name
+
+                SystemMessage matchMsg= await _context.SystemMessages
+                    .Where(m=>m.MemberId==id && m.Content==matchContent)
+                    .FirstAsync();
+
+                if (matchMsg!=null)
+                {
+                    _context.SystemMessages.Remove(matchMsg);
+                    await _context.SaveChangesAsync();
+                }
+            
+
                 return false;
             }
             

@@ -25,6 +25,8 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using static Google.Apis.Requests.BatchRequest;
+using RouteMasterFrontend.Models.ViewModels.Carts;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -113,12 +115,14 @@ namespace RouteMasterFrontend.Controllers
            
             //設定使用者登入資訊
             const bool rememberMe = false;
-            var member = _context.Members.FirstOrDefault(m => m.Account == vm.Account);
+            var member = _context.Members.First(m => m.Account == vm.Account);
+
+            //圖片可在優化位置
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
                 //new Claim("memberImage", member.Image),
-                //new Claim("id",member.Id.ToString())
+                new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             //identity.AddClaim(new Claim("memberImage", member.Image));
@@ -131,7 +135,12 @@ namespace RouteMasterFrontend.Controllers
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                authProperties);
+            authProperties);
+
+            Response.Cookies.Append("Id", member.Id.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddHours(2)
+            });
 
             //購物車
             var memberid = _context.Members.Where(m => m.Account == vm.Account).FirstOrDefault()?.Id;
@@ -174,6 +183,7 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        //加入id到claim
         //Google登入
         public async Task<IActionResult> GoogleLogin()
         {
@@ -200,15 +210,16 @@ namespace RouteMasterFrontend.Controllers
             //step1.判斷帳號是否存在，存在=>創身分登入:註冊後創身分後登入
             if (_context.Members.Any(m => m.Email == payload.Email))
             {
+                var member = _context.Members.First((m => m.Email == payload.Email));
                 const bool rememberMe = false;
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
+                    new Claim(ClaimTypes.Name, payload.Name),
                     //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
+                //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要可以加其他資料
 
                 var authProperties = new AuthenticationProperties
                 {
@@ -218,6 +229,11 @@ namespace RouteMasterFrontend.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                     authProperties);
+
+                Response.Cookies.Append("Id", member.Id.ToString(), new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddHours(2)
+                });
 
                 //購物車功能
                 var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
@@ -256,7 +272,7 @@ namespace RouteMasterFrontend.Controllers
 
                 }
 
-                return RedirectToAction("MyMemberIndex", "Members");
+                return RedirectToAction("Index", "Home");
             }
             else
             {
@@ -269,8 +285,9 @@ namespace RouteMasterFrontend.Controllers
                     const bool rememberMe = false;
                     var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, payload.Name),  //使用 payload 中的用戶名稱作為身份標識
-                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
+                    new Claim(ClaimTypes.Name, payload.Name),  
+                    //
+                    //new Claim(ClaimTypes.Email, payload.Email)
                 };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -284,6 +301,8 @@ namespace RouteMasterFrontend.Controllers
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
                         authProperties);
+
+
 
                     //購物車功能
                     var memberid = _context.Members.Where(m => m.Email == payload.Email).FirstOrDefault()?.Id;
@@ -321,7 +340,7 @@ namespace RouteMasterFrontend.Controllers
 
                     }
 
-                    return RedirectToAction("MyMemberIndex", "Members");
+                    return RedirectToAction("Index", "Home");
 
                 }
                 else
@@ -340,17 +359,15 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
-            var member = _context.Members;
+            
 
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
             
-            Member myMember =  _context.Members.FirstOrDefault(m=>m.Account == userAccount);
+            Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
-            {
-               
-                    
+            {              
                 return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
@@ -456,13 +473,13 @@ namespace RouteMasterFrontend.Controllers
             return View("MemberLogin");
         }
 
-        //更改密碼       
+        //忘記密碼/更改密碼       
         public IActionResult MemberResetPassword()
         {
             return View();
         }
         
-        //更改密碼 
+        //忘記密碼/更改密碼 
         [HttpPost]
         public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
         {
@@ -487,10 +504,12 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPassword(MemberEditPasswordVM vm)
+        public ActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
         {
-            if (ModelState.IsValid == false) return View(vm);
-
+            if (ModelState.IsValid == false)
+            {
+                return Json(new { success = false, message = "输入数据无效，请检查输入。" });
+            }
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
@@ -499,7 +518,9 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 return View(vm);
             }
-            return RedirectToAction("MyMemberIndex");
+
+            return ViewComponent("MemberArea");
+            
         }
 
         [HttpGet] 
@@ -517,15 +538,6 @@ namespace RouteMasterFrontend.Controllers
            var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
            var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
 
-
-
-
-
-
-
-
-
-           
             return View(historyOrders);
         }
 
@@ -596,6 +608,15 @@ namespace RouteMasterFrontend.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MembersNavbar([FromBody]Abc dto)
+        {
+            var page = dto.pagecase;
+            return ViewComponent("MemberArea", page);
+        }
+
+      
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {
@@ -866,11 +887,11 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name + DateTime.Now,
+                Account = payload.Name+DateTime.Now.ToString("FFFFFFF"),
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
-                Birthday= DateTime.Now,
+                Birthday= DateTime.Today,
                 Gender= false,
                 Image= imageFile,
                 IsConfirmed = false,

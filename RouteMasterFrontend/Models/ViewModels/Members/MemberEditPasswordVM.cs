@@ -5,6 +5,8 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 {
     public class MemberEditPasswordVM
     {
+        public int id { get; set; }
+
         [Display(Name = "原始密碼")]
         [Required]
         [StringLength(20)]

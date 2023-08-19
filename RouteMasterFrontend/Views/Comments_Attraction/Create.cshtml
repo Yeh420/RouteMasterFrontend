@@ -51,7 +51,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="panel mb-3">
                 <div class="tip">請點選分數</div>
@@ -63,16 +63,6 @@
                     <li><i class="fa fa-star fa-fw"></i></li>
                     <li><i class="fa fa-star fa-fw"></i></li>                
                 </ul>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="MemberId" class="control-label"></label>
-                <input asp-for="MemberId" class="form-control" />
-               @* <span asp-validation-for="MemberId" class="text-danger"></span>*@
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AttractionId" class="control-label"></label>
-                <input asp-for="AttractionId" class="form-control" />
-              @*  <span asp-validation-for="AttractionId" class="text-danger"></span>*@
             </div>
             <div class="form-group d-none">
                 <label asp-for="Score" class="control-label"></label>
@@ -99,16 +89,15 @@
                 <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" />
                 <span asp-validation-for="Images" class="text-danger"></span>
             </div>                  
-            <div class="form-group mb-3">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group mb-3 d-flex">
+                <button class="btn btn-secondary me-3" onclick="history.back()">上一頁</button>
+                <input type="submit" value="新增" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"

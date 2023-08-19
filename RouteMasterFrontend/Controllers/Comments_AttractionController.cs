@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
+using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
+using RouteMasterFrontend.Models.ViewModels.Comments_Attractions;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -75,6 +77,126 @@ namespace RouteMasterFrontend.Controllers
         {
 
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(int id, Comments_AttractionCreateVM vm, List<IFormFile> file1)
+        {
+            ViewBag.spotId=id;
+            if(ModelState.IsValid)
+            {
+                Comments_Attraction commentDb = new Comments_Attraction
+                {
+                    AttractionId = id,
+                    MemberId = 1, //記得改呼叫user.identity.name
+                    Score = vm.Score,
+                    Content = vm.Content,
+                    StayHours = vm.StayHours,
+                    Price = vm.Price,
+                    CreateDate = DateTime.Now,
+                    IsHidden = false,
+                };
+
+                _context.Comments_Attractions.Add(commentDb);
+                _context.SaveChanges();
+
+                string webRootPath = _environment.WebRootPath;
+
+                string path = Path.Combine(webRootPath, "MemberUploads");
+
+                foreach (IFormFile i in file1)
+                {
+                    if (i != null && i.Length > 0)
+                    {
+                        Comments_AttractionImage img = new Comments_AttractionImage();
+                        string fileName = SaveUploadedFile(path, i);
+
+                        img.Comments_AttractionId = commentDb.Id;
+                        img.Image = fileName;
+                      _context.Comments_AttractionImages.Add(img);
+                    }
+                }
+
+                _context.SaveChanges();
+
+                return RedirectToAction("Details", "Attractions", new { id = id });
+            }
+            ModelState.AddModelError("", "請點擊星星給予評分");
+            return View(vm);
+
+        }
+
+      
+        public async Task<string> ReportComment(int targetId, int reasonId)
+        {
+            ReportedAttractionComment report = new ReportedAttractionComment
+            {
+                CommentAttractionId = targetId,
+                ReportReasonId = reasonId,
+                IsHandled = true,
+            };
+            _context.ReportedAttractionComments.Add(report);
+            _context.SaveChanges();
+
+            var targetComment = _context.ReportedAttractionComments
+                .Any(r => r.CommentAttractionId == targetId && r.IsHandled == true);
+
+            var commentDb = _context.Comments_Attractions
+                .Include(c=>c.Attraction)
+                .Where(c => c.Id == targetId);
+               
+            int reviewerId=commentDb.Select(c=>c.MemberId).FirstOrDefault();
+            string spot =commentDb.Select(c=>c.Attraction.Name).First();
+
+            if (targetComment)
+            {
+                SystemMessage reportNotice = new SystemMessage
+                {
+                    MemberId = 1, //記得改成user.Identity.name
+                    Content=$"已收到您在{spot}評論區對某評論的檢舉，RouteMaster團隊將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
+                    IsRead=false,
+                };
+
+                SystemMessage reportSus = new SystemMessage
+                {
+                    MemberId = reviewerId,
+                    Content = $"您在{spot}評論區的評論，因涉及不良內容，已遭檢舉，審核檢舉成功後，該評論將遭下架。",
+                    IsRead = false,
+
+                };
+                _context.SystemMessages.AddRange(reportNotice, reportSus);
+                _context.SaveChanges() ;
+
+                return "檢舉通知已寄出";
+            }
+            return "檢舉失敗";
+        }
+
+        private string SaveUploadedFile(string path, IFormFile file1)
+        {
+            // 如果沒有上傳檔案或檔案是空的,就不處理, 傳回 string.empty
+            if (file1 == null) return string.Empty;
+
+            // 取得上傳檔案的副檔名
+            string ext = System.IO.Path.GetExtension(file1.FileName); // ".jpg" 而不是 "jpg"
+
+            // 如果副檔名不在允許的範圍裡,表示上傳不合理的檔案類型, 就不處理, 傳回 string.empty
+            string[] allowedExts = new string[] { ".jpg", ".jpeg", ".png", ".tif" };
+            if (allowedExts.Contains(ext.ToLower()) == false) return string.Empty;
+
+            // 生成一個不會重複的檔名
+            string newFileName = Guid.NewGuid().ToString("N") + ext; // 生成 亂碼.jpg
+            string fullName = System.IO.Path.Combine(path, newFileName);
+
+            // 將上傳檔案存放到指定位置
+            using (var stream = new FileStream(fullName, FileMode.Create))
+            {
+                file1.CopyTo(stream);
+            }
+
+            // 傳回存放的檔名
+            return newFileName;
         }
     }
 }

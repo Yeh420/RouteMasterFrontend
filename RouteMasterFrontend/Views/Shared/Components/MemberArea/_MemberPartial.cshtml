@@ -24,10 +24,13 @@
         </ul>
     </div>
 </nav>
-<div class="memberphoto position-absolute top-50 end-0 translate-middle-y">
+    @{
+        if (User.Identity.IsAuthenticated){
+    <div class="memberphoto position-absolute top-50 end-0 translate-middle-y">
         <img src="@Url.Content(imagePath)" alt="會員圖片" class="member-image" />
     </div>
-    <div>
-        
-
-    </div>
+    }
+    else{
+        <div></div>
+    }
+    }
