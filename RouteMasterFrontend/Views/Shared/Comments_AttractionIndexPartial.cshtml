@@ -1,6 +1,7 @@
 ﻿<style>
-    .panel li {
+    .starIndex li {
         color: #ccc;
+       
     }
 
     .active {
@@ -10,6 +11,29 @@
     .pointer {
         cursor: pointer;
     }
+
+    .panel li {
+        cursor: pointer;
+    }
+
+    .panel li.blank {
+        color: #ccc;
+    }
+
+    .panel li.hover {
+        color: #ff0;
+    }
+
+    .panel li.active {
+        color: #f90;
+    }
+
+    .tip,
+    .result {
+        margin-top: 10px;
+        font-size: 1.2rem;
+    }
+
 </style>
 <div>@Model.Id</div>
 <div id="app">
@@ -27,6 +51,9 @@
             </div>     
             <div class="col-3 ms-auto text-end">
                 <a asp-controller="Comments_Attraction" asp-action="Create" asp-route-id="@Model.Id">撰寫評論</a>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @@click="starRating">
+                    撰寫評論
+                </button>
             </div>
         </div>
        
@@ -45,7 +72,7 @@
                            </a>
                           
                         </div>
-                        <div class="panel d-flex">
+                        <div class="starIndex d-flex">
                             <p>{{item.score}}</p>
                             <ul class="d-flex list-unstyled">
                                 <li v-for="starIndex in 5" :key="starIndex">
@@ -92,8 +119,70 @@
             </div>
         </div>
 
+        <!-- Modal新增評論 -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">新增評論</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <p v-show="starAlert" style="color:red" class="fs-6">{{starAlert}}</p>
+                            </div>
+                            <div class="panel mb-3">
+                                <div class="tip">請點選分數</div>
+                                <div class="result">{{"您選擇了" + starpoint + "分"}}</div>
+                                <ul class="d-flex list-unstyled" @@mouseout="clearAlert">
+                                    <li><i class="fa fa-star fa-fw"></i></li>
+                                    <li><i class="fa fa-star fa-fw"></i></li>
+                                    <li><i class="fa fa-star fa-fw"></i></li>
+                                    <li><i class="fa fa-star fa-fw"></i></li>
+                                    <li><i class="fa fa-star fa-fw"></i></li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <input v-model="hours" type="number" class="form-control" id="stayHours" placeholder="停留時間" min="0" max="24">
+                            </div>
+                            <div class="mb-3">
+                                <input v-model="price" type="number" class="form-control" id="cost" placeholder="花費" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <textarea v-model="content" class="form-control" placeholder="評論內容" id="paragraph" style="height: 300px"></textarea>            
+                            </div>
+                            <div class="mb-3">
+                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" @@change="previewMultiImg" />
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row mb-3">
+                                <p class="mt-3 col-2">圖片預覽:</p>
+                                <button type="button" class="btn btn-primary col-2 ms-auto " @@click="reset">清空預覽圖</button>
+                            </div>
+                            
+                            <div v-if="preview_list.length" class="row gy-3">
+                                <div v-for="item, index in preview_list" :key="index" class="col-4">
+                                    <img :src="item" class="img-fluid" style="height:180px" />
+                                    @*<p class="mb-0">file name: {{ image_list[index].name }}</p>
+                                    <p>size: {{ image_list[index].size/1024 }}KB</p>*@
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @@click="inputCheck">送出</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Modal -->
+
+        <!-- Modal檢舉 -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -142,6 +231,7 @@
 
             </div>
         </div>
+
     </div>      
 </div>
 
@@ -157,15 +247,46 @@
                 selected:0,
                 spotId: @Html.Raw(Json.Serialize(Model.Id)),
                 pick:"",
-                commentid:0,              
+                commentid:0,
+                errors:[],
+                starpoint:null,
+                hours: null,
+                price: null,
+                content:null,
+                starAlert:null,
+                preview_list: [],
+                image_list: [],
                             
             }
         },
         mounted: function () {
             let _this = this;
             _this.commentDisplay();
+           
         },
         methods:{
+            previewMultiImg: function (event) {
+                let _this = this;
+                var input = event.target;
+                var count = input.files.length;
+                var index = 0;
+                if(input.files){
+                    while (count--) {
+                        var reader = new FileReader();
+                        reader.onload = (e) => {
+                            _this.preview_list.push(e.target.result);
+                        }
+                        _this.image_list.push(input.files[index]);
+                        reader.readAsDataURL(input.files[index]);
+                        index++;
+                    }
+                }
+            },
+            reset:function(){
+                let _this = this;
+                _this.preview_list=[];
+                _this.image_list=[];
+            },
             sweetAlert:function(){
                 Swal.fire(
                     '已成功檢舉',
@@ -245,6 +366,62 @@
                 _this.pick="";
                 console.log(_this.pick);
                 
+            },
+            starRating:function(){
+                let _this = this;
+
+                var panel = document.querySelector(".panel");
+                var result = panel.querySelector(".result");
+                var liItems = panel.querySelectorAll("li");
+
+                result.style.display="none";
+
+                liItems.forEach(function(liItem, index){
+                    liItem.classList.add("blank");
+
+                    liItem.addEventListener("mouseover", function () {
+                        for (var j = 0; j <= index; j++) {
+                            liItems[j].classList.remove("blank");
+                            liItems[j].classList.add("hover");
+                        }
+                    });
+
+                    liItem.addEventListener("mouseout", function () {
+                        liItems.forEach(function (item) {
+                            item.classList.remove("hover");
+                            item.classList.add("blank");
+                        });
+                    });
+
+                    liItem.addEventListener("click", function () {
+                        liItems.forEach(function (item, idx) {
+                            if (idx <= index) {
+                                item.classList.remove("blank");
+                                item.classList.add("active");
+                            } else {
+                                item.classList.remove("active");
+                                item.classList.add("blank");
+                            }
+                        });
+                        panel.querySelector(".tip").style.display = "none";
+                        _this.starpoint = index + 1;
+                        result.style.display = "block";
+                        //result.textContent = "您選擇了 " + points + " 分";
+
+                    });
+
+                });
+
+            },
+            inputCheck:function(){
+                let _this=this;
+                if(_this.starpoint==null){
+                    _this.starAlert="請點選星星評分";
+                }
+            },
+            clearAlert:function(){
+                let _this = this;
+                _this.starAlert=null;
             },
 
         }
