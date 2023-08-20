@@ -37,6 +37,12 @@
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" :id='"switchStatus" + item.id' :checked="item.isRead" @@change="updateSW(item.id)">
                         <label class="form-check-label" :for='"switchStatus" + item.id'>{{item.isRead? "已讀":"未讀"}}</label>
+                        <template v-if="item.category=='檢舉'">
+                            <button type="button" class="btn btn-warning btn-sm ms-3" @@click="searchSite(item.id)">前往評論區</button>
+                        </template>
+                        <template v-else>
+                            <a class="btn btn-warning btn-sm ms-3" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -125,6 +131,18 @@
                         ).catch(error => {
                             console.error('There was a problem with the fetch operation:', error);
                         });
+                },
+
+                searchSite:function(id){
+                    var uri = `https://localhost:7145/SystemMessage/GetUrl?msgId=${id}`;
+                    fetch(uri,{
+                        method:"POST",
+                    }).then(response=> response.text())
+                    .then(result=>{
+                        var url= result;
+                            window.location.href = url + "#commentArea";
+                          
+                    })
                 },
                
             }
