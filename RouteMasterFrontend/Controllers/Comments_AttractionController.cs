@@ -73,6 +73,47 @@ namespace RouteMasterFrontend.Controllers
             return Json(records);
         }
 
+        [HttpPost]
+        public async Task<string> NewComment([FromForm] Comments_AttractionCreateDTO dto )
+        {
+            Comments_Attraction commentDb = new Comments_Attraction
+            {
+                MemberId = 1,
+                AttractionId = dto.AttractionId,
+                Score = dto.Score,
+                StayHours = dto.StayHours,
+                Price = dto.Price,
+                Content = dto.Content,
+                CreateDate = DateTime.Now,
+                IsHidden = false,
+
+            };
+            _context.Comments_Attractions.Add(commentDb);
+            _context.SaveChanges();
+
+            string webRootPath = _environment.WebRootPath;
+            string path = Path.Combine(webRootPath, "MemberUploads");
+
+            if (dto.Files != null)
+            {
+                foreach (IFormFile i in dto.Files)
+                {
+                    if (i != null && i.Length > 0)
+                    {
+                        Comments_AttractionImage img = new Comments_AttractionImage();
+                        string fileName = SaveUploadedFile(path, i);
+
+                        img.Comments_AttractionId = commentDb.Id;
+                        img.Image = fileName;
+                        _context.Comments_AttractionImages.Add(img);
+                    }
+                }
+                _context.SaveChanges();
+                return "新增含圖評論成功";
+            }
+            return "新增無圖評論成功";
+        }
+
         public IActionResult Create()
         {
 
@@ -146,17 +187,17 @@ namespace RouteMasterFrontend.Controllers
                 .Include(c=>c.Attraction)
                 .Where(c => c.Id == targetId);
                
-            int reviewerId=commentDb.Select(c=>c.MemberId).FirstOrDefault();
-            string spot =commentDb.Select(c=>c.Attraction.Name).First();
+            int reviewerId= await commentDb.Select(c=>c.MemberId).FirstOrDefaultAsync();
+            string spot = await commentDb.Select(c=>c.Attraction.Name).FirstAsync();
 
             if (targetComment)
             {
-                SystemMessage reportNotice = new SystemMessage
-                {
-                    MemberId = 1, //記得改成user.Identity.name
-                    Content=$"已收到您在{spot}評論區對某評論的檢舉，RouteMaster團隊將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
-                    IsRead=false,
-                };
+                //SystemMessage reportNotice = new SystemMessage
+                //{
+                //    MemberId = 1, //記得改成user.Identity.name
+                //    Content=$"已收到您在{spot}評論區對某評論的檢舉，RouteMaster團隊將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
+                //    IsRead=false,
+                //};
 
                 SystemMessage reportSus = new SystemMessage
                 {
@@ -165,7 +206,8 @@ namespace RouteMasterFrontend.Controllers
                     IsRead = false,
 
                 };
-                _context.SystemMessages.AddRange(reportNotice, reportSus);
+                //_context.SystemMessages.AddRange(reportNotice, reportSus);
+                _context.SystemMessages.Add(reportSus);
                 _context.SaveChanges() ;
 
                 return "檢舉通知已寄出";
