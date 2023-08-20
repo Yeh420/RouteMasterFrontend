@@ -1,19 +1,42 @@
 ﻿
 
 <div id="app">
-    <div class="container">
-        <div class="row">
-            <h1>heLLO WORLD</h1>
+    <div class="container">       
+        <div class="row row-cols-md-auto ms-1">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio1" v-model="filter" value="1" @@change="getMessage">
+                <label class="form-check-label" for="radio1">
+                  未讀
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio2" v-model="filter" value="2" @@change="getMessage">
+                <label class="form-check-label" for="radio2">
+                  已讀
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio3" v-model="filter" value="3" @@change="getMessage">
+                <label class="form-check-label" for="radio3">
+                    全部
+                </label>
+            </div>
+            <div class="form-check form-switch">
+           <input class="form-check-input" type="checkbox" role="switch" id="readall" @@change="allRead">
+           <label class="form-check-label" for="readall">全部已讀</label>
         </div>
-        <div class="row row-cols-2 mt-3 g-2">
-            <div class="card mb-3 col" v-for="(item,index) in indexVM">
+            
+        </div>
+        <div class="row mt-1 g-2">
+            <div class="card mb-3 col-6" v-for="(item,index) in indexVM" :key="item.id">
                 <h5 class="card-header">{{item.category}}</h5>
                 <div class="card-body">
+                    <p class="card-text">{{item.id}}</p>
                     <h5 class="card-title">{{item.content}}</h5>
                     <p class="card-text">{{item.isRead}}</p>
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                        <label class="form-check-label" for="flexSwitchCheckChecked">狀態</label>
+                        <input class="form-check-input" type="checkbox" role="switch" :id='"switchStatus" + item.id' :checked="item.isRead" @@change="updateSW(item.id)">
+                        <label class="form-check-label" :for='"switchStatus" + item.id'>{{item.isRead? "已讀":"未讀"}}</label>
                     </div>
                 </div>
             </div>
@@ -27,23 +50,72 @@
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <script>
+       
         const vueApp = {
             data() {
                 return {
                     indexVM:[],
-                }
+                    filter:1,
+            }
             },
             mounted: function () {
                 let _this = this;
                 _this.getMessage();
              
             },
-            methods: {
+            methods: {    
+                allRead:function(){
+                    let _this = this;
+                    const one = document.getElementById("readall");
+                    const isLaunched= one.checked;
+                    if(isLaunched){
+                        fetch("https://localhost:7145/SystemMessage/MarkAllAsRead", {
+                            method: "POST",
+                        }).then(response => response.text())
+                            .then(result => {
+
+                                console.log(result);
+                                _this.getMessage();
+                            }
+                            ).catch(error => {
+                                console.error('There was a problem with the fetch operation:', error);
+                            });
+                       
+                    }
+                },
+                updateSW:function(msgId){
+                    let _this = this;
+                    console.log(msgId);
+                    const sw = document.getElementById("switchStatus" + msgId);
+                    const isChecked= sw.checked;
+
+                    if (isChecked) {
+                        console.log("該發送ajax");
+                        var uri = `https://localhost:7145/SystemMessage/UpdateNoticeStatus?id=${msgId}`;
+                        fetch(uri, {
+                            method: "POST",
+                        }).then(response => response.text())
+                            .then(result => {
+
+                                console.log(result);
+                                _this.getMessage();
+                            }
+                            ).catch(error => {
+                                console.error('There was a problem with the fetch operation:', error);
+                            });
+                        
+
+                    }
+                    else{
+                        console.log("沒是");
+                    }
+                    
+                },
               
                 getMessage: function () {
                     let _this = this;
-
-                    fetch("https://localhost:7145/SystemMessage/Index", {
+                    var uri = `https://localhost:7145/SystemMessage/Index?filter=${_this.filter}`;
+                    fetch(uri, {
                         method: "POST",
                     }).then(response => response.json())
                         .then(result => {
