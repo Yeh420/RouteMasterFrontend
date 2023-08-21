@@ -28,11 +28,11 @@ namespace RouteMasterFrontend.Controllers
             foreach (var accommodationItem in cart.Cart_AccommodationDetails)
             {
                 var roomId = accommodationItem.RoomProductId;
-                var room = _context.Rooms.FirstOrDefault(x => x.Id == roomId);
+                var room = _context.RoomProducts.FirstOrDefault(x => x.Id == roomId);
 
                 if (room != null)
                 {
-                    int roomTotal = room.Price * accommodationItem.Quantity;
+                    int roomTotal = (int)room.NewPrice * accommodationItem.Quantity;
                     total += roomTotal;
                 }
             }
@@ -74,7 +74,7 @@ namespace RouteMasterFrontend.Controllers
 
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
 
-            
+            var accommodationNameArray = new List<string>();
             var extraServiceNameArray = new List<string>();
             var activityProductNameArray = new List<string>();
 
@@ -92,6 +92,16 @@ namespace RouteMasterFrontend.Controllers
 
                 extraServiceNameArray.Add(extraServiceName); // 將每個值添加到陣列中
             }
+            foreach (var accommodationItem in cart.Cart_AccommodationDetails)
+            {
+                var roomId = _context.Rooms
+                    .Where(x => x.Id == accommodationItem.RoomProductId)
+                    .Select(x => x.Id)
+                    .FirstOrDefault();
+                var accommodationName = _context.Accommodations
+                    .Where(x => x.Id == roomId) .Select(x => x.Name) .FirstOrDefault();
+            }
+          
 
             foreach (var activityItem in cart.Cart_ActivitiesDetails)
             {

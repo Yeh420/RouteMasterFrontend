@@ -380,11 +380,11 @@
                     //加入購物車
                     const postData = {
                         cartId: this.cartId,
-                        activityid: this.selectedProductId,
+                        activityId: this.selectedProductId,
                         quantity: this.inputQuantity
-                    }
+                    };
                     console.log(postData);
-                    console.log('加購物車啦')
+
                     fetch(`${baseAddress}/api/Carts/addactivity`, {
                         method:'POST',
                         headers: {
@@ -392,15 +392,15 @@
                         },
                         body: JSON.stringify(postData)
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            alert(data.message);
-                            this.reloadCartItems();
-                        }else{
-                            alert('加入購物車失敗');
-                        }
-                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                alert(data.message);
+                                this.reloadCartItems();
+                            }else{
+                                alert('加入購物車失敗');
+                            }
+                        })
                     .catch(error => {
                         console.log('Failed to add to cart:', error);
                     });
