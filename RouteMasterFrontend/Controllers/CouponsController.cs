@@ -24,7 +24,7 @@ namespace RouteMasterFrontend.Controllers
                 .Select(c => new Coupon
                 {
                     Id = c.Id,
-                    Code = c.Code,
+                    Name = c.Name,
                     Discount = c.Discount,
                     StartDate = c.StartDate,
                     EndDate = c.EndDate,
@@ -50,7 +50,7 @@ namespace RouteMasterFrontend.Controllers
     public class Coupon
     {
         public int Id { get; set; }
-        public int Code { get; set; }
+        public string Name { get; set; }
         public int Discount { get; set; }
         public DateTime StartDate { get; set; }
 
