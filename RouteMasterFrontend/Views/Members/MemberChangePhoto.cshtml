@@ -1,0 +1,30 @@
+﻿<form id="uploadForm" asp-action="MemberChangePhoto" enctype="multipart/form-data">
+    <p>上傳圖片</p>
+    <input type="file" id="imageInput" name="facePhoto" multiple="multiple" accept="image/*" />
+
+    <div class="form-group">
+        <input type="submit" value="更換大頭貼" class="btn btn-primary" />
+    </div>
+</form>
+
+<div id="imagePreview"></div>
+
+<script>
+    // 获取图片输入元素和预览容器元素
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+
+    // 监听图片输入元素的变化事件
+    imageInput.addEventListener('change', function () {
+        // 清空之前的预览内容
+        imagePreview.innerHTML = '';
+
+        // 遍历用户选择的图片
+        for (const file of imageInput.files) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file); // 创建图片预览 URL
+            img.classList.add('preview-image');
+            imagePreview.appendChild(img); // 将图片添加到预览容器中
+        }
+    });
+</script>
