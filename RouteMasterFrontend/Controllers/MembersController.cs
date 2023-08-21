@@ -92,7 +92,7 @@ namespace RouteMasterFrontend.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return ViewComponent("MemberArea");
             }
             return View(member);
         }
@@ -122,11 +122,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                new Claim("memberImage", member.Image),
+                //new Claim("memberImage", member.Image),
                 new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim("memberImage", member.Image));
+            //identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
