@@ -83,11 +83,11 @@
                                     <input type="checkbox" v-model="group.selected" />
                                 </td>
                                 <td>
-                                <img :src="group.imgUrl" alt="圖片" style="max-width: 100px; max-height: 100px;" />
+                                <img :src="'../ActivityImages/' + group.imgUrl" alt="圖片" style="max-width: 100px; max-height: 100px;" />
                                 </td>
-                                <td class="align-middle text-center">{{ group.firstItem.ActivityName }}</td>
-                                <td class="align-middle text-center">{{ group.firstItem.Description }}</td>
-                                <td class="align-middle text-center">{{ group.firstItem.StartTime }} ~ {{ group.firstItem.EndTime }}</td>
+                                <td class="align-middle text-center">{{ group.Name }}</td>
+                                <td class="align-middle text-center">{{ group.Description }}</td>
+                                <td class="align-middle text-center">{{ group.StartTime }} ~ {{ group.EndTime }}</td>
                                 <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
                                     ${{ group.price }}
                                 </td>

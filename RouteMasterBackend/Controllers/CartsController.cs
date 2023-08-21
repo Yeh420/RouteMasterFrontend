@@ -72,7 +72,8 @@ namespace RouteMasterBackend.Controllers
             return data;
            
         }
-
+        [HttpGet("getcartview")]
+       
         [HttpPost("addextraservice")]
         public IActionResult AddExtraService2Cart([FromBody]AddExtraServiceDto dto)
         {
@@ -104,8 +105,7 @@ namespace RouteMasterBackend.Controllers
                     _context.CartExtraServicesDetails.Add(cartItem);
                 }
                     _context.SaveChanges();
- 
-
+                    
                 return Ok(new { success = true, message = "Successfully added to cart." });
             }
 

@@ -2,9 +2,11 @@
     var extraServiceId = ViewBag.ExtraServiceId;
     var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 
 @section Styles{
     <style>
+
         .date-picker {
             width: 300px;
             border: 1px solid #ccc;
@@ -275,15 +277,44 @@
                     //加入購物車
                     const postData={
                         cartId:this.cartId,
-                        extProductId: this.selectedProductId,
+                        extraserviceId: this.selectedProductId,
                         quantity: this.inputQuantity
-                    }   
+                    };   
                     console.log(postData);
+                    fetch(`${baseAddress}/api/Carts/addextraservice`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            this.reloadCartItems();
+                            } else {
+                                alert('加入購物車失敗');
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Failed to add to cart:', error);
+                        });
 
-
-                    console.log('加購物車啦')
-                },             
+                    console.log('加購物車啦');
+                },
+                reloadCartItems() {
+                    fetch('/Carts/RefreshCart')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('Cart').innerHTML = data;
+                        })
+                        .catch(() => {
+                            alert('Failed to reload cart items.');
+                        });
+                }
             }
+
         };
         let app = Vue.createApp(vueApp).mount('#app');
     </script>
