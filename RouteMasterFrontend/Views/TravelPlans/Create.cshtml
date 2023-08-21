@@ -976,30 +976,22 @@
             let extProBoxes = document.querySelectorAll('input[name="extraServiceProduct"]:checked');
             let extCheckboxValues= Array.from(extProBoxes).map(extProBox=>parseInt(extProBox.value));
 
-
-
             //住宿商品加入購物車
 
-
-
-
-            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0){
+            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0  && roomProducts.length ==0){
                 alert('請至少選擇一項商品才可以加入購物車')
             }else{
                 let cartIdFromCookie = @cartIdFromCookie;
-
 
                 //住宿商品放入postData
                 const postData = {
                     cartId: cartIdFromCookie,
 
                     activityProductIds: actCheckboxValues,
-                    extraServiceProductIds: extCheckboxValues
-                    // roomProducts
+                    extraServiceProductIds: extCheckboxValues,
+                    roomProducts : roomProducts
+
                 };
-
-
-
 
                 axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
                     .then(response => {
