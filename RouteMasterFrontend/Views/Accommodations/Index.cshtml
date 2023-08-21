@@ -1,17 +1,11 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
-@using System.Text.Json;
-@using System.Text.Json.Serialization;
 @model FilterDTO
-
 @section Styles{
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-
     @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
-
-
     <style>
         .currentPage {
             background-color: lightgray;
@@ -152,7 +146,6 @@
             </noscript>
     }
 <div id="app" v-cloak>
-
     <div v-if="toggle">
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
         <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" />
@@ -258,10 +251,11 @@
                                                 <div class="col-9">
                                                     <div class="card-body w-100">
                                                         <div class="d-flex align-items-center">
-                                                            <h5 class="card-title m-0">
+                                                            <h5 class="card-title m-0 me-2">
                                                                 {{product.name}}
                                                             </h5>
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                            <i v-for="grade in product.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
+                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.score}}</span>
                                                         </div>
                                                         <p class="card-text">
                                                             <small class="text-muted">
@@ -416,7 +410,7 @@
                                         </ul>
                                         <ul v-if="accommodationServiceCId.indexOf(5) !== -1" class="col-4 mb-4">
                                             <li>
-                                                <i class="me-1 li-icon fa-solid fa-handshake"></i></i>會議與商務設施
+                                                <i class="me-1 li-icon fa-solid fa-handshake"></i>會議與商務設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 5})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
@@ -452,7 +446,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 @section Scripts{
@@ -975,6 +968,5 @@
             }
         }
         var app = Vue.createApp(vueApp).mount("#app");
-
     </script>
 }
