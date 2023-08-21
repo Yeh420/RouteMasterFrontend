@@ -8,33 +8,6 @@
 
 }
 
-<style>
-   /* .col-md-2 {
-        position:absolute;
-        border-width: medium;
-        border-style: double;
-        border-color: gray;
-        border-radius: 20px;
-        padding:10px;     
-        line-height:40px;
-        background-color: #81C0C0;
-        
-    }
-
-        .col-md-2 navbar{
-            background-color:aliceblue;
-        }
-    .col-md-9{
-        position:relative;
-        border-width: medium;
-        border-style: double;
-        border-color: gray;
-        border-radius: 20px;
-        left:400px;
-    }
-*/
-    
-</style>
 
 
     <h4>會員中心</h4>
@@ -43,20 +16,26 @@
         <div class="col-md-2">
             <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid" >
-                <button data-number="0">會員資料</button>
+                <button class="navbar-brand" data-number="0">會員資料</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button data-number="1">歷史訂單</button>
+                <button class="navbar-brand" data-number="1">歷史訂單</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button data-number="2">更改密碼</button>
+                <button class="navbar-brand" data-number="2">更改密碼</button>
             </div>
-            </nav> 
-        </div>
+            </nav>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <button class="navbar-brand" data-number="3">訊息通知</button>
+            </div>
+        </nav>
+
+    </div>
 
         @*渲染nav*@
 
@@ -66,33 +45,65 @@
         </div>
        </div>
 
+  
 
 @section Scripts{
 
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <script>
-        //var arg = document.querySelector('#memberData').getAttribute('data-number')
+ 
         var buttons = document.getElementsByTagName("button");
 
-        //console.log(buttons);
+      
+        //for (var i = 0; i < buttons.length; i++) {
+        //    buttons[i].addEventListener("click", function () {
+        //        var arg = this.getAttribute('data-number');
+        //        console.log(arg);
+
+        //        var request={};
+        //        request.pagecase=arg;
+        //        fetch("https://localhost:7145/Members/MembersNavbar", {
+        //            method: "POST",
+        //            headers: {
+        //                "Content-Type": "application/json"
+        //            },
+        //            body: JSON.stringify(request)
+        //        }).then(response => response.text()
+        //                )
+        //            .then(result => {
+        //                console.log(result)
+        //                var memberArea = document.querySelector("#memberNavbar");
+             
+        //                memberArea.innerHTML = result;
+        //            })
+        //            .catch(error => {
+        //                console.log(error);
+        //            });
+        //            l
+        //    });
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener("click", function () {
                 var arg = this.getAttribute('data-number');
                 console.log(arg);
-            $.ajax({
-                type:"post",
-                data: JSON.stringify({ pagecase: arg }),
-                contentType:"application/json",
-                url: "https://localhost:7145/Members/MembersNavbar",
-                }).done(function (response){
-                    
+                $.ajax({
+                    type: "post",
+                    data: JSON.stringify({ pagecase: arg }),
+                    contentType: "application/json",
+                    url: "https://localhost:7145/Members/MembersNavbar",
+                }).done(function (response) {
+
                     var memberArea = $("#memberNavbar");
                     memberArea.html(response);
-                }).fail(function(err){
+                }).fail(function (err) {
                     console.log('err')
                 });
             });
         }
+            
+        
 
     </script>
+
 
 }

@@ -12,7 +12,7 @@ namespace RouteMasterBackend.DTOs
         public string? Image { get; set; }
         public TimeSpan? CheckIn { get; set; }
         public TimeSpan? CheckOut { get; set; }
-        public double Score { get; set; }
+        public string Score { get; set; }
         public IEnumerable<AccommodationServiceInfo> Services { get; set; }
     }
 }

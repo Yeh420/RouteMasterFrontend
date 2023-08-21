@@ -22,69 +22,58 @@ namespace RouteMasterBackend.Controllers
             _context = context;
         }
 
-        [HttpGet("Index")]
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<CartItemsDto> LoadCartItems(int cartId, int quantity)
         {
-            int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
 
-                var cartDetailsDto = new CartDetailDto
-                {
-                    ExtraServices = _context.CartExtraServicesDetails
-                   .Where(c => c.CartId == cartIdFromCookie)
-                   .Include(c => c.ExtraServiceProduct)
-                   .Include(c => c.ExtraServiceProduct.ExtraService)
-                   .Select(cartDetail => new Cart_ExtraServicesDetailDto
-                   {
-                       Id = cartDetail.Id,
-                       Name = cartDetail.ExtraServiceProduct.ExtraService.Name,
-                       Description = cartDetail.ExtraServiceProduct.ExtraService.Description,
-                       Price = cartDetail.ExtraServiceProduct.Price,
-                       Date = cartDetail.ExtraServiceProduct.Date,
-                       Quantity = cartDetail.Quantity,
-                       ImageUrl = "/ExtraServiceImages/" + cartDetail.ExtraServiceProduct.ExtraService.Image,
-                   })
-                    .ToList(),
 
-                    Accommodations = _context.CartAccommodationDetails
-                    .Where(c => c.CartId == cartIdFromCookie)
-                    .Include(c => c.RoomProduct)
-                    .Include(c => c.RoomProduct.Room)
-                    .Include(c => c.RoomProduct.Room.Accommodation)
-                    .Include(c => c.RoomProduct.Room.RoomType)
-                    .Select(cartDetail => new Cart_AccommodationDetailDto
+            var data = new CartItemsDto();
+            data.cartId= cartId;
+            data.ActivityCartItems = await _context.CartActivitiesDetails
+                    .Where(x => x.CartId == cartId)
+                    .Select(x => new ActivityCartItem
                     {
-                        Id = cartDetail.Id,
-                        RoomName = cartDetail.RoomProduct.Room.Name,
-                        AccommodationName = cartDetail.RoomProduct.Room.Accommodation.Name,
-                        RoomTypeName = cartDetail.RoomProduct.Room.RoomType.Name,
-                        Price = cartDetail.RoomProduct.NewPrice,
-                        Date = cartDetail.RoomProduct.Date,
-                        Quantity = cartDetail.Quantity,
-                        ImageUrl = "123"
+                        imgUrl = x.ActivityProduct.Activity.Image,
+                        Name = x.ActivityProduct.Activity.Name,
+                        Description = x.ActivityProduct.Activity.Description,
+                        startTime = x.ActivityProduct.StartTime,
+                        endTime = x.ActivityProduct.EndTime,
+                        Price = x.ActivityProduct.Price,
+                        Quantity = quantity
                     })
-                        .ToList(),
+                    .ToListAsync();
+            data.AccommodationCartItems = await _context.CartAccommodationDetails
+                 .Where(x => x.CartId == cartId)
+                 .Select(x => new AccommodationCartItem
+                 {
+                     imgUrl = "123",
+                     AccommodationName = x.RoomProduct.Room.Accommodation.Name,
+                     RoomTypeName = x.RoomProduct.Room.RoomType.Name,
+                     Date = x.RoomProduct.Date,
+                     Quantity = quantity,
+                     Price = x.RoomProduct.NewPrice,
 
-                    Activities = _context.CartActivitiesDetails
-                       .Where(c => c.CartId == cartIdFromCookie)
-                       .Include(c => c.ActivityProduct)
-                       .Include(c => c.ActivityProduct.Activity)
-                       .Select(cartDetail => new Cart_ActivitiesDetailDto
-                       {
-                           Id = cartDetail.Id,
-                           ActivityName = cartDetail.ActivityProduct.Activity.Name,
-                           Description = cartDetail.ActivityProduct.Activity.Description,
-                           Price = cartDetail.ActivityProduct.Price,
-                           StartTime = cartDetail.ActivityProduct.StartTime,
-                           EndTime = cartDetail.ActivityProduct.EndTime,
-                           Quantity = cartDetail.Quantity,
-                           ImageUrl = "/ActivityImages/" + cartDetail.ActivityProduct.Activity.Image,
-                       })
-                       .ToList()
-                };
-                return Ok(new { CartId = cartIdFromCookie, CartDetails = cartDetailsDto });
+                 })
+                 .ToListAsync();
 
+            data.ExtraServiceCartItems = await _context.CartExtraServicesDetails
+                .Where(x => x.CartId == cartId)
+                .Select(x => new ExtraServiceCartItem
+                {
+                    Name = x.ExtraServiceProduct.ExtraService.Name,
+                    ImgUrl = x.ExtraServiceProduct.ExtraService.Image,
+                    Description = x.ExtraServiceProduct.ExtraService.Description,
+                    Date = x.ExtraServiceProduct.Date,
+                    Price = x.ExtraServiceProduct.Price,
+                    Quantity = quantity,
+                })
+                .ToListAsync();
+        
+            return data;
+           
         }
-
+        [HttpGet("getcartview")]
+       
         [HttpPost("addextraservice")]
         public IActionResult AddExtraService2Cart([FromBody]AddExtraServiceDto dto)
         {
@@ -116,8 +105,7 @@ namespace RouteMasterBackend.Controllers
                     _context.CartExtraServicesDetails.Add(cartItem);
                 }
                     _context.SaveChanges();
- 
-
+                    
                 return Ok(new { success = true, message = "Successfully added to cart." });
             }
 
@@ -283,6 +271,7 @@ namespace RouteMasterBackend.Controllers
 				}
 
 			}
+
             if(dto.extraServiceProductIds!=null)
             {
 				for (int i = 0; i < dto.extraServiceProductIds.Length; i++)
@@ -294,6 +283,21 @@ namespace RouteMasterBackend.Controllers
 						Quantity = 1
 					};
 					cart.CartExtraServicesDetails.Add(cartExtraServiceDetails);
+					_context.SaveChanges();
+				}
+			}			
+
+            if(dto.roomProducts!=null)
+            {
+				for (int i = 0; i < dto.roomProducts.Length; i++)
+				{
+					var cartAccommodationDetails = new CartAccommodationDetail()
+					{
+						CartId = dto.cartId,
+						RoomProductId = dto.roomProducts[i].Id,
+						Quantity = dto.roomProducts[i].Quantity
+                    };
+					cart.CartAccommodationDetails.Add(cartAccommodationDetails);
 					_context.SaveChanges();
 				}
 			}			

@@ -96,7 +96,7 @@
                 <div class="col-6">
                     @Html.DisplayFor(model => model.CellPhoneNumber)
                 </div>
-                <div class="col-6">
+                <div class="col-6" id="editPassword">
                     @Html.DisplayNameFor(model => model.Address)
                 </div>
                 <div class="col-6">
@@ -106,7 +106,15 @@
                     @Html.DisplayNameFor(model => model.Gender)
                 </div>
                 <div class="col-6">
-                    @Html.DisplayFor(model => model.Gender)
+                    @Html.DisplayFor(model => model.Gender.Value)  
+                    @if (Model.Gender == false)
+                    {
+                        <p>男性</p>
+                    }
+                    else
+                    {
+                        <p>女性</p>
+                    }
                 </div>
                 <div class="col-6">
                     @Html.DisplayNameFor(model => model.Birthday)

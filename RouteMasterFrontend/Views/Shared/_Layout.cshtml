@@ -116,6 +116,10 @@
                                     <li>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
                                     </li>        
+                                    <li id="Cart">                               
+                                        @await Component.InvokeAsync("CartPartial" )
+                                    </li>
+
                                 }
                                 else
                                 {
@@ -124,11 +128,6 @@
                                     </li>
                                 }
                             }
-
-                            <li id="Cart">                               
-                                @await Component.InvokeAsync("CartPartial" )
-                            </li>
-
                         </ul>
                         <a class='menu-trigger'>
                             <span>Menu</span>

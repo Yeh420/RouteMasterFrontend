@@ -38,7 +38,13 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Carts.Include(c => c.Member);
             return View(await routeMasterContext.ToListAsync());
         }
-      
+
+
+        public IActionResult IndexVue()
+        {  
+            return View();
+        }
+    
         public IActionResult Index()
         {
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
@@ -131,13 +137,13 @@ namespace RouteMasterFrontend.Controllers
 
 
         //    return Json(new { success = true, message = "已加入購物車", cartId = cart.Id });
-        
+
         //}
-		
-        public IActionResult ExtraServicesDetailsPartialView(int memberId)
+        [HttpGet]
+        public IActionResult ExtraServicesDetailsPartialView(int cartId)
         {
             var extraServicesDetails = _context.Cart_ExtraServicesDetails
-                   //.Where(c => c.CartId == memberId)
+                   .Where(c => c.CartId == cartId)
                    .Include(c => c.ExtraServiceProduct) // Load the ExtraServiceProduct
                    .Include(c => c.ExtraServiceProduct.ExtraService) // Load the ExtraService within ExtraServiceProduct
                    .ToList();
@@ -152,7 +158,7 @@ namespace RouteMasterFrontend.Controllers
             //    ExtraServiceName = cartExtraServiceDetail.ExtraServiceProduct.ExtraService.Name // Assuming you have ExtraServiceName property in Cart_ExtraServicesDetail entity   
             //}).ToList();
 
-            return PartialView("ExtraServicesDetailsPartialView");
+            return ViewComponent("CartPartial");
         }
         public List<Cart_ExtraServicesDetail> GetCartExtraServicesDetails(int memberId)
 		{
@@ -165,37 +171,36 @@ namespace RouteMasterFrontend.Controllers
 
 			return extraServicesDetails;
 		}
-        public IActionResult AddExtraService2Cart(int extraserviceId, int quantity)
+        [HttpPost]
+        public IActionResult AddExtraService2Cart([FromBody] ExtraserviceProductsDto dto)
         {
             try
             {
-
-               
                 var extraServiceProduct = _context.ExtraServiceProducts
-                    .FirstOrDefault(p => p.Id == extraserviceId);
+                 .Where(e => dto.extraserviceId.Contains(e.Id));
 
                 if (extraServiceProduct != null)
                 {
-                    
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["CartId"] ?? "0");
-                    var cartItem = new Cart_ExtraServicesDetail
-                    {
-                        CartId = cartIdFromCookie,
-                        ExtraServiceProductId = extraserviceId,
-                        Quantity = quantity
-                    };
+                    foreach(var ep in extraServiceProduct){
 
+                        var cartItem = new Cart_ExtraServicesDetail
+                        {
+                            CartId = cartIdFromCookie,
+                            ExtraServiceProductId = ep.ExtraServiceId,
+                            Quantity = dto.quantity
+                        };
+                        _context.Cart_ExtraServicesDetails.Add(cartItem);
+                    }
+                   
 
-                    _context.Cart_ExtraServicesDetails.Add(cartItem);
+                   
                     _context.SaveChanges();
                     Response.Cookies.Append("CartId", cartIdFromCookie.ToString());
-
-
-                    return Json(new { success = true, message = "Successfully added to cart." });
+                    return ViewComponent("CartPartial");
                 }
                 else
                 {
-                   
                     return Json(new { success = false, message = "Product not found." });
                 }
             }
@@ -268,21 +273,21 @@ namespace RouteMasterFrontend.Controllers
         {
             try
             {
-                var RoomProduct = _context.RoomProducts.Where(r=> dto.roomProductId.Contains(r.Id));
+                var RoomProduct = _context.RoomProducts.Where(r=> dto.RoomProductId.Contains(r.Id));
                 if(RoomProduct != null)
                 {
                     var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                    //var cartIdFromCookie = 3;
-                    foreach(var rp in RoomProduct)
-                    {
-                        var cartItem = new Cart_AccommodationDetail
+                     
+                        foreach(var rp in RoomProduct)
                         {
-                            CartId = cartIdFromCookie,
-                            RoomProductId = rp.Id,
-                            Quantity = 1
-                        };
-                        _context.Cart_AccommodationDetails.Add(cartItem);
-                    }
+                            var cartItem = new Cart_AccommodationDetail
+                            {
+                                CartId = cartIdFromCookie,
+                                RoomProductId = rp.Id,
+                                Quantity = dto.Quantity
+                            };
+                            _context.Cart_AccommodationDetails.Add(cartItem);
+                        }
                         _context.SaveChanges();
                         Response.Cookies.Append("cartId", cartIdFromCookie.ToString());
 
@@ -378,7 +383,8 @@ namespace RouteMasterFrontend.Controllers
             }
         }
 
-        public IActionResult RefreshCart(int memberId)
+        [HttpGet]
+        public IActionResult RefreshCart()
         {
            
 
@@ -543,37 +549,40 @@ namespace RouteMasterFrontend.Controllers
                         _context.SaveChanges();
 
                     }
-                    foreach (var extraservicesDetail in cart.Cart_ExtraServicesDetails)
+                    foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
                     {
-                        var extraservicesProductsId = _context.ExtraServices.Where(x=>x.Id==extraservicesDetail.ExtraServiceProductId).First().Id;
-                        var extraServicesId = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Id;
-                        var extraServiceName= _context.ExtraServices.Where(x=>x.Id==extraservicesProductsId).First().Name;   
-                        var date = _context.ExtraServiceProducts.Where(X=>X.Id==extraservicesProductsId).First().Date;
-                        var price = _context.ExtraServiceProducts.Where(x => x.Id == extraservicesProductsId).First().Price;
-                        var quantity = extraservicesDetail.Quantity;
+                        var extraserviceProductId = extraserviceItem.ExtraServiceProductId;
+                        var extraserviceProduct = _context.ExtraServiceProducts.Include(x => x.ExtraService).FirstOrDefault(x => x.Id == extraserviceProductId);
 
-                        var extraserviceDetails = new OrderExtraServicesDetail
+
+                        if (extraserviceProduct.ExtraService != null)
                         {
-                            OrderId = order.Id,
-                            ExtraServiceId = extraServicesId,
-                            ExtraServiceName = extraServiceName,
-                            ExtraServiceProductId = extraservicesDetail.ExtraServiceProductId,
-                            Date = date,
-                            Price = price * quantity,
-                            Quantity = quantity 
-                        };
-                        _context.OrderExtraServicesDetails.Add(extraserviceDetails);
-                        _context.SaveChanges();
+                            var extraServicesId = extraserviceProduct.ExtraServiceId;
+                            var extraServiceName = extraserviceProduct.ExtraService.Name;
+                            var date = extraserviceProduct.Date;
+                            var price = extraserviceProduct.Price;
+                            var quantity = extraserviceProduct.Quantity;
 
+                            var extraserviceDetails = new OrderExtraServicesDetail
+                            {
+                                OrderId = order.Id,
+                                ExtraServiceId = extraServicesId,
+                                ExtraServiceName = extraServiceName,
+                                ExtraServiceProductId = extraserviceItem.ExtraServiceProductId,
+                                Date = date,
+                                Price = price * quantity,
+                                Quantity = quantity
+                            };
 
-                        var extraservicesProducts = _context.ExtraServiceProducts.FirstOrDefault(x => x.Id == extraservicesProductsId);
-                        if (extraservicesProducts != null)
-                        {
-                            extraservicesProducts.Quantity -= quantity;
-                            _context.SaveChanges();
+                            _context.OrderExtraServicesDetails.Add(extraserviceDetails);
+
+                            extraserviceProduct.Quantity -= quantity;
                         }
-
                     }
+
+                    _context.SaveChanges();
+
+                
                     foreach (var activitiesDetail in cart.Cart_ActivitiesDetails)
                     {
                         var activityproductsId = _context.Activities.Where(x=>x.Id== activitiesDetail.ActivityProductId).First().Id;  
@@ -716,38 +725,39 @@ namespace RouteMasterFrontend.Controllers
             int total = 0;
             foreach (var accommodationItem in cart.Cart_AccommodationDetails)
             {
-                var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
-                var RoomPrice = _context.Rooms.Where(x => x.Id == roomId).First().Price;
-                int roomTotal = RoomPrice * accommodationItem.Quantity;
-                total += roomTotal;
+                var roomId = accommodationItem.RoomProductId;
+                var room = _context.Rooms.FirstOrDefault(x => x.Id == roomId);
+
+                if (room != null)
+                {
+                    int roomTotal = room.Price * accommodationItem.Quantity;
+                    total += roomTotal;
+                }
             }
             foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
             {
 
-                var extraservicesProductsId = _context.ExtraServices.Where(x => x.Id == extraserviceItem.ExtraServiceProductId).First().Id;
-                var extraServicesId = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Id;
-                var extraServiceName = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Name;
-                var date = _context.ExtraServiceProducts.Where(X => X.Id == extraservicesProductsId).First().Date;
-                var price = _context.ExtraServiceProducts.Where(x => x.Id == extraservicesProductsId).First().Price;
-                var quantity = extraserviceItem.Quantity;
+                var extraserviceProductId = extraserviceItem.ExtraServiceProductId;
+                var extraserviceProduct = _context.ExtraServiceProducts.FirstOrDefault(x => x.Id == extraserviceProductId);
 
-                int extraServicesTotal = price * quantity;
-                total += extraServicesTotal;
+                if (extraserviceProduct != null)
+                {
+                    int extraserviceTotal = extraserviceProduct.Price * extraserviceItem.Quantity;
+                    total += extraserviceTotal;
+                }
             }
-            foreach(var activityItem in cart.Cart_ActivitiesDetails)
+            foreach (var activityItem in cart.Cart_ActivitiesDetails)
             {
-                var activityproductsId = _context.Activities.Where(x => x.Id == activityItem.ActivityProductId).First().Id;
-                var activityId = _context.Activities.Where(x => x.Id == activityproductsId).First().Id;
-                var activitiesName = _context.Activities.Where(X => X.Id == activityproductsId).First().Name;
-                var date = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Date;
-                var startTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().StartTime;
-                var endTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().EndTime;
-                var price = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Price;
-               var quantity = activityItem.Quantity;
+                var activityProductId = activityItem.ActivityProductId;
+                var activityProduct = _context.ActivityProducts.FirstOrDefault(x => x.Id == activityProductId);
 
-                int activityTotal = price * quantity;
-                total += activityTotal;
+                if (activityProduct != null)
+                {
+                    int activityTotal = activityProduct.Price * activityItem.Quantity;
+                    total += activityTotal;
+                }
             }
+
             return total;
         }
 
