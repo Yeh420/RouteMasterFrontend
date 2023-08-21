@@ -52,11 +52,11 @@
         }
 
             .product-info .left {
-                width: 722px;
+                width: 662px;
             }
 
             .product-info .right {
-                width: 55%;
+                width: 58%;
                 padding: 10px;
                 margin-left: auto;
                 overflow: auto;
@@ -305,15 +305,19 @@
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content h-100">
-                <div class="modal-header d-f">
+                <div class="modal-header pb-1 pe-3 flex-wrap">
                     <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationIndex.name}}</h1>
-                    <div class="d-flex">
-                        <button class="form-control">總覽</button>
-                        <button class="form-control">所有評論</button>
+                    <i v-for="grade in accommodationIndex.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
+                    <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 32px; height: 32px; letter-spacing:1px">{{accommodationIndex.score}}</span>
+                    <button type="button" class="btn-close me-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="w-100 mt-2">
+                        <div class="d-flex justify-content-between" style="width:12%">
+                            <button class="form-control btn border-0 me-2 px-0" :class="{ 'btn-outline-success':!overview, ' btn-success':overview }" @@click="Overview(accommodationIndex.id)">總覽</button>
+                            <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments">所有評論</button>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div v-if="true" class="modal-body">
+                <div class="modal-body">
                     <div class="modal-container h-100">
                         <div class="product-info h-100">
                             <div class="left h-100 mt-2 ms-2">
@@ -327,7 +331,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="right h-100" data-simplebar>
+                            <div v-if="overview" class="right h-100" data-simplebar>
                                 <section class="mb-3">
                                     <p class="d-inline-flex gap-1 fs-5">
                                         <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -342,7 +346,6 @@
                                     </p>
                                     <div class="collapse" id="collapseExample">
                                         <div class="card card-body">
-                                            @*<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>*@
                                             <div id="map" class="ratio ratio-16x9"></div>
                                         </div>
                                     </div>
@@ -389,44 +392,44 @@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2 "><i class="fa-solid fa-award me-3"></i>設施與服務：</h2>
-                                    <div class="row d-flex">
-                                        <ul v-if="accommodationServiceCId.indexOf(1) !== -1" class="col-4 mb-4">
+                                    <div class="row d-flex w-100">
+                                        <ul v-if="accommodationServiceCId.indexOf(1) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-van-shuttle"></i>交通與車輛相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 1})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(2) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(2) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-wifi"></i>網路與通訊相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 2})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(3) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(3) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-tv"></i>休閒與娛樂設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 3})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(5) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(5) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-handshake"></i>會議與商務設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 5})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(6) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(6) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-utensils"></i>餐飲相關設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 6})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(7) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(7) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-regular fa-credit-card"></i>金融與支付相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 7})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(8) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(8) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-circle-info"></i>其他
                                             </li>
@@ -439,10 +442,10 @@
                                     <img src="https://static.thenounproject.com/png/2392153-200.png" style="width:24px;height:24px" /> 最晚CheckOut時間：{{accommodationIndex.checkOut}}
                                 </section>
                             </div>
+                            <div v-else class="right h-100" >123</div>
                         </div>
                     </div>
                 </div>
-                <div v-else>123</div>
             </div>
         </div>
     </div>
@@ -483,6 +486,7 @@
                     cartItems: [],
                     map: null,
                     toggle: false,
+                    overview:true,
                     isLoading: false,
                 }
             },
@@ -677,7 +681,6 @@
                             return s.serviceInfoCategoryId;
                         });
 
-                        _this.$refs.childRef.commentBrief(p.id);
                         const showMoreText = "...顯示更多";
                         const showLessText = "...顯示更少";
                         const lines = _this.temp = p.description.split('\n');
@@ -704,6 +707,7 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
+                        _this.$refs.childRef.commentBrief(p.id);
                         _this.initMap(id);
                     }
                 },
@@ -961,7 +965,14 @@
 
                     alert("已幫你挑選10間精選住所")
 
-                }
+                },
+                Overview:function(id){
+                    this.overview = true;
+                    this.showModal(id);
+                },
+                ShowComments:function(){
+                    this.overview = false;
+                },
             },
             components: {
                 dec

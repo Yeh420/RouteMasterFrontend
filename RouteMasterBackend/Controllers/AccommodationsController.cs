@@ -87,6 +87,7 @@ namespace RouteMasterBackend.Controllers
                 PositionY = a.PositionY,
                 CheckIn = a.CheckIn,
                 CheckOut = a.CheckOut,
+                Score = a.CommentsAccommodations.Average(ca => ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
                 Images = a.AccommodationImages,
                 Comments = a.CommentsAccommodations,
                 Rooms = a.Rooms,
