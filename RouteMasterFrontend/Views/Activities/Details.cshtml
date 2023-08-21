@@ -2,6 +2,7 @@
     var activityId = ViewBag.ActivityId;
     var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 
 @section Styles{
     <style>
@@ -401,12 +402,42 @@
                     //加入購物車
                     const postData = {
                         cartId: this.cartId,
-                        actProductId: this.selectedProductId,
+                        activityid: this.selectedProductId,
                         quantity: this.inputQuantity
                     }
                     console.log(postData);
                     console.log('加購物車啦')
+                    fetch(`${baseAddress}/api/Carts/addactivity`, {
+                        method:'POST',
+                        headers: {
+                            'Content-Type':'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success) {
+                            alert(data.message);
+                            this.reloadCartItems();
+                        }else{
+                            alert('加入購物車失敗');
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Failed to add to cart:', error);
+                    });
+                    console.log('加入購購物車');
                 },
+                reloadCartItems() {
+                    fetch('/Carts/RefreshCart')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('Cart').innerHTML = data;
+                        })
+                        .catch(() => {
+                            alert('Failed to reload cart items.');
+                        });
+                }
             }
         };
         let app = Vue.createApp(vueApp).mount('#app');
