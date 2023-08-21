@@ -83,7 +83,7 @@
                             <p class="card-text ms-3">| {{ "停留" + item.stayHours + "小時"}} | {{ "花費" + item.price + "元"}}</p>
                         </div>
                         <p class="card-text">{{item.id}}</p>
-                        <p class="card-text">{{item.content}}</p>                       
+                        <p v-if="item.content" class="card-text">{{item.content}}</p>
                         <div class="d-flex mt-1">                          
                             <p class="ms-auto"><small class="text-muted">{{item.createDate}}</small></p>                           
                         </div>                                                                                     
@@ -173,7 +173,7 @@
                         
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="shutDown">關閉</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="shutDown" @@click="clearWords(starpoint)">關閉</button>
                         <button type="button" class="btn btn-primary" @@click="sendForm">送出</button>
                     </div>
                 </div>
@@ -467,6 +467,23 @@
             clearAlert:function(){
                 let _this = this;
                 _this.starAlert=null;
+            },
+            clearWords:function(point){
+                let _this = this;
+                var panel = document.querySelector(".panel");
+                var liItems = panel.querySelectorAll("li");
+                console.log(point);
+
+                liItems.forEach(function (item, idx) {
+                    if (idx <= point-1) {
+                        item.classList.remove("active");
+                      
+                    }
+                });
+                _this.hours="";
+                _this.price="";
+                _this.content="";
+              
             },
 
         }

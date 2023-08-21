@@ -13,7 +13,7 @@
     [x]顯示名稱
     [x]顯示項目調整
     [x]版面
-    [x]last step 檢查程式碼邏輯
+    [x]last step 檢查程式碼邏輯l
     []abc 類別要改掉
 
 4.[]歷史訂單
@@ -116,3 +116,4 @@ partial view
 
 使用ajax又想要驗證，使用javascript會比較好，但原始密碼要去後端抓，像是其他欄位的compare的話 用javascript來做比對
 同理，其他欄位也是
+
