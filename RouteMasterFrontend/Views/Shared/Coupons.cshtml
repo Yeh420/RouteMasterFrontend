@@ -8,6 +8,7 @@
             <h1><i class="fa-solid fa-gift" style="color:orange"></i></h1>
         </div>
         <div class="ms-3 me-auto">
+            <h5>{{ coupon.Name }}</h5>
             <h3>折扣數 : {{ coupon.Discount }}% off !!</h3>
             <h5 style="color: lightseagreen;">有效日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
             <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <strong>抱歉，這張優惠券目前無法使用，請確認有效日期。</strong></p>
@@ -24,6 +25,7 @@
 </div>
 
 <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+<script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin="anonymous"></script>
 
 <script>
     const app = Vue.createApp({
