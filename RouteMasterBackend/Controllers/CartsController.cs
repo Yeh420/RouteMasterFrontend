@@ -72,7 +72,8 @@ namespace RouteMasterBackend.Controllers
             return data;
            
         }
-
+        [HttpGet("getcartview")]
+       
         [HttpPost("addextraservice")]
         public IActionResult AddExtraService2Cart([FromBody]AddExtraServiceDto dto)
         {
@@ -104,8 +105,7 @@ namespace RouteMasterBackend.Controllers
                     _context.CartExtraServicesDetails.Add(cartItem);
                 }
                     _context.SaveChanges();
- 
-
+                    
                 return Ok(new { success = true, message = "Successfully added to cart." });
             }
 
@@ -271,6 +271,7 @@ namespace RouteMasterBackend.Controllers
 				}
 
 			}
+
             if(dto.extraServiceProductIds!=null)
             {
 				for (int i = 0; i < dto.extraServiceProductIds.Length; i++)
@@ -282,6 +283,21 @@ namespace RouteMasterBackend.Controllers
 						Quantity = 1
 					};
 					cart.CartExtraServicesDetails.Add(cartExtraServiceDetails);
+					_context.SaveChanges();
+				}
+			}			
+
+            if(dto.roomProducts!=null)
+            {
+				for (int i = 0; i < dto.roomProducts.Length; i++)
+				{
+					var cartAccommodationDetails = new CartAccommodationDetail()
+					{
+						CartId = dto.cartId,
+						RoomProductId = dto.roomProducts[i].Id,
+						Quantity = dto.roomProducts[i].Quantity
+                    };
+					cart.CartAccommodationDetails.Add(cartAccommodationDetails);
 					_context.SaveChanges();
 				}
 			}			

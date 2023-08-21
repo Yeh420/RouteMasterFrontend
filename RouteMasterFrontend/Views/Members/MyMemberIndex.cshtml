@@ -8,33 +8,6 @@
 
 }
 
-<style>
-   /* .col-md-2 {
-        position:absolute;
-        border-width: medium;
-        border-style: double;
-        border-color: gray;
-        border-radius: 20px;
-        padding:10px;     
-        line-height:40px;
-        background-color: #81C0C0;
-        
-    }
-
-        .col-md-2 navbar{
-            background-color:aliceblue;
-        }
-    .col-md-9{
-        position:relative;
-        border-width: medium;
-        border-style: double;
-        border-color: gray;
-        border-radius: 20px;
-        left:400px;
-    }
-*/
-    
-</style>
 
 
     <h4>會員中心</h4>
@@ -43,17 +16,17 @@
         <div class="col-md-2">
             <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid" >
-                <button data-number="0">會員資料</button>
+                <button class="navbar-brand" data-number="0">會員資料</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button data-number="1">歷史訂單</button>
+                <button class="navbar-brand" data-number="1">歷史訂單</button>
             </div>
             </nav>
         <nav class="navbar bg-body-tertiary">
                 <div class="container-fluid">
-                <button data-number="2">更改密碼</button>
+                <button class="navbar-brand" data-number="2">更改密碼</button>
             </div>
             </nav> 
         </div>
@@ -66,14 +39,16 @@
         </div>
        </div>
 
+  
 
 @section Scripts{
+  
 
     <script>
-        //var arg = document.querySelector('#memberData').getAttribute('data-number')
+ 
         var buttons = document.getElementsByTagName("button");
 
-        //console.log(buttons);
+      
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener("click", function () {
                 var arg = this.getAttribute('data-number');
@@ -94,5 +69,6 @@
         }
 
     </script>
+
 
 }

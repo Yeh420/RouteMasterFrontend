@@ -2,6 +2,7 @@
 {
     public class RoomProductsDto
     {
-        public int[] roomProductId { get; set; }
+        public int[] RoomProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -15,10 +15,28 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Index()
+        public async Task<JsonResult> Index(int filter)
         {
-            var messageDb= await _context.SystemMessages
-                .Where(m=>m.MemberId ==1)
+            var messageDb = _context.SystemMessages
+                .Where(m => m.MemberId == 1)
+                .OrderByDescending(m => m.Id)
+                .AsQueryable();
+
+            switch (filter)
+            {
+                case 1:
+                    messageDb = messageDb.Where(m => m.IsRead == false);
+                    break;
+                case 2:
+                    messageDb = messageDb.Where(m => m.IsRead == true);
+                    break;
+                case 3:
+                   
+                    break;
+               
+            }
+            var dto= await messageDb
+
                 .Select(m=>new SystemMessageAjaxDTO
                 {
                     Id = m.Id,
@@ -29,9 +47,58 @@ namespace RouteMasterFrontend.Controllers
             
                    
                 }).ToListAsync();
-                
 
-            return Json(messageDb);
+            return Json(dto);
+        }
+        [HttpPost]
+        public async Task<string> UpdateNoticeStatus(int id)
+        {
+            SystemMessage msg= await _context.SystemMessages
+                .Where (m=>m.Id == id).FirstAsync();
+
+            msg.IsRead = true;
+            _context.SystemMessages.Update(msg);
+            _context.SaveChanges();
+
+            string result = $"通知編號:{id}已被列為已讀";
+
+            return result;
+            
+        }
+
+        [HttpPost]
+        public async Task<string> MarkAllAsRead()
+        {
+            var targetMsg= await _context.SystemMessages
+                .Where(m=>m.IsRead == false)
+                .ToListAsync();
+            foreach( var item in targetMsg )
+            {
+                item.IsRead = true;
+            }
+            await _context.SaveChangesAsync();
+
+            return "全已讀修改完成";
+        }
+        [HttpPost]
+        public async Task<string> GetUrl(int msgId)
+        {
+            string content = await _context.SystemMessages
+                .Where(m => m.Id == msgId)
+                .Select(m => m.Content).FirstAsync();
+
+            string endText = "評論區";
+            int endIndex = content.IndexOf(endText);
+
+            string spotName=content.Substring(2, (endIndex-2));
+            
+            int AttractionId= await _context.Attractions
+                .Where(a=>a.Name == spotName)
+                .Select(a=>a.Id).FirstAsync();
+
+            var url = $"https://localhost:7145/Attractions/Details/{AttractionId}";
+
+            return url;
         }
     }
 }

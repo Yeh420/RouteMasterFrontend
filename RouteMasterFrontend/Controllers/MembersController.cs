@@ -26,6 +26,8 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using static Google.Apis.Requests.BatchRequest;
 using RouteMasterFrontend.Models.ViewModels.Carts;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Diagnostics.Metrics;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -120,11 +122,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                //new Claim("memberImage", member.Image),
-                //new Claim("id",member.Id.ToString())
+                new Claim("memberImage", member.Image),
+                new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //identity.AddClaim(new Claim("memberImage", member.Image));
+            identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
@@ -182,6 +184,7 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        //加入id到claim
         //Google登入
         public async Task<IActionResult> GoogleLogin()
         {
@@ -284,6 +287,7 @@ namespace RouteMasterFrontend.Controllers
                     var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, payload.Name),  
+                    //
                     //new Claim(ClaimTypes.Email, payload.Email)
                 };
 
@@ -356,7 +360,7 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
-            var member = _context.Members;
+            
 
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
@@ -372,9 +376,11 @@ namespace RouteMasterFrontend.Controllers
    
         [HttpGet]
         public async Task<IActionResult> MemberRegister()
-        {
-            var towns = await _context.Towns.ToListAsync();
-            ViewBag.TownList = new SelectList(towns,"城市");
+        {  
+            List<Region> regions = await _context.Regions.ToListAsync();
+            List<Town> towns = await _context.Towns.ToListAsync();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
             return View();
         }
 
@@ -501,10 +507,12 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPassword(MemberEditPasswordVM vm)
+        public ActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
         {
-            if (ModelState.IsValid == false) return View(vm);
-
+            if (ModelState.IsValid == false)
+            {
+                return Json(new { success = false, message = "输入数据无效，请检查输入。" });
+            }
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
@@ -513,7 +521,9 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 return View(vm);
             }
-            return RedirectToAction("Index", "Home");
+
+            return ViewComponent("MemberArea");
+            
         }
 
         [HttpGet] 
@@ -609,7 +619,56 @@ namespace RouteMasterFrontend.Controllers
             return ViewComponent("MemberArea", page);
         }
 
-      
+
+        public IActionResult DropdownTown(int regionId)
+        {
+            List<Town> towns = _context.Towns.Where(t=>t.RegionId == regionId).ToList();
+
+            return Json(towns);
+        }
+
+        //更改大頭貼
+        public IActionResult MemberChangePhoto(string img)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult MemberChangePhoto(IFormFile? facePhoto)
+        {
+            MemberImage img = new MemberImage();
+            //抓會員登入資訊
+            ClaimsPrincipal user = HttpContext.User;
+
+
+            //列出與登入符合資料
+            string userAccount = user.Identity.Name;
+
+            Member myMember = _context.Members.First(m => m.Account == userAccount);
+            if (facePhoto != null && facePhoto.Length > 0)
+            {
+                string path = Path.Combine(_environment.WebRootPath, "MemberUploads");
+                string fileName = SaveUploadFile(path, facePhoto);
+                img.Image = fileName;
+                img.Name = "未命名";
+                myMember.Image = fileName;
+            }
+            else
+            {
+                string newFileName = myMember.Image;
+                img.Image = newFileName;
+                img.Name = "未命名";
+                myMember.Image = newFileName;
+
+            }
+            
+            _context.SaveChanges();
+            img.MemberId = myMember.Id;
+            _context.MemberImages.Add(img);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "Home");
+        }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
         {
