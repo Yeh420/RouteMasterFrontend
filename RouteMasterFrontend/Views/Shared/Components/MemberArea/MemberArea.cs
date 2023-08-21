@@ -39,5 +39,6 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
             return View("EditPassword", model);
         }
 
+       
     }
 }

@@ -28,8 +28,14 @@
                 <div class="container-fluid">
                 <button class="navbar-brand" data-number="2">更改密碼</button>
             </div>
-            </nav> 
-        </div>
+            </nav>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <button class="navbar-brand" data-number="3">訊息通知</button>
+            </div>
+        </nav>
+
+    </div>
 
         @*渲染nav*@
 
@@ -42,31 +48,60 @@
   
 
 @section Scripts{
-  
 
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <script>
  
         var buttons = document.getElementsByTagName("button");
 
       
+        //for (var i = 0; i < buttons.length; i++) {
+        //    buttons[i].addEventListener("click", function () {
+        //        var arg = this.getAttribute('data-number');
+        //        console.log(arg);
+
+        //        var request={};
+        //        request.pagecase=arg;
+        //        fetch("https://localhost:7145/Members/MembersNavbar", {
+        //            method: "POST",
+        //            headers: {
+        //                "Content-Type": "application/json"
+        //            },
+        //            body: JSON.stringify(request)
+        //        }).then(response => response.text()
+        //                )
+        //            .then(result => {
+        //                console.log(result)
+        //                var memberArea = document.querySelector("#memberNavbar");
+             
+        //                memberArea.innerHTML = result;
+        //            })
+        //            .catch(error => {
+        //                console.log(error);
+        //            });
+        //            l
+        //    });
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener("click", function () {
                 var arg = this.getAttribute('data-number');
                 console.log(arg);
-            $.ajax({
-                type:"post",
-                data: JSON.stringify({ pagecase: arg }),
-                contentType:"application/json",
-                url: "https://localhost:7145/Members/MembersNavbar",
-                }).done(function (response){
-                    
+                $.ajax({
+                    type: "post",
+                    data: JSON.stringify({ pagecase: arg }),
+                    contentType: "application/json",
+                    url: "https://localhost:7145/Members/MembersNavbar",
+                }).done(function (response) {
+
                     var memberArea = $("#memberNavbar");
                     memberArea.html(response);
-                }).fail(function(err){
+                }).fail(function (err) {
                     console.log('err')
                 });
             });
         }
+            
+        
 
     </script>
 
