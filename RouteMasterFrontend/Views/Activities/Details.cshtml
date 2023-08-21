@@ -10,6 +10,9 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin: 50px auto;
+            min-height: 410px; /* 設定一個預設的最小高度 */
+
+
         }
 
         .header {
@@ -17,6 +20,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+        
         }
 
         .calendar {
@@ -82,57 +86,46 @@
             position: relative;
         }
 
-            .disabled::after {
-                content: 'x';
-                /* 在日期元素的後面添加一個 "x" 標記 */
-                position: absolute;
-                top: 80%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: lightgray;
-                /* 可以自行調整顏色 */
-
-            }
 
         .image-container {
             width: 500px; /* 调整宽度 */
     
         }
+
+        .textbox {
+            padding: 10px;
+            border: 1px solid transparent; /* 初始設定為透明的框線 */
+            transition: border-color 0.3s; /* 添加過渡效果 */
+        }
+
+            .textbox:hover {
+                border-color: #ccc; /* 鼠標懸停時改變框線顏色 */
+            }
     </style>
 
 
 }
 <div id="app">
-    <div class="informationBigContainer">
-        <div class="d-flex">
-            <div>
-                <img v-bind:src="image" class="image-container" />
-            </div>
-            <div class="informationContainer">
-                <div class="d-block">
-                <h4>活動名稱</h4>
-                <div>{{name}}</div>
+
+        <div class="card mb-3" style="max-width: 2000px;">
+            <div class="row g-0">
+                <div class="col-md-5">
+                    <img v-bind:src="image" class="img-fluid rounded-start w-100" />
                 </div>
-
-
-                <div class="d-block">
-                    <h4>所在縣市</h4>
-                <div>{{regionName}}</div>
+                <div class="col-md-7">
+                    <div class="card-body">
+                        <h5 class="card-title" >{{name}}</h5>
+                        <div class="d-flex">
+                            <p class="card-text"><small class="text-body-secondary">{{regionName}}</small></p>
+                            <p class="card-text"><small class="text-body-secondary">{{attractionName}}</small></p>
+                        </div>
+                        <p class="card-text">{{description}}</p>
+    
+                    </div>
                 </div>
-
-
-                <div class="d-block">
-                    <h4>附屬景點</h4>
-                <div>{{attractionName}}</div>
-                </div>
-
-                <div class="d-block">
-                    <h4>活動說明</h4>
-                <div>{{description}}</div>
             </div>
-            </div>
-        </div>              
-    </div>
+        </div>
+  
 
 
 
@@ -145,9 +138,9 @@
     <div class="row">
         <div class="date-picker col-6">
             <div class="header">
-                <button id="prevMonth" @@click="changeMonth(-1)">&lt;</button>
+                <button id="prevMonth" class="btn btn-outline-secondary" @@click="changeMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
                 <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
-                <button id="nextMonth" @@click="changeMonth(1)">&gt;</button>
+                <button id="nextMonth" class="btn btn-outline-secondary" @@click="changeMonth(1)"><i class="fa-solid fa-right-long"></i></button>
             </div>
             <div class="calendar" id="calendar">
                 <div v-for="(dateObj, index) in calendarDates" :key="date">
@@ -156,6 +149,7 @@
                          v-bind:data-quantity="dateObj.quantity" @@click="dateObj.highestPrice != null && selectDate(dateObj)">
                         <template v-if="dateObj.date === null">
                             <div class="day other-month"></div>
+                            <span class="price"> </span>
                         </template>
                         <template v-else-if="dateObj.highestPrice !== null">
                            <div class="day">{{ dateObj.date.getDate() }}</div>
@@ -163,18 +157,22 @@
                        </template>
                         <template v-else>
                             <div class="day">{{ dateObj.date.getDate() }}</div>
+                            <span class="price">X</span>
                         </template>
                     </div>                    
                 </div>
             </div>
         </div>
+
         <div id="buyingContainer" class="col-6">
             <br />
             <br />
-            <h4>{{selectedDate}}</h4>
+            <h4 class="textbox">{{selectedDate}}</h4>
             <br />
 
-            <h3 v-if="selectedDate!='請選擇日期'">選擇梯次</h3>
+            <h5 v-if="selectedDate!='請選擇日期'">選擇梯次</h5>
+            <br />
+            <br />
             <div class="d-flex row">
                 <div v-for="(productObj,index) in selectedProductsArray" :key="id" class="col-3">
                     <button class="btn btn-primary " @@click="selectTheTargetPatchProduct(productObj)">{{productObj.startTime}}</button>
@@ -184,11 +182,12 @@
      
             <div v-if="selectedProductId!=''">
 @*                <div>產品編號:{{selectedProductId}}</div>*@
-                <h5 class="border-1  w-50">價格:{{selectedPrice}}</h5>
+                <h5 class="border-1  w-50">價格: {{selectedPrice}}</h5>
                 <br />
-                <h5 class="border-1  w-50">可購買數量:{{selectedQuantity}}</h5>
+                <h5 class="border-1  w-50">可購買數量: {{selectedQuantity}}</h5>
+                <br />
                 <div >
-                    <label class="border-1  w-50">選擇購買數量</label>
+                    <label class="border-1  w-25">選擇購買數量</label>
                     <input  class="m-1 p-1 " v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
                     <button class="m-1 p-1 btn btn-primary" @@click="addToCart()">加入購物車</button>
                 </div>
@@ -202,32 +201,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </div>
 
 
@@ -235,6 +208,7 @@
 
 
 @section Scripts{
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
@@ -260,8 +234,8 @@
                     selectedQuantity: "",
                     inputQuantity: "",
                     calendarDates: [],
-                    currentMonth: Number("8"),
-                    currentYear: Number("2023"),
+                    currentMonth: new Date().getMonth() + 1,
+                    currentYear: new Date().getFullYear(),
                     selectedProductsArray:[],
 
                 };
@@ -286,6 +260,10 @@
                     let request = {};
 
                     axios.post(`${baseAddress}/api/ActivityVuePage/Id?activityId=${_this.activityId}`).then(response => {
+
+                        console.log(response)
+
+
 
 
                         _this.activityId = response.data.id
