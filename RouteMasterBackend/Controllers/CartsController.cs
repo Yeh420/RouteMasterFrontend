@@ -72,7 +72,8 @@ namespace RouteMasterBackend.Controllers
             return data;
            
         }
-
+        [HttpGet("getcartview")]
+       
         [HttpPost("addextraservice")]
         public IActionResult AddExtraService2Cart([FromBody]AddExtraServiceDto dto)
         {
@@ -104,8 +105,7 @@ namespace RouteMasterBackend.Controllers
                     _context.CartExtraServicesDetails.Add(cartItem);
                 }
                     _context.SaveChanges();
- 
-
+                    
                 return Ok(new { success = true, message = "Successfully added to cart." });
             }
 
@@ -120,8 +120,8 @@ namespace RouteMasterBackend.Controllers
         {
             try
             {
-                var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == dto.activityid);
-                var activitiesCartItems = _context.CartActivitiesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ActivityProductId == dto.activityid);
+                var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == dto.activityId);
+                var activitiesCartItems = _context.CartActivitiesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ActivityProductId == dto.activityId);
                 if(activitiesCartItems != null)
                 {
                     activitiesCartItems.Quantity += dto.quantity;
@@ -131,11 +131,11 @@ namespace RouteMasterBackend.Controllers
                     var cartItem = new CartActivitiesDetail
                     {
                         CartId = dto.cartId,
-                        ActivityProductId = dto.activityid,
+                        ActivityProductId = dto.activityId,
                         Quantity = dto.quantity,
                     };
                     _context.CartActivitiesDetails.Add(cartItem);
-                }           
+                 }           
                 _context.SaveChanges();
              
                 return Ok(new { success = true, message = "Succesfully added to cart." });

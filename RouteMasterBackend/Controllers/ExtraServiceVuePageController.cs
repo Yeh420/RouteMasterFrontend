@@ -22,7 +22,7 @@ namespace RouteMasterBackend.Controllers
 
 
         [HttpPost("filter")]
-        public async Task<IEnumerable<ExtraServiceVuePageIndexDto>> FilterExtraServices(ExtraServiceCriteria criteria)
+        public async Task<ExtraServicePagingVueDto> FilterExtraServices(ExtraServiceCriteria criteria)
         {
             var data = _context.ExtraServices.Include(x=>x.Region).Include(x=>x.Attraction).AsQueryable();
             if (!string.IsNullOrEmpty(criteria.Keyword))
@@ -32,11 +32,19 @@ namespace RouteMasterBackend.Controllers
 
 
 
+            int totalCount = data.Count();
 
-          var resultData=  data.Select(x => new ExtraServiceVuePageIndexDto
+            int totalPages = (int)Math.Ceiling(totalCount / (double)criteria.PageSize);
+
+            data = data.Skip(criteria.PageSize * (criteria.Page - 1)).Take(criteria.PageSize);
+
+
+
+            var resultData=  data.Select(x => new ExtraServiceVuePageIndexDto
             {
               Id= x.Id,
               Name= x.Name,
+              Status=x.Status,
               Image= "/ExtraServiceImages/"+x.Image,   
               Description= x.Description,
               RegionName=x.Region.Name,
@@ -44,7 +52,12 @@ namespace RouteMasterBackend.Controllers
             });
 
 
-            return resultData;
+
+            ExtraServicePagingVueDto extraServicePagingDto=new ExtraServicePagingVueDto();
+            extraServicePagingDto.ExtraServiceVuePageDtoes=await resultData.ToListAsync();
+            extraServicePagingDto.TotalPage = totalPages;   
+
+            return extraServicePagingDto;
         }
 
 

@@ -16,7 +16,7 @@ namespace RouteMasterFrontend.EFModels
         public string RoomName { get; set; }
         public DateTime? CheckIn { get; set; }
         public DateTime? CheckOut { get; set; }
-        public int? RoomPrice { get; set; }
+        public decimal? RoomPrice { get; set; }
         public int Quantity { get; set; }
         public string Note { get; set; }
 

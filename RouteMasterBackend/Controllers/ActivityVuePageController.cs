@@ -21,7 +21,7 @@ namespace RouteMasterBackend.Controllers
         }
 
         [HttpPost("filter")]
-        public async Task<IEnumerable<ActivityVuePageIndexDto>> FilterActivity(ActivityCriteria criteria)
+        public async Task<ActivityPagingVueDto> FilterActivity(ActivityCriteria criteria)
         {
             var data = _context.Activities.Include(x => x.Region).Include(x => x.Attraction).AsQueryable();
 
@@ -31,10 +31,18 @@ namespace RouteMasterBackend.Controllers
             }
 
 
+
+
+            int totalCount=data.Count();
+
+            int totalPages = (int)Math.Ceiling(totalCount / (double)criteria.PageSize);
+
+            data = data.Skip(criteria.PageSize * (criteria.Page - 1)).Take(criteria.PageSize);
             var resultData = data.Select(x => new ActivityVuePageIndexDto
             {
                 Id = x.Id,
                 Name = x.Name,
+                Status = x.Status,
                 Image = "/ActivityImages/" + x.Image,
                 Description = x.Description,
                 RegionName = x.Region.Name,
@@ -42,9 +50,17 @@ namespace RouteMasterBackend.Controllers
             });
 
 
+            ActivityPagingVueDto activityPagingDto= new ActivityPagingVueDto();
+            activityPagingDto.ActivityVuePageDtoes =await resultData.ToListAsync();
+
+            activityPagingDto.TotalPage = totalPages;
+
+           
 
 
-            return resultData;
+
+
+            return activityPagingDto;
         }
 
 

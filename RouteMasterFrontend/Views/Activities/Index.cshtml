@@ -1,32 +1,91 @@
 ﻿@section Styles{
 
+    <style>
+        .descriptionBorder p {
+            border: 1px solid transparent; /* 初始设置外框线为透明 */
+            border-radius: 8px; /* 添加圆角效果 */
+            transition: border-color 0.3s ease; /* 添加过渡效果 */
+        }
+
+            .descriptionBorder p:hover {
+                border-color: #ccc; /* 在 hover 时设置外框线颜色 */
+            }
+
+      .currentPage{
+            background-color: #0D6EFD;
+            color: white;
+      }
+      .pagination li{
+          cursor:pointer;
+      }
+                   
+    </style>
+
+
 }
 <div id="app">
-    <input type="search" v-model="keyword" />
+    <div class="row">
+        <div class="col-2">
+            <select v-model="pageSize" class="form-select" @@change="filterActivityDtoesToNewPageSize">
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select>
+        </div>
+            <div class="d-flex justify-content-end ">
+                <input type="search" v-model.lazy="keyword" @@blur="filterActivityDtoes" />
+            </div> 
+     
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>項目名稱</th>
-                <th>圖片預覽</th>
-                <th>所在區域</th>
-                <th>附屬景點</th>
-                <th>項目說明</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in activityDtoes">
+   
 
-                <td v-model>{{item.name}} </td>
-                <td><img v-bind:src="item.image" style="height:200px;" /></td>
-                <td v-model>{{item.regionName}} </td>
-                <td v-model>{{item.attractionName}} </td>
-                <td v-model> {{item.description}} </td>
-                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button></td>
-                <td><button id="turnToPurchasingPage" class="btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button></td>
-            </tr>
-        </tbody>
-    </table>
+        <div v-for="item in activityDtoes" class="card m-3 mx-auto" style="width:800px;">
+            <div class="row d-flex">
+                <div class="col-6">
+                    <div class="card-body">
+                        <img v-bind:src="item.image" class="card-img-top" />
+                        <br />
+                        <br />
+                        <h5 class="card-title" style="text-align:center">{{item.name}}</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{item.regionName}}  {{item.attractionName}}</li>
+                        <li class="list-group-item"> {{ item.status ? '上架中' : '已下架' }}</li>
+                    </ul>
+                    <div class="card-body">
+                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button>
+                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
+                    </div>
+                </div>
+                <div class="col-6 descriptionBorder  p-3">
+                    <div>{{item.description}}</div>
+                </div>
+            </div>
+        </div>
+
+
+
+    <nav aria-label="...">
+        <ul class="pagination justify-content-center mx-auto">
+            <li class="page-item " v-bind:class="{'disabled':page==1}" @@click="page!=1 && prevPageHandler()">
+                <a class="page-link">Previous</a>
+            </li>
+            <li class="page-item" v-for="(value,index) in totalPage" :key="index" @@click="pageClickHandler(value)">
+                <a v-bind:class="{'currentPage':page==value,'page-link':true}">{{value}}</a>
+            </li>
+            <li class="page-item" v-bind:class="{'disabled':page==totalPage}" @@click="page!=totalPage&&nextPageHandler()">
+                <a class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+
+
+
+
+  
 
 
 
@@ -39,24 +98,27 @@
                     <h5 class="modal-title" id="modalTitleId">詳細資料</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">FirstName:</label>
-                        <input class="form-control" />
+                <div class="modal-body" style="text-align:center;">
+                    <div >
+                        <label class="form-label">活動名稱</label>
+                        <p></p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">LastName:</label>
-                        <input class="form-control" />
+                    <div >
+                        <label class="form-label">舉辦地點</label>
+                        <p></p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Title:</label>
-                        <input class="form-control" />
+                    <div>
+                        <label class="form-label">上架狀態</label>
+                        <p></p>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">關閉</button>
-                    <button type="button" class="btn btn-primary" @@click="insert">新增</button>
-                </div>
+                    <div >
+                        <label class="form-label">詳細說明</label>
+                        <p></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" data-bs-dismiss="modal">關閉</button>
+                    </div>                            
+                </div>     
             </div>
         </div>
     </div>
@@ -80,6 +142,9 @@
                 return {
                     activityDtoes: [],
                     keyword: "",
+                    page:1,
+                    pageSize:1,
+                    totalPage:"",
 
 
 
@@ -96,9 +161,14 @@
                     let request = {};
 
                     request.Keyword = _this.keyword;
+                    request.Page=_this.page;
+                    request.PageSize=_this.pageSize;
 
                     axios.post(`${baseAddress}/api/ActivityVuePage/filter`, request).then(response => {
-                        _this.activityDtoes = response.data;
+                        console.log(response)
+
+                        _this.activityDtoes = response.data.activityVuePageDtoes;
+                        _this.totalPage=response.data.totalPage;
 
                         for (let i = 0; i < _this.activityDtoes.length; i++) {
                             let item = _this.activityDtoes[i];
@@ -117,7 +187,7 @@
                 },
 
 
-                getExtraServiceDetails: function (id) {
+                getActivityDetails: function (id) {
                     //將modal資料內容改掉
                     console.log('再來啊!')
                     console.log(id)
@@ -127,6 +197,43 @@
                     let newUrl = '/Activities/Details/' + itemId
                     window.location.href = newUrl;
 
+                },
+
+                pageClickHandler: function (pageValue) {
+                    this.page=pageValue;
+                    this.filterActivityDtoes();
+
+                },
+                prevPageHandler:function(){
+                    this.page=this.page -1;
+                    this.filterActivityDtoes();
+                },
+                nextPageHandler:function(){
+                    this.page=this.page +1;
+                    this.filterActivityDtoes();
+                },
+                filterActivityDtoesToNewPageSize:function(){
+                    let _this = this;
+                    let request = {};
+
+                    request.Keyword = _this.keyword;
+                    request.Page = 1;
+                    request.PageSize = _this.pageSize;
+
+                    axios.post(`${baseAddress}/api/ActivityVuePage/filter`, request).then(response => {
+                        console.log(response)
+
+                        _this.activityDtoes = response.data.activityVuePageDtoes;
+                        _this.totalPage = response.data.totalPage;
+
+                        for (let i = 0; i < _this.activityDtoes.length; i++) {
+                            let item = _this.activityDtoes[i];
+                        }
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
                 },
             }
         };
