@@ -98,7 +98,6 @@ namespace RouteMasterFrontend.Controllers
             return ViewComponent("MemberArea");
         }
 
-
         //會員普通登入
         [HttpGet]
         public async Task<IActionResult> MemberLogin()
