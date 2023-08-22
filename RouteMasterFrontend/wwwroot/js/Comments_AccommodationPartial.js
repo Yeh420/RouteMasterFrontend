@@ -3,7 +3,7 @@
         return {
             bfVM: [],
             indexVM: [],
-            item: {},
+            //item: {},
             isReplyed: "已回復",
             ep: null,
             selected: 0,         
@@ -42,11 +42,13 @@
 
         },
         commentDisplay: function (id) {
+            console.log(id)
             let _this = this;
             var request = {};
             if (id) {
                 _this.hotelId = id;
             }
+
             request.Manner = _this.selected;
             request.HotelId = _this.hotelId;
 
@@ -59,9 +61,9 @@
                 })
                 
 
-                for (let j = 0; j < _this.indexVM.length; j++) {
-                    _this.item = _this.indexVM[j];
-                }
+                //for (let j = 0; j < _this.indexVM.length; j++) {
+                //    _this.item = _this.indexVM[j];
+                //}
 
             }).catch(err => {
                 alert(err);
@@ -108,7 +110,7 @@
 
         <div class="row mb-2">
             <div class="col-3">
-                <select v-model="selected" id="commentOrder" @change="commentDisplay()">
+                <select v-model="selected" id="commentOrder" @change="commentDisplay(hotelId)">
                    <option value="0" selected>排序選擇</option>
                    <option value="1">最新留言</option>
                    <option value="2">星星評分高至低</option>
