@@ -1,30 +1,33 @@
 ﻿
-<button class="btn btn-warning" onclick="getit()">歷史訂單</button>
+<button class="btn btn-warning" id="getOrder">歷史訂單</button>
 
 <table>
     <tr>
         <td>id</td>
         <td>paymentStatusId</td>
+        
 
     </tr>
 
 
 </table>
 
-@section Scripts{
-    <script src="~/lib/datatables/js/jquery.datatables.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script>
         var memberId = "1";
-        $(d function getit() {
+        document.querySelector('#getOrder').addEventListener('click',function(){
+            alert("dfdf");
 
             $.ajax({
-                type: "Get",
+                type: "GET",
                 url: `https://localhost:7251/api/Members/${memberId}`
             }).done(data => {
                 alert(JSON.stringify(data));
             }).fail(err => {
                 alert(err.statusText);
             });
-        }
+
+        });
+        
     </script>
-}
