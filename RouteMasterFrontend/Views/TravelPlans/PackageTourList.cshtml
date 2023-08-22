@@ -7,6 +7,45 @@
 
 
 <h1>套裝行程啦</h1>
+    <div v-for="(dataObj,index) in packageTours" :key="id">
+        <div>{{dataObj.id}}</div>
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="..." class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                        <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex" v-for="actObj in dataObj.packageActList">
+                <div>{{actObj.actId}}</div>
+                <div>{{actObj.actName}}</div>
+            </div>
+     
+
+        <div class="d-flex" v-for="attObj in dataObj.packageAttList">
+                <div>{{attObj.attId}}</div>
+                <div>{{attObj.attName}}</div>
+            </div>
+   
+
+
+       
+            <div class="d-flex" v-for="extObj in dataObj.packageExtList">
+                <div>{{extObj.attId}}</div>
+                <div>{{extObj.attName}}</div>
+            </div>       
+    </div>
+
+
+
     <div>{{packageTours}}</div>
 
 
@@ -22,8 +61,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
 
     <script>
         let baseAddress = "https://localhost:7251";
@@ -61,7 +98,4 @@
         };
         let app = Vue.createApp(vueApp).mount('#app');
     </script>
-
-
-
 }

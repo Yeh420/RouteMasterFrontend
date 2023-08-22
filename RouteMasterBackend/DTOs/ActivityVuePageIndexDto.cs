@@ -1,13 +1,6 @@
 ﻿namespace RouteMasterBackend.DTOs
 {
-    public class ActivityPagingVueDto
-    {
-        public int TotalPage { get; set; }
-
-        public List<ActivityVuePageIndexDto>? ActivityVuePageDtoes { get; set; }
-    }
-
-
+  
     public class ActivityVuePageIndexDto
     {
         public int Id { get; set; }
@@ -30,4 +23,13 @@
         public int PageSize { get; set; }   
 
     }
+
+    public class ActivityPagingVueDto
+    {
+        public int TotalPage { get; set; }
+
+        public List<ActivityVuePageIndexDto>? ActivityVuePageDtoes { get; set; }
+    }
+
+
 }
