@@ -310,7 +310,7 @@
                     <div class="w-100 mt-2">
                         <div class="d-flex justify-content-between" style="width:12%">
                             <button class="form-control btn border-0 me-2 px-0" :class="{ 'btn-outline-success':!overview, ' btn-success':overview }" @@click="Overview(accommodationIndex.id)">總覽</button>
-                            <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments">所有評論</button>
+                            <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">所有評論</button>
                         </div>
                     </div>
                 </div>
@@ -352,8 +352,8 @@
                                     </p>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
-
                                     <dec ref="childRef"></dec>
+                                    <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -439,7 +439,9 @@
                                     <img src="https://static.thenounproject.com/png/2392153-200.png" style="width:24px;height:24px" /> 最晚CheckOut時間：{{accommodationIndex.checkOut}}
                                 </section>
                             </div>
-                            <div v-else class="right h-100" >123</div>
+                            <div v-else class="right h-100">
+                                <dec ref="childRef"></dec>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -707,27 +709,7 @@
                         _this.$refs.childRef.commentBrief(p.id);
                         _this.initMap(id);
                     }
-                },
-                showAllComment: function () {
-                    let _this = this;
-                    const swcollapse2 = document.getElementById("swcollapse2");
-                    const collapse2 = document.getElementById("collapse2");
-                    const topthree = document.getElementById("topthree");
-
-                    const isCollapsed = swcollapse2.classList.contains('collapsed');
-                    if (isCollapsed) {
-                        // Collapse 已展開，這裡可以執行相關程式碼
-                        topthree.style.display = 'block';
-                        console.log("close");
-
-                    }
-                    else {
-                        _this.$refs.childRef.commentDisplay();
-                        topthree.style.display = 'none';
-                        console.log("open");
-                    }
-
-                },
+                },             
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;
@@ -977,8 +959,10 @@
                     this.overview = true;
                     this.showModal(id);
                 },
-                ShowComments:function(){
+                ShowComments:function(id){
                     this.overview = false;
+                    this.$refs.childRef.commentBrief(id);
+                    //this.$refs.childRef.commentDisplay(id);
                 },
             },
             components: {

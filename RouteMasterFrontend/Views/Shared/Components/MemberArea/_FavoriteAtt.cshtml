@@ -1,0 +1,101 @@
+﻿@using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
+@model IEnumerable<RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionIndexVM>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section Styles{
+    <style>
+        .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .attraction {
+            cursor: pointer;
+        }
+    </style>
+
+}
+
+
+
+<section>
+    <div class="container">
+        @foreach (var item in Model)
+        {
+            <div class="row mb-4 border rounded attraction" style="height:250px;cursor:pointer" onclick="location.href='@Url.Content("~")/Attractions/Details/' + @item.Id">
+
+
+
+                <img src="~/AttractionImages/@item.Image" class="col-4 g-0 p-0 rounded-start" style="object-fit: cover;">
+
+
+
+                <div class="col-8 d-flex flex-column justify-content-between  py-3">
+
+                    <h2>@($"{item.Name} ")<span class="badge bg-info text-white">@item.AttractionCategory</span></h2>
+                    <p>@item.DescriptionText</p>
+
+                    <div class="mb-0">
+                        <h5>@item.Region @item.Town</h5>
+                        <p>
+                            @($"{item.Score}")
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                @if (i <= Math.Round(item.Score))
+                                {
+                                    <i class="fa fa-star fa-fw" style="color:#f90"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-star fa-fw" style="color:#ccc"></i>
+                                }
+                            }
+                            @($"({item.ScoreCount}) | 平均停留{item.Hours}小時({item.HoursCount}) | 平均花費{item.Price}元({item.PriceCount})")
+                        </p>
+                        <h5>
+                            @foreach (var tag in item.Tags)
+                            {
+                                <span class="badge bg-primary text-white">@tag</span>
+                            }
+                        </h5>
+                    </div>
+
+
+                    @Html.ActionLink("景點詳情", "Details", new { id = item.Id }, new { @class = "d-none" })
+
+                </div>
+
+            </div>
+        }
+    </div>
+</section>
+
+
+@*<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                <a class="page-link" href="@Url.Action("FavoriteAtt", new { page = i, pageSize = ViewBag.PageSize })"
+                   class="@(i == ViewBag.Page ? "active" : "")">@i</a>
+            </li>
+        }
+    </ul>
+</nav>*@
+
+
+
+
+@section Scripts{
+    <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin="anonymous"></script>
+
+    <script>
+
+    </script>
+}
+

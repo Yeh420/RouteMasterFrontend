@@ -6,50 +6,75 @@
 
 
 
-<h1>套裝行程啦</h1>
     <div v-for="(dataObj,index) in packageTours" :key="id">
-        <div>{{dataObj.id}}</div>
-        <div class="card mb-3" style="max-width: 540px;">
+        <div class="card mb-3" style="max-width: 2000px;">
             <div class="row g-0">
                 <div class="col-md-4">
                     <img src="..." class="img-fluid rounded-start" alt="...">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                        <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                        <h5 class="card-title">{{dataObj.description}}</h5>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation" v-for="(attObj, index) in dataObj.packageAttList" :key="attObj.attId">
+                                <button class="nav-link"
+                                      v-bind:class="{ 'active': index === 0 }"
+                                        data-bs-toggle="tab"
+                                        :data-bs-target="'#packageTour' + dataObj.id +'attId'+ attObj.attId"
+                                        type="button"
+                                        role="tab"
+                                        >
+                                    {{ attObj.attName }}
+                               </button>                          
+                            </li>                                  
+                        </ul>
+
+                        <div class="tab-content " style="max-height: 400px; min-height: 400px; overflow-y:auto; overflow-x:hidden; ">
+                            <div v-for="(attObj, index) in dataObj.packageAttList" :key="attObj.attId" class="tab-pane " v-bind:class="{ 'active': index === 0 }" :id="'packageTour' + dataObj.id + 'attId' + attObj.attId" role="tabpanel">
+                                <div v-for="(actObj,index) in dataObj.packageActList">
+                                    <div v-if="actObj.attId==attObj.attId">
+                                        <div class="row">
+                                            <div class="col-6 p-1  d-flex justify-content-center align-items-center">
+                                                <img v-bind:src="actObj.actImage" style="width: 250px;" />
+                                            </div>
+                                            <div class="col-6 p-1  d-flex justify-content-center align-items-center">
+                                                <p>{{actObj.actName}}</p>
+                                            </div>
+                                        </div>                                                                              
+                                    </div>                    
+                                </div>
+                                <div v-for="(extObj,index) in dataObj.packageExtList">
+                                    <div v-if="extObj.attId==attObj.attId">
+                                        <div class="row">
+                                            <div class="col-6 p-1  d-flex justify-content-center align-items-center">
+                                                 <img v-bind:src="extObj.extImage" style="width: 250px; " />
+                                            </div>
+                                            <div class="col-6 p-1  d-flex justify-content-center align-items-center">
+                                                 <p>{{extObj.extName}}</p>                            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class=" d-flex justify-content-center align-items-center " style="height:400px" v-if="!dataObj.packageExtList.some(extObj=>extObj.attId==attObj.attId)&&!dataObj.packageActList.some(actObj=>actObj.attId==attObj.attId)">
+                                    <h3>此景點無綁定項目</h3>
+                                </div>
+                   
+
+                            </div>              
+                        </div>
+                        <br />
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary " @@click="goToPurchasingPage">前往購買</button>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex" v-for="actObj in dataObj.packageActList">
-                <div>{{actObj.actId}}</div>
-                <div>{{actObj.actName}}</div>
-            </div>
-     
-
-        <div class="d-flex" v-for="attObj in dataObj.packageAttList">
-                <div>{{attObj.attId}}</div>
-                <div>{{attObj.attName}}</div>
-            </div>
-   
 
 
-       
-            <div class="d-flex" v-for="extObj in dataObj.packageExtList">
-                <div>{{extObj.attId}}</div>
-                <div>{{extObj.attName}}</div>
-            </div>       
     </div>
-
-
-
-    <div>{{packageTours}}</div>
-
-
-
 
 </div>
 
@@ -67,7 +92,8 @@
         let vueApp = {
             data() {
                 return {
-                    packageTours:[],
+                    packageTours:[],                    
+                    
 
                 };
             },
@@ -86,12 +112,16 @@
                     axios.get(`${baseAddress}/api/PackageToures`).then(response => {
                         _this.packageTours = response.data;
                         console.log(this.packageTours)
+                        
 
          
 
                     }).catch(err => {
                         alert(err);
                     })
+                },
+                goToPurchasingPage:function(){
+                    console.log('66');
                 },
                
             }

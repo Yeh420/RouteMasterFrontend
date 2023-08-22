@@ -125,6 +125,30 @@ namespace RouteMasterBackend.Controllers
 
             return null;
         }
+        ////結帳時可以更新會員資料
+        //[HttpPost("updatemember")]
+        //public IActionResult UpdateMemberInfo(int memberId, string account, string firstName, string lastName, string address)
+        //{
+          
+        //    var member = _context.Members.Find(memberId);
+        //    if (member == null)
+        //    {
+        //        return BadRequest(new { success = false, message = "會員未找到" });
+        //    }
+
+        //    member.Account = account;
+        //    member.FirstName = firstName;
+
+        //    member.LastName = lastName;
+        //    member.Address = address;
+
+            
+        //    _context.SaveChanges();
+
+        //    return Ok(new { success = true });
+        //}
+      
+
 
 
         private bool MemberExists(int id)
