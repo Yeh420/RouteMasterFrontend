@@ -1,5 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Infra.EFRepositories;
+using RouteMasterFrontend.Models.Infra.ExtenSions;
+using RouteMasterFrontend.Models.Interfaces;
+using RouteMasterFrontend.Models.Services;
+using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
 using RouteMasterFrontend.Models.ViewModels.Members;
 using System.Security.Claims;
 
@@ -21,7 +27,12 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
             Member myMember = _context.Members.First(m => m.Id == memberid);
             var modelPasword = new MemberEditPasswordVM();
             modelPasword.id =memberid;
-            
+
+            var customerAccount = User.Identity.Name;
+            IEnumerable<AttractionIndexVM> attractions = GetFavoriteAtt(customerAccount);
+
+           
+
             switch (pagecase)
             {
                 case 0:
@@ -32,6 +43,8 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
                     return View("EditPassword", modelPasword);
                 case 3:
                     return View("_MessagePartial");
+                case 4:
+                    return View("_FavoriteAtt", attractions);
 
             }
 
@@ -39,6 +52,12 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
             return View("EditPassword", model);
         }
 
-       
+        private IEnumerable<AttractionIndexVM> GetFavoriteAtt(string? customerAccount)
+        {
+            IAttractionRepository repo = new AttractionEFRepository();
+            AttractionService service = new AttractionService(repo);
+
+            return service.GetFavoriteAtt(customerAccount).Select(dto => dto.ToIndexVM());
+        }
     }
 }

@@ -41,12 +41,12 @@
             });
 
         },
-        commentDisplay: function () {
+        commentDisplay: function (id) {
             let _this = this;
             var request = {};
-            //if (id) {
-            //    _this.hotelId = id;
-            //}
+            if (id) {
+                _this.hotelId = id;
+            }
             request.Manner = _this.selected;
             request.HotelId = _this.hotelId;
 
