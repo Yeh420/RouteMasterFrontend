@@ -7,12 +7,9 @@
 
 
     <div v-for="(dataObj,index) in packageTours" :key="id">
-        <div class="card mb-3" style="max-width: 2000px;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="..." class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
+        <div class="card mb-3" style="max-width: 1500px;">
+            <div class="row g-0">              
+                <div class="col-md-12">
                     <div class="card-body">
                         <h5 class="card-title">{{dataObj.description}}</h5>
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -35,7 +32,7 @@
                                     <div v-if="actObj.attId==attObj.attId">
                                         <div class="row">
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
-                                                <img v-bind:src="actObj.actImage" style="width: 250px;" />
+                                                <img v-bind:src="actObj.actImage" style="width: 400px;" />
                                             </div>
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
                                                 <p>{{actObj.actName}}</p>
@@ -47,7 +44,7 @@
                                     <div v-if="extObj.attId==attObj.attId">
                                         <div class="row">
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
-                                                 <img v-bind:src="extObj.extImage" style="width: 250px; " />
+                                                <img v-bind:src="extObj.extImage" style="width: 400px; " />
                                             </div>
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
                                                  <p>{{extObj.extName}}</p>                            
@@ -64,7 +61,7 @@
                         </div>
                         <br />
                         <div style="display: flex; justify-content: flex-end;">
-                            <button class="btn btn-primary " @@click="goToPurchasingPage">前往購買</button>
+                            <button class="btn btn-primary " @@click="goToPurchasingPage(dataObj.id)">前往購買</button>
                         </div>
 
                     </div>
@@ -120,8 +117,9 @@
                         alert(err);
                     })
                 },
-                goToPurchasingPage:function(){
-                    console.log('66');
+                goToPurchasingPage:function(packageTourId){
+                    let newUrl = '/TravelPlans/Details/' + packageTourId
+                    window.location.href = newUrl;
                 },
                
             }

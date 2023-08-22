@@ -28,20 +28,9 @@ namespace RouteMasterFrontend.Controllers
         // GET: TravelPlans/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TravelPlans == null)
-            {
-                return NotFound();
-            }
 
-            var travelPlan = await _context.TravelPlans
-                .Include(t => t.Member)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (travelPlan == null)
-            {
-                return NotFound();
-            }
-
-            return View(travelPlan);
+            ViewBag.PackageTourId = id;
+            return View();
         }
 
         // GET: TravelPlans/Create
