@@ -192,12 +192,12 @@ namespace RouteMasterFrontend.Controllers
 
             if (targetComment)
             {
-                //SystemMessage reportNotice = new SystemMessage
-                //{
-                //    MemberId = 1, //記得改成user.Identity.name
-                //    Content=$"已收到您在{spot}評論區對某評論的檢舉，RouteMaster團隊將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
-                //    IsRead=false,
-                //};
+                SystemMessage reportNotice = new SystemMessage
+                {
+                    MemberId = 1, //記得改成user.Identity.name
+                    Content = $"您在{spot}評論區對某評論的檢舉，RouteMaster團隊已收到，將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
+                    IsRead = false,
+                };
 
                 SystemMessage reportSus = new SystemMessage
                 {
@@ -206,8 +206,8 @@ namespace RouteMasterFrontend.Controllers
                     IsRead = false,
 
                 };
-                //_context.SystemMessages.AddRange(reportNotice, reportSus);
-                _context.SystemMessages.Add(reportSus);
+                _context.SystemMessages.AddRange(reportNotice, reportSus);
+                //_context.SystemMessages.Add(reportSus);
                 _context.SaveChanges() ;
 
                 return "檢舉通知已寄出";

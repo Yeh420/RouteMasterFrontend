@@ -73,28 +73,29 @@ namespace RouteMasterFrontend.Controllers
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(member);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MemberExists(member.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return ViewComponent("MemberArea");
-            }
-            return View(member);
+            _context.Update(member);
+            await _context.SaveChangesAsync();
+            //if (ModelState.IsValid)
+            //{
+            //    try
+            //    {
+            //        _context.Update(member);
+            //        await _context.SaveChangesAsync();
+            //    }
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if (!MemberExists(member.Id))
+            //        {
+            //            return NotFound();
+            //        }
+            //        else
+            //        {
+            //            throw;
+            //        }
+            //    }
+            //    return ViewComponent("MemberArea");
+            //}
+            return ViewComponent("MemberArea");
         }
 
 
@@ -507,7 +508,7 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
+        public IActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
         {
             if (ModelState.IsValid == false)
             {
@@ -524,6 +525,25 @@ namespace RouteMasterFrontend.Controllers
 
             return ViewComponent("MemberArea");
             
+        }
+
+        public IActionResult MemEdit([FromBody]MemberEditDTO dto)
+        {
+            var currentUserAccount = User.Identity.Name;
+            Member member = _context.Members.FirstOrDefault(m => m.Account == currentUserAccount);
+
+            member.FirstName=dto.FirstName;
+            member.LastName=dto.LastName;
+            member.Email=dto.Email;
+            member.CellPhoneNumber=dto.CellPhoneNumber;
+            member.Address=dto.Address;
+            member.Gender=dto.Gender;
+            member.Birthday=dto.Birthday;
+            member.IsSuscribe=dto.IsSuscribe;
+
+            _context.Entry(member).State =EntityState.Modified;
+            _context.SaveChanges();
+            return ViewComponent("MemberArea");
         }
 
         [HttpGet] 
