@@ -53,11 +53,15 @@
                     </thead>
                     <tbody>
                             @{
+                                decimal totalAmount = 0;
+
                                 var groupedExtraServices = Model.ExtraServices
                                 .GroupBy(e => e.Id);
                             }
                             @foreach (var group in groupedExtraServices)
                             {
+                                decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
+                                totalAmount += groupPrice;
                                 <tr>
                                     <td>
                                         <img src="@Url.Content(group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
@@ -75,6 +79,7 @@
                             }
                         @foreach (var accommodationDTO in Model.Accommodations)
                         {
+                                totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
                             <tr>
                                 <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
@@ -91,6 +96,8 @@
                             }
                             @foreach (var group in groupActivities)
                         {
+                                decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
+                                totalAmount += groupPrice;
                             <tr>
                                     <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                     <td class="align-middle text-center">@group.First().ActivityName</td>
@@ -102,7 +109,7 @@
                                    
                                     <td class="align-middle text-center">
                                         <span class="quantity">@group.First().Quantity</span>
-                                        </td>
+                                    </td>
                             </tr>
                         }
                     </tbody>
@@ -127,12 +134,109 @@
         </div>
     </div>
 
-    <div class="card-body  d-flex ">
+   
+
+    
+
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+    <div class="card-body d-flex" id="app">
         <div class="container custom-container ms-0" style="width:60%">
-            @await Html.PartialAsync("Coupons")
+        @*    @await Html.PartialAsync("Coupons")*@
+
+
+            <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex" :class="{'border-3': coupon.Selected}">
+
+                    <div class=" justify-content-center align-items-center d-flex">
+                        <h1><i class="fa-solid fa-gift" style="color:orange"></i></h1>
+                    </div>
+                    <div class="ms-3 me-auto">
+                        <h5>{{ coupon.Name }}</h5>
+                        <h3>折扣數 : {{ coupon.Discount }}% off !!</h3>
+                        <h5 style="color: lightseagreen;">有效日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
+                        <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <strong>抱歉，這張優惠券目前無法使用，請確認有效日期。</strong></p>
+                    </div>
+                    <div class=" justify-content-center align-items-center d-flex">
+                        <button :disabled="!coupon.Valuable" :class="{'btn': true, 'btn-warning': !coupon.Selected, 'btn-danger': coupon.Selected}" v-on:click="UseCoupon(index)">
+                            <i class="fa-solid" :class="{'fa-truck-fast': !coupon.Selected, 'fa-check-circle': coupon.Selected}"></i>
+                            {{ coupon.Selected ? '優惠券已選取' : '使用優惠券' }}
+                        </button>
+                    </div>
+
+             </div>
+
+            
         </div>
         <div style="width:38%" class="container custom-container me-0">
-            預留結帳區域
+            <h5>小計總金額: @totalAmount 元</h5>
+            <h5>優惠券金額：</h5>
+            <h5>使用優惠券折扣後的金額: {{ discountedTotal }} 元</h5>
+         
         </div>
     </div>
-        </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    coupons: [],
+                    totalAmount: @totalAmount,
+                    discount: 300,
+                    couponCode: ''
+                }
+            },
+            computed: {
+                discountedTotal() {
+                    return this.totalAmount - this.discount;
+                }
+            },
+            mounted: function () {
+                let _this = this;
+                _this.ShowCoupons();
+            },
+            methods: {
+                ShowCoupons: async function () {
+                    let _this = this;
+                    var data = {};
+                    var uri = "https://localhost:7145/Coupons/GetAllCoupons";
+                    const response = await fetch(uri, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (response.ok) {
+                        _this.coupons = await response.json();
+                        console.log(_this.coupons);
+
+                    }
+                    else {
+                        console.error('Error:', response.status);
+                    }
+                },
+                UseCoupon: function (index) {
+                    console.log("use coupon");
+                    // Reset previously selected coupons
+                    this.coupons.forEach((coupon, i) => {
+                        if (i !== index) {
+                            coupon.Selected = false;
+                        }
+                    });
+                    // Toggle selected state for the clicked coupon
+                    this.coupons[index].Selected = !this.coupons[index].Selected;
+
+                    const selectedCouponId = this.coupons[index].Id;
+                    if (this.coupons[index].Selected) {
+                        console.log("Selected Coupon ID:", selectedCouponId);
+                    }
+
+                }
+            }
+        })
+
+        app.mount("#app")
+    </script>
+       
+</div>

@@ -2,9 +2,11 @@
     var extraServiceId = ViewBag.ExtraServiceId;
     var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 
 @section Styles{
     <style>
+
         .date-picker {
             width: 300px;
             border: 1px solid #ccc;
@@ -64,32 +66,71 @@
         }
 
 
+
+        .informationBigContainer {
+            display: flex;
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
+
+        .informationContainer {
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
         .disabled {
             opacity: 0.5;
             /* 設置透明度為 50% */
             position: relative;
         }
 
-            .disabled::after {
-                content: 'x';
-                /* 在日期元素的後面添加一個 "x" 標記 */
-                position: absolute;
-                top: 80%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: lightgray;
-                /* 可以自行調整顏色 */
+
+        .image-container {
+            width: 500px; /* 调整宽度 */
+        }
+
+        .textbox {
+            padding: 10px;
+            border: 1px solid transparent; /* 初始設定為透明的框線 */
+            transition: border-color 0.3s; /* 添加過渡效果 */
+        }
+
+            .textbox:hover {
+                border-color: #ccc; /* 鼠標懸停時改變框線顏色 */
             }
+
+
+
+
+          
     </style>
 }
 <div id="app">
-    <div>        
-        <div>{{name}}</div>
-        <img v-bind:src="image" />
-        <div>{{regionName}}</div>
-        <div>{{attractionName}}</div>
-        <div>{{description}}</div>
+
+
+    <div class="card mb-3" style="max-width: 2000px;">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <img v-bind:src="image" class="img-fluid rounded-start w-100" />
+            </div>
+            <div class="col-md-7">
+                <div class="card-body">
+                    <h5 class="card-title">{{name}}</h5>
+                    <div class="d-flex">
+                        <p class="card-text"><small class="text-body-secondary">{{regionName}}</small></p>
+                        <p class="card-text"><small class="text-body-secondary">{{attractionName}}</small></p>
+                    </div>
+                    <p class="card-text">{{description}}</p>
+
+                </div>
+            </div>
+        </div>
     </div>
+
+
+
+
     <div class="row">
         <div class="date-picker col-6">
             <div class="header">
@@ -104,6 +145,7 @@
                          v-bind:data-quantity="dateObj.quantity" @@click="dateObj.price!=null&&selectDate(dateObj)">
                         <template v-if="dateObj.date === null">
                             <div class="day other-month"></div>
+                            <span class="price"> </span>
                         </template>
                         <template v-else-if="dateObj.price !== null">
                             <div class="day">{{ dateObj.date.getDate() }}</div>
@@ -111,6 +153,7 @@
                         </template>
                         <template v-else>
                             <div class="day">{{ dateObj.date.getDate() }}</div>
+                            <span class="price">X</span>
                         </template>
                     </div>
                 </div>
@@ -118,16 +161,28 @@
         </div>
         <div id="buyingContainer" class="col-6">
             <br />
-            <h3>選擇方案</h3>
             <br />
-            <div>{{selectedDate}}</div>
-            <div>產品編號:{{selectedProductId}}</div>
-            <div>價格:{{selectedPrice}}</div>
-            <div>可購買數量:{{selectedQuantity}}</div>
-            <div>
-                <input v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+            <br />
+            <h4>{{selectedDate}}</h4>
+            <br />
+
+            <div v-if="selectedDate!='請選擇日期'">
+                <br />
+                <h5>價格:{{selectedPrice}}</h5>
+                <br />
+                <h5>可購買數量:{{selectedQuantity}}</h5>
+                <br />
+                <div>
+                    <label class="border-1  w-25">選擇購買數量</label>
+                    <input class="m-1 p-1 " v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+                </div>
+                <button @@click="addToCart()" class="btn btn-primary">加入購物車</button>
+
+
             </div>
-            <button @@click="addToCart()" class="btn btn-primary">加入購物車</button>
+
+            
+        
         </div>
     </div>      
 </div>
@@ -275,15 +330,44 @@
                     //加入購物車
                     const postData={
                         cartId:this.cartId,
-                        extProductId: this.selectedProductId,
+                        extraserviceId: this.selectedProductId,
                         quantity: this.inputQuantity
-                    }   
+                    };   
                     console.log(postData);
+                    fetch(`${baseAddress}/api/Carts/addextraservice`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            this.reloadCartItems();
+                            } else {
+                                alert('加入購物車失敗');
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Failed to add to cart:', error);
+                        });
 
-
-                    console.log('加購物車啦')
-                },             
+                    console.log('加購物車啦');
+                },
+                reloadCartItems() {
+                    fetch('/Carts/RefreshCart')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('Cart').innerHTML = data;
+                        })
+                        .catch(() => {
+                            alert('Failed to reload cart items.');
+                        });
+                }
             }
+
         };
         let app = Vue.createApp(vueApp).mount('#app');
     </script>

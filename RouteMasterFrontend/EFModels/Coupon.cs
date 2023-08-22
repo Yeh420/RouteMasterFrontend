@@ -13,7 +13,7 @@ namespace RouteMasterFrontend.EFModels
         }
 
         public int Id { get; set; }
-        public int Code { get; set; }
+        public string Name { get; set; }
         public int Discount { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
