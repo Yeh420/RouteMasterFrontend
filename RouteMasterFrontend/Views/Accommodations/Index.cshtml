@@ -5,15 +5,10 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  
     <style>
         .currentPage {
             background-color: lightgray;
-        }
-
-        .wh220 {
-            width: 220px;
-            height: 220px;
         }
 
         .w-33 {
@@ -129,21 +124,21 @@
             100% { transform: rotate(360deg); }
         }
             </style>
-            <noscript>
-                <style>
-                    .simplebar-content-wrapper {
-                        scrollbar-width: auto;
-                        -ms-overflow-style: auto;
-                    }
+        <noscript>
+            <style>
+                .simplebar-content-wrapper {
+                    scrollbar-width: auto;
+                    -ms-overflow-style: auto;
+                }
 
-                        .simplebar-content-wrapper::-webkit-scrollbar,
-                        .simplebar-hide-scrollbar::-webkit-scrollbar {
-                            display: initial;
-                            width: initial;
-                            height: initial;
-                        }
-                </style>
-            </noscript>
+                    .simplebar-content-wrapper::-webkit-scrollbar,
+                    .simplebar-hide-scrollbar::-webkit-scrollbar {
+                        display: initial;
+                        width: initial;
+                        height: initial;
+                    }
+            </style>
+        </noscript>
     }
 <div id="app" v-cloak>
     <div v-if="toggle">
@@ -243,19 +238,21 @@
                             <td>
                                 <div class="row mb-2">
                                     <div class="col">
-                                        <div class="card mb-3 h200">
+                                        <div class="card mb-3">
                                             <div class="row g-0 ">
-                                                <div class="wh220">
-                                                    <img class="card-img card-img-left h-100 w-100" v-bind:src="product.image" style="object-fit:cover" alt="尚未建立住所照片" />
+                                                <div class="col-5">
+                                                    <div class="ratio ratio-4x3">
+                                                        <img class="card-img card-img-left h-100 w-100" v-bind:src="product.image" style="object-fit:cover" alt="尚未建立住所照片" />
+                                                    </div>
                                                 </div>
-                                                <div class="col-9">
+                                                <div class="col-7">
                                                     <div class="card-body w-100">
                                                         <div class="d-flex align-items-center">
                                                             <h5 class="card-title m-0 me-2">
                                                                 {{product.name}}
                                                             </h5>
                                                             <i v-for="grade in product.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.score}}</span>
+                                                            <p class="ms-auto">{{product.comment}}筆評論<span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 40px; height: 40px; letter-spacing:1px">{{product.score}}</span></p>
                                                         </div>
                                                         <p class="card-text">
                                                             <small class="text-muted">
@@ -306,9 +303,9 @@
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content h-100">
                 <div class="modal-header pb-1 pe-3 flex-wrap">
-                    <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationIndex.name}}</h1>
+                    <h1 class="modal-title fs-2 me-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationIndex.name}}</h1>
                     <i v-for="grade in accommodationIndex.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
-                    <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 32px; height: 32px; letter-spacing:1px">{{accommodationIndex.score}}</span>
+                    <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 40px; height: 40px; letter-spacing:1px">{{accommodationIndex.score}}</span>
                     <button type="button" class="btn-close me-1" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="w-100 mt-2">
                         <div class="d-flex justify-content-between" style="width:12%">
@@ -871,7 +868,7 @@
                     this.map = new google.maps.Map(document.getElementById("RecommendMap"), {
                         // 中心點位置
                         center: location,
-                        zoom: 12, // 地圖縮放比例 (0-20)
+                        zoom: 13, // 地圖縮放比例 (0-20)
                         streetViewControl: true, // 是否顯示右下角街景小人
                         mapTypeControl: true // 使用者能否切換地圖樣式：一般、衛星圖等
                     });
@@ -885,24 +882,6 @@
 
                     console.log(result);
 
-                    let markerCenter = new google.maps.Marker({
-                        position: location,
-                        //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
-                        map: _this.map,
-                        animation: google.maps.Animation.DROP, // DROP掉下來、BOUNCE一直彈跳
-                        draggable: false // true、false可否拖拉
-                    });
-
-                    markerCenter.addListener('click', e => {
-                        infowindow.open(_this.map, markerCenter);
-                    });
-
-                    let centerInfowindow = new google.maps.InfoWindow({
-                        content: `你的位置` // 支援html
-                    });
-
-                    centerInfowindow.open(_this.map, markerCenter);
-
                     result.forEach(r => {
                         let latLng = new google.maps.LatLng(r.positionY, r.positionX);
 
@@ -914,28 +893,37 @@
                             draggable: false // true、false可否拖拉
                         });
 
+                        let distanceOutput = '';
+                        if (r.distance >= 1) {
+                            distanceOutput = r.distance.toFixed(1) + '公里';
+                        } else {
+                            distanceOutput = (r.distance * 1000) + '公尺';
+                            const distanceLevel = Math.floor(r.distance * 1000 / 50);
+                            distanceOutput = (distanceLevel * 50) + '公尺';
+                        }
+
                         let infowindow = new google.maps.InfoWindow({
                             content: `
-                                    <div class="card mb-3" style="max-width: 540px;">
+                                    <div class="card" style="width: 410px;">
                                       <div class="row g-0">
-                                        <div class="col-md-4">
-                                          <img src="${r.image}" class="img-fluid rounded-start" alt="...">
+                                        <div class="col-md-5">
+                                            <div class="ratio ratio-4x3">
+                                              <img src="${r.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
+                                            </div>
                                         </div>
-                                        <div class="col-md-8">
-                                          <div class="card-body">
-                                            <h5 class="card-title">${r.name}</h5>
-                                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                                        <div class="col-md-7">
+                                          <div class="card-body h-100 pb-0 d-flex flex-column">
+                                            <h5 class="card-title">${r.name}  <i v-for="grade in ${r.grade}" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i></h5>
+                                            <p class="card-text"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 40px; height: 40px; letter-spacing:1px">${r.score}</span>${r.comment}筆評論</p><br>
+                                            <p class="card-text d-flex justify-content-end"><small class="ms-auto text-body-secondary">距離你的位置： ${distanceOutput} </small></p>
                                           </div>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <h6>${r.name}</h6>
-                                    <small>${r.address}</small>
-
                                     ` // 支援html
                         });
+                        infowindow.open(_this.map, marker);
 
                         marker.addListener('mouseover', e => {
                             infowindow.open(_this.map, marker);
@@ -951,6 +939,25 @@
                         });
 
                     });
+                    
+                    let markerCenter = new google.maps.Marker({
+                        position: location,
+                        //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
+                        map: _this.map,
+                        animation: google.maps.Animation.DROP, // DROP掉下來、BOUNCE一直彈跳
+                        draggable: false // true、false可否拖拉
+                    });
+
+
+                    let centerInfowindow = new google.maps.InfoWindow({
+                        content: `你的位置` // 支援html
+                    });
+
+                    markerCenter.addListener('click', e => {
+                        centerInfowindow.open(_this.map, markerCenter);
+                    });
+
+                    centerInfowindow.open(_this.map, markerCenter);
 
                     this.map.setOptions({
                         styles: [

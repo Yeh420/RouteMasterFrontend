@@ -28,7 +28,7 @@
 <div id="app">
     <div class="row">
         <div class="col-2">
-            <select v-model="pageSize" class="form-select" @@change="filterExtraServiceDtoes">
+            <select v-model="pageSize" class="form-select" @@change="filterExtraServiceDtoesToNewPageSize">
                 <option value="1">1</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -214,7 +214,30 @@
                 nextPageHandler: function () {
                     this.page = this.page + 1;
                     this.filterExtraServiceDtoes();
-                }
+                },
+                filterExtraServiceDtoesToNewPageSize:function(){
+                    let _this = this;
+                    let request = {};
+
+                    request.Keyword = _this.keyword;
+                    request.Page = 1;
+                    request.PageSize = _this.pageSize;
+
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/filter`, request).then(response => {
+                        _this.extraServiceDtoes = response.data.extraServiceVuePageDtoes;
+                        _this.totalPage = response.data.totalPage;
+
+
+                        for (let i = 0; i < _this.extraServiceDtoes.length; i++) {
+                            let item = _this.extraServiceDtoes[i];
+                        }
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
 
           }
       };
