@@ -4,68 +4,128 @@
     ViewData["Title"] = "Checkout";
    
 }
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <h1>Checkout</h1>
+<style>
+    .checkout-progress {
+        display: flex;
+        justify-content: space-between;
+    }
 
+    .step {
+        width: 30%;
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .step.active {
+        font-weight: bold;
+        border-color: #000;
+    }
+
+    .container{
+        margin-bottom: 20px;
+    }
+</style>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<form asp-action="CheckoutPost" method="post">
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Member)
-            </th>
-            <th>
-                Member Info
-            </th>
-            <th>
-                Payment Method
-            </th>
-            <th></th>
-            
-        </tr>
-      
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Member.Account)
-            </td>
-                <td>
-                   
-                @Html.DisplayFor(modelItem => item.Member.FirstName)
-                @Html.DisplayFor(modelItem => item.Member.LastName)
-                  
-                </td>
-                    <td>
-                        @foreach (var paymentMethod in ViewBag.PaymentMethods)
-                        {
-                            <label>
-                                <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
-                                @paymentMethod.Name
-                            </label>
-                        }
-                        <p class="selected-payment-method-info"></p>
-                    </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-  </table>
-    <div>
-        <input type="submit" value="Save" class="btn btn-primary" />
-    </div>
-</form>
+<div class="checkout-progress">
+    <div class="step active"><span>1. 購物車</span></div>
+    <div class="step"><span>2. 付款訊息</span></div>
+    <div class="step"><span>3. 確認訂單</span></div>
+</div>
+
+
+<div id="accordion">
+    @foreach (var item in Model)
+    {
+        <div class="card" style="margin-top:50px";>
+            <div class="card-header" id="heading-@item.Member.Id">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
+                        訂購人資料
+                    </button>
+                </h5>
+            </div>
+            <div id="collapse-@item.Member.Id" class="collapse" aria-labelledby="heading-@item.Member.Id" data-parent="#accordion">
+                <div class="card-body">
+                    <div>
+                        <label>帳號:</label>
+                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Account)</span>
+                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Account)" style="display: none;" />
+                    </div>
+                    <div>
+                        <label>姓名:</label>
+                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.FirstName) @Html.DisplayFor(modelItem => item.Member.LastName)</span>
+                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.FirstName)" style="display: none;" />
+                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.LastName)" style="display: none;" />
+                    </div>
+                    <div>
+                        <label>地址:</label>
+                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Address)</span>
+                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Address)" style="display: none;" />
+                    </div>
+                    <button type="button" class="btn btn-secondary edit-button">編輯</button>
+                    <button type="button" class="btn btn-primary save-button" style="display: none;">儲存</button>
+                </div>
+             </div>
+        </div>
+
+        <div class="card" style="margin-top:50px;">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-payment" aria-expanded="true" aria-controls="collapse-payment">付款方式</button>
+                </h5>
+            </div>
+            <div id="collapse-payment" class="collapse" aria-labelledby="heading-payment">
+                <div class="card-body">
+                    @foreach (var paymentMethod in ViewBag.PaymentMethods)
+                    {
+                        <label>
+                            <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
+                            @paymentMethod.Name
+                        </label>
+                    }
+                    <p class="selected-payment-method-info"></p>
+                 </div>
+             </div>
+        </div>
+     
+    }
+</div>
+<input type="submit" value="Save" class="btn btn-primary" style="margin-top:50px;" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 @section Scripts {
     <script>
-        // 監聽 payment method 選擇變化事件
+       
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const container = button.closest('.container');
+                container.querySelectorAll('.display-field').forEach(el => el.style.display = 'none');
+                container.querySelectorAll('.edit-field').forEach(el => el.style.display = 'inline');
+                container.querySelector('.edit-button').style.display = 'none';
+                container.querySelector('.save-button').style.display = 'inline';
+            });
+       });
+
+        document.querySelectorAll('.save-button').forEach(button => {
+            button.addEventListener('click', function () {
+             
+                const container = button.closest('.container');
+                container.querySelectorAll('.display-field').forEach((el, index) => {
+                    el.textContent = container.querySelectorAll('.edit-field')[index].value;
+                    el.style.display = 'inline';
+                });
+                container.querySelectorAll('.edit-field').forEach(el => el.style.display = 'none');
+                container.querySelector('.edit-button').style.display = 'inline';
+                container.querySelector('.save-button').style.display = 'none';
+            });
+        });
+    
         document.querySelectorAll('.payment-method-radio').forEach(radio =>     {
             radio.addEventListener('change', function () {
                 const selectedRadio = document.querySelector('.payment-method-radio:checked');
@@ -74,7 +134,7 @@
                     const selectedItemRow = selectedRadio.closest('tr');
                     const selectedPaymentMethodInfo = selectedItemRow.querySelector('.selected-payment-method-info');
                     console.log(123);
-                    // 更新顯示的內容
+                 
                     selectedPaymentMethodInfo.textContent = `Selected Payment Method: ${selectedRadio.nextSibling.textContent} (ID: ${selectedMethodId})`;
                 }
             });
