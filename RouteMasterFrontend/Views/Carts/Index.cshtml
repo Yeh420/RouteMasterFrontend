@@ -1,8 +1,46 @@
 ﻿@model RouteMasterFrontend.Models.Dto.CartDetailDto
 
 @section Styles{
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            list-style-type: none;
+            padding: 0;
+        }
 
+        .step {
+            width: 32%;
+            text-align: center;
+        }
+
+        .step .circle {
+            background-color: #ccc;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            line-height: 30px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .step.active .circle {
+            background-color: #007bff;
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #ccc;
+            position: relative;
+            top: 15px;
+        }
+
+        .step-divider.active {
+            background-color: #007bff;
+        }
         .custom-container {
             background-color: white;
             padding: 10px;
@@ -28,6 +66,24 @@
     </style>
 
 }
+<div class="container mt-5">
+    <div class="step-container">
+        <div class="step active">
+            <div class="circle">1</div>
+            <span>購物車</span>
+        </div>
+        <div class="step-divider active"></div>
+        <div class="step">
+            <div class="circle">2</div>
+            <span>付款訊息</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+            <div class="circle">3</div>
+            <span>確認訂單</span>
+        </div>
+    </div>
+</div>
 
 
 <div id="app">
@@ -186,7 +242,8 @@
 @section Scripts{
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         const app = Vue.createApp({
             data() {
