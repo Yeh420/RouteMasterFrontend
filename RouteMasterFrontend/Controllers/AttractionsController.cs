@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
+using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Infra.EFRepositories;
 using RouteMasterFrontend.Models.Infra.ExtenSions;
 using RouteMasterFrontend.Models.Interfaces;
@@ -272,6 +274,25 @@ namespace RouteMasterFrontend.Controllers
             ViewBag.TotalPages = totalPages;
 
             return View(attractions);
+        }
+
+        [Authorize]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult GetFavoriteAtt(int page = 1)
+        {
+            var customerAccount = User.Identity.Name;
+            IEnumerable<AttractionIndexVM> attractions = GetFavoriteAtt(customerAccount);
+
+            int pageSize = 15;
+
+            int totalItems = attractions.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            attractions = attractions.Skip((page - 1) * pageSize).Take(pageSize);
+
+            
+
+            return Content(JsonConvert.SerializeObject(attractions), "application/json");
         }
 
         private IEnumerable<AttractionIndexVM> GetFavoriteAtt(string? customerAccount)
