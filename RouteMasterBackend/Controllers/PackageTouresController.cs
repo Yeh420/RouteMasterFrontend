@@ -54,6 +54,7 @@ namespace RouteMasterBackend.Controllers
             {
                 var data = new PackageToursDto();
                 data.Id = item.Id;
+                data.Description = item.Description;    
                 data.PackageActList = new List<actDtoInPackage>(); // 初始化集合
                 data.PackageAttList = new List<attDtoInPackage>();
                 data.PackageExtList = new List<extDtoInPackage>();
@@ -65,7 +66,9 @@ namespace RouteMasterBackend.Controllers
                     var newActDtoInPackage = new actDtoInPackage
                     {
                         ActId = act.Id,
+                        AttId=act.AttractionId,
                         ActName = act.Name,
+                        ActImage = "/ActivityImages/"+ act.Image,
                     };
                     data.PackageActList.Add(newActDtoInPackage);
                 }
@@ -77,6 +80,7 @@ namespace RouteMasterBackend.Controllers
                     {
                         AttId = att.Id,
                         AttName = att.Name,
+                        AttImage ="/AttractionImages/"+ att.Image,   
                     };
 
                     data.PackageAttList.Add(newAttDtoInPackage);
@@ -89,7 +93,9 @@ namespace RouteMasterBackend.Controllers
                     var newExtDtoInPackage = new extDtoInPackage
                     {
                         ExtId = ext.Id,
+                        AttId=ext.AttractionId,
                         ExtName = ext.Name,
+                        ExtImage ="/ExtraServiceImages/"+ ext.Image,
                     };
 
                     data.PackageExtList.Add(newExtDtoInPackage);
