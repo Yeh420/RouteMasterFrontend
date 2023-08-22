@@ -31,6 +31,37 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+        [HttpGet("Id")]
+        public async Task<PackageTourPurchasingDto> GetTargetPackageTour(int id)
+        {
+            var packageInDb = _context.PackageTours
+            .Include(x => x.Activities)
+            .Include(x => x.ExtraServices)
+            .Where(x=>x.Id == id)
+            .AsQueryable().First();
+
+
+            PackageTourPurchasingDto dto = new PackageTourPurchasingDto();
+            dto.Id = id;
+            dto.ActivityIds = new List<int>();
+            dto.ExtraServiceIds = new List<int>(); 
+            
+            foreach(var item in  packageInDb.Activities)
+            {
+                dto.ActivityIds.Add(item.Id);
+            }
+
+            foreach (var item in packageInDb.ExtraServices)
+            {
+                dto.ExtraServiceIds.Add(item.Id);
+            }
+
+
+
+            return dto;
+        }
+
+
  
 
 
@@ -47,7 +78,7 @@ namespace RouteMasterBackend.Controllers
 
             var model = new List<PackageToursDto>();
 
-
+        
 
 
             foreach (var item in packageInDb)
