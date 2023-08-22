@@ -1,31 +1,37 @@
 ﻿@model RouteMasterFrontend.Models.Dto.CartDetailDto
 
-<style>
+@section Styles{
+    <style>
 
-    .custom-container {
-        background-color: white;
-        padding: 10px;
-        border: 1px solid white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+        .custom-container {
+            background-color: white;
+            padding: 10px;
+            border: 1px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .fixed-row-height tr {
-        height: 100px; 
-    }
+        .fixed-row-height tr {
+            height: 100px;
+        }
 
-    .fixed-row-height thead th {
-        font-weight: bold;
-        font-size:16px;
-        color: darkgray; 
-    }
+        .fixed-row-height thead th {
+            font-weight: bold;
+            font-size: 16px;
+            color: darkgray;
+        }
 
 
-    .fixed-row-height tbody td,
-    .fixed-row-height tbody th {
-        border-color: lightgrey; 
-    }
-   
-</style>
+        .fixed-row-height tbody td,
+        .fixed-row-height tbody th {
+            border-color: lightgrey;
+        }
+    </style>
+
+}
+
+
+<div id="app">
+
 <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
     <div class="card-body">
         <div class="container custom-container">
@@ -118,30 +124,27 @@
                 
 
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-outline-secondary" onclick="window.location.href='/Carts/Checkout'">
+                            <button class="btn btn-outline-secondary" @@click="goToCheckout">
                         <i class="fas fa-shopping-cart"></i>前往結帳
 
                     </button>
               
                    </div>
                 </div>
-
-
-               
-
             </div>
 
         </div>
     </div>
+   </div>
 
-   
 
-    
 
-    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
-    <div class="card-body d-flex" id="app">
+ 
+
+
+@*<input type="hidden" id="selectedCouponId" name="selectedCouponId" />*@
+<div class="card-body d-flex" >
         <div class="container custom-container ms-0" style="width:60%">
         @*    @await Html.PartialAsync("Coupons")*@
 
@@ -164,17 +167,25 @@
                         </button>
                     </div>
 
-             </div>
+            </div>
 
-            
+       
         </div>
-        <div style="width:38%" class="container custom-container me-0">
+        <div style="width:38%; border:none;" class="container custom-container me-0">
             <h5>小計總金額: @totalAmount 元</h5>
-            <h5>優惠券金額：</h5>
-            <h5>使用優惠券折扣後的金額: {{ discountedTotal }} 元</h5>
-         
+            <div style="border-top: 1px dashed #ccc; padding-top: 10px;">
+                <h5 style="font-size: smaller; color: #888;">優惠券折扣：{{ selectedCouponAmount}}%</h5>
+                <h5 style="font-size: smaller; color: #888;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h5>
+            </div>
+            <h5 style="color: lightseagreen;">總金額: {{ discountedTotal }} 元</h5>
         </div>
-    </div>
+</div>
+</div>
+
+
+@section Scripts{
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
     <script>
         const app = Vue.createApp({
@@ -182,61 +193,96 @@
                 return {
                     coupons: [],
                     totalAmount: @totalAmount,
-                    discount: 300,
-                    couponCode: ''
-                }
+                    selectedCouponAmount: 0,
+                    usingCouponId: 0,
+                };
             },
             computed: {
                 discountedTotal() {
-                    return this.totalAmount - this.discount;
+                    const discountFactor = this.selectedCouponAmount / 100;
+                    const discountedAmount = this.totalAmount * discountFactor;
+                    return this.totalAmount - discountedAmount;
                 }
             },
-            mounted: function () {
-                let _this = this;
-                _this.ShowCoupons();
+            mounted() {
+                this.ShowCoupons();
             },
             methods: {
-                ShowCoupons: async function () {
-                    let _this = this;
-                    var data = {};
-                    var uri = "https://localhost:7145/Coupons/GetAllCoupons";
-                    const response = await fetch(uri, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    });
-                    if (response.ok) {
-                        _this.coupons = await response.json();
-                        console.log(_this.coupons);
-
-                    }
-                    else {
-                        console.error('Error:', response.status);
+                async ShowCoupons() {
+                    try {
+                        const uri = "https://localhost:7145/Coupons/GetAllCoupons";
+                        const response = await fetch(uri, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({})
+                        });
+                        if (response.ok) {
+                            this.coupons = await response.json();
+                            console.log(this.coupons[0]);
+                        } else {
+                            console.error('Error:', response.status);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
                     }
                 },
-                UseCoupon: function (index) {
+                UseCoupon(index) {
                     console.log("use coupon");
-                    // Reset previously selected coupons
+                    this.selectedCouponAmount = 0;
                     this.coupons.forEach((coupon, i) => {
                         if (i !== index) {
                             coupon.Selected = false;
                         }
                     });
-                    // Toggle selected state for the clicked coupon
                     this.coupons[index].Selected = !this.coupons[index].Selected;
 
                     const selectedCouponId = this.coupons[index].Id;
+                    this.usingCouponId = this.coupons[index].Id;
+
                     if (this.coupons[index].Selected) {
+                        this.selectedCouponAmount = this.coupons[index].Discount;
                         console.log("Selected Coupon ID:", selectedCouponId);
+                        console.log("Selected Coupon Amount:", this.selectedCouponAmount);
+                        document.getElementById("selectedCouponId").value = selectedCouponId;
+                    } else {
+                        document.getElementById('selectedCouponId').value = '';
                     }
+                },
+                goToCheckout:function(){
+                    const url = `/Carts/Checkout/${this.usingCouponId}`;
+                    window.location.href = url;
+                },
+                //async sendSelectedCoupon() {
+                //    const selectedCouponId = document.getElementById("selectedCouponId").value;
+                //    const url = "/Ecpay/Index";
+                //    try {
+                //        const response = await fetch(url, {
+                //            method: "POST",
+                //            headers: {
+                //                "Content-Type": "application/json"
+                //            },
+                //            body: JSON.stringify({ selectedCouponId: selectedCouponId })
+                //        });
 
-                }
+                //        if (response.ok) {
+                //            console.log("123");
+                //        } else {
+                //            console.log("XXX");
+                //        }
+                //    } catch (error) {
+                //        console.error("There was an error sending the coupon:", error);
+                //    }
+                //}
             }
-        })
+        });
 
-        app.mount("#app")
+        app.mount("#app");
     </script>
+
+
+}
+
        
-</div>
+

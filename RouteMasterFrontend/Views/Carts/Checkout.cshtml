@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
 
 @{
-    ViewData["Title"] = "Checkout";
+    var couponId = ViewBag.CouponId;
+
+
    
 }
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -37,69 +39,73 @@
     <div class="step"><span>3. 確認訂單</span></div>
 </div>
 
-
-<div id="accordion">
-    @foreach (var item in Model)
-    {
-        <div class="card" style="margin-top:50px";>
-            <div class="card-header" id="heading-@item.Member.Id">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
-                        訂購人資料
-                    </button>
-                </h5>
-            </div>
-            <div id="collapse-@item.Member.Id" class="collapse" aria-labelledby="heading-@item.Member.Id" data-parent="#accordion">
-                <div class="card-body">
-                    <div>
-                        <label>帳號:</label>
-                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Account)</span>
-                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Account)" style="display: none;" />
-                    </div>
-                    <div>
-                        <label>姓名:</label>
-                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.FirstName) @Html.DisplayFor(modelItem => item.Member.LastName)</span>
-                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.FirstName)" style="display: none;" />
-                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.LastName)" style="display: none;" />
-                    </div>
-                    <div>
-                        <label>地址:</label>
-                        <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Address)</span>
-                        <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Address)" style="display: none;" />
-                    </div>
-                    <button type="button" class="btn btn-secondary edit-button">編輯</button>
-                    <button type="button" class="btn btn-primary save-button" style="display: none;">儲存</button>
+<form asp-action="CheckoutPost" method="post">
+    <div id="accordion">
+        @foreach (var item in Model)
+        {
+            <div class="card" style="margin-top:50px";>
+                <div class="card-header" id="heading-@item.Member.Id">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
+                            訂購人資料
+                        </button>
+                    </h5>
                 </div>
-             </div>
-        </div>
-
-        <div class="card" style="margin-top:50px;">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-payment" aria-expanded="true" aria-controls="collapse-payment">付款方式</button>
-                </h5>
-            </div>
-            <div id="collapse-payment" class="collapse" aria-labelledby="heading-payment">
-                <div class="card-body">
-                    @foreach (var paymentMethod in ViewBag.PaymentMethods)
-                    {
-                        <label>
-                            <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
-                            @paymentMethod.Name
-                        </label>
-                    }
-                    <p class="selected-payment-method-info"></p>
+                <div id="collapse-@item.Member.Id" class="collapse" aria-labelledby="heading-@item.Member.Id" data-parent="#accordion">
+                    <div class="card-body">
+                        <div>
+                            <label>帳號:</label>
+                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Account)</span>
+                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Account)" style="display: none;" />
+                        </div>
+                        <div>
+                            <label>姓名:</label>
+                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.FirstName) @Html.DisplayFor(modelItem => item.Member.LastName)</span>
+                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.FirstName)" style="display: none;" />
+                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.LastName)" style="display: none;" />
+                        </div>
+                        <div>
+                            <label>地址:</label>
+                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Address)</span>
+                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Address)" style="display: none;" />
+                        </div>
+                        <button type="button" class="btn btn-secondary edit-button">編輯</button>
+                        <button type="button" class="btn btn-primary save-button" style="display: none;">儲存</button>
+                    </div>
                  </div>
-             </div>
-        </div>
+            </div>
+
+            <div class="card" style="margin-top:50px;">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn" type="button" data-toggle="collapse" data-target="#collapse-payment" aria-expanded="true" aria-controls="collapse-payment">付款方式</button>
+                    </h5>
+                </div>
+                <div id="collapse-payment" class="collapse" aria-labelledby="heading-payment">
+                    <div class="card-body">
+                        @foreach (var paymentMethod in ViewBag.PaymentMethods)
+                        {
+                            <label>
+                                <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
+                                @paymentMethod.Name
+                            </label>
+                        }
+                        <p class="selected-payment-method-info"></p>
+                     </div>
+                 </div>
+            </div>
+
+            <input type="hidden" name="couponId" value="@couponId">
      
-    }
-</div>
+        }
+    </div>
 <input type="submit" value="Save" class="btn btn-primary" style="margin-top:50px;" />
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</form>
+
 
 @section Scripts {
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
        
         document.querySelectorAll('.edit-button').forEach(button => {
