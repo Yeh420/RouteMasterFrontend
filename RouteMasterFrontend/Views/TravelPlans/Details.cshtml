@@ -1,36 +1,781 @@
-﻿@model RouteMasterFrontend.EFModels.TravelPlan
-
-@{
-    ViewData["Title"] = "Details";
+﻿@{
+    var packageTourId = ViewBag.PackageTourId;
+    var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
 
-<h1>Details</h1>
 
-<div>
-    <h4>TravelPlan</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TravelDays)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TravelDays)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Member)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Member.Account)
-        </dd>
-    </dl>
+@section Styles{
+    <style>
+        .date-picker {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 50px auto;
+            min-height: 410px; /* 設定一個預設的最小高度 */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .other-month {
+            color: #ccc;
+        }
+
+        .day-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 0.5px solid transparent;
+            transition: border 0.3s ease-in-out;
+        }
+
+            .day-container:hover {
+                border-color: #ccc;
+                /* 使用者懸停時，邊框顏色變為 #ccc */
+            }
+
+
+        .price {
+            font-size: 0.8em;
+        }
+
+        .informationBigContainer {
+            display: flex;
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
+
+        .informationContainer {
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
+
+        .disabled {
+            opacity: 0.5;
+            /* 設置透明度為 50% */
+            position: relative;
+        }
+
+
+        .image-container {
+            width: 500px; /* 调整宽度 */
+        }
+
+        .textbox {
+            padding: 10px;
+            border: 1px solid transparent; /* 初始設定為透明的框線 */
+            transition: border-color 0.3s; /* 添加過渡效果 */
+        }
+
+            .textbox:hover {
+                border-color: #ccc; /* 鼠標懸停時改變框線顏色 */
+            }
+    </style>
+}
+
+
+<div id="app">
+
+    <h1>套裝行程購買頁面啦啦啦</h1>
+
+    <h3>活動方案選擇</h3>
+    <div v-for="actObj in activityInformations"key="actObj.id" class="card mb-3" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <img v-bind:src="actObj.image" class="img-fluid rounded-start w-100" />
+            </div>
+            <div class="col-md-7">
+                <div class="card-body">
+                    <h5 class="card-title">{{actObj.name}}</h5>
+                    <div class="d-flex">
+                        <p class="card-text"><small class="text-body-secondary">{{actObj.regionName}}</small></p>
+                        <p class="card-text"><small class="text-body-secondary">{{actObj.attractionName}}</small></p>
+                    </div>
+                    <p class="card-text">{{actObj.description}}</p>
+                    <p>{{actObj.selectedActProduct}}</p>
+
+
+                    <div v-if="actObj.selectedActProduct!=undefined">
+                        <p>{{actObj.selectedActProduct.productId}}</p>
+                        <p>{{actObj.selectedActProduct.price}}</p>
+                        <p>{{actObj.selectedActProduct.quantity}}</p>
+                    </div>    
+                </div>
+            </div>       
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <button class="btn btn-primary m-1 " @@click="selectActProduct(actObj.id);toggleActDatePicker()">選擇方案</button>             
+            </div>
+        </div>
+    </div>
+
+
+    <h3>服務方案選擇</h3>
+    <div v-for="extObj in extraServiceInformations" key="extObj.id" class="card mb-3" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <img v-bind:src="extObj.image" class="img-fluid rounded-start w-100" />
+            </div>
+            <div class="col-md-7">
+                <div class="card-body">
+                    <h5 class="card-title">{{extObj.name}}</h5>
+                    <div class="d-flex">
+                        <p class="card-text"><small class="text-body-secondary">{{extObj.regionName}}</small></p>
+                        <p class="card-text"><small class="text-body-secondary">{{extObj.attractionName}}</small></p>
+                    </div>
+                    <p class="card-text">{{extObj.description}}</p>
+                    <p>{{extObj.selectedExtProduct}}</p>
+
+
+                    <div v-if="extObj.selectedExtProduct!=undefined">
+                        <p>{{extObj.selectedExtProduct.productId}}</p>
+                        <p>{{extObj.selectedExtProduct.price}}</p>
+                        <p>{{extObj.selectedExtProduct.quantity}}</p>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <button class="btn btn-primary m-1 " @@click="selectExtProduct(extObj.id);toggleExtDatePicker()">選擇方案</button>
+            </div>
+        </div>
+    </div>
+
+   
+
+
+
+
+
+
+
+
+    <div class="modal fade" id="ActivityDatePickerModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+         aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">選擇方案</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                </div>
+                <div class="modal-body" style="text-align:center;">
+                    <div class="row" >
+                        <div class="date-picker col-6">
+                            <div class="header">
+                                <button id="prevMonth" class="btn btn-outline-secondary" @@click="changeActMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
+                                <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
+                                <button id="nextMonth" class="btn btn-outline-secondary" @@click="changeActMonth(1)"><i class="fa-solid fa-right-long"></i></button>
+                            </div>
+                            <div class="calendar" id="calendar">
+                                <div v-for="(dateObj, index) in actCalendarDates" :key="date">
+                                    <div class="day-container" v-bind:class="{'disabled':dateObj.highestPrice==null,'selected':dateObj.selected==true}"
+                                         v-bind:data-id="dateObj.id "
+                                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.highestPrice != null && actSelectDate(dateObj)">
+                                        <template v-if="dateObj.date === null">
+                                            <div class="day other-month"></div>
+                                            <span class="price"> </span>
+                                        </template>
+                                        <template v-else-if="dateObj.highestPrice !== null">
+                                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                                            <span class="price">{{ dateObj.highestPrice }}</span>
+                                        </template>
+                                        <template v-else>
+                                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                                            <span class="price">X</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="buyingContainer" class="col-6">
+                            <br />
+                            <br />
+                            <h4 class="textbox">{{selectedDate}}</h4>
+                            <br />
+                            <h5 v-if="selectedDate!='請選擇日期'">選擇梯次</h5>
+                            <br />
+                            <br />
+                            <div class="d-flex row">
+                                <div v-for="(productObj,index) in selectedProductsArray" :key="id" class="col-3">
+                                    <button class="btn btn-primary " @@click="selectTheTargetPatchProduct(productObj)">{{productObj.startTime}}</button>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div v-if="selectedProductId!=''">
+                                <h5 class="border-1  w-50">價格: {{selectedPrice}}</h5>
+                                <br />
+                                <h5 class="border-1  w-50">可購買數量: {{selectedQuantity}}</h5>
+                                <br />
+                                <div>
+                                    <label class="border-1  w-25">選擇購買數量</label>
+                                    <input class="m-1 p-1 " v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+                                    <button class="m-1 p-1 btn btn-primary" @@click="confirmActSelection">確認</button>
+                                </div>
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="ExtraServiceDatePickerModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+         aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">選擇方案</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                </div>
+                <div class="modal-body" style="text-align:center;">
+                    <div class="row">
+                        <div class="date-picker col-6">
+                            <div class="header">
+                                <button id="prevMonth" @@click="changeExtMonth(-1)">&lt;</button>
+                                <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
+                                <button id="nextMonth" @@click="changeExtMonth(1)">&gt;</button>
+                            </div>
+                            <div class="calendar" id="calendar">
+                                <div v-for="(dateObj, index) in extCalendarDates" :key="date">
+                                    <div class="day-container" v-bind:class="{'disabled':dateObj.price==null,'selected':dateObj.selected==true}"
+                                         v-bind:data-id="dateObj.id "
+                                         v-bind:data-quantity="dateObj.quantity" @@click="dateObj.price!=null&&extSelectDate(dateObj)">
+                                        <template v-if="dateObj.date === null">
+                                            <div class="day other-month"></div>
+                                            <span class="price"> </span>
+                                        </template>
+                                        <template v-else-if="dateObj.price !== null">
+                                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                                            <span class="price">{{ dateObj.price }}</span>
+                                        </template>
+                                        <template v-else>
+                                            <div class="day">{{ dateObj.date.getDate() }}</div>
+                                            <span class="price">X</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="buyingContainer" class="col-6">
+                            <br />
+                            <br />
+                            <br />
+                            <h4>{{selectedDate}}</h4>
+                            <br />
+                            <div v-if="selectedDate!='請選擇日期'">
+                                <br />
+                                <h5>價格:{{selectedPrice}}</h5>
+                                <br />
+                                <h5>可購買數量:{{selectedQuantity}}</h5>
+                                <br />
+                                <div>
+                                    <label class="border-1  w-25">選擇購買數量</label>
+                                    <input class="m-1 p-1 " v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
+                                    <button class="m-1 p-1 btn btn-primary" @@click="confirmExtSelection">確認</button>
+                                </div>                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
+
+
+
+
+
+@section Scripts{
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script>
+        let baseAddress = "https://localhost:7251";
+        let vueApp = {
+            data() {
+                return {
+                    packageTourId: @packageTourId,
+                    cartId: @cartIdFromCookie,
+                    activityIds:[],
+                    extraServiceIds:[],
+
+                    selectedActId:"",
+                    selectedExtId:"",
+
+
+                    activityInformations:[],
+                    extraServiceInformations:[],
+
+                    selectedActProductIdsWithQuantity:[],
+                    selectedExtProductIdsWithQuantity:[],
+
+
+                    
+                    actCalendarDates: [],
+                    extCalendarDates: [],
+
+
+                    selectedDate: "請選擇日期",
+                    selectedProductId: "",
+                    selectedPrice: "",
+                    selectedQuantity: "",
+                    inputQuantity: "",
+                 
+                    currentMonth: new Date().getMonth() + 1,
+                    currentYear: new Date().getFullYear(),
+                    selectedProductsArray: [],
+
+                };
+            },
+            mounted: async function () {
+                let _this = this;
+
+               await  _this.getTargetPackageTour();
+               await _this.getActivityInformations();
+               await _this.getExtraServiceInformations();
+
+
+            },
+            computed: {
+                firstDay() {
+                    return new Date(this.currentYear, this.currentMonth - 1, 1).getDay()
+                },
+                daysInMonth() {
+                    return new Date(this.currentYear, this.currentMonth, 0).getDate();
+                }
+            },
+            methods: {
+                getTargetPackageTour:async function(){
+                    let  _this=this;
+       
+
+                await    axios.get(`${baseAddress}/api/PackageToures/Id?id=${_this.packageTourId}`).then(response => {
+                       
+                        console.log(response)
+                        _this.activityIds = response.data.activityIds;
+                        _this.extraServiceIds = response.data.extraServiceIds;
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+                getActivityInformations:function(){
+                    for (let i = 0; i < this.activityIds.length;i++){
+                        this.getTargetActivityDto(this.activityIds[i])
+                    }                    
+                },
+                getTargetActivityDto: function (activityId) {      
+                    axios.post(`${baseAddress}/api/ActivityVuePage/Id?activityId=${activityId}`).then(response => {
+
+                        this.activityInformations.push(response.data)                      
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+
+
+
+                getExtraServiceInformations: function () {
+                    for (let i = 0; i < this.extraServiceIds.length; i++) {
+                        this.getTargetExtraServiceDto(this.extraServiceIds[i])
+                    }
+                },
+                getTargetExtraServiceDto: function (extraServiceId) {                  
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/Id?extraServiceId=${extraServiceId}`).then(response => {
+                        this.extraServiceInformations.push(response.data)           
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                selectActProduct: function (actId){
+                    this.selectedActId = actId;
+                    this.updateActCalendar();
+                },
+
+                selectExtProduct:function(extId){
+                    this.selectedExtId = extId;
+                    this.updateExtCalendar();
+                },
+
+
+                toggleActDatePicker: function () {
+                    console.log('actToggle啦')              
+                    $('#ActivityDatePickerModal').modal("show");
+                },
+
+
+                toggleExtDatePicker:function(){
+                    console.log('extToggle啦')
+                    $('#ExtraServiceDatePickerModal').modal("show");
+                },
+
+
+
+  
+
+
+                changeActMonth:function(change){
+                    this.currentMonth += change;
+                    if (this.currentMonth < 1) {
+                        this.currentMonth = 12;
+                        this.currentYear -= 1;
+                    } else if (this.currentMonth > 12) {
+                        this.currentMonth = 1;
+                        this.currentYear += 1;
+                    }
+                    this.updateActCalendar();
+                },
+
+
+                changeExtMonth: function (change) {
+                    this.currentMonth += change;
+                    if (this.currentMonth < 1) {
+                        this.currentMonth = 12;
+                        this.currentYear -= 1;
+                    } else if (this.currentMonth > 12) {
+                        this.currentMonth = 1;
+                        this.currentYear += 1;
+                    }
+                    this.updateExtCalendar();
+                },
+
+
+
+
+
+                updateActCalendar: function () {            
+                    this.generateActCalendarDates();
+                },
+                updateExtCalendar: function () {
+                    this.generateExtCalendarDates();
+                },
+
+
+
+                generateExtCalendarDates:function(){
+                    this.extCalendarDates = [];
+                    for (let i = 0; i < this.firstDay; i++) {
+                        this.extCalendarDates.push({ date: null, price: null, quantity: 0, id: 0, selected: false });
+                    }
+                    for (let i = 1; i <= this.daysInMonth; i++) {
+                        const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
+                        this.extCalendarDates.push({ date: currentDate, price: null, quantity: 0, id: 0, selected: false });
+                    }
+                    //console.log(this.calendarDates)
+                    const postData = {
+                        extraServiceId: this.selectedExtId,
+                        currentMonth: this.currentMonth,
+                        currentYear: this.currentYear
+                    };
+
+
+                    axios.post(`${baseAddress}/api/ExtraServiceVuePage/getProducts`, postData)
+                        .then(response => {
+                            //console.log('response啦')
+                            //console.log(response)
+
+                            for (let i = 0; i < response.data.length; i++) {
+                                let dateFromIso = new Date(response.data[i].date);
+                                for (let j = 0; j < this.extCalendarDates.length; j++) {
+                                    if (this.extCalendarDates[j].date !== null) {
+                                        if (this.extCalendarDates[j].date.getDate() == dateFromIso.getDate()) {
+
+                                            this.extCalendarDates[j].price = response.data[i].price
+                                            this.extCalendarDates[j].quantity = response.data[i].quantity
+                                            this.extCalendarDates[j].id = response.data[i].id
+                                        }
+                                    }
+                                }
+                            }
+                            console.log(this.extCalendarDates)
+                        }).catch(err => {
+                            console.log(err);
+                        })
+
+
+
+                        
+                },
+
+                generateActCalendarDates: function () {
+                    this.actCalendarDates = [];
+                    for (let i = 0; i < this.firstDay; i++) {
+                        this.actCalendarDates.push({ date: null, highestPrice: null, actProducts: [], selected: false });
+                    }
+                    for (let i = 1; i <= this.daysInMonth; i++) {
+                        const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
+                        this.actCalendarDates.push({ date: currentDate, highestPrice: null, actProducts: [], selected: false });
+                    }
+                    //console.log(this.calendarDates)
+                    const postData = {
+                        activityId: this.selectedActId,
+                        currentMonth: this.currentMonth,
+                        currentYear: this.currentYear
+                    };
+
+
+                    axios.post(`${baseAddress}/api/ActivityVuePage/getProducts`, postData)
+                        .then(response => {
+                            console.log('response啦')
+                            console.log(response)
+
+
+
+
+                            for (let i = 0; i < response.data.length; i++) {
+                                let dateFromIso = new Date(response.data[i].date);
+                                for (let j = 0; j < this.actCalendarDates.length; j++) {
+                                    if (this.actCalendarDates[j].date !== null) {
+                                        if (this.actCalendarDates[j].date.getDate() == dateFromIso.getDate()) {
+                                            const newActProduct = { id: response.data[i].id, price: response.data[i].price, quantity: response.data[i].quantity, startTime: response.data[i].startTime, endeTime: response.data[i].endTime };
+                                            this.actCalendarDates[j].actProducts.push(newActProduct)
+
+
+                                            if (this.actCalendarDates[j].highestPrice == null) {
+                                                this.actCalendarDates[j].highestPrice = response.data[i].price
+                                            }
+
+
+
+                                            if (response.data[i].price > this.actCalendarDates[j].highestPrice) {
+                                                this.actCalendarDates[j].highestPrice = response.data[i].price
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            console.log(this.actCalendarDates)
+                        }).catch(err => {
+                            console.log(err);
+                        })
+                },
+
+
+
+                actSelectDate: function (dateObj) {
+                    for (let i = 0; i < this.actCalendarDates.length; i++) {
+                        this.actCalendarDates[i].selected = false;
+                    }
+
+                    this.selectedDate = dateObj.date.getMonth()+1 + "月" + dateObj.date.getDate() + "日";
+                    this.selectedProductsArray = dateObj.actProducts;
+                    dateObj.selected = true;
+                    this.selectedProductId = "";
+                    this.selectedPrice = "";
+                    this.selectedQuantity = "";
+                },
+
+
+                extSelectDate: function (dateObj) {
+                    for (let i = 0; i < this.extCalendarDates.length; i++) {
+                        this.extCalendarDates[i].selected = false;
+                    }
+
+                    this.selectedDate = dateObj.date.getMonth() + 1 + "月" + dateObj.date.getDate() + "日";
+                    this.selectedProductId = dateObj.id;
+                    this.selectedPrice = dateObj.price;
+                    this.selectedQuantity = dateObj.quantity;
+                    this.inputQuantity = 1;
+                    dateObj.selected = true;
+                },
+
+
+
+
+
+
+                selectTheTargetPatchProduct: function (productObj) {
+                    this.selectedProductId = productObj.id;
+                    this.selectedPrice = productObj.price;
+                    this.selectedQuantity = productObj.quantity;
+                    this.inputQuantity = 1;
+                },
+
+                confirmActSelection:function(){
+                   this.selectedActProductIdsWithQuantity.push({ id: this.selectedProductId, quantity: this.inputQuantity })
+
+
+
+                    this.activityInformations.forEach(actObj => {
+                        if (actObj.id == this.selectedActId) {
+                            actObj.selectedActProduct = {
+                                productId: this.selectedProductId,
+                                quantity: this.inputQuantity,
+                                price: this.selectedPrice
+                            };
+                        }
+                    });
+
+
+
+                    this.selectedProductId = "";
+                    this.selectedPrice = "";
+                    this.selectedQuantity = "";
+                    this.selectedDate = "請選擇日期";
+
+                    $('#ActivityDatePickerModal').modal("hide");
+
+                    
+                },
+
+
+
+
+                confirmExtSelection: function () {
+                    this.selectedExtProductIdsWithQuantity.push({ id: this.selectedProductId, quantity: this.inputQuantity })
+
+                    console.log('有啦有啦有啦有啦')
+
+                    this.extraServiceInformations.forEach(extObj => {
+                        if (extObj.id == this.selectedExtId) {
+                            console.log('有等於啦')
+                            extObj.selectedExtProduct = {
+                                productId: this.selectedProductId,
+                                quantity: this.inputQuantity,
+                                price: this.selectedPrice
+                            };
+                        }
+                    });
+
+
+
+                    this.selectedProductId = "";
+                    this.selectedPrice = "";
+                    this.selectedQuantity = "";
+                    this.selectedDate = "請選擇日期";
+
+                    $('#ExtraServiceDatePickerModal').modal("hide");
+
+
+                },
+
+
+
+
+
+                addToCart: function () {
+                    //加入購物車
+                    const postData = {
+                        cartId: this.cartId,
+                        activityid: this.selectedProductId,
+                        quantity: this.inputQuantity
+                    }
+                    console.log(postData);
+                    console.log('加購物車啦')
+                    fetch(`${baseAddress}/api/Carts/addactivity`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                this.reloadCartItems();
+                            } else {
+                                alert('加入購物車失敗');
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Failed to add to cart:', error);
+                        });
+                    console.log('加入購購物車');
+                },
+                reloadCartItems() {
+                    fetch('/Carts/RefreshCart')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('Cart').innerHTML = data;
+                        })
+                        .catch(() => {
+                            alert('Failed to reload cart items.');
+                        });
+                }
+            }
+        };
+        let app = Vue.createApp(vueApp).mount('#app');
+
+
+
+
+        //todo加入購物車邏輯&方法  
+        //重複打開應該要做覆蓋的動作，也就是存進去目標陣列的時候要判斷是否已存在物件，有的話要將已存在的刪除
+        //購物車數量判斷(要全部都有選擇方案才可以加入購物車)
+
+    </script>
+
+
+
+
+
+}

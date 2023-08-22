@@ -142,6 +142,7 @@
     }
 <div id="app" v-cloak>
     <div v-if="toggle">
+        <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
         <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" @@click="toggle"/>
     </div>
@@ -439,7 +440,9 @@
                                     <img src="https://static.thenounproject.com/png/2392153-200.png" style="width:24px;height:24px" /> 最晚CheckOut時間：{{accommodationIndex.checkOut}}
                                 </section>
                             </div>
-                            <div v-else class="right h-100" >123</div>
+                            <div v-else class="right h-100">
+                                <dec ref="childRef"></dec>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -707,27 +710,7 @@
                         _this.$refs.childRef.commentBrief(p.id);
                         _this.initMap(id);
                     }
-                },
-                showAllComment: function () {
-                    let _this = this;
-                    const swcollapse2 = document.getElementById("swcollapse2");
-                    const collapse2 = document.getElementById("collapse2");
-                    const topthree = document.getElementById("topthree");
-
-                    const isCollapsed = swcollapse2.classList.contains('collapsed');
-                    if (isCollapsed) {
-                        // Collapse 已展開，這裡可以執行相關程式碼
-                        topthree.style.display = 'block';
-                        console.log("close");
-
-                    }
-                    else {
-                        _this.$refs.childRef.commentDisplay();
-                        topthree.style.display = 'none';
-                        console.log("open");
-                    }
-
-                },
+                },             
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;
@@ -979,11 +962,12 @@
                 },
                 ShowComments:function(id){
                     this.overview = false;
-                    _this.$refs.childRef.commentDisplay(id);
+                    this.$refs.childRef.commentBrief(id);
+                    //this.$refs.childRef.commentDisplay(id);
                 },
                 toggle:function(){
                     this.toggle = false;
-
+                    this.loadProducts();
                 },
             },
             components: {

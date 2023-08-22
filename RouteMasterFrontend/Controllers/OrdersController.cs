@@ -24,6 +24,20 @@ namespace RouteMasterFrontend.Controllers
             var routeMasterContext = _context.Orders.Include(o => o.Coupons).Include(o => o.Member).Include(o => o.OrderHandleStatus).Include(o => o.PaymentMethod).Include(o => o.PaymentStatus);
             return View(await routeMasterContext.ToListAsync());
         }
+        public ActionResult PayInfo(int orderId)
+        {
+            Order order = GetOrderDetailsById(orderId);
+            if(order == null)
+            {
+                return View("Error");
+            }
+            return RedirectToAction("Index", "Orders");
+        }
+
+        private Order GetOrderDetailsById(int orderId)
+        {
+            throw new NotImplementedException();
+        }
 
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
