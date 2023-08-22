@@ -98,6 +98,9 @@ namespace RouteMasterFrontend.Controllers
                 .Select(p => p.Image).ToList(),
                 ThumbsUp = proLike.Any(l => l.Comments_AccommodationId == c.Id && l.MemberId == 1),
                 TotalThumbs = proLike.Where(l => l.Comments_AccommodationId == c.Id).Count(),
+                Profile= c.Member.Image,
+                Gender= c.Member.Gender,
+                Address= c.Member.Address.Length >= 3 ? c.Member.Address.Substring(0, 3) : c.Member.Address,
 
             }).ToListAsync();
 
@@ -224,7 +227,7 @@ namespace RouteMasterFrontend.Controllers
                 Comments_Accommodation commentDb = new Comments_Accommodation
                 {
                     AccommodationId = 1,//vm.AccommodationId,
-                    MemberId = vm.MemberId,
+                    MemberId = 2,
                     Score = vm.Score,
                     Title = vm.Title,
                     Pros = vm.Pros,
@@ -259,7 +262,7 @@ namespace RouteMasterFrontend.Controllers
                 return RedirectToAction("Index","Home");
 
             }
-            ModelState.AddModelError("", "請點擊星星給予評分");
+            //ModelState.AddModelError("", "請點擊星星給予評分");
             return View(vm);
         }
         private string SaveUploadedFile(string path, IFormFile file1)
