@@ -1,25 +1,14 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
-@using System.Text.Json;
-@using System.Text.Json.Serialization;
 @model FilterDTO
-
 @section Styles{
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-
-    @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
-
-
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  
     <style>
         .currentPage {
             background-color: lightgray;
-        }
-
-        .wh220 {
-            width: 220px;
-            height: 220px;
         }
 
         .w-33 {
@@ -58,11 +47,11 @@
         }
 
             .product-info .left {
-                width: 722px;
+                width: 662px;
             }
 
             .product-info .right {
-                width: 55%;
+                width: 58%;
                 padding: 10px;
                 margin-left: auto;
                 overflow: auto;
@@ -135,24 +124,23 @@
             100% { transform: rotate(360deg); }
         }
             </style>
-            <noscript>
-                <style>
-                    .simplebar-content-wrapper {
-                        scrollbar-width: auto;
-                        -ms-overflow-style: auto;
-                    }
+        <noscript>
+            <style>
+                .simplebar-content-wrapper {
+                    scrollbar-width: auto;
+                    -ms-overflow-style: auto;
+                }
 
-                        .simplebar-content-wrapper::-webkit-scrollbar,
-                        .simplebar-hide-scrollbar::-webkit-scrollbar {
-                            display: initial;
-                            width: initial;
-                            height: initial;
-                        }
-                </style>
-            </noscript>
+                    .simplebar-content-wrapper::-webkit-scrollbar,
+                    .simplebar-hide-scrollbar::-webkit-scrollbar {
+                        display: initial;
+                        width: initial;
+                        height: initial;
+                    }
+            </style>
+        </noscript>
     }
 <div id="app" v-cloak>
-
     <div v-if="toggle">
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
         <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" />
@@ -250,18 +238,21 @@
                             <td>
                                 <div class="row mb-2">
                                     <div class="col">
-                                        <div class="card mb-3 h200">
+                                        <div class="card mb-3">
                                             <div class="row g-0 ">
-                                                <div class="wh220">
-                                                    <img class="card-img card-img-left h-100 w-100" v-bind:src="product.image" style="object-fit:cover" alt="尚未建立住所照片" />
+                                                <div class="col-5">
+                                                    <div class="ratio ratio-4x3">
+                                                        <img class="card-img card-img-left h-100 w-100" v-bind:src="product.image" style="object-fit:cover" alt="尚未建立住所照片" />
+                                                    </div>
                                                 </div>
-                                                <div class="col-9">
+                                                <div class="col-7">
                                                     <div class="card-body w-100">
                                                         <div class="d-flex align-items-center">
-                                                            <h5 class="card-title m-0">
+                                                            <h5 class="card-title m-0 me-2">
                                                                 {{product.name}}
                                                             </h5>
-                                                            <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-auto" style="width: 32px; height: 32px; letter-spacing:1px">{{product.grade}}</span>
+                                                            <i v-for="grade in product.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
+                                                            <p class="ms-auto">{{product.comment}}筆評論<span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 40px; height: 40px; letter-spacing:1px">{{product.score}}</span></p>
                                                         </div>
                                                         <p class="card-text">
                                                             <small class="text-muted">
@@ -311,15 +302,19 @@
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content h-100">
-                <div class="modal-header d-f">
-                    <h1 class="modal-title fs-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationIndex.name}}</h1>
-                    <div class="d-flex">
-                        <button class="form-control">總覽</button>
-                        <button class="form-control">所有評論</button>
+                <div class="modal-header pb-1 pe-3 flex-wrap">
+                    <h1 class="modal-title fs-2 me-2" id="exampleModalLabel"><i class="fa-solid fa-hotel me-3"></i>{{accommodationIndex.name}}</h1>
+                    <i v-for="grade in accommodationIndex.grade" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>
+                    <span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 ms-2" style="width: 40px; height: 40px; letter-spacing:1px">{{accommodationIndex.score}}</span>
+                    <button type="button" class="btn-close me-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="w-100 mt-2">
+                        <div class="d-flex justify-content-between" style="width:12%">
+                            <button class="form-control btn border-0 me-2 px-0" :class="{ 'btn-outline-success':!overview, ' btn-success':overview }" @@click="Overview(accommodationIndex.id)">總覽</button>
+                            <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments">所有評論</button>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div v-if="true" class="modal-body">
+                <div class="modal-body">
                     <div class="modal-container h-100">
                         <div class="product-info h-100">
                             <div class="left h-100 mt-2 ms-2">
@@ -333,7 +328,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="right h-100" data-simplebar>
+                            <div v-if="overview" class="right h-100" data-simplebar>
                                 <section class="mb-3">
                                     <p class="d-inline-flex gap-1 fs-5">
                                         <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -348,7 +343,6 @@
                                     </p>
                                     <div class="collapse" id="collapseExample">
                                         <div class="card card-body">
-                                            @*<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.0436396868013!2d121.21455157595463!3d24.964629841080292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346822334db23863%3A0x7ef0842ef1cf8013!2z5Y-k6I-v6Iqx5ZyS6aOv5bqXIEhvdGVsIEt1dmEgQ2hhdGVhdQ!5e0!3m2!1szh-TW!2stw!4v1691261369090!5m2!1szh-TW!2stw" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>*@
                                             <div id="map" class="ratio ratio-16x9"></div>
                                         </div>
                                     </div>
@@ -395,44 +389,44 @@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2 "><i class="fa-solid fa-award me-3"></i>設施與服務：</h2>
-                                    <div class="row d-flex">
-                                        <ul v-if="accommodationServiceCId.indexOf(1) !== -1" class="col-4 mb-4">
+                                    <div class="row d-flex w-100">
+                                        <ul v-if="accommodationServiceCId.indexOf(1) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-van-shuttle"></i>交通與車輛相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 1})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(2) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(2) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-wifi"></i>網路與通訊相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 2})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(3) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(3) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-tv"></i>休閒與娛樂設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 3})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(5) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(5) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
-                                                <i class="me-1 li-icon fa-solid fa-handshake"></i></i>會議與商務設施
+                                                <i class="me-1 li-icon fa-solid fa-handshake"></i>會議與商務設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 5})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(6) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(6) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-utensils"></i>餐飲相關設施
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 6})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(7) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(7) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-regular fa-credit-card"></i>金融與支付相關
                                             </li>
                                             <li v-for="s in accommodationIndex.services.filter(function(s){return s.serviceInfoCategoryId === 7})"><i class="me-1 li-icon fa-solid fa-check bg-priamry"></i>{{s.name}}</li>
                                         </ul>
-                                        <ul v-if="accommodationServiceCId.indexOf(8) !== -1" class="col-4 mb-4">
+                                        <ul v-if="accommodationServiceCId.indexOf(8) !== -1" class="col-3 mb-4 pe-0">
                                             <li>
                                                 <i class="me-1 li-icon fa-solid fa-circle-info"></i>其他
                                             </li>
@@ -445,14 +439,13 @@
                                     <img src="https://static.thenounproject.com/png/2392153-200.png" style="width:24px;height:24px" /> 最晚CheckOut時間：{{accommodationIndex.checkOut}}
                                 </section>
                             </div>
+                            <div v-else class="right h-100" >123</div>
                         </div>
                     </div>
                 </div>
-                <div v-else>123</div>
             </div>
         </div>
     </div>
-
 </div>
 
 @section Scripts{
@@ -490,6 +483,7 @@
                     cartItems: [],
                     map: null,
                     toggle: false,
+                    overview:true,
                     isLoading: false,
                 }
             },
@@ -684,7 +678,6 @@
                             return s.serviceInfoCategoryId;
                         });
 
-                        _this.$refs.childRef.commentBrief(p.id);
                         const showMoreText = "...顯示更多";
                         const showLessText = "...顯示更少";
                         const lines = _this.temp = p.description.split('\n');
@@ -711,6 +704,7 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
+                        _this.$refs.childRef.commentBrief(p.id);
                         _this.initMap(id);
                     }
                 },
@@ -874,7 +868,7 @@
                     this.map = new google.maps.Map(document.getElementById("RecommendMap"), {
                         // 中心點位置
                         center: location,
-                        zoom: 12, // 地圖縮放比例 (0-20)
+                        zoom: 13, // 地圖縮放比例 (0-20)
                         streetViewControl: true, // 是否顯示右下角街景小人
                         mapTypeControl: true // 使用者能否切換地圖樣式：一般、衛星圖等
                     });
@@ -888,24 +882,6 @@
 
                     console.log(result);
 
-                    let markerCenter = new google.maps.Marker({
-                        position: location,
-                        //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
-                        map: _this.map,
-                        animation: google.maps.Animation.DROP, // DROP掉下來、BOUNCE一直彈跳
-                        draggable: false // true、false可否拖拉
-                    });
-
-                    markerCenter.addListener('click', e => {
-                        infowindow.open(_this.map, markerCenter);
-                    });
-
-                    let centerInfowindow = new google.maps.InfoWindow({
-                        content: `你的位置` // 支援html
-                    });
-
-                    centerInfowindow.open(_this.map, markerCenter);
-
                     result.forEach(r => {
                         let latLng = new google.maps.LatLng(r.positionY, r.positionX);
 
@@ -917,28 +893,37 @@
                             draggable: false // true、false可否拖拉
                         });
 
+                        let distanceOutput = '';
+                        if (r.distance >= 1) {
+                            distanceOutput = r.distance.toFixed(1) + '公里';
+                        } else {
+                            distanceOutput = (r.distance * 1000) + '公尺';
+                            const distanceLevel = Math.floor(r.distance * 1000 / 50);
+                            distanceOutput = (distanceLevel * 50) + '公尺';
+                        }
+
                         let infowindow = new google.maps.InfoWindow({
                             content: `
-                                    <div class="card mb-3" style="max-width: 540px;">
+                                    <div class="card" style="width: 410px;">
                                       <div class="row g-0">
-                                        <div class="col-md-4">
-                                          <img src="${r.image}" class="img-fluid rounded-start" alt="...">
+                                        <div class="col-md-5">
+                                            <div class="ratio ratio-4x3">
+                                              <img src="${r.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
+                                            </div>
                                         </div>
-                                        <div class="col-md-8">
-                                          <div class="card-body">
-                                            <h5 class="card-title">${r.name}</h5>
-                                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                                        <div class="col-md-7">
+                                          <div class="card-body h-100 pb-0 d-flex flex-column">
+                                            <h5 class="card-title">${r.name}  <i v-for="grade in ${r.grade}" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i></h5>
+                                            <p class="card-text"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 40px; height: 40px; letter-spacing:1px">${r.score}</span>${r.comment}筆評論</p><br>
+                                            <p class="card-text d-flex justify-content-end"><small class="ms-auto text-body-secondary">距離你的位置： ${distanceOutput} </small></p>
                                           </div>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <h6>${r.name}</h6>
-                                    <small>${r.address}</small>
-
                                     ` // 支援html
                         });
+                        infowindow.open(_this.map, marker);
 
                         marker.addListener('mouseover', e => {
                             infowindow.open(_this.map, marker);
@@ -954,6 +939,25 @@
                         });
 
                     });
+                    
+                    let markerCenter = new google.maps.Marker({
+                        position: location,
+                        //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
+                        map: _this.map,
+                        animation: google.maps.Animation.DROP, // DROP掉下來、BOUNCE一直彈跳
+                        draggable: false // true、false可否拖拉
+                    });
+
+
+                    let centerInfowindow = new google.maps.InfoWindow({
+                        content: `你的位置` // 支援html
+                    });
+
+                    markerCenter.addListener('click', e => {
+                        centerInfowindow.open(_this.map, markerCenter);
+                    });
+
+                    centerInfowindow.open(_this.map, markerCenter);
 
                     this.map.setOptions({
                         styles: [
@@ -968,13 +972,19 @@
 
                     alert("已幫你挑選10間精選住所")
 
-                }
+                },
+                Overview:function(id){
+                    this.overview = true;
+                    this.showModal(id);
+                },
+                ShowComments:function(){
+                    this.overview = false;
+                },
             },
             components: {
                 dec
             }
         }
         var app = Vue.createApp(vueApp).mount("#app");
-
     </script>
 }

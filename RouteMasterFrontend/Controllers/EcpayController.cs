@@ -25,45 +25,41 @@ namespace RouteMasterFrontend.Controllers
         private int CalculateCartTotal(Cart cart)
         {
             int total = 0;
-           
-
             foreach (var accommodationItem in cart.Cart_AccommodationDetails)
             {
-                var roomId = _context.Rooms.Where(x => x.Id == accommodationItem.RoomProductId).First().Id;
-                var RoomPrice = _context.Rooms.Where(x => x.Id == roomId).First().Price;
+                var roomId = accommodationItem.RoomProductId;
+                var room = _context.RoomProducts.FirstOrDefault(x => x.Id == roomId);
 
-                int roomTotal = RoomPrice * accommodationItem.Quantity;
-                total += roomTotal;
+                if (room != null)
+                {
+                    int roomTotal = (int)room.NewPrice * accommodationItem.Quantity;
+                    total += roomTotal;
+                }
             }
             foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
             {
 
-                var extraservicesProductsId = _context.ExtraServices.Where(x => x.Id == extraserviceItem.ExtraServiceProductId).First().Id;
-                var extraServicesId = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Id;
-                var extraServiceName = _context.ExtraServices.Where(x => x.Id == extraservicesProductsId).First().Name;
-                var date = _context.ExtraServiceProducts.Where(X => X.Id == extraservicesProductsId).First().Date;
-                var price = _context.ExtraServiceProducts.Where(x => x.Id == extraservicesProductsId).First().Price;
-                var quantity = extraserviceItem.Quantity;
+                var extraserviceProductId = extraserviceItem.ExtraServiceProductId;
+                var extraserviceProduct = _context.ExtraServiceProducts.FirstOrDefault(x => x.Id == extraserviceProductId);
 
-                int extraServicesTotal = price * quantity;
-                total += extraServicesTotal;
-                extraServiceNames.Add(extraServiceName);
+                if (extraserviceProduct != null)
+                {
+                    int extraserviceTotal = extraserviceProduct.Price * extraserviceItem.Quantity;
+                    total += extraserviceTotal;
+                }
             }
             foreach (var activityItem in cart.Cart_ActivitiesDetails)
             {
-                var activityproductsId = _context.Activities.Where(x => x.Id == activityItem.ActivityProductId).First().Id;
-                var activityId = _context.Activities.Where(x => x.Id == activityproductsId).First().Id;
-                var activitiesName = _context.Activities.Where(X => X.Id == activityproductsId).First().Name;
-                var date = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Date;
-                var startTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().StartTime;
-                var endTime = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().EndTime;
-                var price = _context.ActivityProducts.Where(x => x.Id == activityproductsId).First().Price;
-                var quantity = activityItem.Quantity;
+                var activityProductId = activityItem.ActivityProductId;
+                var activityProduct = _context.ActivityProducts.FirstOrDefault(x => x.Id == activityProductId);
 
-                int activityTotal = price * quantity;
-                total += activityTotal;
+                if (activityProduct != null)
+                {
+                    int activityTotal = activityProduct.Price * activityItem.Quantity;
+                    total += activityTotal;
+                }
             }
-           
+
             return total;
         }
 
@@ -78,7 +74,7 @@ namespace RouteMasterFrontend.Controllers
 
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
 
-            
+            var accommodationNameArray = new List<string>();
             var extraServiceNameArray = new List<string>();
             var activityProductNameArray = new List<string>();
 
@@ -96,6 +92,16 @@ namespace RouteMasterFrontend.Controllers
 
                 extraServiceNameArray.Add(extraServiceName); // 將每個值添加到陣列中
             }
+            foreach (var accommodationItem in cart.Cart_AccommodationDetails)
+            {
+                var roomId = _context.Rooms
+                    .Where(x => x.Id == accommodationItem.RoomProductId)
+                    .Select(x => x.Id)
+                    .FirstOrDefault();
+                var accommodationName = _context.Accommodations
+                    .Where(x => x.Id == roomId) .Select(x => x.Name) .FirstOrDefault();
+            }
+          
 
             foreach (var activityItem in cart.Cart_ActivitiesDetails)
             {

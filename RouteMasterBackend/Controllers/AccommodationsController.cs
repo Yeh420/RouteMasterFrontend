@@ -44,11 +44,12 @@ namespace RouteMasterBackend.Controllers
                     ACategory = data.AcommodationCategory.Name,
                     Name = data.Name,
                     Grade = data.Grade,
-                    Score = data.CommentsAccommodations.Average(ca => ca.Score),
+                    Score = data.CommentsAccommodations.Average(ca => ca.Score) > 0 ? data.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
                     Address = data.Address,
                     PositionX = data.PositionX,
                     PositionY = data.PositionY,
                     Image = data.Image,
+                    Comment = data.CommentsAccommodations.Count(),
                     Distance = Math.Sqrt(
                 Math.Pow((double)(lngX - data.PositionX), 2) +
                 Math.Pow((double)(latY - data.PositionY), 2)) * 111,
@@ -87,6 +88,7 @@ namespace RouteMasterBackend.Controllers
                 PositionY = a.PositionY,
                 CheckIn = a.CheckIn,
                 CheckOut = a.CheckOut,
+                Score = a.CommentsAccommodations.Average(ca => ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
                 Images = a.AccommodationImages,
                 Comments = a.CommentsAccommodations,
                 Rooms = a.Rooms,
@@ -169,7 +171,8 @@ namespace RouteMasterBackend.Controllers
                 Image = a.Image,
                 CheckIn = a.CheckIn,
                 CheckOut = a.CheckOut,
-                Score = a.CommentsAccommodations.Average(ca=>ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score) : 0,
+                Score = a.CommentsAccommodations.Average(ca=>ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
+                Comment = a.CommentsAccommodations.Count(),
                 Services = a.AccommodationServiceInfos
             }).ToListAsync();
             dto.TotalPages = totalPage;
