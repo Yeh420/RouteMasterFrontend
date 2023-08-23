@@ -8,6 +8,7 @@
   /* Add this style to remove border lines */
     #cartTable tbody tr {
         border-top: none; /* Remove border above each row */
+        border-bottom: none;
     }
 
     /* Optional: Add padding to the cells for better spacing */
@@ -19,6 +20,7 @@
     /* Add this style to remove border between thead and tbody */
     #cartTable thead th {
         border-bottom: none;
+        border-top: none;
     }
 
     .extraservices-container-vertical {
@@ -111,9 +113,9 @@
                                     </div>
                                     <div class="extraservice-remove col-md-1" style="text-align: right;">
                                         <div style="margin-right: 25px;">
-                                            <a href="#" onclick="removeFromCartExt(@firstItem.Id)">
+                                                <button data-itemid="@firstItem.Id" class="btn btn-link">
                                                 <i class="fas fa-trash-can"style="font-size: 18px;"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -128,8 +130,16 @@
 </table>
 </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).on('click', '.extraservice-remove button', function (button) {
+        button.preventDefault();
+        const extraserviceId = $(this).data('itemid');
+        removeFromCartExt(extraserviceId);
+    });
+</script>
 <script>
     function removeFromCartExt(extraserviceId) {
       
@@ -141,16 +151,16 @@
             success: function (result) {
                 if (result.success) {                    
                     alert(result.message);
-                    $('#cartTable').find('tr[data-extraserviceid="' + result.extraserviceId + '"]').remove();
+                    $('.extraservice-item[data-extraserviceid="' + result.extraserviceId + '"]').remove();
                     reloadCartItems();
                 } else {
                     // 失敗時的處理
                     alert(result.message);
                 }
             },
-            error: function () {
-                // 發生錯誤時的處理
+            error: function (jqXHR, textStatus, errorThrown) {
                 alert('發生錯誤，無法刪除項目。');
+                console.error("AJAX Error:", textStatus, errorThrown);  
             }
         });
     }

@@ -194,8 +194,7 @@
                 </div>
           
                 <div>
-            </div>
-         
+            </div>         
             </div>
         </div>
     </div>
@@ -410,7 +409,7 @@
                     fetch('/Carts/RefreshCart')
                         .then(response => response.text())
                         .then(data => {
-                            document.getElementById('Cart').innerHTML = data;
+                             $('#Cart').html(data);
                         })
                         .catch(() => {
                             alert('Failed to reload cart items.');

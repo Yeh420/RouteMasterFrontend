@@ -7,7 +7,7 @@
    
 }
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<h1>Checkout</h1>
+
 <style>
     .step-container {
         display: flex;
@@ -19,6 +19,11 @@
     .step {
         width: 32%;
         text-align: center;
+    }
+
+    .edit-field {
+        width: 150px;
+        height: 30px;
     }
 
         .step .circle {
@@ -51,9 +56,7 @@
         margin-bottom: 20px;
     }
 </style>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
 <div class="container mt-5">
     <div class="step-container">
         <div class="step active">
@@ -87,26 +90,45 @@
                 </div>
                 <div id="collapse-@item.Member.Id" class="collapse" aria-labelledby="heading-@item.Member.Id" data-parent="#accordion">
                     <div class="card-body">
-                        <div>
-                            <label>帳號:</label>
-                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Account)</span>
-                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Account)" style="display: none;" />
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">姓名:</label>
+                            <div class="col-sm-3">
+                             
+                                <input type="text" class="edit-field form-control form-control-sm" value="@Html.DisplayFor(modelItem => item.Member.FirstName)" placeholder="名字" />
+                            </div>
+                            <div class="col-sm-3">
+                                
+                                <input type="text" class="edit-field form-control form-control-sm" value="@Html.DisplayFor(modelItem => item.Member.LastName)" placeholder="姓氏" />
+                            </div>
                         </div>
-                        <div>
-                            <label>姓名:</label>
-                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.FirstName) @Html.DisplayFor(modelItem => item.Member.LastName)</span>
-                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.FirstName)" style="display: none;" />
-                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.LastName)" style="display: none;" />
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">電子信箱:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="edit-field form-control form-control-sm" value="@Html.DisplayFor(modelItem => item.Member.Email)" placeholder="電子信箱" />
+                            </div>
                         </div>
-                        <div>
-                            <label>地址:</label>
-                            <span class="display-field">@Html.DisplayFor(modelItem => item.Member.Address)</span>
-                            <input type="text" class="edit-field" value="@Html.DisplayFor(modelItem => item.Member.Address)" style="display: none;" />
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">手機:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="edit-field form-control form-control-sm" value="@Html.DisplayFor(modelItem => item.Member.CellPhoneNumber)" placeholder="手機" />
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-secondary edit-button">編輯</button>
-                        <button type="button" class="btn btn-primary save-button" style="display: none;">儲存</button>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">地址:</label>
+                            <div class="col-sm-10">
+                              
+                                <input type="text" class="edit-field form-control form-control-sm" value="@Html.DisplayFor(modelItem => item.Member.Address)" placeholder="地址" />
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="button" class="btn btn-secondary edit-button">編輯</button>
+                            <button type="button" class="btn btn-primary save-button">儲存</button>
+                        </div>
                     </div>
-                 </div>
+                </div>
+
+
             </div>
 
             <div class="card" style="margin-top:50px;">
@@ -141,7 +163,8 @@
      
         }
     </div>
-<input type="submit" value="Save" class="btn btn-primary" style="margin-top:50px;" />
+    <input type="submit" value="確認付款" class="btn btn-primary" style="margin-top:50px;margin-right: 10px;" />
+<a href="/carts/index" class="btn btn-secondary" style="margin-top:50px">返回購物車</a>
 </form>
 
 
@@ -149,42 +172,24 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-       
-        document.querySelectorAll('.edit-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const container = button.closest('.container');
-                container.querySelectorAll('.display-field').forEach(el => el.style.display = 'none');
-                container.querySelectorAll('.edit-field').forEach(el => el.style.display = 'inline');
-                container.querySelector('.edit-button').style.display = 'none';
-                container.querySelector('.save-button').style.display = 'inline';
-            });
-       });
 
-        document.querySelectorAll('.save-button').forEach(button => {
-            button.addEventListener('click', function () {
-             
-                const container = button.closest('.container');
-                container.querySelectorAll('.display-field').forEach((el, index) => {
-                    el.textContent = container.querySelectorAll('.edit-field')[index].value;
-                    el.style.display = 'inline';
-                });
-                container.querySelectorAll('.edit-field').forEach(el => el.style.display = 'none');
-                container.querySelector('.edit-button').style.display = 'inline';
-                container.querySelector('.save-button').style.display = 'none';
+        $(document).ready(function () {
+            
+            $(".edit-button").click(function () {
+               
+                var card = $(this).closest(".card-body");
+                card.find(".edit-field").prop("readonly", false); 
+                $(this).hide(); 
+                card.find(".save-button").show();
             });
-        });
-    
-        document.querySelectorAll('.payment-method-radio').forEach(radio =>     {
-            radio.addEventListener('change', function () {
-                const selectedRadio = document.querySelector('.payment-method-radio:checked');
-                if (selectedRadio) {
-                    const selectedMethodId = selectedRadio.value;
-                    const selectedItemRow = selectedRadio.closest('tr');
-                    const selectedPaymentMethodInfo = selectedItemRow.querySelector('.selected-payment-method-info');
-                    console.log(123);
-                 
-                    selectedPaymentMethodInfo.textContent = `Selected Payment Method: ${selectedRadio.nextSibling.textContent} (ID: ${selectedMethodId})`;
-                }
+
+           
+            $(".save-button").click(function () {
+            
+                var card = $(this).closest(".card-body");
+                card.find(".edit-field").prop("readonly", true); 
+                $(this).hide(); 
+                card.find(".edit-button").show(); 
             });
         });
     </script>

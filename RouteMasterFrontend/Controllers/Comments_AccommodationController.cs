@@ -24,15 +24,15 @@ namespace RouteMasterFrontend.Controllers
         }
 
         // GET: Comments_Accommodation
-        [HttpPost]
-        public async Task<JsonResult> Index([FromBody] Comments_AccommodationAjaxDTO input)
+        [HttpGet]
+        public async Task<JsonResult> Index(int stayId)
         {
             var proLike = _context.Comment_Accommodation_Likes;
 
             var commentDb = await _context.Comments_Accommodations
                   .Include(c => c.Member)
                   .Include(c => c.Accommodation)
-                  .Where(c => c.AccommodationId == input.HotelId)
+                  .Where(c => c.AccommodationId == stayId)
                   .AsNoTracking()
                   .OrderByDescending(c=>c.CreateDate)
                   .Select(c => new Comments_AccommodationBriefDTO
@@ -40,7 +40,7 @@ namespace RouteMasterFrontend.Controllers
                       Id = c.Id,
                       Account = c.Member.Account,
                       Score = c.Score,
-                      Title = c.Title,
+                      Title = c.Title.Length > 12 ? c.Title.Substring(0, 12) + "..." : c.Title,
                       Pros = c.Pros,
                       Cons = c.Cons,
                       CreateDate = (c.CreateDate).ToString("yyyy/MM/dd"),
@@ -180,6 +180,45 @@ namespace RouteMasterFrontend.Controllers
             }
             
 
+        }
+        [HttpPost]
+        public async Task<string> NewComment([FromForm] Comments_AccommodationCreateDTO dto)
+        {
+            Comments_Accommodation commentDb = new Comments_Accommodation
+            {
+                MemberId = 2,
+                AccommodationId = dto.AccommodationId,               
+                Score = dto.Score,
+                Title = dto.Title,
+                Pros = dto.Pros,
+                Cons = dto.Cons,
+                CommentStatusId = 1, //預設訊息未回覆狀態
+                CreateDate = DateTime.Now,
+            };
+            _context.Comments_Accommodations.Add(commentDb);
+            _context.SaveChanges();
+
+            string webRootPath = _environment.WebRootPath;
+            string path = Path.Combine(webRootPath, "MemberUploads");
+
+            if(dto.Files != null)
+            {
+                foreach(IFormFile i in dto.Files)
+                {
+                    if(i != null && i.Length > 0)
+                    {
+                        Comments_AccommodationImage img = new Comments_AccommodationImage();
+                        string fileName = SaveUploadedFile(path, i);
+
+                        img.Comments_AccommodationId = commentDb.Id;
+                        img.Image = fileName;
+                        _context.Comments_AccommodationImages.Add(img);
+                    }
+                }
+                _context.SaveChanges();
+                return "新增含圖評論成功";
+            }
+            return "新增無圖評論成功";
         }
 
         // GET: Comments_Accommodation/Details/5    
