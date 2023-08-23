@@ -9,23 +9,44 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <h1>Checkout</h1>
 <style>
-    .checkout-progress {
+    .step-container {
         display: flex;
         justify-content: space-between;
+        list-style-type: none;
+        padding: 0;
     }
 
     .step {
-        width: 30%;
+        width: 32%;
         text-align: center;
-        padding: 10px;
-        border: 1px solid #ccc;
     }
 
-    .step.active {
-        font-weight: bold;
-        border-color: #000;
+        .step .circle {
+            background-color: #ccc;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            line-height: 30px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .step.active .circle {
+            background-color: #007bff;
+        }
+
+    .step-divider {
+        flex-grow: 1;
+        height: 2px;
+        background-color: #ccc;
+        position: relative;
+        top: 15px;
     }
 
+        .step-divider.active {
+            background-color: #007bff;
+        }
     .container{
         margin-bottom: 20px;
     }
@@ -33,10 +54,23 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<div class="checkout-progress">
-    <div class="step active"><span>1. 購物車</span></div>
-    <div class="step"><span>2. 付款訊息</span></div>
-    <div class="step"><span>3. 確認訂單</span></div>
+<div class="container mt-5">
+    <div class="step-container">
+        <div class="step active">
+            <div class="circle">1</div>
+            <span>購物車</span>
+        </div>
+        <div class="step-divider active"></div>
+        <div class="step active">
+            <div class="circle">2</div>
+            <span>付款訊息</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+            <div class="circle">3</div>
+            <span>確認訂單</span>
+        </div>
+    </div>
 </div>
 
 <form asp-action="CheckoutPost" method="post">
@@ -46,7 +80,7 @@
             <div class="card" style="margin-top:50px";>
                 <div class="card-header" id="heading-@item.Member.Id">
                     <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
+                        <button class="btn " type="button" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
                             訂購人資料
                         </button>
                     </h5>
@@ -85,13 +119,21 @@
                     <div class="card-body">
                         @foreach (var paymentMethod in ViewBag.PaymentMethods)
                         {
-                            <label>
+                            <label style="font-size:18px;">
                                 <input type="radio" class="payment-method-radio" name="paymentMethod" value="@paymentMethod.Id">
                                 @paymentMethod.Name
                             </label>
+
+                            <i class="fa-regular fa-credit-card"></i>
                         }
                         <p class="selected-payment-method-info"></p>
                      </div>
+                    <div class="text-left ali" style="padding-left: 30px;padding-bottom:30px; font-size:14px; color: dimgray;">
+                        備註:
+                        請注意本平台不會向您收取任何平台交易手續費，但你下單時使用的第三方支付平台可能會向您收取相關手續費，
+                        請參考其相關服務政策和規定，並向你所選的交易服務商取得更多資訊。
+ 
+                    </div>
                  </div>
             </div>
 
