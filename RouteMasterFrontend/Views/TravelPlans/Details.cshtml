@@ -1,36 +1,411 @@
-﻿@model RouteMasterFrontend.EFModels.TravelPlan
-
-@{
-    ViewData["Title"] = "Details";
+﻿@{
+    var packageTourId = ViewBag.PackageTourId;
+    var cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
 }
 
-<h1>Details</h1>
 
-<div>
-    <h4>TravelPlan</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TravelDays)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TravelDays)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Member)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Member.Account)
-        </dd>
-    </dl>
+@section Styles{
+    <style>
+        .date-picker {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 50px auto;
+            min-height: 410px; /* 設定一個預設的最小高度 */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .other-month {
+            color: #ccc;
+        }
+
+        .day-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 0.5px solid transparent;
+            transition: border 0.3s ease-in-out;
+        }
+
+            .day-container:hover {
+                border-color: #ccc;
+                /* 使用者懸停時，邊框顏色變為 #ccc */
+            }
+
+
+        .price {
+            font-size: 0.8em;
+        }
+
+        .informationBigContainer {
+            display: flex;
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
+
+        .informationContainer {
+            margin-left: 200px; /* 向右平移 20px */
+            align-items: center; /* 在 y 轴上居中 */
+        }
+
+
+        .disabled {
+            opacity: 0.5;
+            /* 設置透明度為 50% */
+            position: relative;
+        }
+
+
+        .image-container {
+            width: 500px; /* 调整宽度 */
+        }
+
+        .textbox {
+            padding: 10px;
+            border: 1px solid transparent; /* 初始設定為透明的框線 */
+            transition: border-color 0.3s; /* 添加過渡效果 */
+        }
+
+            .textbox:hover {
+                border-color: #ccc; /* 鼠標懸停時改變框線顏色 */
+            }
+    </style>
+}
+
+
+<div id="app">
+    <div v-for="actObj in activityInformations"key="actObj.id" class="card mb-3" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <img v-bind:src="actObj.image" class="img-fluid rounded-start w-100" />
+            </div>
+            <div class="col-md-7">
+                <div class="card-body">
+                    <h5 class="card-title">{{actObj.name}}</h5>
+                    <div class="d-flex">
+                        <p class="card-text"><small class="text-body-secondary">{{actObj.regionName}}</small></p>
+                        <p class="card-text"><small class="text-body-secondary">{{actObj.attractionName}}</small></p>
+                    </div>
+                    <p class="card-text">{{actObj.description}}</p>
+                    <p>{{actObj.selectedActProduct}}</p>
+
+
+                    <div v-if="actObj.selectedActProduct!=undefined">
+                        <p>{{actObj.selectedActProduct.productId}}</p>
+                        <p>{{actObj.selectedActProduct.price}}</p>
+                        <p>{{actObj.selectedActProduct.price}}</p>
+                    </div>
+    
+                </div>
+            </div>       
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <button class="btn btn-primary m-1 " @@click="selectActProduct(actObj.id)">選擇方案</button>
+            </div>
+        </div>
+    </div>
+
+
+<h1>套裝行程購買頁面啦啦啦</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div>{{activityIds}}</div>
+    <div>{{extraServiceIds}}</div>
+    <div>{{activityInformations}}</div>
+
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
+
+
+
+
+
+@section Scripts{
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script>
+        let baseAddress = "https://localhost:7251";
+        let vueApp = {
+            data() {
+                return {
+                    packageTourId: @packageTourId,
+                    cartId: @cartIdFromCookie,
+                    activityIds:[],
+                    extraServiceIds:[],
+
+                    activityInformations:[],
+                    extraServiceInformations:[],
+
+                    selectedActProductIdsWithQuantity:[],
+                    selectedExtProductIdsWithQuantity:[],
+
+
+
+
+
+                    selectedDate: "請選擇日期",
+                    selectedProductId: "",
+                    selectedPrice: "",
+                    selectedQuantity: "",
+                    inputQuantity: "",
+                    calendarDates: [],
+                    currentMonth: new Date().getMonth() + 1,
+                    currentYear: new Date().getFullYear(),
+                    selectedProductsArray: [],
+
+                };
+            },
+            mounted: async function () {
+                let _this = this;
+
+               await  _this.getTargetPackageTour();
+               await _this.getActivityInformations();
+
+
+            },
+            computed: {
+                firstDay() {
+                    return new Date(this.currentYear, this.currentMonth - 1, 1).getDay()
+                },
+                daysInMonth() {
+                    return new Date(this.currentYear, this.currentMonth, 0).getDate();
+                }
+            },
+            methods: {
+                getTargetPackageTour:async function(){
+                    let  _this=this;
+       
+
+                await    axios.get(`${baseAddress}/api/PackageToures/Id?id=${_this.packageTourId}`).then(response => {
+                       
+                        console.log(response)
+                        _this.activityIds = response.data.activityIds;
+                        _this.extraServiceIds = response.data.extraServiceIds;
+
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+                getActivityInformations:function(){
+                    for (let i = 0; i < this.activityIds.length;i++){
+                        this.getTargetActivityDto(this.activityIds[i])
+                    }                    
+                },
+                getTargetActivityDto: function (activityId) {      
+                    axios.post(`${baseAddress}/api/ActivityVuePage/Id?activityId=${activityId}`).then(response => {
+
+                        this.activityInformations.push(response.data)                      
+
+                    }).catch(err => {
+                        alert(err);
+                    })
+                },
+
+
+
+                selectActProduct: function (actId){
+                    console.log('666')
+
+
+
+                },
+
+
+
+
+
+
+                changeMonth: function (change) {
+                    this.currentMonth += change;
+                    if (this.currentMonth < 1) {
+                        this.currentMonth = 12;
+                        this.currentYear -= 1;
+                    } else if (this.currentMonth > 12) {
+                        this.currentMonth = 1;
+                        this.currentYear += 1;
+                    }
+
+
+                    this.updateCalendar();
+                },
+                updateCalendar: function () {
+                    //console.log('updateCalendar7788899999');
+                    this.generateCalendarDates();
+                },
+                generateCalendarDates: function () {
+                    this.calendarDates = [];
+                    for (let i = 0; i < this.firstDay; i++) {
+                        this.calendarDates.push({ date: null, highestPrice: null, actProducts: [], selected: false });
+                    }
+                    for (let i = 1; i <= this.daysInMonth; i++) {
+                        const currentDate = new Date(this.currentYear, this.currentMonth - 1, i);
+                        this.calendarDates.push({ date: currentDate, highestPrice: null, actProducts: [], selected: false });
+                    }
+                    //console.log(this.calendarDates)
+                    const postData = {
+                        activityId: this.activityId,
+                        currentMonth: this.currentMonth,
+                        currentYear: this.currentYear
+                    };
+
+
+                    axios.post(`${baseAddress}/api/ActivityVuePage/getProducts`, postData)
+                        .then(response => {
+                            console.log('response啦')
+                            console.log(response)
+
+
+
+
+                            for (let i = 0; i < response.data.length; i++) {
+                                let dateFromIso = new Date(response.data[i].date);
+                                for (let j = 0; j < this.calendarDates.length; j++) {
+                                    if (this.calendarDates[j].date !== null) {
+                                        if (this.calendarDates[j].date.getDate() == dateFromIso.getDate()) {
+                                            const newActProduct = { id: response.data[i].id, price: response.data[i].price, quantity: response.data[i].quantity, startTime: response.data[i].startTime, endeTime: response.data[i].endTime };
+                                            this.calendarDates[j].actProducts.push(newActProduct)
+
+
+                                            if (this.calendarDates[j].highestPrice == null) {
+                                                this.calendarDates[j].highestPrice = response.data[i].price
+                                            }
+
+
+
+                                            if (response.data[i].price > this.calendarDates[j].highestPrice) {
+                                                this.calendarDates[j].highestPrice = response.data[i].price
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            console.log(this.calendarDates)
+                        }).catch(err => {
+                            console.log(err);
+                        })
+                },
+                selectDate: function (dateObj) {
+                    for (let i = 0; i < this.calendarDates.length; i++) {
+                        this.calendarDates[i].selected = false;
+                    }
+
+                    this.selectedDate = dateObj.date.getMonth() + "月" + dateObj.date.getDate() + "日";
+                    this.selectedProductsArray = dateObj.actProducts;
+                    dateObj.selected = true;
+                    this.selectedProductId = "";
+                    this.selectedPrice = "";
+                    this.selectedQuantity = "";
+                },
+                selectTheTargetPatchProduct: function (productObj) {
+
+                    this.selectedProductId = productObj.id;
+                    this.selectedPrice = productObj.price;
+                    this.selectedQuantity = productObj.quantity;
+                    this.inputQuantity = 1;
+
+
+
+
+                },
+
+
+                addToCart: function () {
+                    //加入購物車
+                    const postData = {
+                        cartId: this.cartId,
+                        activityid: this.selectedProductId,
+                        quantity: this.inputQuantity
+                    }
+                    console.log(postData);
+                    console.log('加購物車啦')
+                    fetch(`${baseAddress}/api/Carts/addactivity`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                this.reloadCartItems();
+                            } else {
+                                alert('加入購物車失敗');
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Failed to add to cart:', error);
+                        });
+                    console.log('加入購購物車');
+                },
+                reloadCartItems() {
+                    fetch('/Carts/RefreshCart')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('Cart').innerHTML = data;
+                        })
+                        .catch(() => {
+                            alert('Failed to reload cart items.');
+                        });
+                }
+            }
+        };
+        let app = Vue.createApp(vueApp).mount('#app');
+    </script>
+
+
+
+
+
+}
