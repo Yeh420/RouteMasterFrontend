@@ -1,4 +1,8 @@
-﻿<style>
+﻿@{
+    var account = Context.Request.HttpContext.User.Identity.Name;
+    var memberId = Context.Request.Cookies["Id"];
+}
+<style>
     .starIndex li {
         color: #ccc;
        
@@ -255,6 +259,8 @@
                 starAlert:null,
                 preview_list: [],
                 image_list: [],
+                userAccount: "@account",
+
                             
             }
         },
@@ -323,6 +329,9 @@
                     for (let i = 0; i < _this.indexVM.length;i++){
                         _this.comm = _this.indexVM[i];
                         _this.comm.edit=true;
+                        if (_this.comm.account == _this.userAccount) {
+                            _this.comm.edit=false;
+                        }
                     }
                  
                   
@@ -338,6 +347,7 @@
             labelComment:function(id){
                 let _this = this;
                 _this.commentid=id;
+                console.log(_this.userAccount);
                 console.log(_this.commentid);
                 
             },
