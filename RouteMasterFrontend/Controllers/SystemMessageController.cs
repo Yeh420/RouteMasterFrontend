@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
+using System.Security.Claims;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -17,8 +18,11 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public async Task<JsonResult> Index(int filter)
         {
+            ClaimsPrincipal user = HttpContext.User;
+            int userID = int.Parse(user.FindFirst("id").Value);
+
             var messageDb = _context.SystemMessages
-                .Where(m => m.MemberId == 1)
+                .Where(m => m.MemberId == userID)
                 .OrderByDescending(m => m.Id)
                 .AsQueryable();
 
