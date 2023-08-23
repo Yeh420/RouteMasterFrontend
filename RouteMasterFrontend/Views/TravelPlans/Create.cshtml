@@ -78,7 +78,25 @@
             vertical-align: middle; /* 将文本垂直居中 */
             border-radius: 10px; /* 添加圆角效果，根据需要调整圆角半径的值 */
         }
+        .custom-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.25rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none; /* 避免阻擋事件 */
+            display: none;
+        }
 
+        /* 滑鼠懸停時顯示提示內容 */
+        .custom-btn:hover::after {
+            display: block;
+        }
     </style>
 }
 <hr />
@@ -152,7 +170,7 @@
 
         let theCurrentAttractionOfDropContainer;
         let theNextAttractionOfDropContainer;
-        let roomProducts = [];
+        let roomProducts = {};
 
 
         const addAttBtns = document.querySelectorAll('.addAtt');
@@ -1015,8 +1033,7 @@
 
                     activityProductIds: actCheckboxValues,
                     extraServiceProductIds: extCheckboxValues,
-                    roomProducts : roomProducts
-
+                    roomProducts : roomProducts.cartProducts
                 };
 
                 axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
@@ -1035,6 +1052,7 @@
 
         //選住宿寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡
         function selectAccommodationByGoogleMapsApi(){
+            let _this = this;
             const y = Number(this.getAttribute("positionx"));
             const x = Number(this.getAttribute("positiony"));
 
@@ -1046,15 +1064,17 @@
             window.addEventListener("message", function(event) {
                 if (event.source === newWindow && event.origin === window.location.origin) {
                     // 在这里处理从新窗口传回的消息
-                    var response = JSON.parse(event.data);
-                    console.log(response);
-                    //response.roomProductId.map(function(id){
-                    //    let rp = {
-                    //        id : id,
-                    //        quantity : response.quantity
-                    //    };
-                    //    CheckRoomProducts(rp);
-                    //})
+                    roomProducts = JSON.parse(event.data);
+                    console.log(roomProducts);
+                    _this.innerText = roomProducts.accommodationName;
+                    let tooltipContent = `已加入${roomProducts.cartProducts.length}間房間`;
+
+                    _this.setAttribute("data-tooltip", tooltipContent);
+                    _this.setAttribute("style", "position:relative");
+                    _this.classList.add("custom-btn");
+                    _this.classList.remove("btn-primary");
+                    _this.classList.add("btn-warning");
+                    _this.removeEventListener("click", selectAccommodationByGoogleMapsApi);
                 }
             });
 

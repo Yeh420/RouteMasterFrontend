@@ -314,14 +314,17 @@ namespace RouteMasterBackend.Controllers
             {
 				for (int i = 0; i < dto.roomProducts.Length; i++)
 				{
-					var cartAccommodationDetails = new CartAccommodationDetail()
-					{
-						CartId = dto.cartId,
-						RoomProductId = dto.roomProducts[i].Id,
-						Quantity = dto.roomProducts[i].Quantity
-                    };
-					cart.CartAccommodationDetails.Add(cartAccommodationDetails);
-					_context.SaveChanges();
+                    for (int j = 0; j < dto.roomProducts[i].RoomProductId.Length; j++)
+                    {
+                        var cartAccommodationDetails = new CartAccommodationDetail()
+                        {
+                            CartId = dto.cartId,
+                            RoomProductId = dto.roomProducts[i].RoomProductId[j],
+                            Quantity = dto.roomProducts[i].Quantity
+                        };
+					        cart.CartAccommodationDetails.Add(cartAccommodationDetails);
+					        _context.SaveChanges();
+                    }
 				}
 			}			
 

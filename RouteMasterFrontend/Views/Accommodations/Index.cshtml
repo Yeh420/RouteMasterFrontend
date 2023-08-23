@@ -6,6 +6,7 @@
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  
+     <script src="../js/sweetalert2.all.min.js"></script>
     <style>
         .currentPage {
             background-color: lightgray;
@@ -362,7 +363,7 @@
                                     <table class="table table-hover table-success">
                                         <tbody>
                                             <tr v-for="(room, index) in accommodationIndex.rooms" v-bind:id="'rp' + index" class="row w-100 ms-0">
-                                                <td class="col-2 d-flex align-items-center">
+                                                <td class="col-2 d-flex align-items-center" id="rn">
                                                     {{room.name}}
                                                 </td>
                                                 <td class="d-flex col-10">
@@ -489,6 +490,7 @@
                     accommodationImage: "",
                     accommodationDescription: "",
                     cartProducts: [],
+                    alertContent:[],
                     accommodationServiceCId: [],
                     cartItems: [],
                     map: null,
@@ -736,29 +738,66 @@
                 addCart: async function (roomId) {
                     const _this = this;
                     if (_this.toggle) {
-                        for(let i = 0; $(`#rp${i}`); i++){
-                            
-                            let selectedDays = $(`#rp${i} .datepicker__month-day--selected .rp`).map(function () {
+                        _this.cartProducts = []
+                        _this.alertContent = []
+                        for(let i = 0; document.querySelector(`#rp${i}`) ; i++){
+                            let selectedDays = $(`#rp${i} td[aria-label*="Selected"] .rp`).map(function () {
                                 return Number($(this).text());
                             }).get();
                             selectedDays.pop();
-                            
-                            let cartProduct = {
-                                roomProductId: selectedDays,
-                                quantity: Number($(`#rp${i} .pq`).val())
+                            console.log(selectedDays);  
+                            if(selectedDays.length > 0){
+                                let cartProduct = {
+                                    roomProductId: selectedDays,
+                                    quantity: Number($(`#rp${i} .pq`).val())
+                                }
+                                let content = {
+                                    roomName : $(`#rp${i} #rn`).text(),
+                                    date : $(`#rp${i} #dp-${i+1}`).val(),
+                                    quantity : $(`#rp${i} #pq-${i+1}`).val()
+                                }
+                                _this.cartProducts.push(cartProduct);
+                                _this.alertContent.push(content);
                             }
-
-                            _this.cartProducts.push(cartProduct);
                         }
 
                         let request = {
-                            accommodaionName: accommodationIndex.name,
+                            accommodationName: _this.accommodationIndex.name,
                             cartProducts : _this.cartProducts
                         };
 
-                        console.log(request);
-                        alert(`你選擇了：${request.accommodaionName}`)
-                        window.opener.postMessage(JSON.stringify(request), window.location.origin);
+                        Swal.fire({
+                          title: `你選擇了：${request.accommodationName}
+                          確定將以下客房加入排程嗎?`,
+                          text: `
+『
+    ${_this.alertContent.map(function(c){
+        return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
+    }).join('\n')}
+』`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#3085d6',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: '好!',
+                          cancelButtonText: '我再考慮一下~'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            window.opener.postMessage(JSON.stringify(request), window.location.origin);
+                            Swal.fire(
+                                '恭喜!',
+                                '已成功加入排程!',
+                                'success'
+                            )
+                            window.close();
+                          }
+                        })
+//                        alert(`你選擇了：${request.accommodationName}
+//『
+//    ${_this.alertContent.map(function(c){
+//        return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
+//    }).join('\n')}
+//』`);
                     } 
                     else {
 
