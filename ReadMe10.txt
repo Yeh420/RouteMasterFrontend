@@ -8,6 +8,7 @@
     []Google登入的RM Logo
     []google登入的認證方式要包含信箱 
     []last step 檢查程式碼邏輯
+    [OK]成功登入並抓到登入者資訊
     
 3.[x]index
     [x]顯示名稱
@@ -117,3 +118,8 @@ partial view
 使用ajax又想要驗證，使用javascript會比較好，但原始密碼要去後端抓，像是其他欄位的compare的話 用javascript來做比對
 同理，其他欄位也是
 
+前後端的restful? 
+
+***layout=null***錯誤
+在login的畫面，要用layout = null 發生了 http4xx的錯誤，但結果是 jquery的引用錯誤，導致後續一連串錯誤，也因此有些錯誤沒被呼叫到，反而變對的
+F12顯示的錯誤不能忽略，當layout改成null後，要把html的等等屬性標籤等加回來

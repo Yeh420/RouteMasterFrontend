@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Dto;
+using RouteMasterFrontend.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,26 +15,29 @@ namespace RouteMasterFrontend.Controllers
     public class EcpayController : Controller
     {
         private readonly RouteMasterContext _context;
+        private readonly ICoupon _coupon;
 
-
-        public EcpayController(RouteMasterContext context)
+        public EcpayController(ICoupon couponservice,RouteMasterContext context)
         {
             _context = context;
+            _coupon = couponservice;
         }
 
         public List<string> extraServiceNames=new List<string>();
 
-        private int CalculateCartTotal(Cart cart)
+
+        private int CalculateCartTotal(Cart cart, int couponDiscountAmount)
         {
+           
             int total = 0;
             foreach (var accommodationItem in cart.Cart_AccommodationDetails)
             {
                 var roomId = accommodationItem.RoomProductId;
-                var room = _context.Rooms.FirstOrDefault(x => x.Id == roomId);
+                var room = _context.RoomProducts.FirstOrDefault(x => x.Id == roomId);
 
                 if (room != null)
                 {
-                    int roomTotal = room.Price * accommodationItem.Quantity;
+                    int roomTotal = (int)room.NewPrice * accommodationItem.Quantity;
                     total += roomTotal;
                 }
             }
@@ -59,22 +64,27 @@ namespace RouteMasterFrontend.Controllers
                     total += activityTotal;
                 }
             }
-
-            return total;
+            total -= couponDiscountAmount;
+            return Math.Max(total, 0);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int? selectedCouponId)
         {
 
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
             var cart = _context.Carts.Where(x => x.Id == cartIdFromCookie).Include(x=>x.Cart_ActivitiesDetails).Include(x=>x.Cart_ExtraServicesDetails).Include(x=>x.Cart_AccommodationDetails).First();
-            var cartTotal = CalculateCartTotal(cart);
+            var coupons = await _coupon.GetAllCouponsAsync();
+            var selectedCoupon = coupons.FirstOrDefault(c => c.Id == selectedCouponId); 
+            var couponDiscountPercentage = selectedCoupon != null ? selectedCoupon.Discount : 0;
+            var cartTotalBeforeDiscount = CalculateCartTotal(cart, 0); 
+            var couponDiscountAmount = cartTotalBeforeDiscount * couponDiscountPercentage / 100;
+            var cartTotal = cartTotalBeforeDiscount - couponDiscountAmount;
             var orderId = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 20);
             var website = "https://localhost:7145/";
 
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
 
-            
+            var accommodationNameArray = new List<string>();
             var extraServiceNameArray = new List<string>();
             var activityProductNameArray = new List<string>();
 
@@ -92,6 +102,16 @@ namespace RouteMasterFrontend.Controllers
 
                 extraServiceNameArray.Add(extraServiceName); // 將每個值添加到陣列中
             }
+            foreach (var accommodationItem in cart.Cart_AccommodationDetails)
+            {
+                var roomId = _context.Rooms
+                    .Where(x => x.Id == accommodationItem.RoomProductId)
+                    .Select(x => x.Id)
+                    .FirstOrDefault();
+                var accommodationName = _context.Accommodations
+                    .Where(x => x.Id == roomId) .Select(x => x.Name) .FirstOrDefault();
+            }
+          
 
             foreach (var activityItem in cart.Cart_ActivitiesDetails)
             {
@@ -126,7 +146,8 @@ namespace RouteMasterFrontend.Controllers
                 { "ItemName", $"RouteMaster商品-{formattedItemNames}"}, 
                 { "ExpireDate", "3" },
                 { "ReturnURL", $"{website}/api/Ecpay/AddPayInfo/" },
-                //{ "OrderResultURL", $"{website}Ecpay/PayInfo/{orderId}" },
+                { "ClientBackURL", $"{website}Orders/Index" },
+                //{ "OrderResultURL", $"{website}/api/Orders/PayInfo/" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
                 { "EncryptType", "1" }
