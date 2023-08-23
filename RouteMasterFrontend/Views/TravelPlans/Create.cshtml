@@ -1047,13 +1047,14 @@
                 if (event.source === newWindow && event.origin === window.location.origin) {
                     // 在这里处理从新窗口传回的消息
                     var response = JSON.parse(event.data);
-                    response.roomProductId.map(function(id){
-                        let rp = {
-                            id : id,
-                            quantity : response.quantity
-                        };
-                        CheckRoomProducts(rp);
-                    })
+                    console.log(response);
+                    //response.roomProductId.map(function(id){
+                    //    let rp = {
+                    //        id : id,
+                    //        quantity : response.quantity
+                    //    };
+                    //    CheckRoomProducts(rp);
+                    //})
                 }
             });
 

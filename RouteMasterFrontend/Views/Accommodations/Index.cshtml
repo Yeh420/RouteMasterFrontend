@@ -144,7 +144,7 @@
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" @@click="toggle"/>
+        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
     </div>
     <div v-else>
         <div class="d-flex">
@@ -361,7 +361,7 @@
 
                                     <table class="table table-hover table-success">
                                         <tbody>
-                                            <tr v-for="(room, index) in accommodationIndex.rooms" class="row w-100 ms-0">
+                                            <tr v-for="(room, index) in accommodationIndex.rooms" v-bind:id="'rp' + index" class="row w-100 ms-0">
                                                 <td class="col-2 d-flex align-items-center">
                                                     {{room.name}}
                                                 </td>
@@ -374,15 +374,19 @@
                                                             <div v-bind:id=`ptInput-${room.id}` style="display:none">
                                                                 <div class="d-flex align-items-center">
                                                                     <label v-bind:for=`pq-${room.id}`>數量：</label>
-                                                                    <input v-bind:id=`pq-${room.id}` type="number" min="1" value="1" size="2" class="form-control me-2" style="width:63px; box-sizing:border-box" />
+                                                                    <input v-bind:id=`pq-${room.id}` type="number" min="1" value="1" size="2" class="form-control pq me-2" style="width:63px; box-sizing:border-box" />
                                                                     <label v-bind:for=`tp-${room.id}`>總價：</label>
                                                                     <input v-bind:id=`tp-${room.id}` type="text" value="999999" class="form-control me-3" style="background:white;width:87px; box-sizing:border-box" readonly />
-                                                                    <button v-if="toggle" class="btn btn-primary" @@click="addCart(room.id)">加入排程</button>
-                                                                    <button v-else class="btn btn-primary" @@click="addCart(room.id)">加入購物車</button>
+                                                                    <button v-if="!toggle" class="btn btn-primary" @@click="addCart(room.id)">加入購物車</button>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="toggle" id="addPlanBtn" style="display:none">
+                                                <td>
+                                                     <button class="form-control btn btn-primary" @@click="addCart()">加入排程</button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -484,7 +488,7 @@
                     accommodationIndex: {},
                     accommodationImage: "",
                     accommodationDescription: "",
-                    cartProductId: [],
+                    cartProducts: [],
                     accommodationServiceCId: [],
                     cartItems: [],
                     map: null,
@@ -731,21 +735,45 @@
                 },
                 addCart: async function (roomId) {
                     const _this = this;
-                    let selectedDays = $(`#datepicker-dp-${roomId} .datepicker__month-day--selected .rp`).map(function () {
-                        return Number($(this).text());
-                    }).get();
-                    selectedDays.pop();
-
-                    _this.cartProductId = selectedDays;
-
-                    let request = {
-                        roomProductId: _this.cartProductId,
-                        quantity: Number($(`#pq-${roomId}`).val())
-                    };
-
                     if (_this.toggle) {
+                        for(let i = 0; $(`#rp${i}`); i++){
+                            
+                            let selectedDays = $(`#rp${i} .datepicker__month-day--selected .rp`).map(function () {
+                                return Number($(this).text());
+                            }).get();
+                            selectedDays.pop();
+                            
+                            let cartProduct = {
+                                roomProductId: selectedDays,
+                                quantity: Number($(`#rp${i} .pq`).val())
+                            }
+
+                            _this.cartProducts.push(cartProduct);
+                        }
+
+                        let request = {
+                            accommodaionName: accommodationIndex.name,
+                            cartProducts : _this.cartProducts
+                        };
+
+                        console.log(request);
+                        alert(`你選擇了：${request.accommodaionName}`)
                         window.opener.postMessage(JSON.stringify(request), window.location.origin);
-                    } else {
+                    } 
+                    else {
+
+                        let selectedDays = $(`#datepicker-dp-${roomId} .datepicker__month-day--selected .rp`).map(function () {
+                            return Number($(this).text());
+                        }).get();
+                        selectedDays.pop();
+
+                        _this.cartProducts = selectedDays;
+
+                        let request = {
+                            roomProductId: _this.cartProducts,
+                            quantity: Number($(`#pq-${roomId}`).val())
+                        };
+
                         await fetch(`https://localhost:7145/Carts/AddAccommodation2Cart`, {
                             method: "Post",
                             headers: {
@@ -807,6 +835,7 @@
                         const value = this.value;
                         const pattern = /^(\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})$/;
                         const match = pattern.exec(value);
+                        const addPlanBtn = $('#addPlanBtn');
                         let total;
 
                         if (match) {
@@ -827,6 +856,8 @@
                                 ptInput.val(total.sum);
 
                                 $(`#ptInput-${id}`).show();
+                                if(addPlanBtn){addPlanBtn.show();}
+
                                 pqInput.off('change');
                                 pqInput.on('change', function () {
                                     if (pqInput.val() > total.quantity) {
@@ -909,7 +940,6 @@
 
                                     ` // 支援html
                         });
-                        infowindow.open(_this.map, marker);
 
                         marker.addListener('mouseover', e => {
                             infowindow.open(_this.map, marker);
@@ -967,7 +997,7 @@
                     this.overview = false;                    
                     this.$refs.childRef1.commentDisplay(id);
                 },
-                toggle:function(){
+                toggleView:function(){
                     this.toggle = false;
                     this.loadProducts();
                 },
