@@ -1,11 +1,8 @@
 ﻿const dec = {
     data() {
-        return {
-            bfVM: [],
+        return { 
             indexVM: [],
-            //item: {},
             isReplyed: "已回復",
-            ep: null,
             selected: 0,         
             thumbicon: [],
             hotelId: 0,
@@ -21,26 +18,7 @@
     //    let _this = this;
     //    _this.commentDisplay();
     //},
-    methods: {
-        commentBrief: function (id) {
-            var request = {};
-            let _this = this;
-            if (id) {
-                _this.hotelId = id;
-            }
-            request.Manner = _this.selected;
-            request.HotelId = _this.hotelId;
-
-            axios.post("https://localhost:7145/Comments_Accommodation/Index", request).then(response => {
-                _this.bfVM = response.data;
-                console.log(_this.bfVM);
-            }
-
-            ).catch(err => {
-                alert(err);
-            });
-
-        },
+    methods: {    
         commentDisplay: function (id) {
             console.log(id)
             let _this = this;
@@ -60,10 +38,6 @@
                     return vm.thumbsUp ? '<i class="fa-solid fa-thumbs-up fa-lg"></i>' : '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
                 })
                 
-
-                //for (let j = 0; j < _this.indexVM.length; j++) {
-                //    _this.item = _this.indexVM[j];
-                //}
 
             }).catch(err => {
                 alert(err);
@@ -91,26 +65,9 @@
             return `@Url.Content("../SystemImages/${photo}")`;
         },
     },
-    template: ` <div class="row g-2 mt-2 mb-3">
-            <div v-for="(text, num) in bfVM" :key="num" class="col-md-4">
-                <div class="card overflow-auto" style="max-height: 180px;">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <h5 class="card-title me-auto">{{text.account}}</h5>
-                            <p class="card-text">{{text.score}}<i class="fa fa-star fa-fw" style="color:#f90;"></i></p>
-                        </div>
-                        <div class="d-flex">
-                            <p class="card-text me-auto">{{text.title}}</p>
-                            <p class="card-text"><i class="fa-solid fa-thumbs-up"></i> {{text.totalThumbs}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>                
-        </div>
-
-        <div class="row mb-2">
+    template: `<div class="row mb-2">
             <div class="col-3">
-                <select v-model="selected" id="commentOrder" @change="commentDisplay(hotelId)">
+                <select v-model="selected" id="commentOrder" @change="commentDisplay()">
                    <option value="0" selected>排序選擇</option>
                    <option value="1">最新留言</option>
                    <option value="2">星星評分高至低</option>
@@ -173,13 +130,10 @@
                             </div>
                         </template>
                     </div>
-
-
-                   
                 </div>
                </div>                               
-            </div>`
-    
+            </div>` 
+                         
        
 
 

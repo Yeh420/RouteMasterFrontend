@@ -142,6 +142,7 @@
     }
 <div id="app" v-cloak>
     <div v-if="toggle">
+        <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
         <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" @@click="toggle"/>
     </div>
@@ -352,8 +353,8 @@
                                     </p>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
-                                    <dec ref="childRef"></dec>
-                                    <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>
+                                    <brief ref="childRef2"></brief>                                   
+                                   @* <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>*@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -440,7 +441,7 @@
                                 </section>
                             </div>
                             <div v-else class="right h-100">
-                                <dec ref="childRef"></dec>
+                                <dec ref="childRef1"></dec>
                             </div>
                         </div>
                     </div>
@@ -459,6 +460,9 @@
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="~/js/Comments_AccommodationPartial.js"></script>
+    <script src="~/js/Comments_AccommodationBrief.js"></script>
+
+        
 
     <script>
         var vueApp = {
@@ -706,7 +710,7 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
-                        _this.$refs.childRef.commentBrief(p.id);
+                        _this.$refs.childRef2.commentBrief(p.id);
                         _this.initMap(id);
                     }
                 },             
@@ -960,19 +964,21 @@
                     this.showModal(id);
                 },
                 ShowComments:function(id){
-                    this.overview = false;
-                    this.$refs.childRef.commentBrief(id);
-                    //this.$refs.childRef.commentDisplay(id);
+                    this.overview = false;                    
+                    this.$refs.childRef1.commentDisplay(id);
                 },
                 toggle:function(){
                     this.toggle = false;
-
+                    this.loadProducts();
                 },
             },
             components: {
-                dec
+                dec,
+                brief
             }
         }
         var app = Vue.createApp(vueApp).mount("#app");
+        app.component('brief',childRef2);
+        app.component('dec', childRef1);
     </script>
 }

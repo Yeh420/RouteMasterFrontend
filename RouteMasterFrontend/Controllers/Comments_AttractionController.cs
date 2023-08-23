@@ -78,7 +78,7 @@ namespace RouteMasterFrontend.Controllers
         {
             Comments_Attraction commentDb = new Comments_Attraction
             {
-                MemberId = 1,
+                MemberId = 1, //記得改user.Identity.Id
                 AttractionId = dto.AttractionId,
                 Score = dto.Score,
                 StayHours = dto.StayHours,

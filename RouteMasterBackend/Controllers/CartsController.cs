@@ -115,6 +115,27 @@ namespace RouteMasterBackend.Controllers
                 return BadRequest(new { success = false, message = "Failed to add to cart.", error = ex.Message });
             }
         }
+        [HttpPost("removeextraservice")]
+        public IActionResult RemoveExtraServiceFromCart([FromBody]AddExtraServiceDto dto)
+        {
+            try
+            {
+                var existingCartItem = _context.CartExtraServicesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
+                if(existingCartItem != null)
+                {
+                    existingCartItem.Quantity -= dto.quantity;
+                    _context.CartExtraServicesDetails.Remove(existingCartItem);
+                    _context.SaveChanges();
+                    return Ok(new { success = true, message = "Successfully removed from cart." });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Item not found in cart." });
+                }
+            }catch{
+            
+            return BadRequest(new { success = false, message = "Failed to remove from cart." });}
+        }
         [HttpPost("addactivity")]
         public IActionResult AddActivitiesDetail2Cart([FromBody]AddActivityDto dto)
         {
@@ -249,8 +270,10 @@ namespace RouteMasterBackend.Controllers
                 return BadRequest(new { success = false, message = "Failed to update quantity.", error = ex.Message });
             }
         }
+
+
         [HttpPost("Post/Travel")]
-        public void AddItemToCart(TravelProductDto dto)
+        public void AddTravelItemToCart(TravelProductDto dto)
         {
               
             var cart = _context.Carts.Where(x => x.Id == dto.cartId).First();
@@ -303,6 +326,44 @@ namespace RouteMasterBackend.Controllers
 			}			
 
 
+        }
+
+
+        [HttpPost("Post/PackageTour")]
+        public void AddPackageItemToCart(PackageTourCartItemsDto dto)
+        {
+            var cart = _context.Carts.Where(x => x.Id == dto.cartId).First();
+            if(dto.selectedActProductIdsWithQuantity!=null)
+            {
+               foreach(var item in dto.selectedActProductIdsWithQuantity)
+                {
+                    var cartActivityDetails = new CartActivitiesDetail()
+                    {
+                        CartId = dto.cartId,
+                        ActivityProductId = item.id,
+                        Quantity = item.quantity,
+                    };
+                    cart.CartActivitiesDetails.Add(cartActivityDetails);
+                }
+                _context.SaveChanges();
+            }
+         
+
+
+            if(dto.selectedExtProductIdsWithQuantity!= null)
+            {
+               foreach(var item in dto.selectedExtProductIdsWithQuantity)
+                {
+                    var cartExtraServiceDetails = new CartExtraServicesDetail()
+                    {
+                        CartId=dto.cartId,
+                        ExtraServiceProductId=item.id,
+                        Quantity=item.quantity, 
+                    };
+                    cart.CartExtraServicesDetails.Add(cartExtraServiceDetails); 
+                }
+                _context.SaveChanges();
+            }          
         }
     }
 }

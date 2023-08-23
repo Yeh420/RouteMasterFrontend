@@ -5,7 +5,7 @@
 }
 <!DOCTYPE html>
 <html lang="zh-tw">
-    <head>
+<head>
     <style>
         *, *:before, *:after {
             box-sizing: border-box;
@@ -98,18 +98,17 @@
                 font-family: inherit;
             }
 
-         
     </style>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    </head>
-    <body>
+</head>
+<body>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
         <div class="top"><h1 style="">RouteMaster</h1></div>
         <div class="bottom"></div>
         <div class="center">
-            
+
             <h2>旅程起點</h2>
             <form asp-action="MemberLogin" class="p-3 mt-3" id="loginForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -129,7 +128,7 @@
             <div class="text-center fs-6">
                 <a asp-action="MemberRegister" class=" btn btn-warning ">註冊會員</a> or
                 <a asp-action="MemberForgetPassword" class="btn btn-success">忘記密碼</a>
-            </div>  
+            </div>
             <br />
             <div id="g_id_onload"
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
@@ -146,42 +145,44 @@
             </div>
         </div>
     </div>
-    </body>
+</body>
 </html>
 
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <script>
-        $(document).ready(function(){
-           $('#loginForm').submit(function (event) {
-                event.preventDefault();
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<script>
+    $(document).ready(function () {
+        $('#loginForm').submit(function (event) {
+            event.preventDefault();
 
             const formData = {
-                    Account: $('#Account').val(), 
-                    Password: $('#Password').val()
+                Account: $('#Account').val(),
+                Password: $('#Password').val()
             };
 
             fetch("https://localhost:7145/Members/MemberLogin", {
-                method:"POST",
+                method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData),
             })
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data){
-                        if (data.success) {
-                            window.location.href = 'https://localhost:7145/Home/Index';
-                }else{
-                    swal('帳密錯誤','請再試一次','error')
-                }
-            })
-                    .catch(error => {
-                        console.error('An error occurred:', error);
-                    });
-           });
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        window.location.href = 'https://localhost:7145/Home/Index';
+                    } else {
+                        swal('帳密錯誤', '請再試一次', 'error')
+                    }
+                })
+                .catch(error => {
+                    console.error('An error occurred:', error);
+                });
         });
-    </script>
+    });
+</script>
 
