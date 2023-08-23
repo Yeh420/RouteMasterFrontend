@@ -98,13 +98,40 @@
             .textbox:hover {
                 border-color: #ccc; /* 鼠標懸停時改變框線顏色 */
             }
+
+
+        .fixed-button {
+            position: fixed;
+            top: 50%; /* 将按钮的顶部对齐到父容器的50%位置，即垂直中间 */
+            right: 300px; /* 按钮粘在屏幕的最右侧 */
+            transform: translateY(-50%); /* 向上移动按钮的一半高度，以使其在垂直中间 */
+            /*background-color: #007bff; /* 按钮背景颜色 */*/
+            color: #fff; /* 按钮文本颜色 */
+            padding: 10px 20px; /* 按钮内边距 */
+            cursor: pointer; /* 光标样式为手型 */
+            width: 100px; /* 设置宽度为100像素 */
+            height: 100px; /* 设置高度为100像素 */
+            font-size: 32px; /* 设置图标的字体大小，根据需要调整 */
+        }
+
+
+        .fixed-label {
+            position: fixed;
+            top: 40%; /* 将按钮的顶部对齐到父容器的50%位置，即垂直中间 */
+            right: 270px; /* 按钮粘在屏幕的最右侧 */
+
+            padding: 10px 20px; /* 按钮内边距 */           
+            font-size: 16px; /* 设置图标的字体大小，根据需要调整 */
+        }
+
     </style>
 }
 
 
 <div id="app">
-
-    <h1>套裝行程購買頁面啦啦啦</h1>
+@*    <div>購物車id</div>
+    <div>{{cartId}}</div>
+    *@
 
     <h3>活動方案選擇</h3>
     <div v-for="actObj in activityInformations"key="actObj.id" class="card mb-3" style="max-width: 800px;">
@@ -167,7 +194,11 @@
         </div>
     </div>
 
-   
+
+    <label class="fixed-label" v-if="ifAddToCartBtnIsDisabled==true">請選擇完全部方案</label>
+    <label class="fixed-label" v-else>已可加入購物車</label>
+        <button class="btn btn-secondary fixed-button" v-bind:disabled="ifAddToCartBtnIsDisabled" @@click="addToCart"><i class="fas fa-shopping-cart cart-icon"></i></button>
+
 
 
 
@@ -316,7 +347,7 @@
 
 
 
-
+ 
 
 </div>
 
@@ -389,7 +420,16 @@
                 },
                 daysInMonth() {
                     return new Date(this.currentYear, this.currentMonth, 0).getDate();
+                },
+                ifAddToCartBtnIsDisabled:function(){
+                    if (this.selectedActProductIdsWithQuantity.length == this.activityIds.length && this.selectedExtProductIdsWithQuantity.length == this.extraServiceIds.length){
+                        return false;
+                    }else{
+                        return true;
+                    }
+
                 }
+
             },
             methods: {
                 getTargetPackageTour:async function(){
@@ -660,13 +700,24 @@
                 },
 
                 confirmActSelection:function(){
-                   this.selectedActProductIdsWithQuantity.push({ id: this.selectedProductId, quantity: this.inputQuantity })
+
+                    if (this.selectedActProductIdsWithQuantity.some(item => item.actId == this.selectedActId)) {
+
+                        console.log('有重複')
+                        const targetItem = this.selectedActProductIdsWithQuantity.find(item => item.actId == this.selectedActId);
+                        targetItem.id = this.selectedProductId;
+                        targetItem.quantity = this.inputQuantity;
+                    } else {
+                        console.log('沒重複')
+                        this.selectedActProductIdsWithQuantity.push({ id: this.selectedProductId, actId: this.selectedActId, quantity: this.inputQuantity })
+                    }           
 
 
 
                     this.activityInformations.forEach(actObj => {
                         if (actObj.id == this.selectedActId) {
                             actObj.selectedActProduct = {
+                                actId: this.selectedActId,
                                 productId: this.selectedProductId,
                                 quantity: this.inputQuantity,
                                 price: this.selectedPrice
@@ -690,14 +741,24 @@
 
 
                 confirmExtSelection: function () {
-                    this.selectedExtProductIdsWithQuantity.push({ id: this.selectedProductId, quantity: this.inputQuantity })
 
-                    console.log('有啦有啦有啦有啦')
+                    if (this.selectedExtProductIdsWithQuantity.some(item => item.extId == this.selectedExtId)){
+
+                        console.log('有重複')
+                        const targetItem = this.selectedExtProductIdsWithQuantity.find(item => item.extId == this.selectedExtId);
+                        targetItem.id = this.selectedProductId;
+                        targetItem.quantity = this.inputQuantity;
+                    }else{
+                        console.log('沒重複')
+                        this.selectedExtProductIdsWithQuantity.push({ id: this.selectedProductId, extId: this.selectedExtId, quantity: this.inputQuantity });
+                    }
+
 
                     this.extraServiceInformations.forEach(extObj => {
                         if (extObj.id == this.selectedExtId) {
-                            console.log('有等於啦')
+
                             extObj.selectedExtProduct = {
+                                extId: this.selectedExtId,
                                 productId: this.selectedProductId,
                                 quantity: this.inputQuantity,
                                 price: this.selectedPrice
@@ -722,34 +783,31 @@
 
 
                 addToCart: function () {
+       
+                    console.log('加入購物車了啦啦啦')
                     //加入購物車
                     const postData = {
                         cartId: this.cartId,
-                        activityid: this.selectedProductId,
-                        quantity: this.inputQuantity
+                        selectedExtProductIdsWithQuantity: this.selectedExtProductIdsWithQuantity,
+                        selectedActProductIdsWithQuantity: this.selectedActProductIdsWithQuantity
                     }
-                    console.log(postData);
-                    console.log('加購物車啦')
-                    fetch(`${baseAddress}/api/Carts/addactivity`, {
+          
+
+
+                    fetch(`${baseAddress}/api/Carts/Post/PackageTour`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(postData)
                     })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert(data.message);
-                                this.reloadCartItems();
-                            } else {
-                                alert('加入購物車失敗');
-                            }
-                        })
-                        .catch(error => {
+                    .then(()=>{
+                            alert('已成功加入購物車');
+                            this.reloadCartItems();
+                    })
+                    .catch(error => {
                             console.log('Failed to add to cart:', error);
-                        });
-                    console.log('加入購購物車');
+                    });      
                 },
                 reloadCartItems() {
                     fetch('/Carts/RefreshCart')
@@ -768,9 +826,7 @@
 
 
 
-        //todo加入購物車邏輯&方法  
-        //重複打開應該要做覆蓋的動作，也就是存進去目標陣列的時候要判斷是否已存在物件，有的話要將已存在的刪除
-        //購物車數量判斷(要全部都有選擇方案才可以加入購物車)
+
 
     </script>
 
