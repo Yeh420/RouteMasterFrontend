@@ -86,7 +86,8 @@
                     </label>
                 </div>
                 <div >
-                <button type="button" class="btn btn-danger" id="editInfo">更改資料</button>
+                <input type="button" value="更改資料" class="btn btn-secondary" id="editInfo" />
+                @*<button type="button" class="btn btn-danger" id="editInfo">更改資料</button>*@
                 </div>           
         </div>
 
@@ -94,15 +95,14 @@
 </div>
 
 
-@section Scripts {
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         document.querySelector('#editInfo').addEventListener('click',function(){
-
+          
             var dto =  {
                 Account: document.querySelector('#Account').value,
                 FirstName: document.querySelector('#FirstName').value,
@@ -119,7 +119,7 @@
                  type:"PUT",
                  data:JSON.stringify(dto),
                  contentType:"application/json",
-                url: "https://localhost:7145/Members/EditPassword",
+            url: "https://localhost:7145/Members/MemEdit",
             }).done(function(response){
                 if (response.success) {
                     alert("更改資料成功");
@@ -128,10 +128,10 @@
                 } else {
                     alert("更改資料失败：" + response.message);
                 }
-            }).fail({
+            }).fail(function(error){
                 console.log("失败", error);
-            })
+            });
 
-        })
+        });
     </script>
-}
+

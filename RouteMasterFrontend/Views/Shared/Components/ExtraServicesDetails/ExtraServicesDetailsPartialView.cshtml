@@ -83,7 +83,7 @@
                         @foreach (var group in groupitems)
                         {
                             var firstItem = group.First();
-                            <div class="extraservice-item" data-extraserviceid="@firstItem.ExtraServiceProductId">
+                            <div class="extraservice-item" data-extraserviceid="@firstItem.Id">
                                 <div class="extraservice-info row">
                                     <div class="extraservice-left col-md-3">
                                         <div class="extraservice-image">
@@ -128,7 +128,7 @@
 </table>
 </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
     function removeFromCartExt(extraserviceId) {

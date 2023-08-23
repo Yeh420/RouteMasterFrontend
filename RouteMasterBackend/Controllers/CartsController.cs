@@ -115,6 +115,27 @@ namespace RouteMasterBackend.Controllers
                 return BadRequest(new { success = false, message = "Failed to add to cart.", error = ex.Message });
             }
         }
+        [HttpPost("removeextraservice")]
+        public IActionResult RemoveExtraServiceFromCart([FromBody]AddExtraServiceDto dto)
+        {
+            try
+            {
+                var existingCartItem = _context.CartExtraServicesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
+                if(existingCartItem != null)
+                {
+                    existingCartItem.Quantity -= dto.quantity;
+                    _context.CartExtraServicesDetails.Remove(existingCartItem);
+                    _context.SaveChanges();
+                    return Ok(new { success = true, message = "Successfully removed from cart." });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Item not found in cart." });
+                }
+            }catch{
+            
+            return BadRequest(new { success = false, message = "Failed to remove from cart." });}
+        }
         [HttpPost("addactivity")]
         public IActionResult AddActivitiesDetail2Cart([FromBody]AddActivityDto dto)
         {
