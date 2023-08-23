@@ -79,6 +79,48 @@
             border-radius: 10px; /* 添加圆角效果，根据需要调整圆角半径的值 */
         }
 
+
+
+
+        /* 隐藏自定义属性文本 */
+        input[type="checkbox"][name="activityProduct"]::before {
+            content: "價格 " attr(data-price) " \A 可購買數量 " attr(data-quantity) " \A 開始時間 " attr(data-starttime) " \A 結束時間 " attr(data-endtime);
+            white-space: pre;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 当用户悬停在checkbox上时显示自定义属性 */
+        input[type="checkbox"][name="activityProduct"]:hover::before {
+            display: block;
+        }
+
+
+        input[type="checkbox"][name="extraServiceProduct"]::before {
+            content: "價格 " attr(data-price) " \A 可購買數量 " attr(data-quantity) ;
+            white-space: pre;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 当用户悬停在checkbox上时显示自定义属性 */
+        input[type="checkbox"][name="extraServiceProduct"]:hover::before {
+            display: block;
+        }
+
+
     </style>
 }
 <hr />
