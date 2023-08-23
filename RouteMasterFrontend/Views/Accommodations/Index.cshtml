@@ -142,8 +142,9 @@
     }
 <div id="app" v-cloak>
     <div v-if="toggle">
+        <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" />
+        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="搜尋更多住所" @@click="toggle"/>
     </div>
     <div v-else>
         <div class="d-flex">
@@ -965,6 +966,10 @@
                 ShowComments:function(id){
                     this.overview = false;                    
                     this.$refs.childRef1.commentDisplay(id);
+                },
+                toggle:function(){
+                    this.toggle = false;
+                    this.loadProducts();
                 },
             },
             components: {

@@ -402,7 +402,7 @@ namespace RouteMasterFrontend.Controllers
         //    return View();
         //}
         [HttpGet]
-        public ActionResult Checkout()
+        public ActionResult Checkout(int? id)
         {
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
             if (memberId == null)
@@ -430,6 +430,7 @@ namespace RouteMasterFrontend.Controllers
             }
 
             ViewBag.PaymentMethods = _context.PaymentMethods.ToList();
+            ViewBag.CouponId = id;
             List<Cart> cartList = new List<Cart> { cart };
 
             return View(cartList);
@@ -437,7 +438,7 @@ namespace RouteMasterFrontend.Controllers
 
      
         [HttpPost]
-        public ActionResult CheckoutPost(string paymentmethod, string name, string telephone, string address, string?note)
+        public ActionResult CheckoutPost(string? paymentmethod, string? name, string? telephone, string? address, string?note,int? couponId)
         {
             var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
             if (memberId == null)
@@ -453,7 +454,7 @@ namespace RouteMasterFrontend.Controllers
                 return View("Checkout");
             }
             ProcessCheckout(memberId, note);
-            return RedirectToAction("Index", "Ecpay");
+            return RedirectToAction("Index", "Ecpay", new { selectedCouponId = couponId });
           
         }
 
@@ -468,17 +469,12 @@ namespace RouteMasterFrontend.Controllers
 
             if (!allowCheckout)
             {
-                // 購物車是空的，無法進行結帳，進行相應處理
                 return;
             }
 
-            // 創建新訂單
             CreateOrder(memberId, note);
 
             TempData["MemberIdForEmptyCart"] = memberId;
-
-            //EmptyCart(memberId);
-
         }
 
 
@@ -507,7 +503,7 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 1,
                         OrderHandleStatusId = 1,
-                        CouponsId = 1,
+                        CouponsId = 2,
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal
@@ -529,10 +525,6 @@ namespace RouteMasterFrontend.Controllers
                             var roomPrice = roomProduct.NewPrice;
                             var quantity = accommodationItem.Quantity;
 
-
-                            //DateTime checkin = accommodationItem.SelectedCheckinDateTime; 
-                            //DateTime checkout = accommodationItem.SelectedCheckoutDateTime; 
-
                             var accommodationDetail = new OrderAccommodationDetail
                             {
                                 OrderId = order.Id,
@@ -547,88 +539,78 @@ namespace RouteMasterFrontend.Controllers
                                 RoomPrice = roomPrice * quantity,
                                 Note = note
                             };
+
                             _context.OrderAccommodationDetails.Add(accommodationDetail);
-                            roomProduct.Quantity-=quantity;
-                            _context.SaveChanges();
-
+                            roomProduct.Quantity -= quantity;
                         }
-                        foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
-                        {
-                            var extraserviceProductId = extraserviceItem.ExtraServiceProductId;
-                            var extraserviceProduct = _context.ExtraServiceProducts.Include(x => x.ExtraService).FirstOrDefault(x => x.Id == extraserviceProductId);
-
-
-                            if (extraserviceProduct.ExtraService != null)
-                            {
-                                var extraServicesId = extraserviceProduct.ExtraServiceId;
-                                var extraServiceName = extraserviceProduct.ExtraService.Name;
-                                var date = extraserviceProduct.Date;
-                                var price = extraserviceProduct.Price;
-                                var quantity = extraserviceItem.Quantity;
-
-                                var extraserviceDetails = new OrderExtraServicesDetail
-                                {
-                                    OrderId = order.Id,
-                                    ExtraServiceId = extraServicesId,
-                                    ExtraServiceName = extraServiceName,
-                                    ExtraServiceProductId = extraserviceItem.ExtraServiceProductId,
-                                    Date = date,
-                                    Price = price * quantity,
-                                    Quantity = quantity
-                                };
-
-                                _context.OrderExtraServicesDetails.Add(extraserviceDetails);
-
-                                extraserviceProduct.Quantity -= quantity;
-                                _context.SaveChanges();
-                            }
-                        }
-
-                        _context.SaveChanges();
-
-
-                        foreach (var activitiesDetail in cart.Cart_ActivitiesDetails)
-                        {
-                            var activitiesproductsId = activitiesDetail.ActivityProductId;
-                            var activitiesproducts = _context.ActivityProducts.Include(x => x.Activity).FirstOrDefault(x => x.Id == activitiesproductsId);
-                            
-                            if (activitiesproducts != null)
-                            {
-                                var activityId = activitiesproducts.ActivityId;
-                                var activitiesName = activitiesproducts.Activity.Name;
-                                var date = activitiesproducts.Date;
-                                var startTime = activitiesproducts.StartTime;
-                                var endTime = activitiesproducts.EndTime;
-                                var price = activitiesproducts.Price;
-                                var quantity = activitiesDetail.Quantity;
-
-                                var activitiesDetails = new OrderActivitiesDetail
-                                {
-                                    OrderId = order.Id,
-                                    ActivityId = activitiesproductsId,
-                                    ActivityName = activitiesName,
-                                    ActivityProductId = activitiesDetail.ActivityProductId,
-                                    Date = date,
-                                    StartTime = startTime,
-                                    EndTime = endTime,
-                                    Price = price * quantity,
-                                    Quantity = quantity,
-
-                                };
-
-                                _context.OrderActivitiesDetails.Add(activitiesDetails);
-                                activitiesproducts.Quantity -= quantity;
-
-                                _context.SaveChanges();
-
-                            }
-
-
-                        }
-
-
-                        transaction.Commit();
                     }
+
+                    foreach (var extraserviceItem in cart.Cart_ExtraServicesDetails)
+                    {
+                        var extraserviceProductId = extraserviceItem.ExtraServiceProductId;
+                        var extraserviceProduct = _context.ExtraServiceProducts.Include(x => x.ExtraService).FirstOrDefault(x => x.Id == extraserviceProductId);
+
+                        if (extraserviceProduct.ExtraService != null)
+                        {
+                            var extraServicesId = extraserviceProduct.ExtraServiceId;
+                            var extraServiceName = extraserviceProduct.ExtraService.Name;
+                            var date = extraserviceProduct.Date;
+                            var price = extraserviceProduct.Price;
+                            var quantity = extraserviceItem.Quantity;
+
+                            var extraserviceDetails = new OrderExtraServicesDetail
+                            {
+                                OrderId = order.Id,
+                                ExtraServiceId = extraServicesId,
+                                ExtraServiceName = extraServiceName,
+                                ExtraServiceProductId = extraserviceItem.ExtraServiceProductId,
+                                Date = date,
+                                Price = price * quantity,
+                                Quantity = quantity
+                            };
+
+                            _context.OrderExtraServicesDetails.Add(extraserviceDetails);
+                            extraserviceProduct.Quantity -= quantity;
+                        }
+                    }
+
+                    foreach (var activitiesDetail in cart.Cart_ActivitiesDetails)
+                    {
+                        var activitiesproductsId = activitiesDetail.ActivityProductId;
+                        var activitiesproducts = _context.ActivityProducts.Include(x => x.Activity).FirstOrDefault(x => x.Id == activitiesproductsId);
+
+                        if (activitiesproducts != null)
+                        {
+                            var activityId = activitiesproducts.ActivityId;
+                            var activitiesName = activitiesproducts.Activity.Name;
+                            var date = activitiesproducts.Date;
+                            var startTime = activitiesproducts.StartTime;
+                            var endTime = activitiesproducts.EndTime;
+                            var price = activitiesproducts.Price;
+                            var quantity = activitiesDetail.Quantity;
+
+                            var activitiesDetails = new OrderActivitiesDetail
+                            {
+                                OrderId = order.Id,
+                                ActivityId = activitiesproductsId,
+                                ActivityName = activitiesName,
+                                ActivityProductId = activitiesDetail.ActivityProductId,
+                                Date = date,
+                                StartTime = startTime,
+                                EndTime = endTime,
+                                Price = price * quantity,
+                                Quantity = quantity
+                            };
+
+                            _context.OrderActivitiesDetails.Add(activitiesDetails);
+                            activitiesproducts.Quantity -= quantity;
+                        }
+                    }
+
+                    
+                    _context.SaveChanges();
+                    transaction.Commit();
+
                 }
                 catch (DbUpdateException ex)
                 {
