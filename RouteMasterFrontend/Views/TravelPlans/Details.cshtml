@@ -147,13 +147,27 @@
                         <p class="card-text"><small class="text-body-secondary">{{actObj.attractionName}}</small></p>
                     </div>
                     <p class="card-text">{{actObj.description}}</p>
-                    <p>{{actObj.selectedActProduct}}</p>
 
+                    <br />
+                    <br />
+                    <br />
 
                     <div v-if="actObj.selectedActProduct!=undefined">
-                        <p>{{actObj.selectedActProduct.productId}}</p>
-                        <p>{{actObj.selectedActProduct.price}}</p>
-                        <p>{{actObj.selectedActProduct.quantity}}</p>
+                        <div style="display: flex;flex-direction: column;">
+                            <div class="d-flex">
+                                <p>編號</p>
+                                <p>{{actObj.selectedActProduct.productId}}</p>
+                            </div>
+                            <div class="d-flex">
+                                <p>價格</p>
+                                <p>{{actObj.selectedActProduct.price}}</p>
+                            </div>
+
+                            <div class="d-flex">
+                                <p>數量</p>
+                                <p>{{actObj.selectedActProduct.quantity}}</p>
+                            </div>                                                                   
+                        </div>                        
                     </div>    
                 </div>
             </div>       
@@ -195,9 +209,9 @@
     </div>
 
 
-    <label class="fixed-label" v-if="ifAddToCartBtnIsDisabled==true">請選擇完全部方案</label>
+    <label class="fixed-label" v-if="ifAddToCartBtnIsDisabled==true" v-model>請選擇完全部方案{{selectedSolution}}/{{totalSolution}}</label>
     <label class="fixed-label" v-else>已可加入購物車</label>
-        <button class="btn btn-secondary fixed-button" v-bind:disabled="ifAddToCartBtnIsDisabled" @@click="addToCart"><i class="fas fa-shopping-cart cart-icon"></i></button>
+   <button class="btn btn-secondary fixed-button" v-bind:disabled="ifAddToCartBtnIsDisabled" @@click="addToCart"><i class="fas fa-shopping-cart cart-icon"></i></button>
 
 
 
@@ -294,9 +308,9 @@
                     <div class="row">
                         <div class="date-picker col-6">
                             <div class="header">
-                                <button id="prevMonth" @@click="changeExtMonth(-1)">&lt;</button>
+                                <button id="prevMonth" @@click="changeExtMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
                                 <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
-                                <button id="nextMonth" @@click="changeExtMonth(1)">&gt;</button>
+                                <button id="nextMonth" @@click="changeExtMonth(1)"><i class="fa-solid fa-right-long"></i></button>
                             </div>
                             <div class="calendar" id="calendar">
                                 <div v-for="(dateObj, index) in extCalendarDates" :key="date">
@@ -427,6 +441,12 @@
                     }else{
                         return true;
                     }
+                },
+                totalSolution :function(){
+                    return this.activityIds.length + this.extraServiceIds.length
+                },
+                selectedSolution:function(){
+                    return this.selectedActProductIdsWithQuantity.length + this.selectedExtProductIdsWithQuantity.length
 
                 }
 
