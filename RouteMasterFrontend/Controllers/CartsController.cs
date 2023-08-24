@@ -1092,6 +1092,17 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
             }
         }
-       
+
+
+        public IActionResult ReloadCartItemsWithoutCondition()
+        {
+            return ViewComponent("CartPartial");
+        }
+
+        public IActionResult ConfirmPayment()
+        {
+            return View();
+        }
     }
+   
 }

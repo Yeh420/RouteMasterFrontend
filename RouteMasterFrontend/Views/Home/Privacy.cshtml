@@ -35,6 +35,21 @@
             font-size: 1.2rem;
         }
 
+        .zoomIn{
+            cursor: zoom-in;
+            width:80px;
+            height:80px;
+        }
+
+        .lastImg {
+            opacity: 0.5;
+        }
+
+        .indicatorDark {
+            background-color: black; /* Set the background color */
+            border-color: black; /* Set the border color */
+        }
+
     </style>
 }
 
@@ -94,10 +109,10 @@
                             <p class="text-muted">{{item.createDate}}</p>
                         </div>
                         <p class="card-text" v-if="item.pros">{{"優點:" + item.pros}}</p>
-                        <p class="card-text" v-if="item.cons">{{"缺點:" + item.cons}}</p>
+                        <p class="card-text mb-3" v-if="item.cons">{{"缺點:" + item.cons}}</p>
                         <ul v-if="item.imageList.length" class="d-flex list-unstyled mb-3">
                             <li v-for="(photo,num) in item.imageList" :key="num" class="me-3">
-                                <img :src="getImgPath(photo)" style="height: 80px; width: 80px;" />
+                                <img :src="getImgPath(photo)" class="zoomIn" @@click="openImageModal(item.imageList, num)" />
                             </li>
                         </ul>
 
@@ -163,7 +178,7 @@
                                 <textarea v-model="cons" class="form-control" placeholder="缺點" id="drawBacks" style="height: 200px"></textarea>
                             </div>
                             <div class="mb-3">
-                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*"/>
+                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" id="file1"/>
                             </div>
                         </div>
                         
@@ -177,6 +192,48 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- Modal carousel -->
+        <div class="modal fade bg-black" id="imgModal" tabindex="-1" aria-labelledby="imgModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="carouselImg" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in carouselList" :key="num">
+                                    <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                </div>
+                               
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselImg" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselImg" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                        <div class="carousel-indicators">
+                            <button type="button" v-for="(photo, num) in carouselList"
+                                    :key="num"
+                                    data-bs-target="#carouselImg"
+                                    :data-bs-slide-to="num"
+                                    :class="{ 'indicatorDark':true, 'active': num === 0 }">
+                            </button>
+                           
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
 
     </div>
 </div>
@@ -207,6 +264,7 @@
                     cons:"",
                     starAlert:"",
                     image_list:[],
+                    carouselList:[],
                     
 
                    
@@ -337,9 +395,11 @@
                         formData.append('Pros', _this.pros);
                         formData.append('Cons', _this.cons);
 
+                        const file1= document.querySelector("#file1");
+                        var totalFiles= file1.files.length;
 
-                        for (let i = 0; i < _this.image_list.length; i++){
-                            formData.append('Files', _this.image_list[i]);
+                        for (let i = 0; i < totalFiles; i++){
+                            formData.append('Files', file1.files[i]);
                         }
 
                         axios.post("https://localhost:7145/Comments_Accommodation/NewComment", formData).then(response=>{
@@ -384,6 +444,22 @@
                     _this.pros = "";
                     _this.cons = "";
 
+                },
+                openImageModal:function(images,starIndex){
+                    let _this=this;
+                    _this.carouselList=images;
+                    const imgModal = new bootstrap.Modal(document.getElementById('imgModal'));
+                    imgModal.show();
+
+                    const carouselImg = new bootstrap.Carousel(document.getElementById('carouselImg'), {
+                        interval: 1500,
+                        wrap: true,
+                        
+                    });
+
+                    var init= document.querySelector(`#carouselImg [data-bs-slide-to="${startIndex}"]`);
+
+                    carouselImg.from(init);
                 },
 
 

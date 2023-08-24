@@ -20,6 +20,14 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class TravelPlansController : ControllerBase
     {
+
+        //todo  呈現小詳細資訊
+        //dodo  儲存行程表
+        //dodo  會員專區行程表呈現
+
+
+
+
         private readonly RouteMasterContext _context;
 
         public TravelPlansController(RouteMasterContext context)
