@@ -235,7 +235,7 @@
                                 <textarea v-model="content" class="form-control" placeholder="評論內容" id="paragraph" style="height: 300px"></textarea>            
                             </div>
                             <div class="mb-3">
-                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" @@change="previewMultiImg" />
+                                <input id="file1" type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" @@change="previewMultiImg" />
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -305,7 +305,6 @@
                         </div>
                         <div class="mt-2">                         
                             <button type="button" class="btn btn-danger" @@click="fillCheck">我要檢舉</button>
-                           @* <button v-else type="button" class="btn btn-success " >檢舉已送出</button>*@
                         </div>
                     </div>
                 </div>
@@ -368,8 +367,11 @@
             },
             reset:function(){
                 let _this = this;
+                var file1 = document.querySelector("#file1");
+                file1.value = "";
                 _this.preview_list=[];
                 _this.image_list=[];
+                
             },
             formSweetAlert:function(){
                 Swal.fire({
@@ -560,6 +562,7 @@
                 let _this = this;
                 var panel = document.querySelector(".panel");
                 var liItems = panel.querySelectorAll("li");
+                var file1 =document.querySelector("#file1");
                 console.log(point);
 
                 liItems.forEach(function (item, idx) {
@@ -571,6 +574,7 @@
                 _this.hours="";
                 _this.price="";
                 _this.content="";
+                file1.value="";
               
             },
 
