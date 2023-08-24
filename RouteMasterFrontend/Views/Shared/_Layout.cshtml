@@ -1,5 +1,7 @@
 ﻿@{
-	var memberIdCookie = Context.Request.Cookies["Id"];
+
+    var memberIdCookie = Context.Request.Cookies["Id"];
+
 }
 
 
@@ -42,11 +44,11 @@
 		
 		.car{
 			position: absolute;
-			left: 0;
+			left: 12%;
 			bottom: -10px;
 		}
 		.car.animated {
-			transform: translateX(48%);
+			transform: translateX(64%);
 			transition: 2s ease-out;
 		}
 	</style>
@@ -96,11 +98,11 @@
 							<!-- ***** Logo End ***** -->
 							<!-- ***** Menu Start ***** -->
 							<ul class="nav">
-								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
-								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
-								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+								@*<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>*@
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Accommodations" asp-action="Index">住宿</a></li>
 								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="Index">景點</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">觀光行程</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">景點門票</a></li>
 								<li class="nav-item dropdown">
 									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 										行程

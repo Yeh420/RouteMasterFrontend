@@ -161,8 +161,11 @@ namespace RouteMasterFrontend.Models.Services
 
                 return result;
             }
-
-            return Enumerable.Empty<AttractionIndexDto>();
+            else
+            {
+                return Enumerable.Empty<AttractionIndexDto>();
+            }
+            
         }
     }
 }

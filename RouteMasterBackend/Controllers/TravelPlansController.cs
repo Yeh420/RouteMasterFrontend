@@ -20,10 +20,9 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class TravelPlansController : ControllerBase
     {
-
-        //todo  呈現小詳細資訊
-        //dodo  儲存行程表
-        //dodo  會員專區行程表呈現
+        //放棄
+        //todo  儲存行程表
+        //todo  會員專區行程表呈現
 
 
 
@@ -330,41 +329,32 @@ namespace RouteMasterBackend.Controllers
 
 
 
+        [HttpPost]
+        [Route("Post/SaveTableData")]
 
-
-
-
-
-        // PUT: api/TravelPlans/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTravelPlan(int id, TravelPlan travelPlan)
+        public void SaveTableData(SchduleListDto dto)
         {
-            if (id != travelPlan.Id)
-            {
-                return BadRequest();
-            }
+            var newSchedule = new Schedule();
+            newSchedule.MemberId = 3;
+            newSchedule.Content=dto.content;
+            newSchedule.StartTime = dto.startTime;
+            newSchedule.EndTime = dto.startTime.AddDays(1);
 
-            _context.Entry(travelPlan).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TravelPlanExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            _context.Schedules.Add(newSchedule);
+            _context.SaveChanges();
+        
+        
         }
+
+
+       
+
+
+
+
+
+
+       
 
         // POST: api/TravelPlans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -381,25 +371,7 @@ namespace RouteMasterBackend.Controllers
             return CreatedAtAction("GetTravelPlan", new { id = travelPlan.Id }, travelPlan);
         }
 
-        // DELETE: api/TravelPlans/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTravelPlan(int id)
-        {
-            if (_context.TravelPlans == null)
-            {
-                return NotFound();
-            }
-            var travelPlan = await _context.TravelPlans.FindAsync(id);
-            if (travelPlan == null)
-            {
-                return NotFound();
-            }
 
-            _context.TravelPlans.Remove(travelPlan);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
 
         private bool TravelPlanExists(int id)
         {

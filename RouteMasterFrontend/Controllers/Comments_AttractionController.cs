@@ -4,6 +4,7 @@ using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Dto;
 using RouteMasterFrontend.Models.ViewModels.Comments_Accommodations;
 using RouteMasterFrontend.Models.ViewModels.Comments_Attractions;
+using System.Security.Claims;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -76,9 +77,12 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public async Task<string> NewComment([FromForm] Comments_AttractionCreateDTO dto )
         {
+            ClaimsPrincipal user = HttpContext.User;
+            int userID = int.Parse(user.FindFirst("id").Value);
+
             Comments_Attraction commentDb = new Comments_Attraction
             {
-                MemberId = 1, //記得改user.Identity.Id
+                MemberId = userID, //記得改user.Identity.Id
                 AttractionId = dto.AttractionId,
                 Score = dto.Score,
                 StayHours = dto.StayHours,
@@ -190,11 +194,14 @@ namespace RouteMasterFrontend.Controllers
             int reviewerId= await commentDb.Select(c=>c.MemberId).FirstOrDefaultAsync();
             string spot = await commentDb.Select(c=>c.Attraction.Name).FirstAsync();
 
+            ClaimsPrincipal user = HttpContext.User;
+            int userID = int.Parse(user.FindFirst("id").Value);
+
             if (targetComment)
             {
                 SystemMessage reportNotice = new SystemMessage
                 {
-                    MemberId = 1, //記得改成user.Identity.name
+                    MemberId = userID, //記得改成user.Identity.name
                     Content = $"您在{spot}評論區對某評論的檢舉，RouteMaster團隊已收到，將依您選擇的檢舉原因審核該評論，再決定是否下架該評論。",
                     IsRead = false,
                 };
