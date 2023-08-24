@@ -134,9 +134,9 @@
     <div class="row">
         <div class="date-picker col-6">
             <div class="header">
-                <button id="prevMonth" @@click="changeMonth(-1)">&lt;</button>
+                <button id="prevMonth" @@click="changeMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
                 <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
-                <button id="nextMonth" @@click="changeMonth(1)">&gt;</button>
+                <button id="nextMonth" @@click="changeMonth(1)"><i class="fa-solid fa-right-long"></i></button>
             </div>
             <div class="calendar" id="calendar">
                 <div v-for="(dateObj, index) in calendarDates" :key="date">
@@ -192,6 +192,7 @@
 
 
 @section Scripts{
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
@@ -360,7 +361,7 @@
                     fetch('/Carts/RefreshCart')
                         .then(response => response.text())
                         .then(data => {
-                            document.getElementById('Cart').innerHTML = data;
+                            $('#Cart').html(data);
                         })
                         .catch(() => {
                             alert('Failed to reload cart items.');

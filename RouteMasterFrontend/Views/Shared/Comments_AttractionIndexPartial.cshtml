@@ -39,10 +39,10 @@
     }
 
 </style>
-<div>@Model.Id</div>
+@*<div>@Model.Id</div>*@
 <div id="app">
     <div class="container">
-        <div class="row mb-2">
+        <div class="row mb-2 mt-2">
             <div class="col-3">
                 <select v-model="selected" id="commentOrder" class="ms-1" @@change="commentDisplay">
                     <option value="0" selected>排序選擇</option>
@@ -54,7 +54,7 @@
                 </select>
             </div>     
             <div class="col-3 ms-auto text-end">
-                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @@click="starRating">
+                <button v-if="userAccount" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @@click="starRating">
                     撰寫評論
                 </button>
             </div>
@@ -67,7 +67,6 @@
                     <div class="card-body">
                         <div class="d-flex">
                             <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
-                           @* <div>{{item.isHidden}}</div>*@
                             <a v-if="item.edit" data-bs-toggle="modal" data-bs-target="#exampleModal" class="pointer" style="color:black" @@click="labelComment(item.id)" data-bs-placement="bottom" title="檢舉">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
@@ -328,7 +327,7 @@
                     console.log(_this.indexVM);
                     for (let i = 0; i < _this.indexVM.length;i++){
                         _this.comm = _this.indexVM[i];
-                        _this.comm.edit=true;
+                        _this.comm.edit = _this.userAccount? true:false;
                         if (_this.comm.account == _this.userAccount) {
                             _this.comm.edit=false;
                         }
@@ -424,7 +423,6 @@
                         panel.querySelector(".tip").style.display = "none";
                         _this.starpoint = index + 1;
                         result.style.display = "block";
-                        //result.textContent = "您選擇了 " + points + " 分";
 
                     });
 

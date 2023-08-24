@@ -30,6 +30,10 @@
             background-color: #007bff;
         }
 
+        .table thead th {
+            vertical-align: bottom;
+           
+        }
         .step-divider {
             flex-grow: 1;
             height: 2px;
@@ -50,19 +54,28 @@
 
         .fixed-row-height tr {
             height: 100px;
+            border-top:none;
+            font-size: 14px;
         }
 
         .fixed-row-height thead th {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 1px;
             color: darkgray;
+            font-size: 16px;
         }
 
+        .fixed-row-height thead tr:last-child {
+            border-bottom: 0.5px solid #ccc; 
+        }
+     
 
         .fixed-row-height tbody td,
         .fixed-row-height tbody th {
             border-color: lightgrey;
+            border-top:none;
         }
+
     </style>
 
 }
@@ -88,30 +101,31 @@
 
 <div id="app">
 
-<div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+<div id="collapseOne" class="collapse show" style="margin-top:20px;" aria-labelledby="headingOne">
     <div class="card-body">
         <div class="container custom-container">
             <!-- ExtraServices -->
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-hover fixed-row-height" style="vertical-align: middle; align-items: center;">
-                    <colgroup>
+                    <table class="table table-hover fixed-row-height" style="vertical-align: middle; align-items: center; border-color:white; ">
+                    <colgroup style="border-top:none;">
                             <col style="width: 100px;" />
                             <col style="width: auto;" />
                             <col style="width: auto;" />
-                            <col class="col-md-2" /> 
+                            <col class="col-md-3" /> 
                             <col class="col-md-2" /> 
                             <col class="col-md-2" /> 
                     </colgroup>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th class="align-middle text-center">名稱</th>
-                            <th class="align-middle text-center">描述</th>
-                            <th class="align-middle text-center">日期</th>
-                            <th class="align-middle text-center">價格</th>
-                            <th class="align-middle text-center">數量</th>
-                        </tr>
+                    <thead style="border-top:none;">
+                                <tr style="border-top: none; border-bottom: 1px solid #ccc;">
+                                    <th class=" border-top-0"></th>
+                                    <th class="align-middle text-center border-top-0" >名稱</th>
+                                    <th class="align-middle text-center border-top-0">描述</th>
+                                    <th class="align-middle text-center border-top-0">日期</th>
+                                    <th class="align-middle text-center border-top-0">價格</th>
+                                    <th class="align-middle text-center border-top-0">數量</th>
+                                    <th class=" border-top-0"></th>
+                                </tr>
                     </thead>
                     <tbody>
                             @{
@@ -137,6 +151,7 @@
                                     <td class="align-middle text-center">
                                         <span class="quantity">@group.Sum(item => item.Quantity)</span>
                                     </td>
+
                                 </tr>
                             }
                         @foreach (var accommodationDTO in Model.Accommodations)
@@ -227,13 +242,13 @@
 
        
         </div>
-        <div style="width:38%; border:none;" class="container custom-container me-0">
-            <h5>小計總金額: @totalAmount 元</h5>
-            <div style="border-top: 1px dashed #ccc; padding-top: 10px;">
-                <h5 style="font-size: smaller; color: #888;">優惠券折扣：{{ selectedCouponAmount}}%</h5>
-                <h5 style="font-size: smaller; color: #888;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h5>
+        <div style="width:38%; border:none; text-align:center; align-items:flex-end; justify-content: center; display: flex; flex-direction: column; background-color: #f9f9f9; border-radius: 10px; padding: 20px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);" class="container me-0">
+            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: @totalAmount 元</h5>
+            <div style="border-top: 2px dashed #ddd; padding-top: 20px; width:300px; text-align: right;">
+                <h3 style="font-size: 18px; color: #888; margin-bottom: 10px;">優惠券折扣：{{ selectedCouponAmount}}%</h3>
+                <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h3>
             </div>
-            <h5 style="color: lightseagreen;">總金額: {{ discountedTotal }} 元</h5>
+            <h5 style="color: lightseagreen; font-size: 26px; font-weight: bold;">總金額: {{ discountedTotal }} 元</h5>
         </div>
 </div>
 </div>
