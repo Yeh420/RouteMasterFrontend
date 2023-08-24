@@ -78,6 +78,68 @@
             vertical-align: middle; /* 将文本垂直居中 */
             border-radius: 10px; /* 添加圆角效果，根据需要调整圆角半径的值 */
         }
+        .custom-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.25rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none; /* 避免阻擋事件 */
+            display: none;
+        }
+
+
+        /* 滑鼠懸停時顯示提示內容 */
+        .custom-btn:hover::after {
+            display: block;
+        }
+
+
+
+
+        /* 隐藏自定义属性文本 */
+        input[type="checkbox"][name="activityProduct"]::before {
+            content: "價格 " attr(data-price) " \A 可購買數量 " attr(data-quantity) " \A 開始時間 " attr(data-starttime) " \A 結束時間 " attr(data-endtime);
+            white-space: pre;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 当用户悬停在checkbox上时显示自定义属性 */
+        input[type="checkbox"][name="activityProduct"]:hover::before {
+            display: block;
+        }
+
+
+        input[type="checkbox"][name="extraServiceProduct"]::before {
+            content: "價格 " attr(data-price) " \A 可購買數量 " attr(data-quantity) ;
+            white-space: pre;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 当用户悬停在checkbox上时显示自定义属性 */
+        input[type="checkbox"][name="extraServiceProduct"]:hover::before {
+            display: block;
+        }
+
 
     </style>
 }
@@ -94,13 +156,14 @@
     <div class="col-9 border border-secondary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
         <input type="datetime-local"  id="travelBeginDateTime" />
         <button id="createAttractionTimeSpanContainer" class="btn btn-primary" disabled>新增區塊</button>
+        <button id="saveTheSchedule" class="btn btn-primary">儲存行程</button>
         <button id="callApiToAddToCart" class="btn btn-primary">加入購物車</button>
         <div class="row">            
             <div id="dropZoneContainer" class="col-4">
 
             </div>
             <div id="tableContainer" class="col-8 hide">
-                <table class="w-100">
+                <table id="beSavedScheduleTable" class="w-100">
                     <thead class="w-100">
                         <tr>
                             <th >事項</th>
@@ -152,7 +215,7 @@
 
         let theCurrentAttractionOfDropContainer;
         let theNextAttractionOfDropContainer;
-        let roomProducts = [];
+        let roomProducts = {};
 
 
         const addAttBtns = document.querySelectorAll('.addAtt');
@@ -172,7 +235,28 @@
 
 
 
+        document.querySelector("#saveTheSchedule").addEventListener('click',function(){
 
+
+         let targetScheduleTable=document.querySelector('#beSavedScheduleTable');
+         let targetTableHtml = targetScheduleTable.outerHTML;
+
+            const postData = {
+                cartId: @cartIdFromCookie,
+                content: targetTableHtml,
+                startTime: inputBeginDateTime.value,
+            };
+
+            axios.post(`https://localhost:7251/api/TravelPlans/Post/SaveTableData`, postData)
+                .then(response => {
+                    alert('已成功儲存!');             
+                })
+                .catch(error => {
+                    console.log(error)
+                });
+
+
+        })
 
 
 
@@ -422,7 +506,7 @@
 
 
 
-
+                //第一個地點
                 if (thMonster==null) {
 
 
@@ -431,7 +515,11 @@
                             startDateTime: document.querySelector('#travelBeginDateTime').value,
                         }
                     }).then(response => {
+
+
+                        console.log('下面就是我要的response啦哈哈哈哈哈')
                         console.log(response);
+
                         let selectAccommodationBtn = document.createElement('button');
                         selectAccommodationBtn.textContent = "選擇住宿";
                         selectAccommodationBtn.classList.add('btn', 'btn-primary');
@@ -507,19 +595,46 @@
                                 for (let i = 0; i < response.data.activityProducts.length; i++) {
                                     let label = document.createElement('label');
                                     let newActProduct = document.createElement('input');
+                                    let newNumberInput=document.createElement('input');
+
+                                 
+
+
                                     newActProduct.type = "checkbox";
-                                    newActProduct.id = 'activityProduct' + i;
+                                    //改
+                                    newActProduct.id = 'attractionId' + response.data.id+ 'activityProduct' + i;
                                     newActProduct.name = 'activityProduct';
                                     newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
 
-                                    label.setAttribute('for', 'activityProduct' + i);
+                                    //改
+                                    label.setAttribute('for', 'attractionId' + response.data.id + 'activityProduct' + i)
                                     label.textContent = response.data.activityProducts[i].activityName;
+
+
                                     label.appendChild(newActProduct);
+                                    label.appendChild(newNumberInput);
+
                                     label.classList.add('m-1');
+
+
                                     newActProduct.value = response.data.activityProducts[i].id;
                                     newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
                                     newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
-                                    newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
+                                    newActProduct.setAttribute('data-price', response.data.activityProducts[i].price);
+                                    newActProduct.setAttribute('data-quantity', response.data.activityProducts[i].quantity);
+                                    newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`);
+
+                                    newActProduct.setAttribute('data-inputnumber-id', `actInputNumber${response.data.activityProducts[i].id}`);
+
+
+                                    newNumberInput.type = "number";
+                                    newNumberInput.id = `actInputNumber${response.data.activityProducts[i].id}`;
+                                    newNumberInput.min=1;
+                                    newNumberInput.max = response.data.activityProducts[i].quantity;
+                                    newNumberInput.classList.add('hide');
+
+
+
                                     container.appendChild(label);
                                 }
                             } else if (response.data.extraServiceProducts.length > 0) {
@@ -527,18 +642,41 @@
                                 for (let i = 0; i < response.data.extraServiceProducts.length; i++) {
                                     let label = document.createElement('label');
                                     let newExtProduct = document.createElement('input');
+                                    let newNumberInput = document.createElement('input');
+
                                     newExtProduct.type = "checkbox";
-                                    newExtProduct.id = 'extraServiceProduct' + i;
+                                    newExtProduct.id = 'attractionId' + response.data.id + 'extraServiceProduct' + i;
                                     newExtProduct.name = 'extraServiceProduct';
                                     newExtProduct.addEventListener('click', toggleExtraServiceProductTimeBlock);
 
 
-                                    label.setAttribute('for', 'extraServiceProduct' + i);
+                                    label.setAttribute('for', 'attractionId' + response.data.id + 'extraServiceProduct' + i);
                                     label.textContent = response.data.extraServiceProducts[i].extraServiceName;
+
                                     label.appendChild(newExtProduct);
+                                    label.appendChild(newNumberInput);
+
+
+                          
                                     label.classList.add('m-1');
-                                    newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
+
+                                    newExtProduct.setAttribute('data-price', response.data.extraServiceProducts[i].price);
+                                    newExtProduct.setAttribute('data-quantity', response.data.extraServiceProducts[i].quantity);
+
                                     newExtProduct.value = response.data.extraServiceProducts[i].id;
+                                    newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
+
+                                    newExtProduct.setAttribute('data-inputnumber-id', `extInputNumber${response.data.extraServiceProducts[i].id}`);
+
+
+                                    newNumberInput.type = "number";
+                                    newNumberInput.id = `extInputNumber${response.data.extraServiceProducts[i].id}`;
+                                    newNumberInput.min = 1;
+                                    newNumberInput.max = response.data.extraServiceProducts[i].quantity;
+                                    newNumberInput.classList.add('hide');
+
+
+
                                     container.appendChild(label);
                                 }
                             }
@@ -560,6 +698,9 @@
                     })
 
                 }
+
+
+                //非第一個地點
                 else {
                     console.log('拜託啦不要再搞了啦')
 
@@ -646,19 +787,45 @@
                                 for (let i = 0; i < response.data.activityProducts.length; i++) {
                                     let label = document.createElement('label');
                                     let newActProduct = document.createElement('input');
+                                    let newNumberInput = document.createElement('input');
+
+
                                     newActProduct.type = "checkbox";
-                                    newActProduct.id = 'activityProduct' + i;
+                                    //
+                                    newActProduct.id = 'attractionId' + response.data.id + 'activityProduct' + i;
                                     newActProduct.name = 'activityProduct';
                                     newActProduct.addEventListener('click', toggleActivityProductTimeBlock);
 
-                                    label.setAttribute('for', 'activityProduct' + i);
+                                    //
+                                    label.setAttribute('for', 'attractionId' + response.data.id + 'activityProduct' + i)
                                     label.textContent = response.data.activityProducts[i].activityName;
+
                                     label.appendChild(newActProduct);
+                                    label.appendChild(newNumberInput);
+
                                     label.classList.add('m-1');
                                     newActProduct.value = response.data.activityProducts[i].id;
+
+                                    newActProduct.setAttribute('data-price', response.data.activityProducts[i].price);
+                                    newActProduct.setAttribute('data-quantity', response.data.activityProducts[i].quantity);
                                     newActProduct.setAttribute('data-startTime', response.data.activityProducts[i].startTime);
                                     newActProduct.setAttribute('data-endTime', response.data.activityProducts[i].endTime);
                                     newActProduct.setAttribute('data-tr-id', `act${response.data.activityProducts[i].id}`)
+
+
+                                    newActProduct.setAttribute('data-inputnumber-id', `actInputNumber${response.data.activityProducts[i].id}`);
+                                    newNumberInput.type = "number";
+                                    newNumberInput.id = `actInputNumber${response.data.activityProducts[i].id}`;
+                                    newNumberInput.min = 1;
+                                    newNumberInput.max = response.data.activityProducts[i].quantity;
+                                    newNumberInput.classList.add('hide');
+
+
+
+
+
+
+
                                     container.appendChild(label);
                                 }
                             } else if (response.data.extraServiceProducts.length > 0) {
@@ -666,18 +833,44 @@
                                 for (let i = 0; i < response.data.extraServiceProducts.length; i++) {
                                     let label = document.createElement('label');
                                     let newExtProduct = document.createElement('input');
+                                    let newNumberInput = document.createElement('input');
+
+
+
                                     newExtProduct.type = "checkbox";
-                                    newExtProduct.id = 'extraServiceProduct' + i;
+                                    newExtProduct.id = 'attractionId' + response.data.id + 'extraServiceProduct' + i;
                                     newExtProduct.name = 'extraServiceProduct';
                                     newExtProduct.addEventListener('click', toggleExtraServiceProductTimeBlock);
 
 
-                                    label.setAttribute('for', 'extraServiceProduct' + i);
+                                    label.setAttribute('for', 'attractionId' + response.data.id + 'extraServiceProduct' + i);
                                     label.textContent = response.data.extraServiceProducts[i].extraServiceName;
+
                                     label.appendChild(newExtProduct);
+                                    label.appendChild(newNumberInput);
+
                                     label.classList.add('m-1');
+                                    newExtProduct.setAttribute('data-price', response.data.extraServiceProducts[i].price);
+                                    newExtProduct.setAttribute('data-quantity', response.data.extraServiceProducts[i].quantity);
+
                                     newExtProduct.setAttribute('data-tr-id', `extService${response.data.extraServiceProducts[i].id}`)
                                     newExtProduct.value = response.data.extraServiceProducts[i].id;
+
+
+
+
+                                    newExtProduct.setAttribute('data-inputnumber-id', `extInputNumber${response.data.extraServiceProducts[i].id}`);
+
+
+                                    newNumberInput.type = "number";
+                                    newNumberInput.id = `extInputNumber${response.data.extraServiceProducts[i].id}`;
+                                    newNumberInput.min = 1;
+                                    newNumberInput.max = response.data.extraServiceProducts[i].quantity;
+                                    newNumberInput.classList.add('hide');
+
+
+
+
                                     container.appendChild(label);
                                 }
                             }
@@ -843,10 +1036,18 @@
         function toggleExtraServiceProductTimeBlock(e){
             const checkbox=e.target;
             const trId=checkbox.getAttribute('data-tr-id');
-            const targetRow=document.getElementById(trId);
 
+            const inputNumberId = checkbox.getAttribute('data-inputnumber-id');
+            const targetInputNumber = document.getElementById(inputNumberId);
+
+
+            const targetRow=document.getElementById(trId);
             let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+
             if (checkbox.checked) {
+
+
+                targetInputNumber.classList.remove('hide');
                 let newTr = document.createElement('tr');
                 newTr.id = trId;
                 let tdEventName = document.createElement('td');
@@ -894,6 +1095,8 @@
                 newTr.appendChild(tdEndTime);
                 targetTableBody.appendChild(newTr);
             } else {
+
+                targetInputNumber.classList.add('hide');
                 targetRow.remove();
             }
         }
@@ -906,9 +1109,20 @@
         function toggleActivityProductTimeBlock(e) {
             const checkbox = e.target;
             const trId = checkbox.getAttribute('data-tr-id');
+
+            const inputNumberId = checkbox.getAttribute('data-inputnumber-id');
+            const targetInputNumber = document.getElementById(inputNumberId);
+
+
+
             const targetRow = document.getElementById(trId);                              
             let targetTableBody = document.querySelector('#ajaxUpdateScheduleTBody');
+
+
             if(checkbox.checked){
+                targetInputNumber.value=1;
+                targetInputNumber.classList.remove('hide');
+
                 let newTr = document.createElement('tr');
                 newTr.id = trId;
                 let tdEventName = document.createElement('td');
@@ -954,6 +1168,8 @@
                 newTr.appendChild(tdEndTime);
                 targetTableBody.appendChild(newTr);
             }else{
+
+                targetInputNumber.classList.add('hide');
                 targetRow.remove();
             }            
         }
@@ -994,17 +1210,75 @@
         })
 
 
+        function reloadCartItems() {
+
+            fetch(`https://localhost:7145/Carts/ReloadCartItemsWithoutCondition`, {
+                method: "Post",
+                headers: {
+                    'Content-Type': 'application/json'
+                },               
+            }).then((response) => {
+                response.text().then((data) => {
+                    $('#Cart').html(data);
+                    alert("已成功加入購物車");
+                })
+            });
+        }
 
         function addToCartByCallWebApi(){
+
             let actProBoxes = document.querySelectorAll('input[name="activityProduct"]:checked');
-            let actCheckboxValues = Array.from(actProBoxes).map(actProBox => parseInt(actProBox.value));
+
+         
+            let newActChObjArray = Array.from(actProBoxes).map(actProBox => {
+                console.log('map啦啦')
+
+
+                let actProductId = actProBox.value;       
+                let inputId = actProBox.getAttribute('data-inputnumber-id');
+                let inputElement = document.querySelector(`input[type="number"][id="${inputId}"]`);
+
+
+                if (inputElement) {
+                    let quantity = parseInt(inputElement.value);
+                    return { actProductId, quantity };
+                }
+
+                return null;
+            }).filter(item => item !== null);
+
+
+
 
             let extProBoxes = document.querySelectorAll('input[name="extraServiceProduct"]:checked');
-            let extCheckboxValues= Array.from(extProBoxes).map(extProBox=>parseInt(extProBox.value));
+
+
+
+            let newExtChObjArray = Array.from(extProBoxes).map(extProBox => {
+                console.log('map啦啦')
+
+
+                let extProductId = extProBox.value;
+                let inputId = extProBox.getAttribute('data-inputnumber-id');
+                let inputElement = document.querySelector(`input[type="number"][id="${inputId}"]`);
+
+
+                if (inputElement) {
+                    let quantity = parseInt(inputElement.value);
+                    return { extProductId, quantity };
+                }
+
+                return null;
+            }).filter(item => item !== null);
+
+
+
+
+     
 
             //住宿商品加入購物車
 
-            if (actCheckboxValues.length == 0 && extCheckboxValues.length==0  && roomProducts.length ==0){
+            if (newActChObjArray.length == 0 && newExtChObjArray.length == 0 && roomProducts.length == 0) {
                 alert('請至少選擇一項商品才可以加入購物車')
             }else{
                 let cartIdFromCookie = @cartIdFromCookie;
@@ -1013,15 +1287,19 @@
                 const postData = {
                     cartId: cartIdFromCookie,
 
-                    activityProductIds: actCheckboxValues,
-                    extraServiceProductIds: extCheckboxValues,
-                    roomProducts : roomProducts
+
+                    roomProducts : roomProducts.cartProducts,
+
+                    activityProductIds: newActChObjArray,
+                    extraServiceProductIds: newExtChObjArray,
+         
 
                 };
 
                 axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
                     .then(response => {
                         alert('已成功加入購物車!');
+                        reloadCartItems();
                     })
                     .catch(error => {
                         console.log(error)
@@ -1035,6 +1313,7 @@
 
         //選住宿寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡 寫這裡
         function selectAccommodationByGoogleMapsApi(){
+            let _this = this;
             const y = Number(this.getAttribute("positionx"));
             const x = Number(this.getAttribute("positiony"));
 
@@ -1046,14 +1325,17 @@
             window.addEventListener("message", function(event) {
                 if (event.source === newWindow && event.origin === window.location.origin) {
                     // 在这里处理从新窗口传回的消息
-                    var response = JSON.parse(event.data);
-                    response.roomProductId.map(function(id){
-                        let rp = {
-                            id : id,
-                            quantity : response.quantity
-                        };
-                        CheckRoomProducts(rp);
-                    })
+                    roomProducts = JSON.parse(event.data);
+                    console.log(roomProducts);
+                    _this.innerText = roomProducts.accommodationName;
+                    let tooltipContent = `已加入${roomProducts.cartProducts.length}間房間`;
+
+                    _this.setAttribute("data-tooltip", tooltipContent);
+                    _this.setAttribute("style", "position:relative");
+                    _this.classList.add("custom-btn");
+                    _this.classList.remove("btn-primary");
+                    _this.classList.add("btn-warning");
+                    _this.removeEventListener("click", selectAccommodationByGoogleMapsApi);
                 }
             });
 

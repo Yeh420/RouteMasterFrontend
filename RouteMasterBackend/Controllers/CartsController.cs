@@ -72,6 +72,8 @@ namespace RouteMasterBackend.Controllers
             return data;
            
         }
+
+
         [HttpGet("getcartview")]
        
         [HttpPost("addextraservice")]
@@ -272,6 +274,8 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+
+
         [HttpPost("Post/Travel")]
         public void AddTravelItemToCart(TravelProductDto dto)
         {
@@ -286,8 +290,8 @@ namespace RouteMasterBackend.Controllers
 					var cartActivityDetails = new CartActivitiesDetail()
 					{
 						CartId = dto.cartId,
-						ActivityProductId = dto.activityProductIds[i],
-						Quantity = 1
+						ActivityProductId = dto.activityProductIds[i].actProductId,
+						Quantity = dto.activityProductIds[i].quantity,
 					};
 					cart.CartActivitiesDetails.Add(cartActivityDetails);
 					_context.SaveChanges();
@@ -302,9 +306,9 @@ namespace RouteMasterBackend.Controllers
 					var cartExtraServiceDetails = new CartExtraServicesDetail()
 					{
 						CartId = dto.cartId,
-						ExtraServiceProductId = dto.extraServiceProductIds[i],
-						Quantity = 1
-					};
+						ExtraServiceProductId = dto.extraServiceProductIds[i].extProductId,
+						Quantity = dto.extraServiceProductIds[i].quantity,
+                    };
 					cart.CartExtraServicesDetails.Add(cartExtraServiceDetails);
 					_context.SaveChanges();
 				}
@@ -314,14 +318,17 @@ namespace RouteMasterBackend.Controllers
             {
 				for (int i = 0; i < dto.roomProducts.Length; i++)
 				{
-					var cartAccommodationDetails = new CartAccommodationDetail()
-					{
-						CartId = dto.cartId,
-						RoomProductId = dto.roomProducts[i].Id,
-						Quantity = dto.roomProducts[i].Quantity
-                    };
-					cart.CartAccommodationDetails.Add(cartAccommodationDetails);
-					_context.SaveChanges();
+                    for (int j = 0; j < dto.roomProducts[i].RoomProductId.Length; j++)
+                    {
+                        var cartAccommodationDetails = new CartAccommodationDetail()
+                        {
+                            CartId = dto.cartId,
+                            RoomProductId = dto.roomProducts[i].RoomProductId[j],
+                            Quantity = dto.roomProducts[i].Quantity
+                        };
+					        cart.CartAccommodationDetails.Add(cartAccommodationDetails);
+					        _context.SaveChanges();
+                    }
 				}
 			}			
 

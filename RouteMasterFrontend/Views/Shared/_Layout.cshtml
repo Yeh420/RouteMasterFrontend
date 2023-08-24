@@ -1,5 +1,7 @@
 ﻿@{
+
     var memberIdCookie = Context.Request.Cookies["Id"];
+
 }
 
 
@@ -8,242 +10,264 @@
 <html lang="zh-tw">
 <head>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - RouteMasterFrontend</title>
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/css/font-awesome.css" rel="stylesheet" />
-    <link href="~/css/owl-carousel.css" rel="stylesheet" />
-    <link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<title>@ViewData["Title"] - RouteMasterFrontend</title>
+	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="~/css/font-awesome.css" rel="stylesheet" />
+	<link href="~/css/owl-carousel.css" rel="stylesheet" />
+	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
-    <style>
-        .header-area .main-nav .logo {
-            display: flex;
-            align-items: center;
-        }
+	<style>
+		.header-area .main-nav .logo {
+			display: flex;
+			align-items: center;
+		}
 
-        .header-area .main-nav .logo img {
-            width: 200px; /* 设置Logo图像的宽度 */
-            height: 90px; /* 设置Logo图像的高度 */
-            margin-right: 30px; /* 设置Logo图像与"Menu"文本之间的间距 */
-        }
+			.header-area .main-nav .logo img {
+				width: 200px; /* 设置Logo图像的宽度 */
+				height: 90px; /* 设置Logo图像的高度 */
+				margin-right: 30px; /* 设置Logo图像与"Menu"文本之间的间距 */
+			}
 
-        /*.header-area .main-nav .memberphoto img{
-            width:30px;
-            height:30px;
-        }*/
+		/*.header-area .main-nav .memberphoto img{
+					width:30px;
+					height:30px;
+				}*/
+		.nav-link {
+			display: flex !important;
+			align-items: center;
+		}
+		
+		.car{
+			position: absolute;
+			left: 0;
+			bottom: -10px;
+		}
+		.car.animated {
+			transform: translateX(48%);
+			transition: 2s ease-out;
+		}
+	</style>
 
-    </style>
-   
- 
 
-    @await RenderSectionAsync("Styles", required: false)
+
+	@await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <!-- ***** Preloader Start ***** -->
-    <div id="js-preloader" class="js-preloader">
-        <div class="preloader-inner">
-            <span class="dot"></span>
-            <div class="dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </div>
-    <!-- ***** Preloader End ***** -->
-    <!-- ***** Pre HEader ***** -->
-    <div class="pre-header" style="position: fixed; top: 0; width: 100%; z-index:999; ">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-sm-6">
-                    <span>Ready for your new adventure?</span>
-                </div>
-                <div class="col-lg-6 col-sm-6">
-                    <div class="text-button">
-                        <a href="rent-venue.html">Contact Us Now! <i class="fa fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+		<!-- ***** Preloader Start ***** -->
+		<div id="js-preloader" class="js-preloader">
+			<div class="preloader-inner">
+				<span class="dot"></span>
+				<div class="dots">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</div>
+		</div>
+		<!-- ***** Preloader End ***** -->
+		<!-- ***** Pre HEader ***** -->
+		<div class="pre-header">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-6 col-sm-6">
+						<span>Ready for Adventure?</span>
+					</div>
+					<div class="col-lg-6 col-sm-6">
+						<div class="text-button">
+							<a href="rent-venue.html">Contact Us Now! <i class="fa fa-arrow-right"></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- ***** Pre HEader End ***** -->
+		<header class="header-area header-sticky" style="position: sticky; top: 0 ; width: 100%; z-index:999;">
+			<div class="container">
+				<div class="row">
+					<div class="col-12">
+						<nav class="main-nav">
+							<!-- ***** Logo Start ***** -->
+							<a href="/Home/index" class="logo">
+								<img src="~/images/Route-master-logo.png" />
+							</a>
+							<!-- ***** Logo End ***** -->
+							<!-- ***** Menu Start ***** -->
+							<ul class="nav">
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="Index">景點</a></li>
+								<li class="nav-item dropdown">
+									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+										行程
+									</a>
+									<ul class="dropdown-menu">
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="PackageTourList">套裝行程</a></li>
+										<li><hr class="dropdown-divider"></li>
+									</ul>
+								</li>
+								<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
 
-    <!-- ***** Pre HEader End ***** -->
-    <header class="header-area header-sticky" style="margin-top:60px;">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <nav class="main-nav">
-                        <!-- ***** Logo Start ***** -->
-                        <a href="/Home/index" class="logo">
-                            <img src="~/images/Route-master-logo.png" />
-                        </a>
-                        <!-- ***** Logo End ***** -->
-                        <!-- ***** Menu Start ***** -->
-                        <ul class="nav">
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="Index">景點</a></li>
+								@{
+									if (User.Identity.IsAuthenticated)
+									{
+										var userAccount = User.Identity.Name;
+										<li>
+											<a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
+										</li>
+										//<li>
+										//    <a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="FavoriteAtt">最愛景點</a>
+										//</li>
+										<li>
+											<a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
+										</li>
+										<li id="Cart">
+											@await Component.InvokeAsync("CartPartial" )
+										</li>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    行程
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="PackageTourList">套裝行程</a></li>
-                                    <li><hr class="dropdown-divider"></li>                    
-                                </ul>
-                            </li>
-                  
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Comments_Accommodation" asp-action="PartialPage">評論</a></li>
+									}
+									else
+									{
+										<li>
+											<a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
+										</li>
+									}
+								}
+							</ul>
+							<a class='menu-trigger'>
+								<span>Menu</span>
+							</a>
+							<!-- ***** Menu End ***** -->
+						</nav>
+					</div>
+				</div>
+			</div>
 
-                            @{
-                                if (User.Identity.IsAuthenticated)
-                                {
-                                    var userAccount = User.Identity.Name;
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a>
-                                    </li>
-                                    //<li>
-                                    //    <a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="FavoriteAtt">最愛景點</a>
-                                    //</li>
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="Logout">登出</a>
-                                    </li>        
-                                    <li id="Cart">                               
-                                        @await Component.InvokeAsync("CartPartial" )
-                                    </li>
+		</header>
+	<div class="container">
+		<div>
+			@await Component.InvokeAsync("FacePhotoArea")
+		</div>
+		<div class="row" style="margin-top:20px;">
+			@RenderBody()
+		</div>
+	</div>
+	<br />
 
-                                }
-                                else
-                                {
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MemberLogin">登入</a>
-                                    </li>
-                                }
-                            }
-                        </ul>
-                        <a class='menu-trigger'>
-                            <span>Menu</span>
-                        </a>
-                        <!-- ***** Menu End ***** -->
-                    </nav>
-                </div>
-            </div>
-        </div>
-      
-    </header>
-    <div class="container">
-        <div>
-            @await Component.InvokeAsync("FacePhotoArea")
-        </div>
-        <div class="row" style="margin-top:120px;">
-          @RenderBody()
-        </div>
-    </div> 
+	<div class="col-md-6 mx-md-auto position-relative text-center"><img width="471" height="315" class="bg-whykkday" data-src="https://cdn.kkday.com/pc-web/assets/img/bg_whykkday.svg" src="https://cdn.kkday.com/pc-web/assets/img/bg_whykkday.svg" lazy="loaded"> <div class="car"><svg width="307" height="210" viewBox="0 0 307 210" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M153.424 201.22c84.677 0 153.424-.013 153.424 4.39 0 4.404-68.747 4.39-153.424 4.39S0 210.044 0 205.61c0-4.433 68.747-4.39 153.424-4.39z" fill="#DDD"></path> <path d="M280.472 182.785c0-2.908-2.49-5.268-5.56-5.268H41.608c-3.068 0-5.559 2.36-5.559 5.268 0 2.907 2.49 5.267 5.559 5.267h233.306c3.069 0 5.559-2.36 5.559-5.267z" fill="#138184"></path> <path d="M208.376 95.871c0-7.268-5.89-13.168-13.144-13.168h-88.013c-7.254 0-13.142 5.9-13.142 13.168 0 7.268 5.888 13.169 13.142 13.169h88.013c7.254 0 13.144-5.9 13.144-13.169z" fill="#FFF"></path> <path d="M242.665 120.453c0-7.268-5.89-13.169-13.142-13.169h-88.014c-7.253 0-13.143 5.901-13.143 13.169 0 7.268 5.89 13.169 13.143 13.169h88.014c7.253 0 13.142-5.901 13.142-13.169z" fill="#FFF"></path> <path d="M192.55 38.366c0-7.51-5.95-13.606-13.279-13.606H95.046c-7.329 0-13.278 6.096-13.278 13.606v2.638c0 7.51 5.949 13.605 13.278 13.605h84.225c7.33 0 13.279-6.096 13.279-13.605v-2.638z" fill="#F0AEA8"></path> <path d="M176.724 11.383c0-6.183-4.974-11.204-11.1-11.204h-57.81c-6.125 0-11.1 5.021-11.1 11.204v2.173c0 6.184 4.975 11.204 11.1 11.204h57.81c6.126 0 11.1-5.02 11.1-11.204v-2.173z" fill="#88D4DA"></path> <path d="M192.55 38.366c0-7.51-5.93-13.606-13.235-13.606h-73.762c-7.305 0-13.235 6.096-13.235 13.606v2.638c0 7.51 5.93 13.605 13.235 13.605h73.762c7.305 0 13.235-6.096 13.235-13.605v-2.638z" fill="#E4968F"></path> <path d="M177.603 11.383C177.603 5.2 172.605.18 166.449.18h-50.668c-6.155 0-11.154 5.021-11.154 11.204v2.173c0 6.184 4.999 11.204 11.154 11.204h50.668c6.156 0 11.154-5.02 11.154-11.204v-2.173z" fill="#65C0C0"></path> <path d="M73.696 45.83c-.398 0-.72.394-.72.879v1.755c0 .485.322.878.72.878H202.38c.397 0 .72-.393.72-.878v-1.755c0-.485-.323-.879-.72-.879H73.696z" fill="#999"></path> <path d="M78.25 58.962c0 .505.493.915 1.1.915h2.198c.607 0 1.099-.41 1.099-.915V49.38c0-.505-.492-.915-1.1-.915H79.35c-.607 0-1.1.41-1.1.915v9.583zM192.55 58.962c0 .505.492.915 1.098.915h2.199c.606 0 1.099-.41 1.099-.915V49.38c0-.505-.493-.915-1.099-.915h-2.199c-.606 0-1.098.41-1.098.915v9.583z" fill="#999"></path> <path d="M280.472 109.024c0-22.53-24.413-55.095-43.9-55.292H79.705c-40.518 0-44.537 17.706-44.537 58.063v40.043c0 18.05 14.708 32.703 32.824 32.703h179.655c18.117 0 32.824-14.654 32.824-32.703v-42.814z" fill="#E9E9E9"></path> <path d="M241.392 125.72c-38.56.005-206.223.044-206.223.044v32.014c0 2.625.465 5.164 1.33 7.562 4.007 11.093 16.599 19.2 31.495 19.2l184.977-.37c10.67 0 16.93-1.265 21.792-7.624 5.567-7.282 5.831-10.56 5.68-26.522-.03-3.23-6.846-12.053-12.835-15.991-5.988-3.939-13.42-8.314-26.216-8.313z" fill="#26BEC9"></path> <path d="M272.838 86.75c-2.86-5.351-7.356-11.922-7.356-11.922l-68.4-.027c-5.414 0-9.808 4.23-9.808 9.438v18.875c0 5.209 4.394 9.438 9.807 9.438l81.61-.019s.161-4.78-.38-8.675c-.92-6.637-2.849-12.198-5.473-17.109zM178.482 85.117c0-5.209-4.204-9.438-9.383-9.438h-48.935c-5.178 0-9.382 4.23-9.382 9.438v18.875c0 5.209 4.204 9.438 9.382 9.438H169.1c5.179 0 9.383-4.23 9.383-9.438V85.117z" fill-opacity=".5" fill="#FFF"></path> <path d="M181.12 85.117c0-5.209-4.204-9.438-9.383-9.438h-48.935c-5.178 0-9.382 4.229-9.382 9.438v18.875c0 5.209 4.204 9.438 9.382 9.438h48.935c5.179 0 9.383-4.23 9.383-9.438V85.117z" fill-opacity=".5" fill="#BCBCBC"></path> <path d="M100.231 85.117c0-5.209-4.247-9.438-9.48-9.438H55.2c-5.232 0-9.48 4.229-9.48 9.438v18.875c0 5.209 4.248 9.438 9.48 9.438h35.553c5.232 0 9.48-4.23 9.48-9.438V85.117z" fill-opacity=".5" fill="#FFF"></path> <path d="M103.748 85.117c0-5.209-4.249-9.438-9.48-9.438H58.716c-5.232 0-9.48 4.23-9.48 9.438v18.875c0 5.209 4.248 9.438 9.48 9.438h35.552c5.231 0 9.48-4.23 9.48-9.438V85.117z" fill-opacity=".5" fill="#BCBCBC"></path> <path d="M51.845 133.622c-.469 0-.85.393-.85.877v1.756c0 .485.381.878.85.878h35.226c.47 0 .851-.393.851-.878V134.5a.865.865 0 0 0-.851-.877H51.845zM51.845 140.645c-.469 0-.85.393-.85.878v1.756c0 .484.381.878.85.878h35.226c.47 0 .851-.394.851-.878v-1.756a.865.865 0 0 0-.851-.878H51.845z" fill-opacity=".404" fill="#FFF"></path> <path d="M274.27 86.903c-2.839-5.348-7.012-11.2-7.012-11.2l-67.603-.024c-5.378 0-9.743 4.226-9.743 9.433v18.868c0 5.207 4.365 9.434 9.743 9.434l80.781.016s.198-4.872-.339-8.767c-.916-6.634-3.22-12.85-5.827-17.76z" fill-opacity=".5" fill="#BCBCBC"></path> <path fill="#C77D76" d="M81.768 40.563H192.55v-2.634H81.768z"></path> <path fill="#C5E5E7" d="M96.714 14.225h80.01v-2.633h-80.01z"></path> <path d="M271.68 145.912c2.912 0 5.275 4.721 5.275 10.535 0 5.815-2.363 10.535-5.275 10.535-2.912 0-5.276-4.72-5.276-10.535 0-5.814 2.364-10.535 5.276-10.535z" fill="#E6C06D"></path> <path d="M276.076 183.663c0-1.938-1.632-3.512-3.641-3.512h-32.283c-2.01 0-3.641 1.574-3.641 3.512s1.63 3.511 3.64 3.511h32.284c2.01 0 3.64-1.573 3.64-3.511zM80.888 182.785c0-1.938-1.599-3.512-3.568-3.512H41.375c-1.97 0-3.568 1.574-3.568 3.512s1.599 3.511 3.568 3.511H77.32c1.97 0 3.568-1.573 3.568-3.511z" fill="#138184"></path> <g id="wheel-1"><path d="M225.52 158.203c12.86 0 23.3 10.425 23.3 23.265s-10.44 23.265-23.3 23.265c-12.858 0-23.299-10.425-23.299-23.265s10.441-23.265 23.3-23.265z" fill="#666"></path> <path d="M226.4 166.982c8.492 0 15.386 6.884 15.386 15.364s-6.894 15.363-15.386 15.363c-8.491 0-15.387-6.884-15.387-15.363 0-8.48 6.896-15.364 15.387-15.364z" fill="#999"></path> <path d="M232.099 185.276c3.145-5.469-4.096-15.586 1.351-12.429 5.447 3.158 7.316 10.161 4.172 15.63-3.146 5.468-10.12 7.345-15.568 4.188-5.447-3.158 6.9-1.92 10.045-7.39z" fill="#B8B7B7"></path></g> <path d="M273.438 147.668c2.426 0 4.396 4.13 4.396 9.218s-1.97 9.218-4.396 9.218-4.396-4.13-4.396-9.218c0-5.087 1.97-9.218 4.396-9.218z" fill="#EDCC86"></path> <path d="M156.501 37.93c0-.97-.766-1.757-1.71-1.757h-34.385c-.945 0-1.711.787-1.711 1.756v3.512c0 .969.766 1.756 1.71 1.756h34.386c.944 0 1.71-.787 1.71-1.756v-3.512z" fill="#C45F56"></path> <path d="M151.226 11.372c0-.847-.66-1.536-1.474-1.536h-25.187c-.814 0-1.474.69-1.474 1.536v3.073c0 .848.66 1.536 1.474 1.536h25.187c.814 0 1.474-.688 1.474-1.536v-3.073z" fill="#5EA1A6"></path> <g id="wheel-2"><path d="M87.482 158.203c12.86 0 23.3 10.425 23.3 23.265s-10.44 23.265-23.3 23.265c-12.859 0-23.299-10.425-23.299-23.265s10.44-23.265 23.3-23.265z" fill="#666"></path> <path d="M87.482 166.982c8.493 0 15.387 6.884 15.387 15.364s-6.894 15.363-15.387 15.363c-8.491 0-15.386-6.884-15.386-15.363 0-8.48 6.895-15.364 15.386-15.364z" fill="#999"></path> <path d="M92.303 185.276c3.145-5.469-4.096-15.586 1.351-12.429 5.447 3.158 7.316 10.161 4.171 15.63-3.145 5.468-10.12 7.345-15.567 4.188-5.447-3.158 6.9-1.92 10.045-7.39z" fill="#B8B7B7"></path></g> <path d="M35.169 144.742c0-.323-.296-.585-.66-.585h-1.318c-.364 0-.66.262-.66.585v14.632c0 .323.296.585.66.585h1.318c.364 0 .66-.262.66-.585v-14.632z" fill="#CCC"></path></g></svg></div></div>
+	<!-- *** Footer *** -->
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="address">
+						<h4>Fuen28</h4>
+						<span>Group 5 <br>Group 5<br>Taiwan</span>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="links">
+						<h4>Useful Links</h4>
+						<ul>
+							<li><a href="#">Info</a></li>
+							<li><a href="#">Guides</a></li>
+							<li><a href="#">Videos</a></li>
+							<li><a href="#">Outreach</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="hours">
+						<h4>Open Hours</h4>
+						<ul>
+							<li>Mon to Fri: 10:00 AM to 8:00 PM</li>
+							<li>Sat - Sun: 11:00 AM to 4:00 PM</li>
+							<li>Holidays: Closed</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<div class="under-footer">
+						<div class="row">
+							<div class="col-lg-6 col-sm-6">
+							</div>
+							<div class="col-lg-6 col-sm-6">
+								<p class="copyright">
+									Copyright 2023 Route Master
 
+									@*<br>Design: <a rel="nofollow" href="https://www.tooplate.com" target="_parent">Tooplate</a>*@
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<div class="sub-footer">
+						<div class="row">
+							<div class="col-lg-3">
+								<div class="logo"><span>Route<em>Master</em></span></div>
+							</div>
+							<div class="col-lg-6">
+								<div class="menu">
+									<ul>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="social-links">
+									<ul>
+										<li><a href="#"><i class="fa fa-twitter"></i></a></li>
+										<li><a href="#"><i class="fa fa-facebook"></i></a></li>
+										<li><a href="#"><i class="fa fa-behance"></i></a></li>
+										<li><a href="#"><i class="fa fa-instagram"></i></a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
 
-    <!-- *** Footer *** -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="address">
-                        <h4>Fuen28</h4>
-                        <span>Group 5 <br>Group 5<br>Taiwan</span>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="links">
-                        <h4>Useful Links</h4>
-                        <ul>
-                            <li><a href="#">Info</a></li>
-                            <li><a href="#">Guides</a></li>
-                            <li><a href="#">Videos</a></li>
-                            <li><a href="#">Outreach</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="hours">
-                        <h4>Open Hours</h4>
-                        <ul>
-                            <li>Mon to Fri: 10:00 AM to 8:00 PM</li>
-                            <li>Sat - Sun: 11:00 AM to 4:00 PM</li>
-                            <li>Holidays: Closed</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-12">
-                    <div class="under-footer">
-                        <div class="row">
-                            <div class="col-lg-6 col-sm-6">
-                            </div>
-                            <div class="col-lg-6 col-sm-6">
-                                <p class="copyright">
-                                    Copyright 2023 Route Master
-
-                                    @*<br>Design: <a rel="nofollow" href="https://www.tooplate.com" target="_parent">Tooplate</a>*@
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-12">
-                    <div class="sub-footer">
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <div class="logo"><span>Route<em>Master</em></span></div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="menu">
-                                    <ul>
-                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
-                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
-                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="social-links">
-                                    <ul>
-                                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                        <li><a href="#"><i class="fa fa-behance"></i></a></li>
-                                        <li><a href="#"><i class="fa fa-instagram"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <!-- Plugins -->
-    <script src="~/js/scrollreveal.min.js"></script>
-    <script src="~/js/waypoints.min.js"></script>
-    <script src="~/js/imgfix.min.js"></script>
-    <script src="~/js/mixitup.js"></script>
-    <script src="~/js/accordions.js"></script>
-    <script src="~/js/owl-carousel.js"></script>
+	<!-- Plugins -->
+	<script src="~/js/scrollreveal.min.js"></script>
+	<script src="~/js/waypoints.min.js"></script>
+	<script src="~/js/imgfix.min.js"></script>
+	<script src="~/js/mixitup.js"></script>
+	<script src="~/js/accordions.js"></script>
+	<script src="~/js/owl-carousel.js"></script>
 
-    <!-- Global Init -->
-    <script src="~/js/custom.js"></script>
-    <script>
+	<!-- Global Init -->
+	<script src="~/js/custom.js"></script>
+	<script>
+		$(window).on('scroll', function () {
+			var elem = $('.car'); // 你希望觸發動畫的元素
+			var top_of_element = elem.offset().top;
+			var bottom_of_element = elem.offset().top + elem.outerHeight();
+			var top_of_viewport = $(window).scrollTop();
+			var bottom_of_viewport = top_of_viewport + $(window).height();
 
-    </script>
-    @await RenderSectionAsync("Scripts", required: false)
+			if ((bottom_of_viewport > top_of_element) && (top_of_viewport < bottom_of_element)) {
+				// 如果元素在 viewport 中，開始動畫
+				elem.addClass('animated');
+			}
+		});
+	</script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
