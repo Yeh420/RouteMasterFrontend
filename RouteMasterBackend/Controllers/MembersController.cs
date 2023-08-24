@@ -151,8 +151,6 @@ namespace RouteMasterBackend.Controllers
         //}
       
 
-
-
         private bool MemberExists(int id)
         {
             return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
