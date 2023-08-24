@@ -1,6 +1,6 @@
 ﻿@{
     int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
-    var memberIdFromCookie = Context.Request.Cookies["Id"];
+    var memberIdFromCookie = Context.Request.Cookies["Id"]??"0";
 }
 
 
