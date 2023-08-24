@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "MemberRegister";
+    //Layout = "_LayoutLogin";
 }
 
 @section Styles{
@@ -12,50 +13,77 @@
             gap: 10px; /* 圖片之間的間距 */
         }
 
-     
+        .row {  
+            justify-content: center;
+        }
+
+        .col-md-4 {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-group{
+            margin-bottom:20px;
+        }
+
+        .radio-container{
+            display: inline-flex;
+            gap: 10px;
+        }
+        .h1Container{
+            display:flex;
+            justify-content:center;
+        }
+
+        .image-list li {
+            display: inline-block;
+            margin-right: 10px; 
+        }
     </style>
 }
-<h1>MemberRegister</h1>
+<div class="h1Container">
+    <h1>會員註冊</h1>
+</div>
 
-<h4>MemberRegisterVM</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="MemberRegister" enctype="multipart/form-data">
+        <form asp-action="MemberRegister" class="form" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">               
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
+               
+                <input asp-for="FirstName" class="form-control" placeholder="名字"/>
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
+                
+                <input asp-for="LastName" class="form-control" placeholder="姓氏"/>
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Account" class="control-label"></label>
-                <input asp-for="Account" class="form-control" />
+               
+                <input asp-for="Account" class="form-control" placeholder="帳號名稱"/>
                 <span asp-validation-for="Account" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                
+                <input asp-for="Password" class="form-control" placeholder="密碼"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ConfirmPassword" class="control-label"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
+               
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="再輸入一次"/>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                
+                <input asp-for="Email" class="form-control" placeholder="信箱"/>
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CellPhoneNumber" class="control-label"></label>
-                <input asp-for="CellPhoneNumber" class="form-control" />
+                
+                <input asp-for="CellPhoneNumber" class="form-control" placeholder="電話"/>
                 <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -68,13 +96,13 @@
                     }
                 </select>
                 <span asp-validation-for="Address" class="text-danger"></span>
-                <label asp-for="Address" class="control-label"></label>                
-                <select asp-for="Address" id="town" name="Address" class="form-control">
-                   
+         
+                @*<select asp-for="Address" id="town" name="Address" class="form-control">
+                    <option value="">請選擇鄉鎮</option>
                 </select>
-                <span asp-validation-for="Address" class="text-danger"></span>
+                <span asp-validation-for="Address" class="text-danger"></span>*@
             </div>
-            <div class="form-group">
+            <div class="form-group radio-container">
             <label asp-for="Gender" class="control-label"></label>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -86,8 +114,11 @@
                     <input type="radio" class="form-check-input" asp-for="Gender" value="true" /> 女生
                 </label>
             </div>
+            <br />
             </div>
+            
             <div class="gorm-group"> 
+                <lable>大頭貼圖像</lable>
                 <div class="form-check">
                     <input type="radio" id="radioA" name="option" value="A">上傳大頭貼<br>
                     <label class="form-check-label" for="flexRadioDefault1">
@@ -111,6 +142,7 @@
 
             <div id="divB" style="display: none;">
                 <h3>RouteMaster精美大頭貼</h3>
+                <ul class="image-list">
                 <li>
                     <label>
                         <input type="radio" name="selectedImage" value="2c36c1ae24444c9d92c5d94e5c69ee91.png" />
@@ -119,16 +151,48 @@
                 </li>
                 <li>
                     <label>
-                        <input type="radio" name="selectedImage" value="30519bf58a6d4eefa1b9d6c55d2d2f45.png" />
-                        <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" />
+                        <input type="radio" name="selectedImage" value="ff288dbbf8d3484ca88b6b086af3f2ac.png" />
+                        <img src="~/SystemImages/ff288dbbf8d3484ca88b6b086af3f2ac.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" />
                     </label>
                 </li>
+                
                 <li>
                     <label>
                         <input type="radio" name="selectedImage" value="4f411a319e2e4992a42db1e518238c7d.png" />
                         <img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" class="default-image imgs" alt="預設圖片 3" width="100" height="100" />
                     </label>
                 </li>
+                <li>
+                    <label>
+                        <input type="radio" name="selectedImage" value="7bf343bdbd7541eeb3f86f018be90ddc.png" />
+                        <img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" class="default-image imgs" alt="預設圖片 4" width="100" height="100" />
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="selectedImage" value="c00e1205eb4e459eb9bc7fa2bdc94e00.png" />
+                        <img src="~/SystemImages/c00e1205eb4e459eb9bc7fa2bdc94e00.png" class="default-image imgs" alt="預設圖片 5" width="100" height="100" />
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="selectedImage" value="87df4dd9f26142008539267491e19a6c.png" />
+                        <img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" class="default-image imgs" alt="預設圖片 6" width="100" height="100" />
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="selectedImage" value="30519bf58a6d4eefa1b9d6c55d2d2f45.png" />
+                        <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 7" width="100" height="100" />
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
+                        <img src="~/SystemImages/eeb5e5041d534359b71e516aac29d46c.png" class="default-image imgs" alt="預設圖片 8" width="100" height="100" />
+                    </label>
+                </li>
+                </ul>
             </div>
             <input type="hidden" id="sysImg" name="Image" />
 
@@ -183,8 +247,9 @@
 
             
         });
-</script>
-        <script>
+        </script>
+
+    <script>
             // 在所有的radio input中加上點選事件
             $('input[name="selectedImage"]').click(function () {
                 // 取得選取的radio圖片的src屬性
@@ -198,8 +263,5 @@
             $('#sysImg').val(fileName);
             });
     </script>
-    <script>
-        document.querySelector("select")
-          
-    </script>
-    }
+
+}
