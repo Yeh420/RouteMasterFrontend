@@ -146,7 +146,7 @@
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
+        <input type="button" class="btn btn-outline-primary mt-2" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
     </div>
     <div v-else>
         <div class="d-flex">
@@ -724,6 +724,7 @@
                         _this.initMap(id);
                     }
                 },             
+
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;
