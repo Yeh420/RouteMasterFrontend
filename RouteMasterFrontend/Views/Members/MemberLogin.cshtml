@@ -52,22 +52,22 @@
 
         .top:before {
             transform: rotate(45deg);
-            background: #F6B53D;
+            background: #FF5511;
         }
 
         .top:after {
             transform: rotate(135deg);
-            background: #0F488C;
+            background: #FFFF00;
         }
 
         .bottom:before {
             transform: rotate(-45deg);
-            background: #696CB5;
+            background: #33FF33;
         }
 
         .bottom:after {
             transform: rotate(-135deg);
-            background: #EF8A5A
+            background: #00FFFF;
         }
 
         .center {
@@ -89,19 +89,30 @@
             color: #333;
         }
 
-            .center input {
-                width: 100%;
-                padding: 15px;
-                margin: 5px;
-                border-radius: 1px;
-                border: 1px solid #ccc;
-                font-family: inherit;
-            }
+        .center input {
+            width: 200px;
+            padding: 15px;
+            margin: 5px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+        }
 
+        .container .btn-primary:hover{
+        background: #FFBBBB;
+        color: #fff;
+        border-radius: 5px;
+        box-shadow: 
+        0 0 5px #FFBBBB,
+        0 0 25px #FFBBBB,
+        0 0 50px #FFBBBB,
+        0 0 100px #FFBBBB;
+        }
     </style>
-
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
+
 <body>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
@@ -114,12 +125,12 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group d-flex align-items-center">
                     <span class="far fa-user"></span>
-                    <input asp-for="Account" class="form-control" id="Account" />
+                    <input asp-for="Account" class="form-control" id="Account"/><br/>
                     <span asp-validation-for="Account" class="text-danger"></span>
                 </div>
                 <div class="form-group d-flex align-items-center">
                     <span class="fas fa-key"></span>
-                    <input asp-for="Password" class="form-control" id="Password" />
+                    <input asp-for="Password" class="form-control" id="Password" /><br/>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <input type="submit" value="登入" class="btn btn-primary" />
@@ -134,17 +145,19 @@
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
                  data-login_uri="https://localhost:7145/Members/GoogleLogin"
                  data-auto_prompt="false">
+                 
             </div>
             <div class="g_id_signin"
-                 data-type="standard"
+                 data-type="icon"
                  data-size="large"
                  data-theme="outline"
                  data-text="sign_in_with"
-                 data-shape="rectangular"
+                 data-shape="pill"
                  data-logo_alignment="left">
             </div>
         </div>
     </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </body>
 </html>
 
@@ -153,6 +166,7 @@
 }
 
 <script>
+
     $(document).ready(function () {
         $('#loginForm').submit(function (event) {
             event.preventDefault();
@@ -176,7 +190,8 @@
                     if (data.success) {
                         window.location.href = 'https://localhost:7145/Home/Index';
                     } else {
-                        swal('帳密錯誤', '請再試一次', 'error')
+                        //alert('帳密錯誤', '請再試一次', 'error')
+                        swal("帳密錯誤!", "請再試一次!", "error",{button:"返回"});
                     }
                 })
                 .catch(error => {
