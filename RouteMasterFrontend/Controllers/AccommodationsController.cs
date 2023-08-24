@@ -53,25 +53,9 @@ namespace RouteMasterFrontend.Controllers
         }
 
         // GET: Accommodations/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> ManagementAnalysis(int? id)
         {
-            if (id == null || _context.Accommodations == null)
-            {
-                return NotFound();
-            }
-
-            var accommodation = await _context.Accommodations
-                .Include(a => a.AcommodationCategory)
-                .Include(a => a.Partner)
-                .Include(a => a.Region)
-                .Include(a => a.Town)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (accommodation == null)
-            {
-                return NotFound();
-            }
-
-            return View(accommodation);
+            return View();
         }
 
         // GET: Accommodations/Create
