@@ -141,6 +141,7 @@
             </style>
         </noscript>
     }
+
 <div id="app" v-cloak>
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
@@ -470,8 +471,6 @@
     <script src="~/js/Comments_AccommodationPartial.js"></script>
     <script src="~/js/Comments_AccommodationBrief.js"></script>
 
-        
-
     <script>
         var vueApp = {
             data() {
@@ -759,7 +758,7 @@
                                 let content = {
                                     roomName : $(`#rp${i} #rn`).text(),
                                     date : $(`#rp${i} #dp-${i+1}`).val(),
-                                    quantity : $(`#rp${i} #pq-${i+1}`).val(
+                                    quantity : $(`#rp${i} #pq-${i+1}`).val()
                                 }
                                 _this.cartProducts.push(cartProduct);
                                 _this.alertContent.push(content);
