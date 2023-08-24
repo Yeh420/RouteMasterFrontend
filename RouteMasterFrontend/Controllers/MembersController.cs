@@ -37,13 +37,14 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
-
+        
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
             _configuration = configuration;
+
         }
 
         // GET: Members/Edit/5
@@ -97,7 +98,6 @@ namespace RouteMasterFrontend.Controllers
             //}
             return ViewComponent("MemberArea");
         }
-
 
         //會員普通登入
         [HttpGet]
@@ -218,6 +218,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     new Claim(ClaimTypes.Name, payload.Name),
                     //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
+                    new Claim("id",member.Id.ToString())
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -279,7 +280,7 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 MemberImage img = new MemberImage();
-
+                var member = _context.Members.First((m => m.Email == payload.Email));
                 Result result = RegisterGoogleMember(payload, img);
 
                 if (result.IsSuccess)
@@ -287,7 +288,8 @@ namespace RouteMasterFrontend.Controllers
                     const bool rememberMe = false;
                     var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, payload.Name),  
+                    new Claim(ClaimTypes.Name, payload.Name),
+                    new Claim("id",member.Id.ToString())
                     //
                     //new Claim(ClaimTypes.Email, payload.Email)
                 };
@@ -362,11 +364,12 @@ namespace RouteMasterFrontend.Controllers
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
             
-
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
+            string userID = user.FindFirst("id").Value;
+
+            Member myMember = _context.Members.First(m => m.Account == userAccount);
             
-            Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
             {              
@@ -510,17 +513,16 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public IActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
         {
-            if (ModelState.IsValid == false)
-            {
-                return Json(new { success = false, message = "输入数据无效，请检查输入。" });
-            }
+           
+                //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
+            
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
             if (result.IsSuccess == false)
             {
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
-                return View(vm);
+                return View(result);
             }
 
             return ViewComponent("MemberArea");
@@ -533,15 +535,14 @@ namespace RouteMasterFrontend.Controllers
             Member member = _context.Members.FirstOrDefault(m => m.Account == currentUserAccount);
 
             member.FirstName=dto.FirstName;
-            member.LastName=dto.LastName;
-            member.Email=dto.Email;
+            member.LastName=dto.LastName;           
             member.CellPhoneNumber=dto.CellPhoneNumber;
             member.Address=dto.Address;
             member.Gender=dto.Gender;
             member.Birthday=dto.Birthday;
             member.IsSuscribe=dto.IsSuscribe;
 
-            _context.Entry(member).State =EntityState.Modified;
+            //_context.Entry(member).State =EntityState.Modified;
             _context.SaveChanges();
             return ViewComponent("MemberArea");
         }
@@ -1009,6 +1010,6 @@ namespace RouteMasterFrontend.Controllers
 
             return Result.Success();
         }
-
+       
     }
 }

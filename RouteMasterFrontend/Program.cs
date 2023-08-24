@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using RouteMasterFrontend.EFModels;
 using RouteMasterFrontend.Models.Infra.DapperRepositories;
 using RouteMasterFrontend.Models.Interfaces;
+using RouteMasterFrontend.Models.Services;
 using System.Configuration;
 using static System.Net.WebRequestMethods;
 
@@ -16,8 +17,6 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("RouteMaster"));
 });
-
-
 
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -52,6 +51,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 	options.Secure = (CookieSecurePolicy)SameSiteMode.None; // ³]¸m Secure ÄÝ©Ê¬° None
 });
 
+builder.Services.AddTransient<ICoupon, CouponService>();
 
 
 

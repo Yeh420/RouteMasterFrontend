@@ -27,7 +27,13 @@
 
         public bool ThumbsUp { get; set; }
 
-        public int TotalThumbs { get; set; }    
+        public int TotalThumbs { get; set; }
+
+        public string Profile { get; set; }
+
+        public bool? Gender { get; set; }
+
+        public string?  Address  { get; set; }
 
     }
 }

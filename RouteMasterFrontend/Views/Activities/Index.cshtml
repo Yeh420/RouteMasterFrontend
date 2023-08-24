@@ -26,6 +26,7 @@
 <div id="app">
     <div class="row">
         <div class="col-2">
+            <label>每頁顯示筆數</label>
             <select v-model="pageSize" class="form-select" @@change="filterActivityDtoesToNewPageSize">
                 <option value="1">1</option>
                 <option value="5">5</option>
@@ -34,7 +35,8 @@
             </select>
         </div>
             <div class="d-flex justify-content-end ">
-                <input type="search" v-model.lazy="keyword" @@blur="filterActivityDtoes" />
+            <div class="m-1"><i class="fa-solid fa-magnifying-glass"></i></div>            
+            <input type="search" v-model.lazy="keyword" @@blur="filterActivityDtoes" placeholder="搜尋活動名稱" />
             </div> 
      
     </div>
@@ -55,7 +57,7 @@
                         <li class="list-group-item"> {{ item.status ? '上架中' : '已下架' }}</li>
                     </ul>
                     <div class="card-body">
-                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button>
+@*                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button>*@
                         <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
                     </div>
                 </div>
@@ -128,6 +130,7 @@
 
 
 @section Scripts{
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
@@ -182,7 +185,7 @@
                 showDetailsModal: function (id) {
                     //modal改成詳細資料
                     console.log(id);
-                    this.getExtraServiceDetails(id);
+                    this.getActivityDetails(id);
                     $('#ActivityDetailModal').modal("show");
                 },
 

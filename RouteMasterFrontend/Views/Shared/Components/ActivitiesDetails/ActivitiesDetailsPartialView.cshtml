@@ -7,6 +7,7 @@
 <style>
     #cartTable2 tbody tr {
         border-top: none;
+        border-bottom: none;
     }
     /* Optional: Add padding to the cells for better spacing */
     #cartTable2 tbody td {
@@ -17,6 +18,7 @@
     /* Add this style to remove border between thead and tbody */
     #cartTable2 thead th {
         border-bottom: none;
+        border-top: none;
     }
 
     .activities-container-vertical {
@@ -182,6 +184,7 @@
                     alert(result.message);
                     
                     $('#cartTable2').find('tr[data-activitiesid="' + result.activitiesId + '"]').remove();
+                    reloadCartItems();
                 } else {
                   
                     alert(result.message);

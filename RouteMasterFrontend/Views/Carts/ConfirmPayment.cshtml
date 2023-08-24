@@ -1,30 +1,21 @@
 ﻿@{
-    ViewData["Title"] = "結帳頁面";
+    ViewData["Title"] = "結帳完成";
 }
 
-<h2>結帳</h2>
-@*
-<button id="checkoutButton">前往結帳</button>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>結帳完成</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">感謝您的購買！您的訂單已成功提交。</p>
+                    <p>我們將儘快處理您的訂單，您可以在「我的訂單」中查看訂單狀態。</p>
 
-@section Scripts {
-    <script>
-        document.getElementById("checkoutButton").addEventListener("click", function () {
-            var xhr = new XMLHttpRequest();
-            xhr.open("Get", "/Carts/GetPaymentRedirectUrl", true); // 修改為實際的路由
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        // 請求成功，處理後續動作（例如處理後端重定向 URL）
-                        var response = JSON.parse(xhr.responseText);
-                        window.location.href = response.redirectUrl; // 假設後端回傳了重定向的 URL
-                    } else {
-                        // 請求失敗，處理錯誤
-                        console.error("請求失敗：" + xhr.status);
-                    }
-                }
-            };
-            xhr.send();
-        });
-    </script>
-}*@
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-4">返回首頁</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

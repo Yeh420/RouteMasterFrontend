@@ -51,7 +51,9 @@ namespace RouteMasterBackend.Controllers
           {
                 return null;
           }
-            OrderDTO historyorderDTO = _context.Orders.Where(h => h.MemberId == id).Select(h => new OrderDTO
+            OrderDTO historyorderDTO = _context.Orders
+                .Where(h => h.MemberId == id).Select(h => new OrderDTO
+                
             {
                 Id = h.Id,
                 PaymentStatusId = h.PaymentStatusId,
