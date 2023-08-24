@@ -45,6 +45,8 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
                     return View("_MessagePartial");
                 case 4:
                     return View("_FavoriteAtt", attractions);
+                case 5:
+                    return View("_SchduleTable");
 
             }
 

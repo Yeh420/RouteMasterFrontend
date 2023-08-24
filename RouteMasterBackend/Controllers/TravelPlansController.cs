@@ -368,23 +368,26 @@ namespace RouteMasterBackend.Controllers
                 }
 
             }
- 
-       
-
-            //todo門票 空字串 //todo null排除 
-
-
-
-            
-          
-        
         
         }
 
 
-       
 
 
+        [HttpGet("Get/SchduleData")]
+        public async Task<IEnumerable<SchduleFromDbDto>> GetSchduleData(int memberId)
+        {
+          
+            var data = _context.Schedules.Where(x => x.MemberId == memberId).Select(x => new SchduleFromDbDto
+            {
+                Content = x.Content,    
+                StartTime=x.StartTime,
+                EndTime=x.EndTime
+            });
+
+
+            return data;
+        }
 
 
 
