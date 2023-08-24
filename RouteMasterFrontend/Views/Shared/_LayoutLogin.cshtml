@@ -12,8 +12,7 @@
         }
 
         body {
-            max-height:100%;
-            max-width:100%;
+            min-height: 100vh;
             font-family: "Raleway", sans-serif;
         }
 
@@ -90,38 +89,34 @@
             color: #333;
         }
 
-        .center input {
-            width: 200px;
-            padding: 15px;
-            margin: 5px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-family: inherit;
+            .center input {
+                width: 200px;
+                padding: 15px;
+                margin: 5px;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+                font-family: inherit;
+            }
+
+        .container .btn-primary:hover {
+            background: #FFBBBB;
+            color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #FFBBBB, 0 0 25px #FFBBBB, 0 0 50px #FFBBBB, 0 0 100px #FFBBBB;
         }
 
-        .container .btn-primary:hover{
-        background: #FFBBBB;
-        color: #fff;
-        border-radius: 5px;
-        box-shadow: 
-        0 0 5px #FFBBBB,
-        0 0 25px #FFBBBB,
-        0 0 50px #FFBBBB,
-        0 0 100px #FFBBBB;
-        }
-
-        .header{
+        .header {
             position: absolute;
             top: 0;
             left: 0;
             z-index: 2;
         }
     </style>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 
-<body>  
+<body>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
         <h1 class="header">RouteMaster</h1>
@@ -134,12 +129,12 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group d-flex align-items-center">
                     <span class="far fa-user"></span>
-                    <input asp-for="Account" class="form-control" id="Account"/><br/>
+                    <input asp-for="Account" class="form-control" id="Account" /><br />
                     <span asp-validation-for="Account" class="text-danger"></span>
                 </div>
                 <div class="form-group d-flex align-items-center">
                     <span class="fas fa-key"></span>
-                    <input asp-for="Password" class="form-control" id="Password" /><br/>
+                    <input asp-for="Password" class="form-control" id="Password" /><br />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <input type="submit" value="登入" class="btn btn-primary" />
@@ -148,12 +143,12 @@
             <div class="text-center fs-6">
                 <a asp-action="MemberRegister" class=" btn btn-warning ">註冊會員</a> or
                 <a asp-action="MemberForgetPassword" class="btn btn-success">忘記密碼</a>
-            </div>           
+            </div>
+            <br />
             <div id="g_id_onload"
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
                  data-login_uri="https://localhost:7145/Members/GoogleLogin"
                  data-auto_prompt="false">
-                 
             </div>
             <div class="g_id_signin"
                  data-type="icon"
@@ -199,7 +194,7 @@
                         window.location.href = 'https://localhost:7145/Home/Index';
                     } else {
                         //alert('帳密錯誤', '請再試一次', 'error')
-                        swal("帳密錯誤!", "請再試一次!", "error",{button:"返回"});
+                        swal("帳密錯誤!", "請再試一次!", "error", { button: "返回" });
                     }
                 })
                 .catch(error => {

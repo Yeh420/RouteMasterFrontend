@@ -146,7 +146,7 @@ namespace RouteMasterFrontend.Controllers
                 { "ItemName", $"RouteMaster商品-{formattedItemNames}"}, 
                 { "ExpireDate", "3" },
                 { "ReturnURL", $"{website}/api/Ecpay/AddPayInfo/" },
-                { "ClientBackURL", $"{website}Orders/Index" },
+                { "ClientBackURL", $"{website}Carts/ConfirmPayment" },
                 //{ "OrderResultURL", $"{website}/api/Orders/PayInfo/" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
@@ -179,8 +179,8 @@ namespace RouteMasterFrontend.Controllers
             _context.Cart_ActivitiesDetails.RemoveRange(toBeDeleteAct);
             _context.SaveChanges();
 
-            _context.Carts.Remove(cart);
-            _context.SaveChanges();
+            //_context.Carts.Remove(cart);
+            //_context.SaveChanges();
         }
 
         private string GetCheckMacValue(Dictionary<string, string> order)

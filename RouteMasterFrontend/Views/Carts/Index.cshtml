@@ -130,6 +130,7 @@
                     <tbody>
                             @{
                                 decimal totalAmount = 0;
+                               int totalAmountInt = (int)totalAmount;
 
                                 var groupedExtraServices = Model.ExtraServices
                                 .GroupBy(e => e.Id);
@@ -243,7 +244,7 @@
        
         </div>
         <div style="width:38%; border:none; text-align:center; align-items:flex-end; justify-content: center; display: flex; flex-direction: column; background-color: #f9f9f9; border-radius: 10px; padding: 20px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);" class="container me-0">
-            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: @totalAmount 元</h5>
+            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: @Math.Round(totalAmount) 元</h5>
             <div style="border-top: 2px dashed #ddd; padding-top: 20px; width:300px; text-align: right;">
                 <h3 style="font-size: 18px; color: #888; margin-bottom: 10px;">優惠券折扣：{{ selectedCouponAmount}}%</h3>
                 <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h3>
