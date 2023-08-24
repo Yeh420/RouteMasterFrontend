@@ -1,6 +1,6 @@
 ﻿@{
     int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
-    var memberIdFromCookie = Context.Request.Cookies["Id"];
+    var memberIdFromCookie = Context.Request.Cookies["Id"]??"0";
 }
 
 
@@ -109,7 +109,8 @@
             white-space: pre;
             display: none;
             position: absolute;
-            background-color: #fff;
+            background-color: #000; /* 将背景颜色改为黑色 */
+            color: #fff; /* 将文本颜色改为白色 */
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -128,7 +129,8 @@
             white-space: pre;
             display: none;
             position: absolute;
-            background-color: #fff;
+            background-color: #000; /* 将背景颜色改为黑色 */
+            color: #fff; /* 将文本颜色改为白色 */
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -271,12 +273,14 @@
                     }
                 }
                 return false; 
-            });
+            })
 
-            console.log(tableTBodyTrObjs);
+           console.log(tableTBodyTrObjs);
 
-            const postData = {
-                memberId: @memberIdFromCookie,
+           let memberId = @memberIdFromCookie;
+            
+           const postData = {
+                memberId: memberId,
                 tableTBodyTrObjs: tableTBodyTrObjs,
                 createDate: inputBeginDateTime.value,
             };
