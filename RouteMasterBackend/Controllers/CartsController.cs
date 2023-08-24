@@ -122,10 +122,11 @@ namespace RouteMasterBackend.Controllers
         {
             try
             {
+                    Console.WriteLine($"Received request with extraserviceId: {dto.extraserviceId}");
                 var existingCartItem = _context.CartExtraServicesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
                 if(existingCartItem != null)
                 {
-                    existingCartItem.Quantity -= dto.quantity;
+                    //existingCartItem.Quantity -= dto.quantity;
                     _context.CartExtraServicesDetails.Remove(existingCartItem);
                     _context.SaveChanges();
                     return Ok(new { success = true, message = "Successfully removed from cart." });
