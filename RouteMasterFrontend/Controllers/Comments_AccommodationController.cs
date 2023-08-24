@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -114,9 +115,13 @@ namespace RouteMasterFrontend.Controllers
 
         public async Task<bool> DecideLike ([FromBody] Comments_LikesAjaxDTO input)
         {
+            ClaimsPrincipal user = HttpContext.User;
+            string userAccount = user.Identity.Name;
+            int userID = int.Parse(user.FindFirst("id").Value);
+
             var proLike =await _context.Comment_Accommodation_Likes
                 .Include(l => l.Member)
-                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == 1);
+                .FirstOrDefaultAsync(l => l.Comments_AccommodationId == input.CommentId && l.MemberId == userID);
             // @@l.MemberAccount==user.Identity.name
 
             var info = _context.Comments_Accommodations
@@ -132,7 +137,7 @@ namespace RouteMasterFrontend.Controllers
                 //建立按讚紀錄
                 Comment_Accommodation_Like like = new Comment_Accommodation_Like
                 {
-                    MemberId = 1, //@@記得改user.Identity.name
+                    MemberId = userID, //@@記得改user.Identity.name
                     Comments_AccommodationId = input.CommentId,
                     CreateDate = DateTime.Now,
                     
@@ -148,7 +153,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     //@@按讚人記得改user.Identity.name
                     MemberId =id,
-                    Content =$"按讚人對您標題為:{title}的評論按讚",
+                    Content =$"{userAccount}對您標題為:{title}的評論按讚",
                     IsRead = false,
                 };
                 _context.SystemMessages.Add(msg);
@@ -163,7 +168,7 @@ namespace RouteMasterFrontend.Controllers
                 await _context.SaveChangesAsync();
 
                 //刪除通知
-                var matchContent = $"按讚人對您標題為:{title}的評論按讚"; //記得按讚人改user.Identity.name
+                var matchContent = $"{userAccount}對您標題為:{title}的評論按讚"; //記得按讚人改user.Identity.name
 
                 SystemMessage matchMsg= await _context.SystemMessages
                     .Where(m=>m.MemberId==id && m.Content==matchContent)
@@ -184,9 +189,12 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public async Task<string> NewComment([FromForm] Comments_AccommodationCreateDTO dto)
         {
+            ClaimsPrincipal user = HttpContext.User;
+            int userID = int.Parse(user.FindFirst("id").Value);
+
             Comments_Accommodation commentDb = new Comments_Accommodation
             {
-                MemberId = 2,
+                MemberId = userID, //user,identity.id
                 AccommodationId = dto.AccommodationId,               
                 Score = dto.Score,
                 Title = dto.Title,
