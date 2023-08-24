@@ -1098,6 +1098,11 @@ namespace RouteMasterFrontend.Controllers
         {
             return ViewComponent("CartPartial");
         }
-       
+
+        public IActionResult ConfirmPayment()
+        {
+            return View();
+        }
     }
+   
 }
