@@ -156,13 +156,14 @@
     <div class="col-9 border border-secondary p-3 " style="min-height: 500px; height: auto;" id="schedulePreContainer">
         <input type="datetime-local"  id="travelBeginDateTime" />
         <button id="createAttractionTimeSpanContainer" class="btn btn-primary" disabled>新增區塊</button>
+        <button id="saveTheSchedule" class="btn btn-primary">儲存行程</button>
         <button id="callApiToAddToCart" class="btn btn-primary">加入購物車</button>
         <div class="row">            
             <div id="dropZoneContainer" class="col-4">
 
             </div>
             <div id="tableContainer" class="col-8 hide">
-                <table class="w-100">
+                <table id="beSavedScheduleTable" class="w-100">
                     <thead class="w-100">
                         <tr>
                             <th >事項</th>
@@ -234,7 +235,28 @@
 
 
 
+        document.querySelector("#saveTheSchedule").addEventListener('click',function(){
 
+
+         let targetScheduleTable=document.querySelector('#beSavedScheduleTable');
+         let targetTableHtml = targetScheduleTable.outerHTML;
+
+            const postData = {
+                cartId: @cartIdFromCookie,
+                content: targetTableHtml,
+                startTime: inputBeginDateTime.value,
+            };
+
+            axios.post(`https://localhost:7251/api/TravelPlans/Post/SaveTableData`, postData)
+                .then(response => {
+                    alert('已成功儲存!');             
+                })
+                .catch(error => {
+                    console.log(error)
+                });
+
+
+        })
 
 
 
@@ -1266,7 +1288,7 @@
                     cartId: cartIdFromCookie,
 
 
-                    roomProducts : roomProducts.cartProducts
+                    roomProducts : roomProducts.cartProducts,
 
                     activityProductIds: newActChObjArray,
                     extraServiceProductIds: newExtChObjArray,

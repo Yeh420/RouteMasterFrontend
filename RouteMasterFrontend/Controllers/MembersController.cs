@@ -37,13 +37,14 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
-
+        
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
             _configuration = configuration;
+
         }
 
         // GET: Members/Edit/5
@@ -363,11 +364,12 @@ namespace RouteMasterFrontend.Controllers
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
             
-
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
+            string userID = user.FindFirst("id").Value;
+
+            Member myMember = _context.Members.First(m => m.Account == userAccount);
             
-            Member myMember =  _context.Members.First(m=>m.Account == userAccount);
 
             if (user.Identity.IsAuthenticated)
             {              
@@ -1008,6 +1010,6 @@ namespace RouteMasterFrontend.Controllers
 
             return Result.Success();
         }
-
+       
     }
 }
