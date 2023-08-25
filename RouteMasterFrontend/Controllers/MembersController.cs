@@ -802,7 +802,6 @@ namespace RouteMasterFrontend.Controllers
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
 
-
             //帳號先，後密碼
             if (member != null && string.Compare(hashPassword, member.EncryptedPassword) == 0)
             {
@@ -988,7 +987,6 @@ namespace RouteMasterFrontend.Controllers
                 IsConfirmed = false,
                 IsSuspended = false,
                 IsSuscribe = false,
-
             };
 
             //將它存到db
@@ -996,7 +994,6 @@ namespace RouteMasterFrontend.Controllers
             _context.SaveChanges();
             img.MemberId = member.Id;
            
-
             return Result.Success();
         }
 
