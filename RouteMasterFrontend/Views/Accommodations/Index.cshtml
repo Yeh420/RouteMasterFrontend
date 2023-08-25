@@ -1,5 +1,8 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
 @model FilterDTO
+@{
+    var account = Context.Request.HttpContext.User.Identity.Name;
+}
 @section Styles{
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
@@ -7,6 +10,7 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 @*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
      <script src="../js/sweetalert2.all.min.js"></script>
+    <link href="~/css/comments_accommodation.css" rel="stylesheet" />
     <style>
         .currentPage {
             background-color: lightgray;
@@ -1041,7 +1045,8 @@
                 ShowComments:function(id){
                     this.overview = false; 
                     console.log(id);
-                    this.$refs.childRef1.commentDisplay(id);
+                    var identity="@account"? "@account":"";
+                    this.$refs.childRef1.commentDisplay(id,identity);
                 },
                 toggleView:function(){
                     this.toggle = false;
