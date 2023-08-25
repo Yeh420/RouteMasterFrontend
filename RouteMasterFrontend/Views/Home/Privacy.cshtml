@@ -46,12 +46,6 @@
             opacity: 0.5;
         }
 
-        .indicatorDark {
-            width:8px;
-            height:8px;
-            border-radius:100%;
-
-        }
 
         .input-group input[readonly] {
             background-color: white;
@@ -240,7 +234,7 @@
                                         :key="num"
                                         data-bs-target="#carouselImg"
                                         :data-bs-slide-to="num"
-                                        :class="{'active': num === 0, 'indicatorDark':true}">
+                                        :class="{'active': num === 0}">
                                 </button>
 
                             </div>

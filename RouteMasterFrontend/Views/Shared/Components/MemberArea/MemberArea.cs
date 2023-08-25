@@ -42,7 +42,7 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
                 case 2:                   
                     return View("EditPassword", modelPasword);
                 case 3:
-                    return View("_MessagePartial");
+                    return View("_MessageNonVue");
                 case 4:
                     return View("_FavoriteAtt", attractions);
                 case 5:
