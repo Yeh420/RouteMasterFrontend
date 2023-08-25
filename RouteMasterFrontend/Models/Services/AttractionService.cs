@@ -93,79 +93,79 @@ namespace RouteMasterFrontend.Models.Services
                 .FirstOrDefault();
 
 
-            if (memberId != null)
-            {
-                var query = db.FavoriteAttractions
-                .AsNoTracking()
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.AttractionCategory)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.Region)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.Town)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.AttractionImages)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.Comments_Attractions)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.Tags)
-                .Include(f => f.Attraction)
-                .ThenInclude(f => f.Tags)
-                .Where(f => f.MemberId == memberId)  // 只選取對應使用者的最愛景點
-                .ToList();
+            //if (memberId != null)
+            //{
+            //    var query = db.FavoriteAttractions
+            //    .AsNoTracking()
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.AttractionCategory)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.Region)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.Town)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.AttractionImages)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.Comments_Attractions)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.Tags)
+            //    .Include(f => f.Attraction)
+            //    .ThenInclude(f => f.Tags)
+            //    .Where(f => f.MemberId == memberId)  // 只選取對應使用者的最愛景點
+            //    .ToList();
 
-                var result = query
-                .OrderByDescending(f => f.Id)
-                .Select(q => new AttractionIndexDto
-                {
-                    Id = q.Attraction.Id,
-                    AttractionCategory = q.Attraction.AttractionCategory.Name,
-                    Name = q.Attraction.Name,
-                    Region = q.Attraction.Region.Name,
-                    Town = q.Attraction.Town.Name,
-                    Image = q.Attraction.AttractionImages
-                        .Where(i => i.AttractionId == q.Attraction.Id)
-                        .Select(i => i.Image)
-                        .FirstOrDefault() ?? string.Empty,
-                    Description = q.Attraction.Description,
-                    Tags = q.Attraction.Tags
-                        .Select(t => t.Name)
-                        .ToList(),
-                    Score = Math.Round(db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id)
-                        .Select(c => c.Score)
-                        .DefaultIfEmpty()
-                        .Average(), 1),
-                    ScoreCount = db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id)
-                        .Count(),
-                    Hours = Math.Round(db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id && c.StayHours != null)
-                        .Select(c => c.StayHours.Value)
-                        .DefaultIfEmpty()
-                        .Average(), 1),
-                    HoursCount = db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id && c.StayHours != null)
-                        .Count(),
-                    Price = (int)Math.Round(db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id && c.Price != null)
-                        .Select(c => c.Price.Value)
-                        .DefaultIfEmpty()
-                        .Average(), 0),
-                    PriceCount = db.Comments_Attractions
-                        .Where(c => c.AttractionId == q.Attraction.Id && c.Price != null)
-                        .Count(),
-                    Clicks = 0,
-                    ClicksInThirty = 0
-                }).ToList();
+            //    var result = query
+            //    .OrderByDescending(f => f.Id)
+            //    .Select(q => new AttractionIndexDto
+            //    {
+            //        Id = q.Attraction.Id,
+            //        AttractionCategory = q.Attraction.AttractionCategory.Name,
+            //        Name = q.Attraction.Name,
+            //        Region = q.Attraction.Region.Name,
+            //        Town = q.Attraction.Town.Name,
+            //        Image = q.Attraction.AttractionImages
+            //            .Where(i => i.AttractionId == q.Attraction.Id)
+            //            .Select(i => i.Image)
+            //            .FirstOrDefault() ?? string.Empty,
+            //        Description = q.Attraction.Description,
+            //        Tags = q.Attraction.Tags
+            //            .Select(t => t.Name)
+            //            .ToList(),
+            //        Score = Math.Round(db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id)
+            //            .Select(c => c.Score)
+            //            .DefaultIfEmpty()
+            //            .Average(), 1),
+            //        ScoreCount = db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id)
+            //            .Count(),
+            //        Hours = Math.Round(db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id && c.StayHours != null)
+            //            .Select(c => c.StayHours.Value)
+            //            .DefaultIfEmpty()
+            //            .Average(), 1),
+            //        HoursCount = db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id && c.StayHours != null)
+            //            .Count(),
+            //        Price = (int)Math.Round(db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id && c.Price != null)
+            //            .Select(c => c.Price.Value)
+            //            .DefaultIfEmpty()
+            //            .Average(), 0),
+            //        PriceCount = db.Comments_Attractions
+            //            .Where(c => c.AttractionId == q.Attraction.Id && c.Price != null)
+            //            .Count(),
+            //        Clicks = 0,
+            //        ClicksInThirty = 0
+            //    }).ToList();
 
-                return result;
-            }
-            else
-            {
-                return Enumerable.Empty<AttractionIndexDto>();
-            }
-            
+            //    return result;
+            //}
+            //else
+            //{
+            return Enumerable.Empty<AttractionIndexDto>();
+            //}
+
         }
     }
 }

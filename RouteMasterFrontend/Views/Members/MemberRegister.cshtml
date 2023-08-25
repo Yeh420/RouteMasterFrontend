@@ -92,7 +92,7 @@
                     <option value="">請選擇</option>
                     @foreach (var region in ViewBag.Regions)
                     {
-                        <option value="@region.Id">@region.Name</option>
+                        <option value="@region.Name">@region.Name</option>
                     }
                 </select>
                 <span asp-validation-for="Address" class="text-danger"></span>
@@ -114,15 +114,15 @@
                     <input type="radio" class="form-check-input" asp-for="Gender" value="true" /> 女生
                 </label>
             </div>
+                <span asp-validation-for="Gender" class="text-danger"></span>
             <br />
             </div>
             
-            <div class="gorm-group"> 
-                <lable>大頭貼圖像</lable>
+            <div class="form-group" form-check> 
                 <div class="form-check">
                     <input type="radio" id="radioA" name="option" value="A">上傳大頭貼<br>
-                    <label class="form-check-label" for="flexRadioDefault1">
-    
+                    <label  class="form-check-label" for="flexRadioDefault1">
+                        
                     </label>
                 </div>
                 <div class="form-check">
@@ -132,69 +132,72 @@
                     </label>
                 </div>
 
-            </div>
-            <div class="form-group" id="divA" style="display: none;">
-                <label asp-for="Image" class="control-label"></label>
-                <span asp-validation-for="Image" class="text-danger"></span>
-                <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*" />
-                <input type="hidden" id="imageNameInput" name="ImageName" value="" />              
-            </div>
+                <div class="form-group" id="divA" style="display: none;">
+                    <label asp-for="Image" class="control-label"></label>
+                    <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*"/>
+                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />
+                   
+                </div>
 
-            <div id="divB" style="display: none;">
-                <h3>RouteMaster精美大頭貼</h3>
-                <ul class="image-list">
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="2c36c1ae24444c9d92c5d94e5c69ee91.png" />
-                        <img src="~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91.png" class="default-image imgs" alt="預設圖片 1" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="ff288dbbf8d3484ca88b6b086af3f2ac.png" />
-                        <img src="~/SystemImages/ff288dbbf8d3484ca88b6b086af3f2ac.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" />
-                    </label>
-                </li>
-                
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="4f411a319e2e4992a42db1e518238c7d.png" />
-                        <img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" class="default-image imgs" alt="預設圖片 3" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="7bf343bdbd7541eeb3f86f018be90ddc.png" />
-                        <img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" class="default-image imgs" alt="預設圖片 4" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="c00e1205eb4e459eb9bc7fa2bdc94e00.png" />
-                        <img src="~/SystemImages/c00e1205eb4e459eb9bc7fa2bdc94e00.png" class="default-image imgs" alt="預設圖片 5" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="87df4dd9f26142008539267491e19a6c.png" />
-                        <img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" class="default-image imgs" alt="預設圖片 6" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="30519bf58a6d4eefa1b9d6c55d2d2f45.png" />
-                        <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 7" width="100" height="100" />
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input type="radio" name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
-                        <img src="~/SystemImages/eeb5e5041d534359b71e516aac29d46c.png" class="default-image imgs" alt="預設圖片 8" width="100" height="100" />
-                    </label>
-                </li>
-                </ul>
+                <div id="divB" style="display: none;">
+                    <h3>RouteMaster精美大頭貼</h3>
+                    <ul class="image-list">
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="2c36c1ae24444c9d92c5d94e5c69ee91.png" />
+                                <img src="~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91.png" class="default-image imgs" alt="預設圖片 1" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="ff288dbbf8d3484ca88b6b086af3f2ac.png" />
+                                <img src="~/SystemImages/ff288dbbf8d3484ca88b6b086af3f2ac.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" />
+                            </label>
+                        </li>
+
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="4f411a319e2e4992a42db1e518238c7d.png" />
+                                <img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" class="default-image imgs" alt="預設圖片 3" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="7bf343bdbd7541eeb3f86f018be90ddc.png" />
+                                <img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" class="default-image imgs" alt="預設圖片 4" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="c00e1205eb4e459eb9bc7fa2bdc94e00.png" />
+                                <img src="~/SystemImages/c00e1205eb4e459eb9bc7fa2bdc94e00.png" class="default-image imgs" alt="預設圖片 5" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="87df4dd9f26142008539267491e19a6c.png" />
+                                <img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" class="default-image imgs" alt="預設圖片 6" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="30519bf58a6d4eefa1b9d6c55d2d2f45.png" />
+                                <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 7" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
+                                <img src="~/SystemImages/eeb5e5041d534359b71e516aac29d46c.png" class="default-image imgs" alt="預設圖片 8" width="100" height="100" />
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <input type="hidden" id="sysImg" name="Image" />
+
+                <span asp-validation-for="Image" class="text-danger"></span>
             </div>
-            <input type="hidden" id="sysImg" name="Image" />
+            
 
             <div class="form-group form-check">
                 <label class="form-check-label">
