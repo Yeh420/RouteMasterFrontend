@@ -112,10 +112,11 @@
                             <col style="width: 100px;" />
                             <col style="width: auto;" />
                             <col style="width: auto;" />
-                            <col class="col-md-3" /> 
                             <col class="col-md-2" /> 
-                            <col class="col-md-2" /> 
-                    </colgroup>
+                            <col class="col-md-2" />
+                            <col class="width: auto" />
+                            <col class="col-md-2" />
+                            </colgroup>
                     <thead style="border-top:none;">
                                 <tr style="border-top: none; border-bottom: 1px solid #ccc;">
                                     <th class=" border-top-0"></th>
@@ -401,6 +402,7 @@
                     });
                 },
                  removeFromAcc:function(roomProductId, itemPrice) {
+                     let _this = this;
                     $.ajax({
                         url: '/Carts/RemoveAccommodationFromCart',
                         type: 'POST',
@@ -408,7 +410,7 @@
                         success: function (result) {
                             if (result.success) {
                                 alert(result.message);
-                                $('#cartTable3').find('tr[data-roomProductId="' + result.roomProductId + '"]').remove();
+                                $(`tr[data-roomProductId=${roomProductId}]`).remove();
                                 const price = parseFloat(itemPrice);
                                 if (!isNaN(price)) {
                                     _this.totalAmount -= price;
