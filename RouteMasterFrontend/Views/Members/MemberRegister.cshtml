@@ -49,7 +49,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="MemberRegister" class="form" enctype="multipart/form-data">
+        <form asp-action="MemberRegister" class="form" id="registrationForm" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">               
                
@@ -106,7 +106,7 @@
             <label asp-for="Gender" class="control-label"></label>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input type="radio" class="form-check-input" asp-for="Gender" value="false" /> 男生
+                    <input type="radio" class="form-check-input" asp-for="Gender" value="false" id="maleRadio"/> 男生
                 </label>
             </div>
             <div class="form-group form-check">
@@ -204,6 +204,10 @@
                     <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
                 </label>
             </div>
+
+            <div>
+                <button type="button" id="quickRegiter">專題用註冊</button>
+            </div>
             <div class="form-group">
                 <input type="submit" value="註冊" class="btn btn-primary" />
             </div>
@@ -262,9 +266,64 @@
                 var nameAr = src.split('/');
                 var fileName = nameAr[nameAr.length - 1];
 
-                alert(fileName);
+                //alert(fileName);
             $('#sysImg').val(fileName);
             });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            const form = document.getElementById("registrationForm");
+            const quickRegiter = document.getElementById("quickRegiter");
+
+            quickRegiter.addEventListener("click", function () {
+                
+                const defaultData = {
+                    FirstName: "曉華",
+                    LastName: "林",
+                    Account: "LinHua",
+                    Password: "12345",
+                    ConfirmPassword: "12345",
+                    Email: "johndoe@example.com",
+                    CellPhoneNumber: "0800123456", 
+                    Gender:"false",
+                };
+
+                //跑過每一個屬性並賦值               
+                for (const field in defaultData) {
+                    if (defaultData.hasOwnProperty(field)) {
+                        const inputField = form.querySelector(`[name="${field}"]`);
+                        if (inputField) {
+                            inputField.value = defaultData[field];
+                        }
+                    }
+                }
+
+                //Gender
+                const radioButtons = document.querySelectorAll('input[type="radio"][name="Gender"]');
+                radioButtons.forEach(radioButton => {
+                    if (radioButton.value === "true") {
+                        radioButton.checked = true;
+                    }
+                });
+
+                //Address
+                const selectElement = document.getElementById('region');
+                selectElement.value="臺北市";
+                //for (let i = 0; i < selectElement.options.length; i++) {
+                //    if (selectElement.options[i].value === "臺北市") {
+                //        selectElement.selectedIndex = i;
+                        
+                //        break;
+                //    }
+                //}
+
+
+            });
+        });
+
+    </script>
+    
 
 }
