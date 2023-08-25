@@ -1,0 +1,107 @@
+﻿@{
+	var memberIdFromCookie = Context.Request.Cookies["Id"];
+
+}
+
+
+<style>
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	th, td {
+		text-align: center;
+		padding: 8px;
+		border: 1px solid rgba(0, 0, 0, 0.2); /* 淡色边框 */
+		background-color: rgba(255, 255, 255, 0.7); /* 背景颜色透明度较高 */
+		transition: border 0.3s ease-in-out; /* 边框过渡效果 */
+	}
+
+		td:hover {
+			background-color:lightcyan;
+		}
+
+	.hide{
+		display:none;
+	}
+
+
+</style>
+
+
+
+
+
+<table class="hide" id="theSmallTableToShowData">
+	<thead>
+		<tr>
+			<th>事項</th>
+			<th>開始時間</th>
+			<th>結束時間</th>
+		</tr>
+	</thead>
+	<tbody id="ajaxTargetTBody">
+	
+	</tbody>
+</table>
+
+
+
+<script>
+
+	function formatDateTime(dateTimeString) {
+		const dateTime = new Date(dateTimeString);
+		const datePart = dateTime.toLocaleDateString();
+		const timePart = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+		return `${datePart} ${timePart}`;
+	}
+
+
+
+
+	function initialData(){
+		let targetTable = document.querySelector('#theSmallTableToShowData');
+		let targetTbody = document.querySelector('#ajaxTargetTBody');
+		var memberId = @memberIdFromCookie;
+
+
+		fetch(`https://localhost:7251/api/TravelPlans/Get/SchduleData?memberId=${memberId}`)
+		.then(response=>response.json()
+		)
+		.then(data => {
+			console.log(data.length)
+			if(data.length>0){
+					targetTable.classList.remove('hide');
+
+					for(let i=0;i<data.length;i++){
+
+						let newTr = document.createElement('tr');
+
+						let newTd1 = document.createElement('td');
+						let newTd2 = document.createElement('td');
+						let newTd3 = document.createElement('td');
+						newTd1.textContent = data[i].content;
+						newTd2.textContent = formatDateTime(data[i].startTime);
+						newTd3.textContent = formatDateTime(data[i].endTime);
+
+						newTr.appendChild(newTd1);
+						newTr.appendChild(newTd2);
+						newTr.appendChild(newTd3);
+
+						targetTbody.appendChild(newTr);					
+					}
+			}
+
+				// 在这里处理 data，它是一个 JavaScript 对象或数组
+				console.log(data);
+		})
+		.catch((err)=>{
+			console.log(err)
+		})
+	}
+
+
+	initialData();
+</script>

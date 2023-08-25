@@ -53,6 +53,11 @@
 
         }
 
+        .input-group input[readonly] {
+            background-color: white;
+        }
+      
+
     </style>
 }
 
@@ -186,8 +191,10 @@
                             <div class="mb-3">
                                 <textarea v-model="cons" class="form-control" placeholder="缺點" id="drawBacks" style="height: 200px"></textarea>
                             </div>
-                            <div class="mb-3">
-                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" id="file1"/>
+                            <div class="input-group mb-3">
+                                <label class="btn btn-outline-success" for="file1" id="filesUpload">選擇檔案</label>
+                                <input type="file" class="form-control d-none" id="file1" multiple="multiple" accept="image/*" @@change="selectFiles">
+                                <input v-model="fileName" type="text" class="form-control" aria-describedby="filesUpload" readonly>
                             </div>
                         </div>
                         
@@ -257,6 +264,7 @@
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         var vueApp={
@@ -274,9 +282,10 @@
                     pros:"",
                     cons:"",
                     starAlert:"",
-                    image_list:[],
                     carouselList:[],
                     userAccount:"@account",
+                    fileName:"",
+
                     
 
                    
@@ -290,7 +299,15 @@
                 _this.commentDisplay();
                
             },
-            methods: {              
+            methods: {
+                selectFiles:function(){
+                    let _this = this;
+                    var file1 = document.querySelector("#file1");
+                    var totalFiles = file1.files.length;
+                    _this.fileName = `${totalFiles}個檔案`
+                    console.log(_this.fileName);
+                    
+                },
                 commentBrief:function(){
                     let _this = this;
                     //if(id){
@@ -419,6 +436,14 @@
                                 const result=response.data;
                                 console.log(result);
 
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: '評論新增成功',
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+
                             _this.commentDisplay();
 
                             var closeBut = document.getElementById("shutDown");
@@ -444,6 +469,7 @@
                     let _this = this;
                     var panel = document.querySelector(".panel");
                     var liItems = panel.querySelectorAll("li");
+                    var file1 = document.querySelector("#file1");
                     console.log(point);
 
                     liItems.forEach(function (item, idx) {
@@ -455,7 +481,8 @@
                     _this.title = "";
                     _this.pros = "";
                     _this.cons = "";
-
+                    _this.fileName="";
+                    file1.value="";
                 },
                 openImageModal:function(images,starIndex){
                     let _this=this;

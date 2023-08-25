@@ -3006,7 +3006,7 @@
 		this._controls.$next = $('<' + settings.navElement + '>')
 			.addClass(settings.navClass[1])
 			.html(settings.navText[1])
-			.appendTo(this._controls.$relative)
+			.prependTo(this._controls.$relative)
 			.on('click', $.proxy(function(e) {
 				this.next(settings.navSpeed);
 			}, this));

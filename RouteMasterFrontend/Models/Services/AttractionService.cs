@@ -165,7 +165,7 @@ namespace RouteMasterFrontend.Models.Services
             {
                 return Enumerable.Empty<AttractionIndexDto>();
             }
-            
+
         }
     }
 }

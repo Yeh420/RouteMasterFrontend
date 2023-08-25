@@ -1,5 +1,6 @@
 ﻿@{
     int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
+    var memberIdFromCookie = Context.Request.Cookies["Id"]??"0";
 }
 
 
@@ -108,7 +109,8 @@
             white-space: pre;
             display: none;
             position: absolute;
-            background-color: #fff;
+            background-color: #000; /* 将背景颜色改为黑色 */
+            color: #fff; /* 将文本颜色改为白色 */
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -127,7 +129,8 @@
             white-space: pre;
             display: none;
             position: absolute;
-            background-color: #fff;
+            background-color: #000; /* 将背景颜色改为黑色 */
+            color: #fff; /* 将文本颜色改为白色 */
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -147,7 +150,7 @@
 <div id="AttractionListContainer">
     @await Component.InvokeAsync("SelectAttraction")
 </div>
-<hr />
+
 
 
 
@@ -212,6 +215,7 @@
         let attContainer = document.querySelector('#selectedAttractions');
         let visited = [];
         let selectedPath = [];
+        let tableTBodyTrObjs=[];
 
         let theCurrentAttractionOfDropContainer;
         let theNextAttractionOfDropContainer;
@@ -236,15 +240,49 @@
 
 
         document.querySelector("#saveTheSchedule").addEventListener('click',function(){
+            tableTBodyTrObjs=[];
 
 
-         let targetScheduleTable=document.querySelector('#beSavedScheduleTable');
-         let targetTableHtml = targetScheduleTable.outerHTML;
 
-            const postData = {
-                cartId: @cartIdFromCookie,
-                content: targetTableHtml,
-                startTime: inputBeginDateTime.value,
+            let rows = document.querySelectorAll("tbody tr");
+            rows.forEach(function (row) {
+                
+                var obj = {};
+
+                
+                let inputs = row.querySelectorAll("td input");
+
+                
+                let propertyNames = ['itemName', 'itemPlaceOrItemDistance', 'startTime','endTime'];
+
+                inputs.forEach(function (input, index) {
+                    // 使用预定义的属性名称或者根据需要自定义
+                    let propertyName = propertyNames[index] ;
+                    obj[propertyName] = input.value;
+                });
+
+
+                tableTBodyTrObjs.push(obj);
+            });
+
+            
+            tableTBodyTrObjs = tableTBodyTrObjs.filter(function (obj) {
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key) && obj[key] !== "") {
+                        return true; 
+                    }
+                }
+                return false; 
+            })
+
+           console.log(tableTBodyTrObjs);
+
+           let memberId = @memberIdFromCookie;
+            
+           const postData = {
+                memberId: memberId,
+                tableTBodyTrObjs: tableTBodyTrObjs,
+                createDate: inputBeginDateTime.value,
             };
 
             axios.post(`https://localhost:7251/api/TravelPlans/Post/SaveTableData`, postData)
