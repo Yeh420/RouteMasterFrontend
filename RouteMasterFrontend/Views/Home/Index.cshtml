@@ -1,71 +1,99 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home Page";
 }
 @section Styles{
+	<style>
+		.owl-show-events .item img {
+			width: 295.5px; /* 設置您希望的圖片寬度 */
+			height: 200px; /* 設置您希望的圖片高度 */
+		}
 
-    <style>
-        .owl-show-events .item img {
-            width: 270px; /* 設置您希望的圖片寬度 */
-            height: 200px; /* 設置您希望的圖片高度 */
-        }
-    </style>
+		.container-img {
+			max-width: 100% !important;
+		}
+	</style>
 }
 
 <!-- ***** Main Banner Area Start ***** -->
 <div class="container-fluid" style="padding:0px;">
-    <main role="main" class="" style="margin:0px;">
-        <div class="main-banner">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="main-content">
+	<main role="main" class="" style="margin:0px;">
+		<img class="ratio ratio-1x1 position-absolute" src="../images/1.jpg" style="width:114.324324324%;height:114.324324324%;left:-14.3324324324%" />
+		<div class="main-banner">
+			<div class="container-img">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="main-content position-relative" style="z-index:1;">
 
-                            <h6>準備好開啟您的旅程了嗎?</h6>
-                            <h2>開始建立行程表吧</h2>
+							<h6>準備好開啟您的旅程了嗎?</h6>
+							<h2>開始建立行程表吧</h2>
 
-                            <div class="main-white-button">
-                                <a href="ticket-details.html">Let's Go!</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- *** Owl Carousel Items ***-->
-        <div class="show-events-carousel">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="owl-show-events owl-carousel">
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/carousel1.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/carousel2.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/carousel3.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/carousel4.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                            </div>
-                            <div class="item">
-                                <a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @*@await Component.InvokeAsync("TopTenAtt",null)*@
-    </main>
+							<div class="main-white-button">
+								<a href="ticket-details.html">Let's Go!</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- *** Owl Carousel Items ***-->
+		<div class="container">
+			<div class="show-events-carousel">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="owl-show-events owl-carousel">
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/carousel1.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/carousel2.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/carousel3.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/carousel4.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+							</div>
+							<div class="item">
+								<a href="event-details.html"><img src="~/images/1.jpg" alt=""></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row mt-2">
+			<div class="col-xs-12">
+				<h2 style="font-size: 36px; text-align: center">RouteMaster 是什麼？</h2>
+				<p style="font-size: 18px; text-align: center; font-weight: 200">RouteMaster 是由旅遊愛好者建立而成的行程規劃工具。我們熱愛與世界各地的同好者交流旅遊心得，分享彼此的行程。加入我們，一起體驗行程規劃的樂趣吧！</p>
+				<hr style="margin: 50px 0px">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-4" style="text-align: justify; padding-bottom: 50px; font-weight: 200">
+				<img class="img-responsive w-100" src="https://www.trip-jam.com/resources/images/lightbulb.png" style="height:180px">
+				<h4 style="text-align: center"><strong>行程規劃的嶄新體驗</strong></h4>
+				您還停留在使用 Google 地圖查找路線，然後到 Excel 製作行程列表的年代嗎？ RouteMaster 將引領您邁進新一步。把您想去的景點加入行程列表，行程規劃便大功告成。 RouteMaster 會即時為您計算所有路線及所需時間，您再也不用為此而大費周章。
+			</div>
+			<div class="col-sm-4" style="text-align: justify; padding-bottom: 50px; font-weight: 200">
+				<img class="img-responsive w-100" src="https://www.trip-jam.com/resources/images/cross_platform.png" style="height:180px">
+				<h4 style="text-align: center"><strong>靈活介面設計　支援多個平台</strong></h4>
+				擁有多種智慧型裝置，卻找不到可跨平台使用的行程規劃工具？這正正也是我們遇到的問題，也是 RouteMaster 誕生的主因之一。 RouteMaster 是一個網頁應用程式 - 換句話說，只要您的裝置支援現今常用的瀏覽器，便可以使用 RouteMaster 規劃行程。與一般死板的網頁不同， RouteMaster 會因應屏幕大小及解析度調整操作介面，同時保留所有功能，務求為用家帶來最佳的行程規劃體驗。
+			</div>
+			<div class="col-sm-4" style="text-align: justify; padding-bottom: 50px; font-weight: 200">
+				<img class="img-responsive w-100" src="https://www.trip-jam.com/resources/images/accessibility.png" style="height:180px">
+				<h4 style="text-align: center"><strong>隨心所欲　規劃行程</strong></h4>
+				所有行程都會儲存在雲端上。只需把您的行程網址跟朋友分享，他們就能一同參與規劃。如果在網上看見心儀的行程，更可直接把它套用為藍本，再按個人喜好修改。打造您的專屬行程，就是如此隨心所欲。
+			</div>
+		</div>
+		@await Component.InvokeAsync("TopTenAtt")
+	</main>
 </div>

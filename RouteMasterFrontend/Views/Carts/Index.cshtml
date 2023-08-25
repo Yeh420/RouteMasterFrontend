@@ -125,6 +125,7 @@
                                     <th class="align-middle text-center border-top-0">價格</th>
                                     <th class="align-middle text-center border-top-0">數量</th>
                                     <th class=" border-top-0"></th>
+                                    <th></th>
                                 </tr>
                     </thead>
                     <tbody>
@@ -139,7 +140,7 @@
                             {
                                 decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
                                 totalAmount += groupPrice;
-                                <tr>
+                                <tr data-extraservice-id="@group.First().Id">
                                     <td>
                                         <img src="@Url.Content(group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
                                     </td>
@@ -152,19 +153,25 @@
                                     <td class="align-middle text-center">
                                         <span class="quantity">@group.Sum(item => item.Quantity)</span>
                                     </td>
+                                    <td class="align-middle text-center">
+                                            <button class="btn btn-danger" @@click="removeItem('@group.First().Id', '@groupPrice')">Delete</button>
+                                    </td>
 
                                 </tr>
                             }
                         @foreach (var accommodationDTO in Model.Accommodations)
                         {
                                 totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
-                            <tr>
+                           <tr data-roomProductId="@accommodationDTO.Id">
                                 <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
                                 <td class="align-middle text-center">@accommodationDTO.RoomName @accommodationDTO.RoomTypeName</td>
                                 <td class="align-middle text-center">@accommodationDTO.Date</td>
                                 <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@accommodationDTO.Price</td>
                                 <td class="align-middle text-center">@accommodationDTO.Quantity</td>
+                                <td class="align-middle text-center">
+                                            <button class="btn btn-danger" @@click="removeFromAcc('@accommodationDTO.Id, @accommodationDTO.Price')">Delete</button>
+                                </td>
                             </tr>
                         }
 
@@ -176,21 +183,25 @@
                         {
                                 decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
                                 totalAmount += groupPrice;
-                            <tr>
-                                    <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
-                                    <td class="align-middle text-center">@group.First().ActivityName</td>
-                                    <td class="align-middle text-center">@group.First().Description</td>
-                                    <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
-                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
-                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
-                                        </td>
+                                <tr data-activity-id="@group.First().Id">
+                                        <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                        <td class="align-middle text-center">@group.First().ActivityName</td>
+                                        <td class="align-middle text-center">@group.First().Description</td>
+                                        <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
+                                        <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                            $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                            </td>
                                    
-                                    <td class="align-middle text-center">
-                                        <span class="quantity">@group.First().Quantity</span>
-                                    </td>
-                            </tr>
+                                        <td class="align-middle text-center">
+                                            <span class="quantity">@group.First().Quantity</span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <button class="btn btn-danger" @@click="removeFromCartAct('@group.First().Id',@groupPrice)">Delete</button>
+                                        </td>
+                                </tr>
                         }
                     </tbody>
+                    
                 </table>
 
                 
@@ -244,7 +255,7 @@
        
         </div>
         <div style="width:38%; border:none; text-align:center; align-items:flex-end; justify-content: center; display: flex; flex-direction: column; background-color: #f9f9f9; border-radius: 10px; padding: 20px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);" class="container me-0">
-            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: @Math.Round(totalAmount) 元</h5>
+            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: {{Math.round(totalAmount)}} 元</h5>
             <div style="border-top: 2px dashed #ddd; padding-top: 20px; width:300px; text-align: right;">
                 <h3 style="font-size: 18px; color: #888; margin-bottom: 10px;">優惠券折扣：{{ selectedCouponAmount}}%</h3>
                 <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h3>
@@ -261,13 +272,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        var initialTotalAmount = @totalAmount;
+    </script>
+    <script>
         const app = Vue.createApp({
             data() {
                 return {
                     coupons: [],
-                    totalAmount: @totalAmount,
+                    totalAmount: initialTotalAmount,
                     selectedCouponAmount: 0,
-                    usingCouponId: 0,
+                    usingCouponId: 0, 
+                  
                 };
             },
             computed: {
@@ -279,6 +294,7 @@
             },
             mounted() {
                 this.ShowCoupons();
+                console.log("Initial totalAmount:", this.totalAmount);
             },
             methods: {
                 async ShowCoupons() {
@@ -327,33 +343,146 @@
                     const url = `/Carts/Checkout/${this.usingCouponId}`;
                     window.location.href = url;
                 },
-                //async sendSelectedCoupon() {
-                //    const selectedCouponId = document.getElementById("selectedCouponId").value;
-                //    const url = "/Ecpay/Index";
-                //    try {
-                //        const response = await fetch(url, {
-                //            method: "POST",
-                //            headers: {
-                //                "Content-Type": "application/json"
-                //            },
-                //            body: JSON.stringify({ selectedCouponId: selectedCouponId })
-                //        });
+                removeItem: function (extraserviceId, itemPrice) {
+                    let _this = this;
+                    $.ajax({
+                        url: '/Carts/RemoveExtraServiceFromCart',
+                        type: 'POST',
+                        data: { extraserviceId: extraserviceId },
+                        success: function (result) {
+                            if (result.success) {
+                                alert(result.message);
+                                $(`tr[data-extraservice-id=${extraserviceId}]`).remove();
 
-                //        if (response.ok) {
-                //            console.log("123");
-                //        } else {
-                //            console.log("XXX");
-                //        }
-                //    } catch (error) {
-                //        console.error("There was an error sending the coupon:", error);
-                //    }
-                //}
+                                const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+
+                                reloadCartItems();
+
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert('發生錯誤，無法刪除項目。');
+                            console.error("AJAX Error:", textStatus, errorThrown);
+                        }
+                    });
+                },
+                removeFromCartAct:function (activitiesId, itemPrice) {
+                    let _this = this;
+                    $.ajax({
+                        url: '/Carts/RemoveActivitiesFromCart',
+                        type: 'POST',
+                        data: { activitiesId: activitiesId },
+                        success: function (result) {
+                            if (result.success) {
+
+                                alert(result.message);
+                                $(`tr[data-activity-id=${activitiesId}]`).remove();
+
+                                  const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+                                reloadCartItems();
+                            } else {
+
+                                alert(result.message);
+                            }
+                        },
+                        error: function () {
+                            // 發生錯誤時的處理
+                            console.log('66666')
+                            alert('發生錯誤，無法刪除項目。');
+                        }
+                    });
+                },
+                 removeFromAcc:function(roomProductId, itemPrice) {
+                    $.ajax({
+                        url: '/Carts/RemoveAccommodationFromCart',
+                        type: 'POST',
+                        data: { roomProductId: roomProductId },
+                        success: function (result) {
+                            if (result.success) {
+                                alert(result.message);
+                                $('#cartTable3').find('tr[data-roomProductId="' + result.roomProductId + '"]').remove();
+                                const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+                                reloadCartItems();
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        error: function () {
+                            console.log('66666');
+                            alert('An error occurred, unable to delete item.');
+                        }
+                    });
+                }
+
+            
+
+               
             }
         });
 
-        app.mount("#app");
+        const appInstance = app.mount("#app");
     </script>
+    <script>
 
+        //function removeItem(extraserviceId, itemPrice) {
+        //    $.ajax({
+        //        url: '/Carts/RemoveExtraServiceFromCart',
+        //        type: 'POST',
+        //        data: { extraserviceId: extraserviceId },
+        //        success: function (result) {
+        //            if (result.success) {
+        //                alert(result.message);
+        //                $(`tr[data-extraservice-id=${extraserviceId}]`).remove();
+
+        //                const price = parseFloat(itemPrice);
+        //                if (!isNaN(price)) {
+        //                    const currentTotal = parseFloat($('.total-price').text());
+        //                    const updatedTotal = currentTotal - price;
+
+        //                    $('.total-price').text(updatedTotal.toFixed(2));
+        //                }
+
+        //                reloadCartItems();
+
+        //            } else {
+        //                alert(result.message);
+        //            }
+        //        },
+        //        error: function (jqXHR, textStatus, errorThrown) {
+        //            alert('發生錯誤，無法刪除項目。');
+        //            console.error("AJAX Error:", textStatus, errorThrown);
+        //        }
+        //    });
+        //}
+
+        function reloadCartItems() {
+            $.ajax({
+                url: '/Carts/RefreshCart',
+                type: 'GET',
+                success: function (data) {
+
+                    $('#Cart').html(data);
+                },
+
+
+                error: function () {
+                    alert('Failed to reload cart items.');
+                }
+            });
+        }
+        
+    </script>
 
 }
 

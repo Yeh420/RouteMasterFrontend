@@ -6,6 +6,7 @@
             selected: 0,         
             thumbicon: [],
             hotelId: 0,
+           
 
 
 

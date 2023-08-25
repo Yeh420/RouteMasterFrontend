@@ -5,7 +5,7 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  
+@*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
      <script src="../js/sweetalert2.all.min.js"></script>
     <style>
         .currentPage {
@@ -146,7 +146,7 @@
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
+        <input type="button" class="btn btn-outline-primary mt-2" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
     </div>
     <div v-else>
         <div class="d-flex">
@@ -334,7 +334,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="overview" class="right h-100" data-simplebar>
+                            <div v-show="overview" class="right h-100" data-simplebar>
                                 <section class="mb-3">
                                     <p class="d-inline-flex gap-1 fs-5">
                                         <a class="" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -358,7 +358,7 @@
                                     </p>
                                 </section>
                                 <section class="mb-3 border-top pt-1">
-                                    @*<brief ref="childRef2"></brief>   *@                                
+                                    <brief ref="childRef2"></brief>                                   
                                    @* <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>*@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
@@ -449,7 +449,7 @@
                                     <img src="https://static.thenounproject.com/png/2392153-200.png" style="width:24px;height:24px" /> 最晚CheckOut時間：{{accommodationIndex.checkOut}}
                                 </section>
                             </div>
-                            <div v-else class="right h-100">
+                            <div v-show="!overview" class="right h-100">
                                 <dec ref="childRef1"></dec>
                             </div>
                         </div>
@@ -468,8 +468,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="~/js/Comments_AccommodationPartial.js"></script>
-    <script src="~/js/Comments_AccommodationBrief.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/Comments_AccommodationPartial.js" asp-append-version="true"></script>
+    <script src="~/js/Comments_AccommodationBrief.js" asp-append-version="true"></script>
 
     <script>
         var vueApp = {
@@ -718,12 +719,13 @@
                             var imgSrc = $(this).attr('src');
                             _this.accommodationImage = imgSrc;
                         })
-                        //_this.$refs.childRef2.commentBrief(p.id);
+                        _this.$refs.childRef2.commentBrief(p.id);
 
 
                         _this.initMap(id);
                     }
                 },             
+
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;
@@ -1037,7 +1039,8 @@
                     this.showModal(id);
                 },
                 ShowComments:function(id){
-                    this.overview = false;                    
+                    this.overview = false; 
+                    console.log(id);
                     this.$refs.childRef1.commentDisplay(id);
                 },
                 toggleView:function(){
