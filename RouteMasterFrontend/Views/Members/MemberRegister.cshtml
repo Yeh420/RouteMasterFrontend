@@ -87,7 +87,8 @@
                 <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
+                @*<label asp-for="Address" class="control-label"></label>*@
+                <label>地區</label>
                 <select asp-for="Address" id="region" name="Address" class="form-control">
                     <option value="">請選擇</option>
                     @foreach (var region in ViewBag.Regions)
@@ -120,13 +121,13 @@
             
             <div class="form-group" form-check> 
                 <div class="form-check">
-                    <input type="radio" id="radioA" name="option" value="A">上傳大頭貼<br>
+                    <input type="radio" id="radioA" name="option" value="A" checked >上傳大頭貼<br>
                     <label  class="form-check-label" for="flexRadioDefault1">
                         
                     </label>
                 </div>
                 <div class="form-check">
-                    <input type="radio" id="radioB" name="option" value="B">推薦大頭貼<br>
+                    <input type="radio" id="radioB" name="option" value="B" required>推薦大頭貼<br>
                     <label class="form-check-label" for="flexRadioDefault2">
                         
                     </label>
@@ -134,9 +135,8 @@
 
                 <div class="form-group" id="divA" style="display: none;">
                     <label asp-for="Image" class="control-label"></label>
-                    <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*"/>
-                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />
-                   
+                    <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*" />
+                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />                   
                 </div>
 
                 <div id="divB" style="display: none;">
@@ -187,7 +187,7 @@
                         </li>
                         <li>
                             <label>
-                                <input type="radio" name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
+                                <input type="radio"  name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
                                 <img src="~/SystemImages/eeb5e5041d534359b71e516aac29d46c.png" class="default-image imgs" alt="預設圖片 8" width="100" height="100" />
                             </label>
                         </li>
@@ -208,8 +208,9 @@
             <div>
                 <button type="button" id="quickRegiter">專題用註冊</button>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="註冊" class="btn btn-primary" />
+                <input type="submit" id="formSubmitBtn" value="註冊" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -254,9 +255,10 @@
 
             
         });
-        </script>
 
-    <script>
+
+
+
             // 在所有的radio input中加上點選事件
             $('input[name="selectedImage"]').click(function () {
                 // 取得選取的radio圖片的src屬性
@@ -269,9 +271,9 @@
                 //alert(fileName);
             $('#sysImg').val(fileName);
             });
-    </script>
 
-    <script>
+
+
         document.addEventListener("DOMContentLoaded", function () {
             
             const form = document.getElementById("registrationForm");
@@ -322,6 +324,14 @@
 
             });
         });
+
+        document.querySelector('#formSubmitBtn').addEventListener('click', function (e) {
+   
+            if (document.querySelector('#sysImg').value =="" && document.querySelector('#facePhotoInput').value==""){
+                alert('請上傳本地圖片或選擇系統選項');
+                e.preventDefault();
+            }     
+        })
 
     </script>
     
