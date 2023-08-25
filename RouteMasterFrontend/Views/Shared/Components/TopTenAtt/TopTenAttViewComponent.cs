@@ -5,7 +5,7 @@ using RouteMasterFrontend.Models.Interfaces;
 using RouteMasterFrontend.Models.Services;
 using RouteMasterFrontend.Models.ViewModels.AttractionVMs;
 
-namespace RouteMasterFrontend.Views.Attractions.Components.TopTenAtt
+namespace RouteMasterFrontend.Views.Shared.Components.TopTenAtt
 {
     public class TopTenAttViewComponent : ViewComponent
     {
