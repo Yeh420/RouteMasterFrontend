@@ -1,0 +1,44 @@
+﻿.starIndex li {
+    color: #ccc;
+}
+
+.active {
+    color: #f90;
+}
+
+.panel li {
+    cursor: pointer;
+}
+
+    .panel li.blank {
+        color: #ccc;
+    }
+
+    .panel li.hover {
+        color: #ff0;
+    }
+
+    .panel li.active {
+        color: #f90;
+    }
+
+.tip,
+.result {
+    margin-top: 10px;
+    font-size: 1.2rem;
+}
+
+.zoomIn {
+    cursor: zoom-in;
+    width: 80px;
+    height: 80px;
+}
+
+.lastImg {
+    opacity: 0.5;
+}
+
+
+.input-group input[readonly] {
+    background-color: white;
+}

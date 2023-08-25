@@ -119,6 +119,7 @@ namespace RouteMasterFrontend.Controllers
             const bool rememberMe = false;
             var member = _context.Members.First(m => m.Account == vm.Account);
 
+
             //圖片可在優化位置
             var claims = new List<Claim>
             {
@@ -394,7 +395,9 @@ namespace RouteMasterFrontend.Controllers
 
         {
             MemberImage img = new MemberImage();
-            
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+
             if (ModelState.IsValid)
             {
                 if (facePhoto != null && facePhoto.Length > 0)
@@ -415,16 +418,16 @@ namespace RouteMasterFrontend.Controllers
             }
             else
             {
+             
+                ViewBag.Regions = regions;
+                ViewBag.Towns = towns;
                 return View(vm);
             }
            
 
 
             Result result = RegisterMember(vm, img);
-            List<Region> regions =  _context.Regions.ToList();
-            List<Town> towns =  _context.Towns.ToList();
-            ViewBag.Regions = regions;
-            ViewBag.Towns = towns;
+     
 
             if (result.IsSuccess)
             {
@@ -444,7 +447,7 @@ namespace RouteMasterFrontend.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("LogoutSuccess", "Members");
         }
@@ -781,6 +784,8 @@ namespace RouteMasterFrontend.Controllers
             var salt = _hashUtility.GetSalt();
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
 
+
+
             //帳號先，後密碼
             if (member != null && string.Compare(hashPassword, member.EncryptedPassword) == 0)
             {
@@ -790,19 +795,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 return Result.Failure("帳密有錯");
             }
-            
-            ////var salt = _hashUtility.GetSalt();
-            ////var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
-
-            //if (string.Compare(hashPassword, member.EncryptedPassword) == 0)
-            //{
-            //    return Result.Success();
-            //}
-            //else
-            //{   
-            //    return Result.Failure("帳密有誤");
-            //}
-            
+              
         }
 
         //上傳圖片
