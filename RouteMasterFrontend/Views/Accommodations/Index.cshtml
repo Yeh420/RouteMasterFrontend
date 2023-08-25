@@ -1,5 +1,8 @@
 ﻿@using RouteMasterFrontend.Models.Dto;
 @model FilterDTO
+@{
+    var account = Context.Request.HttpContext.User.Identity.Name;
+}
 @section Styles{
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
@@ -7,6 +10,7 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 @*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
      <script src="../js/sweetalert2.all.min.js"></script>
+    <link href="~/css/comments_accommodation.css" rel="stylesheet" />
     <style>
         .currentPage {
             background-color: lightgray;
@@ -94,8 +98,8 @@
 
         aside {
             position: sticky !important;
-            height: 94.8vh;
-            top: 5vh;
+            height: 90.8vh;
+            top: 82px;
         }
         .loading-indicator {
             display: flex;
@@ -219,7 +223,7 @@
                 </div>
             </aside>
             <div class="main-right ms-auto">
-                <nav class="d-flex row position-sticky mb-3 bg-white" style="top:80px; z-index:10">
+                <nav class="d-flex row position-sticky mb-3 bg-white" style=" top:80px; z-index:10">
                     <input type="search" v-model="keyword" class="form-control w-25 ms-3" placeholder="搜尋關鍵字" @@change="showPages">
                     <div class="d-flex col-3 ms-auto">
                         <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
@@ -1041,7 +1045,8 @@
                 ShowComments:function(id){
                     this.overview = false; 
                     console.log(id);
-                    this.$refs.childRef1.commentDisplay(id);
+                    var identity="@account"? "@account":"";
+                    this.$refs.childRef1.commentDisplay(id,identity);
                 },
                 toggleView:function(){
                     this.toggle = false;
