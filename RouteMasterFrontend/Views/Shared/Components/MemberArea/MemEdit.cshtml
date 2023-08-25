@@ -49,7 +49,7 @@
                 </div>
                 <div >
                     <label>電話：</label>
-                <input asp-for="CellPhoneNumber" id="CellPhoneNumber" class="form-control" />
+                <input asp-for="CellPhoneNumber" id="CellPhoneNumber" class="form-control" pattern="[0-9]{10}" maxlength="10" />
                     <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
                 </div>
                 <div >
@@ -92,22 +92,23 @@
         document.querySelector('#editInfo').addEventListener('click',function(){
           
             var dto =  {
-                Account: document.querySelector('#Account').value,
-                FirstName: document.querySelector('#FirstName').value,
-                LastName: document.querySelector('#LastName').value,
-                Email: document.querySelector('#Email').value,
-                CellPhoneNumber: document.querySelector('#CellPhoneNumber').value,
-                Address: document.querySelector('#Address').value,
-                Gender: document.querySelector('#Gender').value === "男性" ? false : true,
-                Birthday: document.querySelector('#Birthday').value,
-                IsSuscribe: document.querySelector('#IsSuscribe').checked
+                account: document.querySelector('#Account').value,
+                firstName: document.querySelector('#FirstName').value,
+                lastName: document.querySelector('#LastName').value,
+                email: document.querySelector('#Email').value,
+                cellPhoneNumber: document.querySelector('#CellPhoneNumber').value,
+                address: document.querySelector('#Address').value,
+                gender: document.querySelector('#Gender').value === "男性" ? false : true,
+                birthday: document.querySelector('#Birthday').value,
+                isSuscribe: document.querySelector('#IsSuscribe').checked
             }
-
+            alert(dto);
+            console.log(dto);
             $.ajax({
                  type:"PUT",
-                 data:JSON.stringify(dto),
-                 contentType:"application/json",
-            url: "https://localhost:7145/Members/MemEdit",
+                 data:dto,
+                 //contentType:"application/json",
+                url: "https://localhost:7145/Members/MemEdit",
             }).done(function(response){
             swal("更改成功!", "請按返回繼續使用", "success", { button: "返回" });
                 //if (response.success) {

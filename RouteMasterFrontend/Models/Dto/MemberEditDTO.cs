@@ -2,16 +2,15 @@
 {
     public class MemberEditDTO
     {
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Account { get; set; }
-        public string Email { get; set; }
-        public string CellPhoneNumber { get; set; }
-        public string Address { get; set; }
-        public bool? Gender { get; set; }
-        public DateTime? Birthday { get; set; }
+        public string account { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public string email { get; set; }
+        public string cellPhoneNumber { get; set; }
+        public string address { get; set; }
+        public bool? gender { get; set; }
+        public DateTime? birthday { get; set; }
         //public DateTime CreateDate { get; set; }
-        public bool IsSuscribe { get; set; }
+        public bool isSuscribe { get; set; }
     }
 }
