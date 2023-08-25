@@ -53,10 +53,12 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 		[Display(Name = "地址")]
 		[StringLength(255)]
+		[Required]
 		public string? Address { get; set; }
 
 
 		[Display(Name = "性別")]
+		[Required]
 		public bool Gender { get; set; }
 
 
@@ -67,6 +69,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "大頭貼")]
+		[Required]
 		public string? Image { get; set; }
 
 

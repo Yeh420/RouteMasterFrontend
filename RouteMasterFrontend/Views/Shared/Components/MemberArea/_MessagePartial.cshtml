@@ -1,4 +1,4 @@
-﻿
+﻿<link href="~/css/kimstyle.css" rel="stylesheet" />
 
 <div id="app">
     <div class="container">
@@ -30,12 +30,12 @@
         <div class="row mt-1 g-2">
             <div class="col-6" v-for="(item,index) in indexVM" :key="item.id">
                 <div class="d-flex flex-column h-100">
-                    <div class="card mb-3 flex-grow-1">
+                    <div class="card mb-3 flex-grow-1 cardLine">
                         <h5 class="card-header">{{item.category}}</h5>
                         <div class="card-body">
                             <p class="card-text">{{item.id}}</p>
                             <h5 class="card-title">{{item.content}}</h5>
-                            <p class="card-text">{{item.isRead}}</p>
+                            <p class="card-text dis">{{item.isRead}}</p>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" :id='"switchStatus" + item.id' :checked="item.isRead" @@change="updateSW(item.id)">
                                 <label class="form-check-label" :for='"switchStatus" + item.id'>{{item.isRead? "已讀":"未讀"}}</label>
@@ -71,9 +71,12 @@
                     completeRead: false,
                 }
             },
+            created:function(){
+            let _this = this;
+            _this.getMessage();
+            },
             mounted: function () {
-                let _this = this;
-                _this.getMessage();
+              
 
             },
             methods: {

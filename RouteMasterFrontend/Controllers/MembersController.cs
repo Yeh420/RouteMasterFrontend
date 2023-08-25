@@ -421,6 +421,10 @@ namespace RouteMasterFrontend.Controllers
 
 
             Result result = RegisterMember(vm, img);
+            List<Region> regions =  _context.Regions.ToList();
+            List<Town> towns =  _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             if (result.IsSuccess)
             {
@@ -881,9 +885,13 @@ namespace RouteMasterFrontend.Controllers
             if (_context.Members.Any(m => m.Account == vm.Account))
             {
                 // 丟出異常,或者傳回 Result
+                return Result.Failure($"帳號 {vm.Account} 已存在, 請更換後再試一次");
+            }
+            if (_context.Members.Any(m => m.Email == vm.Email))
+            {
+                // 丟出異常,或者傳回 Result
                 return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
             }
-
             Regex PasswordRegex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
             string[] CommonPasswords = new string[]
             {

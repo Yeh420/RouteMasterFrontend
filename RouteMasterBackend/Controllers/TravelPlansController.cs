@@ -334,22 +334,60 @@ namespace RouteMasterBackend.Controllers
 
         public void SaveTableData(SchduleListDto dto)
         {
-            var newSchedule = new Schedule();
-            newSchedule.MemberId = 3;
-            newSchedule.Content=dto.content;
-            newSchedule.StartTime = dto.startTime;
-            newSchedule.EndTime = dto.startTime.AddDays(1);
+            if(dto.tableTBodyTrObjs!=null)
+            {
+                for (int i = 0; i < dto.tableTBodyTrObjs.Length; i++)
+                {
+                    var newSchedule = new Schedule();
+                    newSchedule.MemberId = dto.memberId;
+                    newSchedule.CreateDate = dto.createDate;
+                    newSchedule.Content = dto.tableTBodyTrObjs[i].itemName + "  " + dto.tableTBodyTrObjs[i].itemPlaceOrItemDistance;
 
-            _context.Schedules.Add(newSchedule);
-            _context.SaveChanges();
-        
+                    if (!string.IsNullOrEmpty(dto.tableTBodyTrObjs[i].startTime))
+                    {
+                        newSchedule.StartTime = DateTime.Parse(dto.createDate.Date.ToString("yyyy-MM-dd") +" "+ dto.tableTBodyTrObjs[i].startTime);
+                    }
+                    else
+                    {
+                        newSchedule.StartTime = null;
+                    }
+
+
+                    if (!string.IsNullOrEmpty(dto.tableTBodyTrObjs[i].endTime))
+                    {
+                        newSchedule.EndTime = DateTime.Parse(dto.createDate.Date.ToString("yyyy-MM-dd") + " " + dto.tableTBodyTrObjs[i].endTime);
+                    }
+                    else
+                    {
+                        newSchedule.StartTime = null;
+                    }
+                
+                    _context.Schedules.Add(newSchedule);
+                    _context.SaveChanges();
+
+                }
+
+            }
         
         }
 
 
-       
 
 
+        [HttpGet("Get/SchduleData")]
+        public async Task<IEnumerable<SchduleFromDbDto>> GetSchduleData(int memberId)
+        {
+          
+            var data = _context.Schedules.Where(x => x.MemberId == memberId).Select(x => new SchduleFromDbDto
+            {
+                Content = x.Content,    
+                StartTime=x.StartTime,
+                EndTime=x.EndTime
+            });
+
+
+            return data;
+        }
 
 
 

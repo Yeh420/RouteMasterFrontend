@@ -8,30 +8,15 @@
 
 
 <style>
-
-    .col-md-8 {
-        display: grid;
-        grid-template-columns: auto auto auto;
+    .row{
+     /*   display:flex;
+        justify-content:center;*/
     }
-
-    .form-group {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
+    div{
+        margin:10px 0px;
     }
-
-    .control-label {
-        justify-self: start;
-        text-align: center;
-    }
-
-    .form-group .form-control {
-        justify-self: end;
-        width: 350px;
-        text-align: center;
-    }
-
-    h1 {
-        text-align: center;
+    .form-control{
+        width:300px;
     }
 
 </style>
@@ -43,9 +28,14 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <div >
-                    <label>帳戶：</label>
-                    <input asp-for="Account" id="Account" class="form-control" />
+                    <label>帳戶名稱：</label>                    
+                    <input asp-for="Account" id="Account" class="form-control"  disabled/>
                     <span asp-validation-for="Account" class="text-danger"></span>
+                </div>
+                <div>
+                    <label>註冊信箱：</label>
+                    <input asp-for="Email" id="Email" class="form-control" disabled/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div >
                     <label>名：</label>
@@ -56,11 +46,6 @@
                     <label>姓：</label>
                     <input asp-for="LastName" id="LastName" class="form-control" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
-                <div >
-                    <label>信箱：</label>
-                    <input asp-for="Email" id="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div >
                     <label>電話：</label>
@@ -79,7 +64,7 @@
                 </div>
                 <div >
                     <label>生日：</label>
-                    <input asp-for="Birthday" id="Birthday" class="form-control" />
+                    <input asp-for="Birthday" id="Birthday" class="form-control" type="date"/>
                     <span asp-validation-for="Birthday" class="text-danger"></span>
                 </div>
                 <div class="form-group form-check">
@@ -101,6 +86,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.querySelector('#editInfo').addEventListener('click',function(){
@@ -123,13 +109,14 @@
                  contentType:"application/json",
             url: "https://localhost:7145/Members/MemEdit",
             }).done(function(response){
-                if (response.success) {
-                    alert("更改資料成功");
-                    var memberArea = $("#memberNavbar");
-                    memberArea.html(response);
-                } else {
-                    alert("更改資料失败：" + response.message);
-                }
+            swal("更改成功!", "請按返回繼續使用", "success", { button: "返回" });
+                //if (response.success) {
+                //    alert("更改資料成功");
+                //    var memberArea = $("#memberNavbar");
+                //    memberArea.html(response);
+                //} else {
+                //    alert("更改資料失败：" + response.message);
+                //}
             }).fail(function(error){
                 console.log("失败", error);
             });
