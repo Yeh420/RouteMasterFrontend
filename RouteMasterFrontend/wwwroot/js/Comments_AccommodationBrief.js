@@ -39,7 +39,7 @@
                     <div class="card-body">
                         <div class="d-flex">
                             <h5 class="card-title me-auto">{{text.account}}</h5>
-                            <p class="card-text fs-6">{{text.score}}<i class="fa fa-star fa-fw" style="color:#f90;"></i></p>
+                            <p class="card-text bg-primary text-white d-flex justify-content-center align-items-center rounded-2 fs-6" style="width: 25px; height: 25px;">{{text.score}}</p>
                         </div>
                         <div class="d-flex">
                             <p class="card-text me-auto fs-5">{{text.title}}</p>

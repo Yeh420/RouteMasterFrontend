@@ -75,10 +75,10 @@
 
         },
         getImgPath: function (photo) {
-            return `@Url.Content("../MemberUploads/${photo}")`;
+            return `/MemberUploads/${photo}`;
         },
         getProfile: function (photo) {
-            return `@Url.Content("../SystemImages/${photo}")`;
+            return `/MemberUploads/${photo}`;
         },
         starRating: function () {
             let _this = this;
