@@ -1,0 +1,127 @@
+﻿<link href="~/css/kimstyle.css" rel="stylesheet" />
+
+<div id="app">
+    <div class="container">
+        <div class="row row-cols-md-auto ms-1">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio1" value="1" checked>
+                <label class="form-check-label" for="radio1">
+                    未讀
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio2" value="2">
+                <label class="form-check-label" for="radio2">
+                    已讀
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio3" value="3">
+                <label class="form-check-label" for="radio3">
+                    全部
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="readall">
+                <label class="form-check-label" for="readall">全部已讀</label>
+            </div>
+        </div>
+        <div class="row mt-1 g-2" id="indexVM">
+           
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+        const indexVM = $("#indexVM");
+
+        $("#readall").on("change", function () {
+            const isChecked = $(this).prop("checked");
+            if (isChecked) {
+                $.post("https://localhost:7145/SystemMessage/MarkAllAsRead", function (result) {
+                    console.log(result);
+                    $("#readall").prop("disabled", true);
+
+                    Swal.fire({
+                        position: 'top',
+                        icon: 'success',
+                        title: '已將目前通知都標記為已讀',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    getMessage();
+                }).fail(function (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            }
+        });
+
+        indexVM.on("change", ".form-check-input", function () {
+            const isChecked = $(this).prop("checked");
+            const msgId = $(this).attr("id").replace("switchStatus", "");
+
+            if (isChecked) {
+                console.log("該發送ajax");
+                var uri = `https://localhost:7145/SystemMessage/UpdateNoticeStatus?id=${msgId}`;
+                $.post(uri, function (result) {
+                    console.log(result);
+                    getMessage();
+                }).fail(function (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            } else {
+                console.log("沒是");
+            }
+        });
+
+        indexVM.on("click", ".btn-warning", function () {
+            const msgId = $(this).data("msgid");
+            var uri = `https://localhost:7145/SystemMessage/GetUrl?msgId=${msgId}`;
+            $.post(uri, function (result) {
+                var url = result;
+                window.location.href = url + "#commentArea";
+            });
+        });
+
+        $("input[name='flexRadioDefault']").on("change", function () {
+            getMessage();
+        });
+
+        function getMessage() {
+            const filter = $("input[name='flexRadioDefault']:checked").val();
+            var uri = `https://localhost:7145/SystemMessage/Index?filter=${filter}`;
+            $.post(uri, function (result) {
+                indexVM.html(result.map(item => generateCard(item)).join(""));
+            }).fail(function (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+
+        function generateCard(item) {
+            return `<div class="col-6 d-flex">
+                        <div class="card mb-3 cardLine flex-fill">
+                            <h5 class="card-header">${item.category}</h5>
+                            <div class="card-body d-flex flex-column">
+                                <p class="card-text">${item.id}</p>
+                                <h5 class="card-title">${item.content}</h5>
+                                <p class="card-text dis">${item.isRead}</p>
+                                <div class="form-check form-switch mt-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="switchStatus${item.id}" ${item.isRead ? "checked" : ""}>
+                                    <label class="form-check-label" for="switchStatus${item.id}">${item.isRead ? "已讀" : "未讀"}</label>
+                                    ${item.category === '檢舉'
+                    ? `<button type="button" class="btn btn-warning btn-sm ms-3 fs-6" data-msgid="${item.id}">前往評論區</button>`
+                    : `<a class="btn btn-warning btn-sm ms-3" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>`
+                }
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+        }
+
+        getMessage();
+    });
+</script>

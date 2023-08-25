@@ -99,7 +99,8 @@ vm轉成ajax的欄位驗證問題
 2.使用wwwroot/js/jquery-validation 去寫驗證欄位
 
 
-<Form>以及submit都是會造成刷新頁面
+<Form>裡面的submit或是button都會造成有sumbit的效果，以及submit都是會造成刷新頁面
+
 
 如果要改成ajax 必須preventdafault
 
