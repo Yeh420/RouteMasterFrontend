@@ -1,0 +1,13 @@
+﻿.card-header {
+    background-color: #FF9797;
+}
+.dis {
+    display: none;
+}
+.form-switch .form-check-input:checked {
+    background-color: #95CACA;
+    border-color: lightseagreen;
+}
+.cardLine {
+    border-color: #95CACA;
+}

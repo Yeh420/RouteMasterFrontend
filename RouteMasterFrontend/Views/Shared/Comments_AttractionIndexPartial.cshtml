@@ -38,6 +38,60 @@
         font-size: 1.2rem;
     }
 
+    .vertical.carousel .carousel-item {
+        overflow: hidden;
+    }
+
+    .vertical.carousel .carousel-item-next:not(.carousel-item-start),
+    .vertical.carousel .active.carousel-item-end {
+        transform: translateY(100%);
+    }
+
+    .vertical.carousel .carousel-item-prev:not(.carousel-item-end),
+    .vertical.carousel .active.carousel-item-start {
+        transform: translateY(-100%);
+    }
+
+    .vertical.carousel .carousel-indicators {
+        top: 0;
+        left: unset;
+        margin-left: unset !important;
+        margin-right: 1rem;
+        flex-direction: column;
+    }
+
+        .vertical.carousel .carousel-indicators [data-bs-target] {
+            height: 30px;
+            width: 3px;
+        }
+
+    .vertical.carousel .carousel-control-prev,
+    .vertical.carousel .carousel-control-next {
+        width: 100%;
+        height: 60px;
+    }
+
+    .vertical.carousel .carousel-control-prev-icon,
+    .vertical.carousel .carousel-control-next-icon {
+        transform: rotateZ(90deg);
+    }
+
+    .vertical.carousel .carousel-control-next {
+        top: unset;
+        bottom: 0;
+    }
+
+    .carousel-indicators li{
+        width: 10px;
+        height: 10px;
+        border-radius: 100%; /* 圆形的关键属性 */
+        background-color: #ccc; /* 非活动指示器的颜色 */
+        margin: 0 5px;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+   
+
 </style>
 @*<div>@Model.Id</div>*@
 <div id="app">
@@ -60,13 +114,16 @@
             </div>
         </div>
        
-        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-3 border-primary">
             <div class="row g-0">
                 <div class="col-md-7">
-                    <div class="card-header">{{item.account}}</div>
+                    <div class="card-header bg-transparent border-warning d-flex">
+                        {{item.account}}
+                        <small class="ms-auto">{{item.createDate}}</small>
+                        </div>
                     <div class="card-body">
                         <div class="d-flex">
-                            <h4 class="card-title me-auto">景點: {{item.attractionName}}</h4>
+                            <h4 class="card-title me-auto">{{item.attractionName}}</h4>
                             <a v-if="item.edit" data-bs-toggle="modal" data-bs-target="#exampleModal" class="pointer" style="color:black" @@click="labelComment(item.id)" data-bs-placement="bottom" title="檢舉">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
@@ -74,7 +131,7 @@
                            </a>
                           
                         </div>
-                        <div class="starIndex d-flex">
+                        <div class="starIndex d-flex mb-1">
                             <p>{{item.score}}</p>
                             <ul class="d-flex list-unstyled">
                                 <li v-for="starIndex in 5" :key="starIndex">
@@ -85,19 +142,21 @@
                             </ul>
                             <p class="card-text ms-3">| {{ "停留" + item.stayHours + "小時"}} | {{ "花費" + item.price + "元"}}</p>
                         </div>
-                        <p class="card-text">{{item.id}}</p>
+            @*            <p class="card-text">{{item.id}}</p>*@
                         <p v-if="item.content" class="card-text">{{item.content}}</p>
-                        <div class="d-flex mt-1">                          
+                      @*  <div class="d-flex mt-1">                          
                             <p class="ms-auto"><small class="text-muted">{{item.createDate}}</small></p>                           
-                        </div>                                                                                     
+                        </div>   *@                                                                                  
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-5 d-flex align-items-center justify-content-center">
                     <template v-if="item.imageList.length>1">
-                        <div :id='"carousel" + index' class="carousel carousel-dark slide" data-bs-ride="carousel">
-                            <div class="carousel-inner w-100 mx-auto my-auto">
+                        <div :id='"carousel" + index' class="carousel carousel-dark slide vertical" data-bs-ride="carousel">
+                            <div class="carousel-inner w-100 mx-auto my-auto h-100">
                                 <div :class="{ 'carousel-item': true, 'active': num === 0 }" v-for="(photo,num) in item.imageList" :key="num">
-                                    <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                    <div class="d-flex flex-column align-items-center justify-content-center" style="height: 300px;">
+                                        <img v-bind:src="getImgPath(photo)" class="d-block w-100">
+                                    </div>                                   
                                 </div>
 
                             </div>
@@ -109,7 +168,28 @@
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Next</span>
                             </button>
+
+
+                            <ol class="carousel-indicators">
+                                <li v-for="(photo, num) in item.imageList"
+                                    :key="num"
+                                    :data-bs-target='"#carousel" + index'
+                                    :data-bs-slide-to="num"
+                                    :class="{'active': num === 0}">
+
+                                </li>
+                            </ol>
+                            @*<div class="carousel-indicators">
+                                <button type="button" v-for="(photo, num) in item.imageList"
+                                        :key="num"
+                                        :data-bs-target='"#carousel" + index'
+                                        :data-bs-slide-to="num"
+                                        :class="{'active': num === 0}">
+                                </button>
+
+                            </div>*@
                         </div>
+                       
                     </template>
                     <template v-else-if="item.imageList.length===1">                     
                         <img v-bind:src="getImgPath(item.imageList[0])" class="img-fluid rounded-start">
@@ -155,7 +235,7 @@
                                 <textarea v-model="content" class="form-control" placeholder="評論內容" id="paragraph" style="height: 300px"></textarea>            
                             </div>
                             <div class="mb-3">
-                                <input type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" @@change="previewMultiImg" />
+                                <input id="file1" type="file" name="file1" class="form-control" multiple="multiple" accept="image/*" @@change="previewMultiImg" />
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -225,7 +305,6 @@
                         </div>
                         <div class="mt-2">                         
                             <button type="button" class="btn btn-danger" @@click="fillCheck">我要檢舉</button>
-                           @* <button v-else type="button" class="btn btn-success " >檢舉已送出</button>*@
                         </div>
                     </div>
                 </div>
@@ -288,8 +367,11 @@
             },
             reset:function(){
                 let _this = this;
+                var file1 = document.querySelector("#file1");
+                file1.value = "";
                 _this.preview_list=[];
                 _this.image_list=[];
+                
             },
             formSweetAlert:function(){
                 Swal.fire({
@@ -480,6 +562,7 @@
                 let _this = this;
                 var panel = document.querySelector(".panel");
                 var liItems = panel.querySelectorAll("li");
+                var file1 =document.querySelector("#file1");
                 console.log(point);
 
                 liItems.forEach(function (item, idx) {
@@ -491,6 +574,7 @@
                 _this.hours="";
                 _this.price="";
                 _this.content="";
+                file1.value="";
               
             },
 

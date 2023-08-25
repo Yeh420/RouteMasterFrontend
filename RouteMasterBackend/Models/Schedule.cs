@@ -10,8 +10,8 @@ namespace RouteMasterBackend.Models
         public int Id { get; set; }
         public int MemberId { get; set; }
         public string Content { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
         public DateTime CreateDate { get; set; }
 
         public virtual Member Member { get; set; }

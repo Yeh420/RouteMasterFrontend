@@ -308,9 +308,9 @@
                     <div class="row">
                         <div class="date-picker col-6">
                             <div class="header">
-                                <button id="prevMonth" @@click="changeExtMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
+                                <button id="prevMonth" class="btn btn-outline-secondary" @@click="changeExtMonth(-1)"><i class="fa-solid fa-left-long"></i></button>
                                 <h2 id="monthYear" v-model>{{currentYear}}年  {{currentMonth}}月</h2>
-                                <button id="nextMonth" @@click="changeExtMonth(1)"><i class="fa-solid fa-right-long"></i></button>
+                                <button id="nextMonth" class="btn btn-outline-secondary" @@click="changeExtMonth(1)"><i class="fa-solid fa-right-long"></i></button>
                             </div>
                             <div class="calendar" id="calendar">
                                 <div v-for="(dateObj, index) in extCalendarDates" :key="date">
