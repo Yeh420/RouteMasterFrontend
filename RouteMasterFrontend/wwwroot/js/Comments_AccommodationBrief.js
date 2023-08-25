@@ -33,7 +33,7 @@
         },      
               
     },
-    template: `<div class="row g-3 mt-2 mb-3">
+    template: `<div class="row g-3 mb-3">
             <div v-for="(text, num) in bfVM" :key="num" class="col-md-4">
                 <div class="card overflow-auto" style="max-height: 180px;">
                     <div class="card-body">
