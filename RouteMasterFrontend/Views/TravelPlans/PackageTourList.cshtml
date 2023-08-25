@@ -7,7 +7,7 @@
 
 
     <div v-for="(dataObj,index) in packageTours" :key="id">
-        <div class="card mb-3" style="max-width: 1500px;">
+        <div class="card mb-2" style="max-width: 1600px;">
             <div class="row g-0">              
                 <div class="col-md-12">
                     <div class="card-body">
@@ -34,7 +34,7 @@
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
                                                 <img v-bind:src="actObj.actImage" style="width: 400px;" />
                                             </div>
-                                            <div class="col-6 p-1   justify-content-center align-items-center">
+                                            <div class="col-6 p-3   justify-content-center align-items-center">
                                                 <h4>{{actObj.actName}}</h4>
                                                 <p>{{actObj.description}}</p>
                                             </div>
@@ -47,7 +47,7 @@
                                             <div class="col-6 p-1  d-flex justify-content-center align-items-center">
                                                 <img v-bind:src="extObj.extImage" style="width: 400px; " />
                                             </div>
-                                            <div class="col-6 p-1   justify-content-center align-items-center">
+                                            <div class="col-6 p-3   justify-content-center align-items-center">
                                                  <h4>{{extObj.extName}}</h4>
                                                  <p>{{extObj.description}}</p>
                                             </div>
@@ -62,7 +62,7 @@
                             </div>              
                         </div>
                         <br />
-                        <div style="display: flex; justify-content: flex-end;">
+                        <div style="display: flex; justify-content:center; margin-left:500px">
                             <button class="btn btn-primary " @@click="goToPurchasingPage(dataObj.id)">前往購買</button>
                         </div>
 
