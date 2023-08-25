@@ -129,9 +129,6 @@
 
 
 <div id="app">
-@*    <div>購物車id</div>
-    <div>{{cartId}}</div>
-    *@
 
     <h3>活動方案選擇</h3>
     <div v-for="actObj in activityInformations"key="actObj.id" class="card mb-3" style="max-width: 800px;">
@@ -154,26 +151,26 @@
 
                     <div v-if="actObj.selectedActProduct!=undefined">
                         <div style="display: flex;flex-direction: column;">
+                            <p>已選擇活動項目</p>
                             <div class="d-flex">
-                                <p>編號</p>
+                                <p>活動編號</p>
                                 <p>{{actObj.selectedActProduct.productId}}</p>
                             </div>
                             <div class="d-flex">
                                 <p>價格</p>
                                 <p>{{actObj.selectedActProduct.price}}</p>
                             </div>
-
                             <div class="d-flex">
                                 <p>數量</p>
                                 <p>{{actObj.selectedActProduct.quantity}}</p>
                             </div>                                                                   
                         </div>                        
                     </div>    
-                </div>
-            </div>       
-            <div style="display: flex; justify-content: center; align-items: center;">
-                <button class="btn btn-primary m-1 " @@click="selectActProduct(actObj.id);toggleActDatePicker()">選擇方案</button>             
+                </div>               
             </div>
+            <div style="display: flex; justify-content: center; align-items: center; margin-left: 160px;">
+                <button class="btn btn-primary m-1 " @@click="selectActProduct(actObj.id);toggleActDatePicker()">選擇方案</button>
+            </div>           
         </div>
     </div>
 
@@ -192,17 +189,31 @@
                         <p class="card-text"><small class="text-body-secondary">{{extObj.attractionName}}</small></p>
                     </div>
                     <p class="card-text">{{extObj.description}}</p>
-                    <p>{{extObj.selectedExtProduct}}</p>
 
+                    <br />
+                    <br />
+                    <br />
 
-                    <div v-if="extObj.selectedExtProduct!=undefined">
-                        <p>{{extObj.selectedExtProduct.productId}}</p>
-                        <p>{{extObj.selectedExtProduct.price}}</p>
-                        <p>{{extObj.selectedExtProduct.quantity}}</p>
+                    <div v-if="extObj.selectedExtProduct!=undefined">                                    
+                        <div style="display: flex;flex-direction: column;">
+                            <p>已選擇服務項目</p>
+                            <div class="d-flex">
+                                <p>服務項目編號</p>
+                                <p>{{extObj.selectedExtProduct.productId}}</p>
+                            </div>
+                            <div class="d-flex">
+                                <p>價格</p>
+                                <p>{{extObj.selectedExtProduct.price}}</p>
+                            </div>
+                            <div class="d-flex">
+                                <p>數量</p>
+                                <p>{{extObj.selectedExtProduct.quantity}}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div style="display: flex; justify-content: center; align-items: center;">
+            <div style="display: flex; justify-content: center; align-items: center; margin-left: 160px;">
                 <button class="btn btn-primary m-1 " @@click="selectExtProduct(extObj.id);toggleExtDatePicker()">選擇方案</button>
             </div>
         </div>
@@ -273,7 +284,7 @@
                             </div>
                             <br />
 
-                            <div v-if="selectedProductId!=''">
+                            <div style="text-align:left;" v-if="selectedProductId!=''">
                                 <h5 class="border-1  w-50">價格: {{selectedPrice}}</h5>
                                 <br />
                                 <h5 class="border-1  w-50">可購買數量: {{selectedQuantity}}</h5>
@@ -282,9 +293,7 @@
                                     <label class="border-1  w-25">選擇購買數量</label>
                                     <input class="m-1 p-1 " v-model="inputQuantity" type="number" min="1" v-bind:max="selectedQuantity" />
                                     <button class="m-1 p-1 btn btn-primary" @@click="confirmActSelection">確認</button>
-                                </div>
-                                <div>
-                                </div>
+                                </div>                          
                             </div>
                         </div>
                     </div>
