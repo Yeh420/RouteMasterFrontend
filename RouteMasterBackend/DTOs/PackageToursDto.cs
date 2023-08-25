@@ -13,6 +13,7 @@
             public int ActId { get; set; }
             public string? ActName { get; set; }
             public string? ActImage { get; set; }
+            public string? Description { get; set; }
         }
 
         public class attDtoInPackage
@@ -28,6 +29,8 @@
             public int ExtId { get; set; }
             public string? ExtName { get; set; }
             public string? ExtImage { get; set; }
+
+            public string? Description { get; set; }
         }
     }
 }

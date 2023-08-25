@@ -5,7 +5,7 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-   @*  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
+@*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
      <script src="../js/sweetalert2.all.min.js"></script>
     <style>
         .currentPage {
@@ -141,11 +141,12 @@
             </style>
         </noscript>
     }
+
 <div id="app" v-cloak>
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
+        <input type="button" class="btn btn-outline-primary mt-2" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
     </div>
     <div v-else>
         <div class="d-flex">
@@ -467,10 +468,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
             integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/Comments_AccommodationPartial.js" asp-append-version="true"></script>
     <script src="~/js/Comments_AccommodationBrief.js" asp-append-version="true"></script>
-
-        
 
     <script>
         var vueApp = {
@@ -725,6 +725,7 @@
                         _this.initMap(id);
                     }
                 },             
+
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;

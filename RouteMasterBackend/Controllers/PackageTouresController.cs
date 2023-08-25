@@ -100,6 +100,7 @@ namespace RouteMasterBackend.Controllers
                         AttId=act.AttractionId,
                         ActName = act.Name,
                         ActImage = "/ActivityImages/"+ act.Image,
+                        Description = act.Description,  
                     };
                     data.PackageActList.Add(newActDtoInPackage);
                 }
@@ -127,6 +128,7 @@ namespace RouteMasterBackend.Controllers
                         AttId=ext.AttractionId,
                         ExtName = ext.Name,
                         ExtImage ="/ExtraServiceImages/"+ ext.Image,
+                        Description=ext.Description,
                     };
 
                     data.PackageExtList.Add(newExtDtoInPackage);
