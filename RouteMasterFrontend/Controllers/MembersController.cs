@@ -124,11 +124,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                //new Claim("memberImage", member.Image),
+                new Claim("memberImage", member.Image),
                 new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //identity.AddClaim(new Claim("memberImage", member.Image));
+            identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
@@ -706,13 +706,27 @@ namespace RouteMasterFrontend.Controllers
                 myMember.Image = newFileName;
 
             }
-            
+
             _context.SaveChanges();
             img.MemberId = myMember.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult ShowTownSelect([FromBody]int regionId)
+        {
+            IEnumerable<Town> townList = _context.Towns.Where(t=>t.RegionId == regionId);
+
+            var townData = townList.Select(t=>new
+            {
+                townId = t.Id,
+                name= t.Name
+            }).ToList();
+
+            return Json(townData);
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -783,8 +797,8 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -934,8 +948,8 @@ namespace RouteMasterFrontend.Controllers
                 Image = vm.Image,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = true,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
