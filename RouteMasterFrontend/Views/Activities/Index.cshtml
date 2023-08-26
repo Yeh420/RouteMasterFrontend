@@ -58,13 +58,17 @@
                     </ul>
                     <div class="card-body">
 @*                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button>*@
-                        <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
+              
                     </div>
                 </div>
                 <div class="col-6 descriptionBorder  p-3">
                     <div>{{item.description}}</div>
                 </div>
             </div>
+        <div style="display: flex; justify-content: center; align-items: center; ">
+            <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
+        </div>
+
         </div>
 
 

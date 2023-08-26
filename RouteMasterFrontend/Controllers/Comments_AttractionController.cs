@@ -33,23 +33,27 @@ namespace RouteMasterFrontend.Controllers
             switch (input.Manner)
             {
                 case 0:
-                    commentDb = commentDb.OrderBy(c => c.Id);
-                    break;
-                case 1:
                     commentDb = commentDb.OrderByDescending(c => c.CreateDate);
                     break;
-                case 2:
+                case 1:
                     commentDb = commentDb.OrderByDescending(c => c.Score);
                     break;
-                case 3:
+                case 2:
                     commentDb = commentDb.OrderBy(c => c.Score);
                     break;
-                case 4:
+                case 3:
                     commentDb = commentDb.OrderByDescending(c => c.StayHours);
+                    break;
+                case 4:
+                    commentDb = commentDb.OrderBy(c => c.StayHours);
                     break;
                 case 5:
                     commentDb = commentDb.OrderByDescending(c => c.Price);
                     break;
+                case 6:
+                    commentDb = commentDb.OrderBy(c => c.Price);
+                    break;
+
             }
 
             var proImg = _context.Comments_AttractionImages;

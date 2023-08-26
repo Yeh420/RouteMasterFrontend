@@ -113,14 +113,17 @@ namespace RouteMasterBackend.Controllers
                     .AsQueryable();
             
 
-            if (!string.IsNullOrEmpty(data.Keyword))
+            if (data.Keyword != null && data.Keyword.Length != 0)
             {
-                accommodations = accommodations.Where(p =>
-                    p.Name.Contains(data.Keyword) ||
-                    p.Description.Contains(data.Keyword) ||
-                    p.Address.Contains(data.Keyword) ||
-                    p.AccommodationServiceInfos.Where(s => s.Name.Contains(data.Keyword)).Any()
-                );
+                foreach (var keyword in data.Keyword)
+                {
+                    accommodations = accommodations.Where(p =>
+                    p.Name.Contains(keyword) ||
+                    p.Description.Contains(keyword) ||
+                    p.Address.Contains(keyword) ||
+                    p.AccommodationServiceInfos.Where(s => s.Name.Contains(keyword)).Any()
+                    );
+                }
             }
 
             if (data.Grades != null && data.Grades.Length > 0)
