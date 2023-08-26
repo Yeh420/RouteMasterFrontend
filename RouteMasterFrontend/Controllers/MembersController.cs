@@ -37,7 +37,7 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
-        
+
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
@@ -112,9 +112,9 @@ namespace RouteMasterFrontend.Controllers
             if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
 
             //帳密IsExist
-            Result result = ValidLogin(vm);           
+            Result result = ValidLogin(vm);
             if (result.IsSuccess != true) return BadRequest(new { success = false, message = "Invalid input" });
-           
+
             //設定使用者登入資訊
             const bool rememberMe = false;
             var member = _context.Members.First(m => m.Account == vm.Account);
@@ -124,11 +124,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                //new Claim("memberImage", member.Image),
+                new Claim("memberImage", member.Image),
                 new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //identity.AddClaim(new Claim("memberImage", member.Image));
+            identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
@@ -281,7 +281,7 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 MemberImage img = new MemberImage();
-                var member = _context.Members.First((m => m.Email == payload.Email));
+                Member member = new Member();
                 Result result = RegisterGoogleMember(payload, img);
 
                 if (result.IsSuccess)
@@ -364,24 +364,24 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
-            
+
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
             string userID = user.FindFirst("id").Value;
 
             Member myMember = _context.Members.First(m => m.Account == userAccount);
-            
+
 
             if (user.Identity.IsAuthenticated)
-            {              
+            {
                 return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
         }
-   
+
         [HttpGet]
         public async Task<IActionResult> MemberRegister()
-        {  
+        {
             List<Region> regions = await _context.Regions.ToListAsync();
             List<Town> towns = await _context.Towns.ToListAsync();
             ViewBag.Regions = regions;
@@ -391,12 +391,13 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto)
 
         {
             MemberImage img = new MemberImage();
             List<Region> regions = _context.Regions.ToList();
             List<Town> towns = _context.Towns.ToList();
+
 
             if (ModelState.IsValid)
             {
@@ -418,16 +419,16 @@ namespace RouteMasterFrontend.Controllers
             }
             else
             {
-             
+
                 ViewBag.Regions = regions;
                 ViewBag.Towns = towns;
                 return View(vm);
             }
-           
+
 
 
             Result result = RegisterMember(vm, img);
-     
+
 
             if (result.IsSuccess)
             {
@@ -436,13 +437,16 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                ViewBag.Regions = regions;
+                ViewBag.Towns = towns;
                 return View(vm);
+
             }
 
         }
 
-        
-    
+
+
         //會員登出
         [HttpGet]
         public async Task<IActionResult> Logout()
@@ -470,11 +474,10 @@ namespace RouteMasterFrontend.Controllers
         {
             if (ModelState.IsValid == false) return View(vm);
 
-            //var myAccount = _context.Members.FirstOrDefault(m=>m.Account == vm.Account);
 
             //// 生成email裡的連結
             //var urlTemplate = $"{Request.Scheme}://{Request.Host.Value}/Members/MemberResetPassword?Account={myAccount}&confirmCode={0}";
-            
+
 
             Result result = ProcessResetPassword(vm.Account, vm.Email);
 
@@ -484,21 +487,34 @@ namespace RouteMasterFrontend.Controllers
                 return View(vm);
             }
 
-            return View("MemberLogin");
+
+            //先跳一個成功更改密碼的畫面
+            return View("GetNewPasswordSuccess");
+            //return View("MemberLogin");
         }
+
+        [HttpGet]
+        public IActionResult GetNewPasswordSuccess()
+        {
+            return View();
+        }
+
+
+
+
 
         //忘記密碼/更改密碼       
         public IActionResult MemberResetPassword()
         {
             return View();
         }
-        
+
         //忘記密碼/更改密碼 
         [HttpPost]
         public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
         {
             if (ModelState.IsValid == false) return View(vm);
-            
+
             Result result = ProcessChangePassword(account, confirmCode, vm.Password);
 
             //if (result.IsSuccess == false) { }
@@ -518,11 +534,11 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
+        public IActionResult EditPassword([FromBody] MemberEditPasswordVM vm)
         {
-           
-                //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
-            
+
+            //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
+
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
@@ -533,21 +549,22 @@ namespace RouteMasterFrontend.Controllers
             }
 
             return ViewComponent("MemberArea");
-            
+
         }
 
-        public IActionResult MemEdit([FromBody]MemberEditDTO dto)
+        [HttpPut]
+        public IActionResult MemEdit(MemberEditDTO dto)
         {
             var currentUserAccount = User.Identity.Name;
             Member member = _context.Members.FirstOrDefault(m => m.Account == currentUserAccount);
 
-            member.FirstName=dto.FirstName;
-            member.LastName=dto.LastName;           
-            member.CellPhoneNumber=dto.CellPhoneNumber;
-            member.Address=dto.Address;
-            member.Gender=dto.Gender;
-            member.Birthday=dto.Birthday;
-            member.IsSuscribe=dto.IsSuscribe;
+            member.FirstName=dto.firstName;
+            member.LastName=dto.lastName;           
+            member.CellPhoneNumber=dto.cellPhoneNumber;
+            member.Address=dto.address;
+            member.Gender=dto.gender;
+            member.Birthday=dto.birthday;
+            member.IsSuscribe=dto.isSuscribe;
 
             //_context.Entry(member).State =EntityState.Modified;
             _context.SaveChanges();
@@ -689,13 +706,27 @@ namespace RouteMasterFrontend.Controllers
                 myMember.Image = newFileName;
 
             }
-            
+
             _context.SaveChanges();
             img.MemberId = myMember.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult ShowTownSelect([FromBody]int regionId)
+        {
+            IEnumerable<Town> townList = _context.Towns.Where(t=>t.RegionId == regionId);
+
+            var townData = townList.Select(t=>new
+            {
+                townId = t.Id,
+                name= t.Name
+            }).ToList();
+
+            return Json(townData);
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -766,8 +797,8 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -783,7 +814,6 @@ namespace RouteMasterFrontend.Controllers
             var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
             var salt = _hashUtility.GetSalt();
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
-
 
 
             //帳號先，後密碼
@@ -917,9 +947,9 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 Image = vm.Image,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
-                IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsConfirmed = true,
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -961,7 +991,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name+DateTime.Now.ToString("FFFFFFF"),
+                Account = payload.Name,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
@@ -971,7 +1001,6 @@ namespace RouteMasterFrontend.Controllers
                 IsConfirmed = false,
                 IsSuspended = false,
                 IsSuscribe = false,
-
             };
 
             //將它存到db
@@ -979,7 +1008,6 @@ namespace RouteMasterFrontend.Controllers
             _context.SaveChanges();
             img.MemberId = member.Id;
            
-
             return Result.Success();
         }
 
@@ -989,11 +1017,12 @@ namespace RouteMasterFrontend.Controllers
 
             // 檢查account,email正確性
             var memberInDb = _context.Members.FirstOrDefault(m => m.Account == account);
-            var myAccount = memberInDb.Account;
 
-            if (memberInDb == null) return Result.Failure("帳號或 Email 錯誤"); // 故意不告知確切錯誤原因
+            if (memberInDb == null) return Result.Failure("帳號或註冊信箱錯誤"); // 故意不告知確切錯誤原因
 
-            if (string.Compare(email, memberInDb.Email, StringComparison.CurrentCultureIgnoreCase) != 0) return Result.Failure("帳號或 Email 錯誤");
+            var myAccount = memberInDb.Account;        
+
+            if (string.Compare(email, memberInDb.Email, StringComparison.CurrentCultureIgnoreCase) != 0) return Result.Failure("帳號或註冊信箱錯誤");
 
             // 檢查 IsConfirmed必需是true, 因為只有已啟用的帳號才能重設密碼
             if (memberInDb.IsConfirmed == false) return Result.Failure("您還沒有啟用本帳號, 請先完成才能重設密碼");
