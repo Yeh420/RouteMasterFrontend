@@ -6,7 +6,7 @@
 
 @section Styles{
     <style>
-        .starIndex li {
+      /*  .starIndex li {
             color: #ccc;
         }
 
@@ -34,7 +34,7 @@
         .result {
             margin-top: 10px;
             font-size: 1.2rem;
-        }
+        }*/
 
         .zoomIn{
             cursor: zoom-in;
@@ -50,7 +50,51 @@
         .input-group input[readonly] {
             background-color: white;
         }
-      
+
+        input[type="range"],
+        input[type="range"]::-webkit-slider-runnable-track,
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+        }
+
+        input[type="range"] {
+            height: 30px;
+            width: 200px;
+       /*     overflow: hidden;*/
+            cursor: pointer; 
+            outline: none; 
+          /*  background-color: yellow;*/
+            border: 3px solid #28a745;
+            margin-top:5px;        
+        }
+            /* 滑動軌道 樣式 */
+            input[type="range"]::-webkit-slider-runnable-track {
+                height: 6px;
+                width: 200px;
+                border-radius: 4px;
+                background: #FF9797;
+            }
+            /* 滑動鈕 樣式 */
+            input[type="range"]::-webkit-slider-thumb {
+                position: relative;
+                height: 16px;
+                width: 16px;
+                margin-top: -5px;
+                background-color: #4285F4;
+                border-radius: 50%;               
+            }
+
+        .number-input {
+            margin-left: 10px;
+            width: 65px; 
+        }
+
+        .warnShow{
+            color:red;
+            font-size:1.2em;
+        }
+
+       
 
     </style>
 }
@@ -164,10 +208,22 @@
                     </div>
                     <div class="modal-body row">
                         <div class="col-md-10">
-                            <div class="mb-2">
-                                <p v-show="starAlert" style="color:red" class="fs-6">{{starAlert}}</p>
+                            <div :class="{ 'warnShow': showAlert}">
+                                評分必填*
                             </div>
-                            <div class="panel mb-3">
+                            <div class="mb-2 d-flex align-items-start">
+                                <div class="position-relative">
+                                    <input v-model="starpoint" type="range" min="1" max="10" step="1" list="tickmarks"/>
+                                <datalist id="tickmarks" class="d-flex justify-content-between" style="width:200px;">
+                                    <option value="1" label="1" class="ps-2"></option>
+                                    <option value="5" label="5" class="pe-2"></option>
+                                    <option value="10" label="10" class="ps-2"></option>
+                                </datalist>
+                              </div>
+                                <input v-model="starpoint" type="number" class="form-control number-input" min="1" max="10" step="1" placeholder="評分*">
+                            </div>
+
+                            @*<div class="panel mb-3">
                                 <div class="tip">請點選分數</div>
                                 <div class="result">{{"您選擇了" + starpoint + "分"}}</div>
                                 <ul class="d-flex list-unstyled" @@mouseout="clearAlert">
@@ -175,7 +231,7 @@
                                         <i class="fa fa-star fa-fw"></i>
                                     </li>
                                 </ul>
-                            </div>
+                            </div>*@
                             <div class="mb-3">
                                 <input v-model="title" type="text" class="form-control" id="title" placeholder="評論標題">
                             </div>
@@ -271,14 +327,15 @@
                     selected: 0,
                     hotelId: 1, //假設這是呈現AccomodationId=2的評論清單，這裡直接賦值=2
                     thumbicon: [],
-                    starpoint:null,
+                    starpoint:"",
                     title:"",
                     pros:"",
                     cons:"",
-                    starAlert:"",
+                    showAlert:false,
                     carouselList:[],
                     userAccount:"@account",
                     fileName:"",
+
 
                     
 
@@ -362,52 +419,51 @@
                 getProfile:function(photo){
                     return `@Url.Content("../SystemImages/${photo}")`;
                 },
-                starRating: function () {
-                    let _this = this;
+                //starRating: function () {
+                //    let _this = this;
+                //    var panel = document.querySelector(".panel");
+                //    var result = panel.querySelector(".result");
+                //    var liItems = panel.querySelectorAll("li");
 
-                    var panel = document.querySelector(".panel");
-                    var result = panel.querySelector(".result");
-                    var liItems = panel.querySelectorAll("li");
+                //    result.style.display = "none";
 
-                    result.style.display = "none";
+                //    liItems.forEach(function (liItem, index) {
+                //        liItem.classList.add("blank");
 
-                    liItems.forEach(function (liItem, index) {
-                        liItem.classList.add("blank");
+                //        liItem.addEventListener("mouseover", function () {
+                //            for (var j = 0; j <= index; j++) {
+                //                liItems[j].classList.remove("blank");
+                //                liItems[j].classList.add("hover");
+                //            }
+                //        });
 
-                        liItem.addEventListener("mouseover", function () {
-                            for (var j = 0; j <= index; j++) {
-                                liItems[j].classList.remove("blank");
-                                liItems[j].classList.add("hover");
-                            }
-                        });
+                //        liItem.addEventListener("mouseout", function () {
+                //            liItems.forEach(function (item) {
+                //                item.classList.remove("hover");
+                //                item.classList.add("blank");
+                //            });
+                //        });
 
-                        liItem.addEventListener("mouseout", function () {
-                            liItems.forEach(function (item) {
-                                item.classList.remove("hover");
-                                item.classList.add("blank");
-                            });
-                        });
-
-                        liItem.addEventListener("click", function () {
-                            liItems.forEach(function (item, idx) {
-                                if (idx <= index) {
-                                    item.classList.remove("blank");
-                                    item.classList.add("active");
-                                } else {
-                                    item.classList.remove("active");
-                                    item.classList.add("blank");
-                                }
-                            });
-                            panel.querySelector(".tip").style.display = "none";
-                            _this.starpoint = index + 1;
-                            result.style.display = "block";
+                //        liItem.addEventListener("click", function () {
+                //            liItems.forEach(function (item, idx) {
+                //                if (idx <= index) {
+                //                    item.classList.remove("blank");
+                //                    item.classList.add("active");
+                //                } else {
+                //                    item.classList.remove("active");
+                //                    item.classList.add("blank");
+                //                }
+                //            });
+                //            panel.querySelector(".tip").style.display = "none";
+                //            _this.starpoint = index + 1;
+                //            result.style.display = "block";
 
 
-                        });
+                //        });
 
-                    });
+                //    });
 
-                },
+                //},
                 sendForm:function(){
                     let _this = this;
                     if(_this.starpoint){
@@ -452,26 +508,30 @@
                             });
                     }
                     else{
-                        _this.starAlert = "請點選星星評分";
+                        _this.showAlert=true;
+                        setTimeout(() => {
+                            _this.showAlert =false; // 2秒后復原信息
+                        }, 2000);
                     }
                 },
-                clearAlert: function () {
-                    let _this = this;
-                    _this.starAlert = null;
-                },
+                //clearAlert: function () {
+                //    let _this = this;
+                //    _this.starAlert = null;
+                //},
                 clearWords: function (point) {
                     let _this = this;
-                    var panel = document.querySelector(".panel");
-                    var liItems = panel.querySelectorAll("li");
-                    var file1 = document.querySelector("#file1");
-                    console.log(point);
+                    //var panel = document.querySelector(".panel");
+                    //var liItems = panel.querySelectorAll("li");
+                    //var file1 = document.querySelector("#file1");
+                    //console.log(point);
 
-                    liItems.forEach(function (item, idx) {
-                        if (idx <= point - 1) {
-                            item.classList.remove("active");
+                    //liItems.forEach(function (item, idx) {
+                    //    if (idx <= point - 1) {
+                    //        item.classList.remove("active");
 
-                        }
-                    });
+                    //    }
+                    //});
+                    _this.starpoint="",
                     _this.title = "";
                     _this.pros = "";
                     _this.cons = "";
