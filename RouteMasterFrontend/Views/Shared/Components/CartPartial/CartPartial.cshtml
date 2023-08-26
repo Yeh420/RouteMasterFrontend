@@ -26,10 +26,12 @@
         position: absolute;
         top: 40px;
         right: 0;
-        width: 410px;
+        width: 430px;
         background-color: #fff;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         z-index: 1000;
+        max-height:700px;
+        overflow-y:auto;
     }
 
     .dropdown-cart:hover .dropdown-cart-content {
@@ -81,9 +83,9 @@
         </a>
         <div class="dropdown-cart-content">
             
-                <div class="dropdown-cart-item">@await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })</div>
-                <div class="dropdown-cart-item">@await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })</div>
-                <div class="dropdown-cart-item">@await Component.InvokeAsync("AccomodationDetails", new { ViewBag.CartId })</div>
+                <div class="dropdown-cart-item py-0">@await Component.InvokeAsync("ExtraServicesDetails", new { ViewBag.CartId })</div>
+                <div class="dropdown-cart-item py-0">@await Component.InvokeAsync("ActivitiesDetails", new { ViewBag.CartId })</div>
+                <div class="dropdown-cart-item py-0">@await Component.InvokeAsync("AccomodationDetails", new { ViewBag.CartId })</div>
             
             <div class="dropdown-cart-footer">
                 <button class="btn btn-secondary view-cart-button" onclick="window.location.href='/Carts/Index'">
