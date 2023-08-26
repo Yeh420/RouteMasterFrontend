@@ -95,20 +95,21 @@
 </style>
 @*<div>@Model.Id</div>*@
 <div id="app">
-    <div class="container">
+    
         <div class="row mb-2 mt-2">
             <div class="col-3">
-                <select v-model="selected" id="commentOrder" class="ms-1" @@change="commentDisplay">
-                    <option value="0" selected>排序選擇</option>
-                    <option value="1">最新留言</option>
-                    <option value="2">星星評分高至低</option>
-                    <option value="3">星星評分低至高</option>
-                    <option value="4">停留時間由高至低</option>
+                <select v-model="selected" id="commentOrder" @@change="commentDisplay">
+                    <option value="0" selected>最新留言</option>
+                    <option value="1">星星評分高至低</option>
+                    <option value="2">星星評分低至高</option>
+                    <option value="3">停留時間由高至低</option>
+                    <option value="4">停留時間由低至高</option>
                     <option value="5">花費由高至低</option>
+                    <option value="6">花費由低至高</option>
                 </select>
             </div>     
             <div class="col-3 ms-auto text-end">
-                <button v-if="userAccount" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @@click="starRating">
+                <button v-if="userAccount" type="button" class="btn btn-primary btn-sm fs-6" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @@click="starRating">
                     撰寫評論
                 </button>
             </div>
@@ -313,7 +314,7 @@
             </div>
         </div>
 
-    </div>      
+         
 </div>
 
 <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
