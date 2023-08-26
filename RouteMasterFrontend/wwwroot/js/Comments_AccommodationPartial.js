@@ -75,10 +75,10 @@
 
         },
         getImgPath: function (photo) {
-            return `@Url.Content("../MemberUploads/${photo}")`;
+            return `/MemberUploads/${photo}`;
         },
         getProfile: function (photo) {
-            return `@Url.Content("../SystemImages/${photo}")`;
+            return `/MemberUploads/${photo}`;
         },
         starRating: function () {
             let _this = this;
@@ -225,15 +225,14 @@
     template: ` <div class="row mb-2">
             <div class="col-3">
                 <select v-model="selected" id="commentOrder" @change="commentDisplay()">
-                   <option value="0" selected>排序選擇</option>
-                   <option value="1">最新留言</option>
-                   <option value="2">星星評分高至低</option>
-                   <option value="3">星星評分低至高</option>
+                   <option value="0" selected>最新留言</option>
+                   <option value="1">星星評分高至低</option>
+                   <option value="2">星星評分低至高</option>
                 </select>
             </div>
 
             <div class="col-3 ms-auto text-end">
-                <button v-if="userAccount" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @click="starRating">
+                <button v-if="userAccount" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @click="starRating">
                     撰寫評論
                 </button>
             </div>
@@ -253,13 +252,13 @@
                         </ul>
                     </div>
                     <div class="card-body bg-light">
-                        <div class="d-flex pb-0 mb-2">
-                            <p class="fs-6">{{item.score}}<i class="fa fa-star fa-fw me-3" style="color:#f90;"></i></p>
-                            <h4 class="card-title me-auto" v-if="item.title">{{item.title}}</h4>
-                            <p class="text-muted">{{item.createDate}}</p>
+                        <div class="d-flex pb-0 mb-2 justify-content-center">
+                            <p class="card-text bg-primary text-white d-flex justify-content-center align-items-center rounded-2 fs-6 me-2" style="width: 25px; height: 25px;">{{item.score}}</p>
+                            <h4 class="card-title" v-if="item.title">{{item.title}}</h4>
+                            <p class="ms-auto fs-6" style="color:lightseagreen;">{{item.createDate}}</p>
                         </div>
-                        <p class="card-text" v-if="item.pros">{{"優點:" + item.pros}}</p>
-                        <p class="card-text mb-3" v-if="item.cons">{{"缺點:" + item.cons}}</p>
+                        <p class="fs-5" v-if="item.pros">{{"優點: " + item.pros}}</p>
+                        <p class="mb-3 fs-5" v-if="item.cons">{{"缺點: " +  item.cons}}</p>
                         <ul v-if="item.imageList.length" class="d-flex list-unstyled mb-3">
                             <li v-for="(photo,num) in item.imageList" :key="num" class="me-3">
                                 <img :src="getImgPath(photo)" class="zoomIn" @click="openImageModal(item.imageList, num)" />
@@ -268,7 +267,7 @@
 
 
 
-                        <div class="d-flex mt-2">
+                        <div class="d-flex mt-2 align-items-center">
                             <template v-if="userAccount">
                                 <button type="button" v-html="thumbicon[index]" @click="likeComment(item.id)" class="btn btn-outline-dark me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="按讚">
                                 </button>
@@ -277,7 +276,7 @@
                                 <p class="card-text me-1 fs-5"><i class="fa-solid fa-thumbs-up"></i></p>
                             </template>
                             
-                            <p class="card-text me-3 fs-6"> {{item.totalThumbs}}</p>
+                            <p class="card-text me-3 fs-5 align-self-center"> {{item.totalThumbs}}</p>
                             <button v-if="item.status===isReplyed" type="button" class="btn btn-primary position-relative" data-bs-toggle="collapse"
                                     :data-bs-target='"#collapseExample"+index' @showReply(item.id)>
                                 看回覆訊息

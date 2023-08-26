@@ -55,85 +55,69 @@
 
 <div style="display: flex; justify-content: center;">
 <div class="partial-view-container" style="width:100%;">
-    <table class="table" id="cartTable2">
-    <thead>
-            <tr>
-                <th>
-                    <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
-                </th>
-                <th>
-                    <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
-                </th>
-                <th>
-                    <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
-                </th>
-                <th>
-                    <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
-                </th>
-                <th>
-                    <!-- 您可以在這裡添加表頭的內容，或者直接留空 -->
-                </th>
-                <th>
-
-                </th>
-            </tr>
-       @* <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ActivityProduct)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ActivityProduct.StartTime) 
-                @Html.DisplayNameFor(model => model.ActivityProduct.EndTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ActivityProduct.Price)
-            </th>
-          @*  <th>
-                @Html.DisplayNameFor(model => model.Cart)
-            </th>*@
-     
-      
-    </thead>
+        <table class="table mb-0 border-bottom" id="cartTable2">
             <tbody>
                 @{
                     var groupitems = Model.GroupBy(item => item.ActivityProduct.Id);
                 }
                 <tr>
-                    <td colspan="8">
+                    <td colspan="6">
                         <div class="activities-container-vertical">
+                            <h2>活動</h2>
+
                             @foreach (var group in groupitems)
                             {
                                 var firstItem = group.First();
-                                <div class="activity-item" data-activitiesid="@firstItem.Id">
+                                <div class="activity-item w-100" data-activitiesid="@firstItem.Id">
                                     <div class="activity-info row">
-                                        <div class="activity-left col-md-3">
-                                            <div class="activity-image">
-                                                <img src="~/ActivityImages/@firstItem.ActivityProduct.Activity.Image" alt="圖片" style="max-width: 150%; height: auto;">
+                                        <div class="room-left col-md-5">
+                                            <div class="room-image">
+                                                <img src="~/ActivityImages/@firstItem.ActivityProduct.Activity.Image" alt="圖片" style="max-width: 100%; height: auto;">
                                             </div>
                                         </div>
-                                        <div class="activity-right col-md-8">
-                                            <div class="activity-name" style="font-weight: bold; font-size: 18px; margin-left: 40px;">
+                                        <div class="room-right col-md-6">
+                                            <div class="room-name" style=" font-weight:bold; font-size:18px;">
                                                 @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Name)
                                             </div>
-                                            <div class="activity-description" style="font-size: 16px; margin-left: 40px; margin-top: 5px;">
+                                            <div>
                                                 @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Description)
                                             </div>
-                                            <div class="activity-datetime" style="font-size: 14px; color: dimgrey; margin-left: 40px; margin-top: 5px;">
+                                            <div class="extraservice-roomtype" style="font-size:16px;margin-bottom: 5px;">
                                                 <span class="item-datetime">
                                                     @Html.DisplayFor(modelItem => firstItem.ActivityProduct.StartTime) ~
                                                     @Html.DisplayFor(modelItem => firstItem.ActivityProduct.EndTime)
                                                 </span>
                                             </div>
-                                            <div class="activity-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                            <div class="extraservice-quantity" style="font-size:14px;color:dimgrey;margin-bottom: 5px;">
                                                 數量:
                                                 <span class="quantity">@group.Sum(item => item.Quantity)</span>
+                                            </div>
+                                            <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
+                                                TWD:  <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ActivityProduct.Price)</span>
+                                            </div>
+                                        </div>
+                                        <div class="room-remove col-md-1 p-0" style="text-align: left;">
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" onclick="removeFromAcc(@firstItem.Id)"></i></a>
+                                        </div>
+@*
+                                        <div class="activity-left col-md-3">
+                                            <div class="activity-image">
+                                            </div>
+                                        </div>
+                                        <div class="activity-right col-md-8">
+                                            <div class="activity-name" style="font-weight: bold; font-size: 18px; margin-left: 40px;">
+                                            </div>
+                                            <div class="activity-description" style="font-size: 16px; margin-left: 40px; margin-top: 5px;">
+                                            </div>
+                                            <div class="activity-datetime" style="font-size: 14px; color: dimgrey; margin-left: 40px; margin-top: 5px;">
+                                                
+                                            </div>
+                                            <div class="activity-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                                
 
                                             </div>
                                             <div class="activity-price" style="font-size: 18px; color: lightseagreen; font-weight: bold; margin-left: 40px; margin-top: 5px;">
-                                                TWD:  <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ActivityProduct.Price)</span>
+                                                
                                             </div>
                                         </div>
                                         <div class="activity-remove col-md-1" style="text-align: right;">
@@ -142,7 +126,7 @@
                                                     <i class="fas fa-trash-can" style="font-size: 18px;"></i>
                                                 </a>
                                             </div>
-                                        </div>
+                                        </div>*@
                                     </div>
                                 </div>
                             }
@@ -160,8 +144,12 @@
     $(document).ready(function () {
         $(".item-datetime").each(function () {
             var dateTime = $(this).text();
-            var formattedTime = moment(dateTime).format("HH:mm");
-            $(this).html(formattedTime.replace('~', '<br>'));
+            var times = dateTime.split("~").map(function (time) {
+                var parts = time.trim().split(":");
+                return parts[0] + ":" + parts[1];
+            });
+            var formattedTime = times.join(" ~ ");
+            $(this).html(formattedTime/*.replace('~', '<br>')*/);
         });
     });
 

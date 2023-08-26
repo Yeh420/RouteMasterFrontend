@@ -73,7 +73,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		public string? Image { get; set; }
 
 
-		[Display(Name ="廣告訂閱")]
-		public bool IsSuscribe { get; set; }
+		//[Display(Name ="廣告訂閱")]
+		//public bool IsSuscribe { get; set; }
 	}
 }
