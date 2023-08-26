@@ -147,7 +147,7 @@
     </style>
 }
 <hr />
-<div id="AttractionListContainer">
+<div class="mb-3" id="AttractionListContainer">
     @await Component.InvokeAsync("SelectAttraction")
 </div>
 
@@ -1084,8 +1084,9 @@
 
             if (checkbox.checked) {
 
-
+                targetInputNumber.value = 1;
                 targetInputNumber.classList.remove('hide');
+
                 let newTr = document.createElement('tr');
                 newTr.id = trId;
                 let tdEventName = document.createElement('td');

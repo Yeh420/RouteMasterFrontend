@@ -61,13 +61,14 @@
                     <li class="list-group-item"> {{ item.status ? '上架中' : '已下架' }}</li>
                 </ul>
                 <div class="card-body">
-@*                    <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="showDetailsModal(item.id)">檢視詳細資料</button>*@
-                    <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
                 </div>
             </div>
             <div class="col-6 descriptionBorder  p-3">
                 <div>{{item.description}}</div>
             </div>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center; ">
+            <button id="turnToPurchasingPage" class="m-1  btn btn-primary" @@click="goToPurchasingPage(item.id)">前往購買</button>
         </div>
     </div>
 
@@ -140,7 +141,7 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
-
+             
    <script>
       let baseAddress = "https://localhost:7251";
       let  vueApp={
@@ -149,7 +150,7 @@
                  extraServiceDtoes:[],
                  keyword:"",
                  page: 1,
-                 pageSize: 1,
+                 pageSize: 5,
                  totalPage: "",
             
 
