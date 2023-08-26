@@ -8,7 +8,7 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-@*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script> 
      <script src="../js/sweetalert2.all.min.js"></script>
     <link href="~/css/Comments_Accommodation.css" rel="stylesheet" />
     <style>
@@ -579,30 +579,34 @@
                     // info window
                     let infowindow = new google.maps.InfoWindow({
                         content: `
-                                        <div class="card" style="width: 350px;">
-                                                              <div class="row g-0">
-                                                                <div class="col-md-5">
-                                                                    <div class="ratio ratio-4x3">
-                                                                      <img src="${p.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-7">
-                                                                    <div class="card-body h-100 pb-0 d-flex flex-column justify-content-center">
-                                                                    <h5 class="card-title">${p.name}
-                                                                    ${
-                                                                            for(let i = 1; i <= p.grade; i++) {
-                                                                            starsHtml += '<i class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>';
-                                                                        }
-                                                                    }
-                                                                    </h5>
-                                                                    <p class="card-text d-flex align-items-end"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 me-2" style="width: 40px; height: 40px; letter-spacing:1px">${p.score}</span>${p.comment}筆評論</p>
-                                                                  </div>
-                                                                </div>
-                                                              </div>
-                                                            </div>
-                                ` // 支援html
+                <div class="card" style="width: 350px;">
+                    <div class="row g-0">
+                        <div class="col-md-5">
+                            <div class="ratio ratio-4x3">
+                                <img src="${p.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body h-100 pb-0 d-flex flex-column justify-content-center">
+                                <h5 class="card-title">${p.name}</h5>
+                                <div>
+                                ${
+                            // 使用內嵌表達式生成星星圖示
+                            (() => {
+                                for (let i = 1; i <= p.grade; i++) {
+                                    starsHtml += `<i class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>`;
+                                }
+                                return starsHtml;
+                            })()
+                            }
+                                    </div>
+                                <p class="card-text d-flex align-items-end"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 me-2" style="width: 40px; height: 40px; letter-spacing:1px">${p.score}</span>${p.comment}筆評論</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ` // 支援html
                     });
-
                     infowindow.open(this.map, marker);
 
                     // 監聽 marker click 事件

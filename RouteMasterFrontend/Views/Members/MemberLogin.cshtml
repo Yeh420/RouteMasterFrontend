@@ -20,17 +20,18 @@
 
     .container {
         top:0;
-        left:auto;
+        left:0;
         position: absolute;
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         height: 100%;
         overflow: hidden;
     }
 
 
     .container:hover .top:before, .container:hover .top:after, .container:hover .bottom:before, .container:hover .bottom:after, .container:active .top:before, .container:active .top:after, .container:active .bottom:before, .container:active .bottom:after {
-    margin-left: 200px;
-    transform-origin: -200px 50%;
+    margin-left: 300px;
+    transform-origin: -300px 50%;
     transition-delay: 0s;
     }
 
@@ -104,65 +105,68 @@
     font-family: inherit;
     }
 
-    .container .btn-primary:hover {
-    background: #FFCF78;
-    color: #FAFAFA;
-    border-radius: 5px;
-    box-shadow:
-    0 0 5px #FFCF78,
-    0 0 25px #FFCF78,
-    /*0 0 40px #30FFFF,
-    0 0 60px #00F5F5;*/
+    .container #loginBtn{
+        background: #A6FFFF;
+    }
+
+    .container #loginBtn:hover {
+        background: #FFBFBF;
+        color: #FAFAFA;
+        border-radius: 5px;
+        box-shadow:
+        0 0 5px #FFCF78,
+        0 0 25px #FFCF78,
+        /*0 0 40px #30FFFF,
+        0 0 60px #00F5F5;*/
     }
 
   
     .container .logo img{
-    position: absolute;
-    width:200px;
-    height:95px;
-    top: 0;
-    left: 0;
-    z-index: 50;
+        width:240px;
+        height: 120.786369593709px;
     }
 
-        .g_id_signin{
-            margin-top:10px;
-        }
+    .g_id_signin{
+        margin-top:10px;
+    }
+
     </style>
 
-
+	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 
 <body>  
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
-        <div class="logo">
-        <a href="https://localhost:7145"><img src="~/SystemImages/Route-master-logo-black_0.png" /></a>
-        </div>
         <div class="top"></div>
         <div class="bottom"></div>
         <div class="center">
 
+            <div class="logo">
+            <a href="https://localhost:7145"><img src="~/SystemImages/Route-master-logo-black_0.png" /></a>
+            </div>
             <h2>旅程起點</h2>
-            <form asp-action="MemberLogin" class="p-3 mt-3" id="loginForm">
+            <form asp-action="MemberLogin" class="p-3" id="loginForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group d-flex align-items-center">
+                <div class="form-floating form-group d-flex align-items-center mb-3">
                     <span class="far fa-user"></span>
-                    <input asp-for="Account" class="form-control" id="Account"/><br/>
+                    <input asp-for="Account" class="form-control" id="Account" placeholder="Account"/><br />
+                    <label for="Account">帳號</label>
                     <span asp-validation-for="Account" class="text-danger"></span>
                 </div>
-                <div class="form-group d-flex align-items-center">
+                <div class="form-floating form-group d-flex align-items-center mb-3">
                     <span class="fas fa-key"></span>
-                    <input asp-for="Password" class="form-control" id="Password" /><br/>
+                    <input asp-for="Password" class="form-control" id="Password" placeholder="Password" /><br />
+                    <label for="Password">密碼</label>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <input type="submit" value="登入" class="btn btn-primary" />
+                <input type="submit" value="登入" id="loginBtn" class="btn"/>
 
             </form>
             <div class="text-center fs-6">
                 <a asp-action="MemberRegister" class=" btn btn-warning ">註冊會員</a> or
-                <a asp-action="MemberForgetPassword" class="btn btn-success">忘記密碼</a>
+                <a asp-action="MemberForgetPassword" class="btn btn-success">忘記密碼?</a>
             </div>           
             <div id="g_id_onload"
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
@@ -180,7 +184,7 @@
             </div>
 
             <div>
-                <button type="button" id="quickLogin">Demo Account</button>
+                <button type="button" class="btn btn-outline-secondary" id="quickLogin">Demo Account</button>
             </div>
         </div>
     </div>
