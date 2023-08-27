@@ -44,7 +44,7 @@ namespace RouteMasterFrontend.Controllers
                       Title = c.Title.Length > 12 ? c.Title.Substring(0, 12) + "..." : c.Title,
                       Pros = c.Pros,
                       Cons = c.Cons,
-                      CreateDate = (c.CreateDate).ToString("yyyy/MM/dd"),
+                      CreateDate = TransCommentCreate(c.CreateDate),
                       TotalThumbs = proLike.Where(l => l.Comments_AccommodationId == c.Id).Count(),
                   }).Take(3).ToListAsync();
       
@@ -89,7 +89,7 @@ namespace RouteMasterFrontend.Controllers
                 Title = c.Title,
                 Pros = c.Pros,
                 Cons = c.Cons,
-                CreateDate = (c.CreateDate).ToString("yyyy/MM/dd"),
+                CreateDate = TransCommentCreate(c.CreateDate),
                 Status = c.CommentStatus.Name,
                 ReplyMessage = c.Reply,
                 ReplyDate = c.ReplyAt.HasValue ? c.ReplyAt.Value.ToString("yyyy/MM/dd") : null,
@@ -105,6 +105,50 @@ namespace RouteMasterFrontend.Controllers
 
             return Json(rod);
         }
+
+        private static string TransCommentCreate(DateTime createDate)
+        {
+            TimeSpan sinceCreation = DateTime.Now - createDate;
+            try
+            {
+                if (sinceCreation.TotalDays > 365)
+                {
+                    int years = (int)(sinceCreation.TotalDays / 365);
+                    return $"{years} 年前";
+                }
+                else if (sinceCreation.TotalDays > 60)
+                {
+                    return "多個月前";
+                }
+                else if(sinceCreation.TotalDays > 3)
+                {
+                    return "多天前";
+                }
+                else if (sinceCreation.TotalHours >= 24)
+                {
+                    return $"{(int)sinceCreation.TotalDays} 天前";
+                }
+                else if (sinceCreation.TotalHours >= 1)
+                {
+                    return $"{(int)sinceCreation.TotalHours} 小時前";
+                }
+                else if (sinceCreation.TotalMinutes >= 1)
+                {
+                    return $"{(int)sinceCreation.TotalMinutes} 分鐘前";
+                }               
+                else
+                {
+                    return "剛剛";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return $"錯誤: {ex.Message}";
+            }
+            
+        }
+
         public IActionResult PartialPage()  
         {
             return View();

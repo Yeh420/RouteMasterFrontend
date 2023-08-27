@@ -1,0 +1,479 @@
+﻿@{
+    int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
+    var memberIdFromCookie = Context.Request.Cookies["Id"] ?? "0";
+}
+
+@section Styles{
+    <style>
+        .item-container button {
+            position: relative; /* 使按钮成为相对定位的容器 */
+        }
+
+            .item-container button:hover i {
+                opacity: 1; /* 鼠标悬停时设置 i 元素的透明度为 1 */
+            }
+
+            .item-container button i {
+                opacity: 0; /* 初始透明度为 0 */
+                transition: opacity 0.3s; /* 添加过渡效果 */
+            }
+
+
+        .attraction-dot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+       
+        .vertical-line {
+            width: 4px; /* 线的宽度 */
+            height: 70px; /* 线的高度 */
+            background-color: gray; /* 线的颜色 */
+            
+        }
+
+
+    </style>
+}
+
+
+
+<div id="app">    
+
+
+    <div >
+        <button class="btn btn-primary dropdown-toggle" @@click="toggleAllAttractionContainer">顯示/隱藏</button>
+        <template v-if="AllAttractionContainerStatus">
+            <div>
+                <div class="d-flex row max-height-containers"
+                     style="max-height:500px; overflow-y:auto">
+                    <div class="col-3" v-for="attObj in allAttractions" :key="attObj.attractionId">
+                        <div class="item-container m-3">                     
+                            <button  class="btn btn-outline-secondary" @@click="addAttractionToDistanceMatrixArray(attObj)">{{ attObj.attractionName }}<i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+ 
+
+    <br />
+
+
+
+    <div class="d-flex row">
+        <div class="col-6 row">
+            <div class="col-9">
+                <div>
+                    <div v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" class="attraction-dot-container">
+                        <div class="vertical-line " v-if="index > 0"></div>
+                        <div  >
+                            <i style="font-size: 35px; " class="fa-solid fa-location-dot "></i>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+            <div class="col-3">
+                <div v-for="(visitedAttObj,index) in visitedAttraction "
+                     class="border border-primary rounded-1 m-1 p-2"
+                     :key="visitedAttObj.attId"
+                     style="width:120px"
+                     @@drop="drop(index,$event)"
+                     @@dragover="allowDrop($event)">
+                    <div style="text-align:center;justify-content:center; cursor: grab;" draggable="true" @@dragstart="drag(visitedAttObj,index,$event)">{{index+1}}. {{visitedAttObj.attName}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex row">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==1 }" href="#" @@click="setRightSidePage(1)">已選擇{{selectedAttractions.length}}景點</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==2 }" href="#" @@click="setRightSidePage(2)">計算路徑</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==3 }" href="#" @@click="setRightSidePage(3)">未排程景點</a>
+                </li>
+            </ul>           
+
+            <template v-if="rightSidePage==1">
+                <div class="d-flex">
+                    <div class="m-1">
+                        <label class="m-1 p-1">選擇交通模式</label>
+                        <select class="m-1 p-1" v-model="selectedTravelMode">
+                            <option v-for="travelObj in travelModes" :key="travelObj.id" :value="travelObj.value">
+                                {{ travelObj.modeName }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="m-1">
+                        <button class="btn btn-outline-secondary" @@click="callDistanceMatrix()"><i class="fa-solid fa-play"></i> 取得資料進行排程</button>
+                    </div>
+                </div>
+                <div v-for="selectedAttObj in selectedAttractions" :key="selectedAttObj.attId" class="col-5 m-2 p-2 item-container" >
+                    <div>
+                        <button class="btn btn-outline-secondary"
+                                @@click="removeAttractionFromDistanceMatrixArray(selectedAttObj)">
+                            {{ selectedAttObj.attName }} <i class="fa-solid fa-x"></i>
+                        </button>
+                    </div>
+                </div>               
+            </template>
+
+            <template v-else-if="rightSidePage==2">
+                <div >計算結果</div>
+            </template>
+
+
+            <template v-else>
+                <div>         
+                    <div v-for="attObj in unvisitedAttraction" :key="attObj.attId">
+                        <div class="badge bg-secondary text-wrap m-2 p-2" style="width: 15rem;font-size:20px">{{attObj.attName}}</div>
+                        <button class="m-1 p-1 btn btn-outline-secondary" @@click="AddToVisitedArray(attObj)">加入</button>
+                    </div>                 
+                </div>
+            </template>                           
+        </div>    
+    </div>
+
+
+
+    <div>{{sortedAttractions}}</div>
+
+
+    <div>{{selectedPathesOrderByAttractions}}</div>
+ 
+
+
+</div>
+
+
+@section Scripts{
+    
+@*    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0&callback=initMap"></script>   *@
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script>
+
+        let baseAddress = "https://localhost:7251";
+        let vueApp ={
+            data(){
+                return{
+                    memberId: @cartIdFromCookie,
+                    cartId: @memberIdFromCookie,
+                    rightSidePage: 1,
+
+                    AllAttractionContainerStatus:false,
+                    allAttractions:[],
+
+                    travelModes: [{ id: 1, modeName: "開車", value: "DRIVING" }, { id: 2, modeName: "步行", value: "WALKING" }],
+                    selectedTravelMode:"DRIVING",
+
+                    //選擇景點
+                    selectedAttractions:[],
+                    //從MapsApi取得的資料
+                    dataFromDistanceMatrix: [
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "137 公里", "value": 136574 },
+                        "duration": { "text": "2 小時 48 分鐘", "value": 10092 } },
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "125 公里", "value": 124620 },
+                        "duration": { "text": "2 小時 34 分鐘", "value": 9268 } },                         
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "53.6 公里", "value": 53597 },
+                        "duration": { "text": "1 小時 1 分鐘", "value": 3687 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "distance": { "text": "136 公里", "value": 136412 },
+                        "duration": { "text": "2 小時 45 分鐘", "value": 9891 } },
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "56.5 公里", "value": 56480 },
+                        "duration": { "text": "1 小時 25 分鐘", "value": 5121 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "175 公里", "value": 174979 },
+                        "duration": { "text": "3 小時 18 分鐘", "value": 11903 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "distance": { "text": "124 公里", "value": 123932 },
+                        "duration": { "text": "2 小時 32 分鐘", "value": 9126 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "55.6 公里", "value": 55603 },
+                        "duration": { "text": "1 小時 25 分鐘", "value": 5094 } },                         
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "162 公里", "value": 162498 },
+                        "duration": { "text": "3 小時 6 分鐘", "value": 11138 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "distance": { "text": "54.8 公里", "value": 54779 }, 
+                        "duration": { "text": "1 小時 3 分鐘", "value": 3771 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                        "distance": { "text": "176 公里", "value": 175540 }, 
+                        "duration": { "text": "3 小時 22 分鐘", "value": 12146 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 }, 
+                        "distance": { "text": "164 公里", "value": 163586 }, 
+                        "duration": { "text": "3 小時 9 分鐘", "value": 11322 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } }],
+
+
+
+
+
+                    //dataFromDistanceMatrix:[],
+
+
+
+
+
+
+
+                    //未拜訪景點
+                    unvisitedAttraction: [{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+                    //visitedAttraction: 
+                    //[
+                    //{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //{ "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                    //{ "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //{ "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+
+
+                    //已拜訪景點
+                    visitedAttraction:[],
+                };
+            },
+
+            mounted: async function () {
+                let _this=this;
+                await  _this.getAllAttractions();
+
+            },
+            computed:{
+                sendToGoogleMapsApi:function(){
+                    return this.selectedAttractions.map(attraction=>({
+                        lat: parseFloat(attraction.positionX),
+                        lng: parseFloat(attraction.positionY)
+                    }));
+                },
+                sortedAttractions: function () {
+
+                   return  this.visitedAttraction.map(visitedItem=>{
+
+                        const matchingItem = this.allAttractions.find(allAttObj => allAttObj.attractionId == visitedItem.attId)
+
+
+                        if (matchingItem){
+                            return{
+                                attId: visitedItem.attId,
+                                attName: visitedItem.attName,
+                                stayHours: matchingItem.stayHours,
+                                extList: matchingItem.extListInAtt,
+                                actList: matchingItem.actList,
+                                startTime:"",
+                                endTime:"",
+                            };
+                        }
+                     });
+                },
+                selectedPathesOrderByAttractions:function(){
+                    const pathes = [];
+
+                    for (let i = 1; i < this.sortedAttractions.length; i++) {
+                        const start = {
+                            attId: this.sortedAttractions[i - 1].attId,
+                            attName: this.sortedAttractions[i - 1].attName,
+                        };
+
+                        const end = {
+                            attId: this.sortedAttractions[i].attId,
+                            attName: this.sortedAttractions[i].attName,
+                        };
+
+                        const matchingData = this.dataFromDistanceMatrix.find(item => {
+                            return item.start.attId === start.attId && item.end.attId === end.attId;
+                        });
+
+                        if (matchingData) {
+                            const path = {
+                                start: start,
+                                end: end,
+                                distance: matchingData.distance,
+                                duration: matchingData.duration,
+                            };
+
+                            pathes.push(path);
+                        }
+                    }
+
+                    return pathes;
+                },
+                
+            },
+            methods:{
+                getAllAttractions:async function(){
+                   
+                  await  axios.get(`${baseAddress}/api/TravelPlans/Get/AllAttractionsInfo`)
+             
+                    .then(response=>{                       
+                            this.allAttractions=response.data;
+                    })
+                    .catch(err=>{
+                        alert(err)
+                    })
+                },
+                toggleAllAttractionContainer:function(){
+                    this.AllAttractionContainerStatus = !this.AllAttractionContainerStatus;
+                },
+                addAttractionToDistanceMatrixArray:function(attObj){
+
+                    if (this.sendToGoogleMapsApi.length == 10) {
+                       alert("至多選擇十個項目進行排序，請移除其他項目後再加入")
+                    }else{
+                        if (!this.selectedAttractions.some(selAttObj => selAttObj.attId == attObj.attractionId)) {
+                            this.selectedAttractions.push({ attId: attObj.attractionId, attName: attObj.attractionName, positionX: attObj.positionX, positionY: attObj.positionY })
+                        } else {
+                            alert('已存在該景點')
+                        }
+                    }                  
+                },
+                removeAttractionFromDistanceMatrixArray: function (selectedAttObj) {
+                    const index = this.selectedAttractions.findIndex(obj => obj.attId === selectedAttObj.attId);
+                    if (index !== -1) {
+                        this.selectedAttractions.splice(index, 1);
+                    }else{
+                        alert('欲移除之項目不存在')
+                    }
+                },
+                callDistanceMatrix:async function(){
+
+                    if (this.sendToGoogleMapsApi.length<2){
+                        alert("請選擇至少兩個景點")
+                    }else{
+
+                        const service = new google.maps.DistanceMatrixService();
+
+                        await service.getDistanceMatrix(
+                            {
+                                origins: this.sendToGoogleMapsApi,
+                                destinations: this.sendToGoogleMapsApi,
+                                travelMode: this.selectedTravelMode,
+                                unitSystem: google.maps.UnitSystem.METRIC,
+                                avoidHighways: false,
+                                avoidTolls: false,
+                            },
+                            (response, status) => {
+                                if (status === "OK") {
+                                    console.log(response);
+                                    this.dataFromDistanceMatrix = [];
+
+
+                                    for (let i = 0; i < response.rows.length; i++) {
+                                        for (let j = 0; j < response.rows[i].elements.length; j++) {
+                                            this.dataFromDistanceMatrix.push({
+                                                start: this.selectedAttractions[i],
+                                                end: this.selectedAttractions[j],
+                                                distance: response.rows[i].elements[j].distance,
+                                                duration: response.rows[i].elements[j].duration
+                                            })
+                                        }
+                                    }
+                                } else {
+                                    console.error("距離矩陣計算失敗，原因：" + status);
+                                }
+                            }
+                        );
+                    }                
+                    this.unvisitedAttraction = this.selectedAttractions;
+
+                    //清空目前結果??
+                    //不一定要清空
+                    //好像還是得清空，不然行為判斷邏輯要另外判斷是否已經visited
+                    this.visitedAttraction=[];
+                },
+
+
+
+
+               drag: function (visitedAttObj,index, event) {
+                    console.log('drag啦啦啦')
+                    event.dataTransfer.setData('visitedAttObj', JSON.stringify(visitedAttObj));
+                    event.dataTransfer.setData('currentIndex', index);
+               },
+
+               allowDrop:function(e){                 
+                    e.preventDefault();
+               },
+
+
+               drop: function (targetIndex, event) {
+                    event.preventDefault();
+                    const data = JSON.parse(event.dataTransfer.getData('visitedAttObj'));
+                    const currentIndex = event.dataTransfer.getData('currentIndex');
+
+                    const temp = this.visitedAttraction[targetIndex];
+
+                    this.visitedAttraction[targetIndex]=data;
+                    this.visitedAttraction[currentIndex]=temp;
+               },
+
+              
+        
+
+
+
+                AddToVisitedArray: function (attObj){
+                    const targetIndex = this.unvisitedAttraction.findIndex(obj => obj.attId === attObj.attId)
+                    this.unvisitedAttraction.splice(targetIndex,1);
+                    this.visitedAttraction.push(attObj);
+                },
+                setRightSidePage:function(number){   
+                    this.rightSidePage=number;
+                },
+            }
+        };
+
+        let app = Vue.createApp(vueApp).mount('#app');
+
+
+
+    </script>
+}

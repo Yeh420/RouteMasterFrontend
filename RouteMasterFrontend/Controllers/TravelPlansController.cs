@@ -36,7 +36,15 @@ namespace RouteMasterFrontend.Controllers
         // GET: TravelPlans/Create
         public IActionResult Create()
         {
-            ViewData["MemberId"] = new SelectList(_context.Members, "Id", "Account");
+         
+            return View();
+        }
+
+
+
+        public IActionResult CreateTravelVuePage()
+        {
+       
             return View();
         }
 

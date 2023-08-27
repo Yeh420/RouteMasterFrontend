@@ -79,6 +79,7 @@ namespace RouteMasterFrontend.Controllers
                     .Select(cartDetail => new Cart_AccommodationDetailDto
                            {
                            Id = cartDetail.Id,
+                           RoomId = cartDetail.RoomProduct.Id,
                            RoomName = cartDetail.RoomProduct.Room.Name,
                            AccommodationName = cartDetail.RoomProduct.Room.Accommodation.Name,
                            RoomTypeName = cartDetail.RoomProduct.Room.RoomType.Name,
@@ -308,7 +309,7 @@ namespace RouteMasterFrontend.Controllers
             try
             {
                 var cartIdFromCookie = Convert.ToInt32(HttpContext.Request.Cookies["cartId"] ?? "0");
-                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.Id== roomProductId);
+                var cartItem=_context.Cart_AccommodationDetails.FirstOrDefault(x=>x.CartId==cartIdFromCookie&& x.RoomProductId == roomProductId);
                 if (cartItem != null)
                 {
                     _context.Cart_AccommodationDetails.Remove(cartItem);
@@ -454,6 +455,7 @@ namespace RouteMasterFrontend.Controllers
                 return View("Checkout");
             }
             ProcessCheckout(memberId, note);
+           
             return RedirectToAction("Index", "Ecpay", new { selectedCouponId = couponId });
           
         }
@@ -501,9 +503,9 @@ namespace RouteMasterFrontend.Controllers
                     {
                         MemberId = memberId,
                         PaymentMethodId = 1,
-                        PaymentStatusId = 1,
+                        PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = 2,
+                        CouponsId = 1,
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal

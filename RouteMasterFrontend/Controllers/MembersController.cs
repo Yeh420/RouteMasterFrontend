@@ -124,11 +124,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                //new Claim("memberImage", member.Image),
+                new Claim("memberImage", member.Image),
                 new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //identity.AddClaim(new Claim("memberImage", member.Image));
+            identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
@@ -571,23 +571,90 @@ namespace RouteMasterFrontend.Controllers
             return ViewComponent("MemberArea");
         }
 
-        [HttpGet] 
-        public async Task<IActionResult> HistoryOrder(int? id)
+        [HttpGet("Member/HistoryOrder/{memberid?}")]
+        public async Task<IActionResult> HistoryOrder(int? memberid)
         {
-            var historyOrders = _context.Orders
-                .Include(x => x.OrderExtraServicesDetails)
-                .Include(x => x.OrderActivitiesDetails)
-                .Include(x => x.OrderAccommodationDetails)
-                .Include(x => x.Coupons)
-                .Include(x => x.OrderHandleStatus)
-                .Include(x => x.PaymentStatus)
-                .Include(x => x.PaymentMethod);
+			if (!memberid.HasValue)
+			{
+				return BadRequest("Member ID is required");
+			}
+			var memberId = await _context.Members.Where(m => m.Id == memberid.Value).Select(m => m.Id).FirstOrDefaultAsync();
 
-           var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
-           var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
+			if (memberId == 0)
+			{
+				return NotFound("Member not found");
+			}
+			var orders = await _context.Orders
+		    .Where(o => o.MemberId == memberId)
+		    .Include(x => x.OrderExtraServicesDetails)
+		    .Include(x => x.OrderActivitiesDetails)
+		    .Include(x => x.OrderAccommodationDetails)
+		    .Include(x => x.Coupons)
+		    .Include(x => x.OrderHandleStatus)
+		    .Include(x => x.PaymentStatus)
+		    .Include(x => x.PaymentMethod)
+		    .ToListAsync();
 
-            return View(historyOrders);
-        }
+            if (!orders.Any())
+            {
+                return NotFound("Member not found or no orders for this member");
+            }
+            var orderDTOs = orders.Select(o => new OrderDto
+			{
+				Id = o.Id,
+				MemberId = o.MemberId,
+                PaymentMethodName = o.PaymentMethod.Name,   
+                PaymentStatusName = o.PaymentStatus.Name,
+				OrderHandleStatusId = o.OrderHandleStatusId,
+				CouponsId = o.CouponsId,
+				CreateDate = o.CreateDate,
+				ModifiedDate = o.ModifiedDate,  
+				Total = o.Total,
+
+				ExtraServiceDetails = o.OrderExtraServicesDetails.Select(es => new OrderExtraServiceDetailDTO
+				{
+					Id = es.Id,
+					OrderId = es.OrderId,
+					ExtraServiceId = es.ExtraServiceId,
+					ExtraServiceName = es.ExtraServiceName,
+					ExtraServiceProductId = es.ExtraServiceProductId,
+					Date = es.Date,
+					Price = es.Price,
+					Quantity = es.Quantity
+				}).ToList(),
+
+				ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
+				{
+					Id = ad.Id,
+					OrderId = ad.OrderId,
+					ActivityId = ad.ActivityId,
+					ActivityName = ad.ActivityName,
+					ActivityProductId = ad.ActivityProductId,
+					Date = ad.Date,
+					StartTime = ad.StartTime,
+					EndTime = ad.EndTime,
+					Price = ad.Price,
+					Quantity = ad.Quantity
+				}).ToList(),
+
+				AccommodationDetails = o.OrderAccommodationDetails.Select(ac => new OrderAccommodationDetailDTO
+				{
+					Id = ac.Id,
+					OrderId = ac.OrderId,
+					AccommodationId = ac.AccommodationId,
+					AccommodationName = ac.AccommodationName,
+					RoomProductId = ac.RoomProductId,
+					RoomType = ac.RoomType,
+					RoomName = ac.RoomName,
+					CheckIn = (DateTime)ac.CheckIn,
+					CheckOut = (DateTime)ac.CheckOut,
+					RoomPrice = (decimal)ac.RoomPrice,
+					Quantity = ac.Quantity,
+					Note = ac.Note
+				}).ToList()
+			}).ToList();
+			return View(orderDTOs);
+		}
 
         ////使用dapper做資料庫存取歷史訂單    
         //[HttpGet]
@@ -706,13 +773,27 @@ namespace RouteMasterFrontend.Controllers
                 myMember.Image = newFileName;
 
             }
-            
+
             _context.SaveChanges();
             img.MemberId = myMember.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult ShowTownSelect([FromBody]int regionId)
+        {
+            IEnumerable<Town> townList = _context.Towns.Where(t=>t.RegionId == regionId);
+
+            var townData = townList.Select(t=>new
+            {
+                townId = t.Id,
+                name= t.Name
+            }).ToList();
+
+            return Json(townData);
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -783,8 +864,8 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -934,8 +1015,8 @@ namespace RouteMasterFrontend.Controllers
                 Image = vm.Image,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = true,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db

@@ -1,8 +1,6 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart_AccommodationDetail>
 @section style{
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-
-
 }
 <style>
     /* 移除上下的水平分隔線 */
@@ -68,6 +66,8 @@
                             @foreach (var group in groupitem)
                             {
                                 var firstItem = group.First();
+                                var price = (int)(firstItem.RoomProduct.NewPrice);
+
                                     <div class="room" data-roomProductId="@firstItem.RoomProductId">
                                         <div class="room-info row">
                                             <div class="room-left col-md-5">
@@ -89,10 +89,10 @@
                                                     @Html.DisplayFor(modelItem => firstItem.RoomProduct.Date)
                                                 </div>
                                                  <div class="extraservice-quantity" style="font-size:14px;color:dimgrey;margin-bottom: 5px;">
-                                                    數量:@group.Sum(item =>item.Quantity)
+                                                    數量：@group.Sum(item =>item.Quantity)
                                                 </div>
                                                 <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
-                                                    TWD:@Html.DisplayFor(modelItem => firstItem.RoomProduct.NewPrice)
+                                                    TWD：@Html.DisplayFor(modelItem => price)
                                                 </div>
                                             </div>
                                             <div class="room-remove col-md-1 p-0" style="text-align: left;">

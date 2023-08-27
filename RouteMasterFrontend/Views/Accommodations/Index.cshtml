@@ -8,7 +8,7 @@
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <link href="~/hotel-datepicker-main/dist/css/hotel-datepicker.css" rel="stylesheet" /><!-- Optional -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-@*     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script>  *@
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDr_zVippBk_-dJNEGc5yK8PtX-xE5qZ-w&libraries=&v=weekly" defer></script> 
      <script src="../js/sweetalert2.all.min.js"></script>
     <link href="~/css/Comments_Accommodation.css" rel="stylesheet" />
     <style>
@@ -18,6 +18,10 @@
 
         .w-33 {
             width: 33.33333333%;
+        }
+
+        .h-33 {
+            height: 33.33333333%
         }
 
         .main-left {
@@ -100,6 +104,7 @@
             height: 91.5vh;
             top: 80px;
         }
+
         .loading-indicator {
             display: flex;
             justify-content: center;
@@ -124,32 +129,37 @@
         }
 
         @@keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-            </style>
-        <noscript>
-            <style>
-                .simplebar-content-wrapper {
-                    scrollbar-width: auto;
-                    -ms-overflow-style: auto;
-                }
+            0% {
+                transform: rotate(0deg);
+            }
 
-                    .simplebar-content-wrapper::-webkit-scrollbar,
-                    .simplebar-hide-scrollbar::-webkit-scrollbar {
-                        display: initial;
-                        width: initial;
-                        height: initial;
-                    }
-            </style>
-        </noscript>
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <noscript>
+        <style>
+            .simplebar-content-wrapper {
+                scrollbar-width: auto;
+                -ms-overflow-style: auto;
+            }
+
+                .simplebar-content-wrapper::-webkit-scrollbar,
+                .simplebar-hide-scrollbar::-webkit-scrollbar {
+                    display: initial;
+                    width: initial;
+                    height: initial;
+                }
+        </style>
+    </noscript>
     }
 
 <div id="app" v-cloak>
     <div v-if="toggle">
         <h1>你是不是想找．．．</h1>
         <div id="RecommendMap" class="ratio ratio-16x9"></div>
-        <input type="button" class="btn btn-outline-primary mt-2" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView"/>
+        <input type="button" class="btn btn-outline-primary mt-2" data-id="index" id=`${product.id}` value="搜尋更多住所" @@click="toggleView" />
     </div>
     <div v-else>
         <div class="d-flex">
@@ -364,8 +374,8 @@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-comment-dots me-3"></i>住宿評論：</h2>
-                                    <brief ref="childRef2"></brief>                                   
-                                   @* <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>*@
+                                    <brief ref="childRef2"></brief>
+                                    @* <button class="form-control btn border-0 px-0" :class="{ 'btn-outline-success':overview, ' btn-success':!overview }" @@click="ShowComments(accommodationIndex.id)">更多評論</button>*@
                                 </section>
                                 <section class="mb-3 border-top pt-1">
                                     <h2 class="mb-2"><i class="fa-solid fa-bed me-3"></i>客房供應：</h2>
@@ -397,7 +407,7 @@
                                             </tr>
                                             <tr v-if="toggle" id="addPlanBtn" style="display:none">
                                                 <td>
-                                                     <button class="form-control btn btn-primary" @@click="addCart()">加入排程</button>
+                                                    <button class="form-control btn btn-primary" @@click="addCart()">加入排程</button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -499,12 +509,12 @@
                     accommodationImage: "",
                     accommodationDescription: "",
                     cartProducts: [],
-                    alertContent:[],
+                    alertContent: [],
                     accommodationServiceCId: [],
                     cartItems: [],
                     map: null,
                     toggle: false,
-                    overview:true,
+                    overview: true,
                     isLoading: false,
                 }
             },
@@ -565,12 +575,38 @@
                         map: this.map,
                         title: p.name
                     });
+                    let starsHtml = "";
                     // info window
                     let infowindow = new google.maps.InfoWindow({
-                        content: `<h6>${p.name}</h6>
-                                                     <small>${p.address}</small>` // 支援html
+                        content: `
+                <div class="card" style="width: 350px;">
+                    <div class="row g-0">
+                        <div class="col-md-5">
+                            <div class="ratio ratio-4x3">
+                                <img src="${p.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body h-100 pb-0 d-flex flex-column justify-content-center">
+                                <h5 class="card-title">${p.name}</h5>
+                                <div>
+                                ${
+                            // 使用內嵌表達式生成星星圖示
+                            (() => {
+                                for (let i = 1; i <= p.grade; i++) {
+                                    starsHtml += `<i class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i>`;
+                                }
+                                return starsHtml;
+                            })()
+                            }
+                                    </div>
+                                <p class="card-text d-flex align-items-end"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 me-2" style="width: 40px; height: 40px; letter-spacing:1px">${p.score}</span>${p.comment}筆評論</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ` // 支援html
                     });
-
                     infowindow.open(this.map, marker);
 
                     // 監聽 marker click 事件
@@ -624,7 +660,7 @@
                 loadProducts: async function (infinity) {
                     let _this = this;
                     let request = {
-                        keyword: /^\s*$/.test(_this.keyword) || _this.keyword === null || _this.keyword === undefined ? null:_this.keyword.split(" "),
+                        keyword: /^\s*$/.test(_this.keyword) || _this.keyword === null || _this.keyword === undefined ? null : _this.keyword.split(" "),
                         page: _this.thePage,
                         pageSize: _this.pageSize,
                         grades: _this.selectedGrades,
@@ -655,14 +691,14 @@
                             _this.products.push(data)
                         })
                     }
-                    else{
+                    else {
                         _this.products = (datas.items);
                     }
                     _this.totalPages = datas.totalPages;
                 },
                 showPages: function () {
                     let _this = this;
-                    _this.thePage = 1;             
+                    _this.thePage = 1;
                     _this.loadProducts();
                 },
                 loadMoreContent() {
@@ -731,7 +767,7 @@
 
                         _this.initMap(id);
                     }
-                },             
+                },
                 clickHandler: function (value) {
                     let _this = this;
                     _this.thePage = value;
@@ -752,21 +788,21 @@
                     if (_this.toggle) {
                         _this.cartProducts = []
                         _this.alertContent = []
-                        for(let i = 0; document.querySelector(`#rp${i}`) ; i++){
+                        for (let i = 0; document.querySelector(`#rp${i}`); i++) {
                             let selectedDays = $(`#rp${i} td[aria-label*="Selected"] .rp`).map(function () {
                                 return Number($(this).text());
                             }).get();
                             selectedDays.pop();
-                            console.log(selectedDays);  
-                            if(selectedDays.length > 0){
+                            console.log(selectedDays);
+                            if (selectedDays.length > 0) {
                                 let cartProduct = {
                                     roomProductId: selectedDays,
                                     quantity: Number($(`#rp${i} .pq`).val())
                                 }
                                 let content = {
-                                    roomName : $(`#rp${i} #rn`).text(),
-                                    date : $(`#rp${i} #dp-${i+1}`).val(),
-                                    quantity : $(`#rp${i} #pq-${i+1}`).val()
+                                    roomName: $(`#rp${i} #rn`).text(),
+                                    date: $(`#rp${i} #dp-${i + 1}`).val(),
+                                    quantity: $(`#rp${i} #pq-${i + 1}`).val()
                                 }
                                 _this.cartProducts.push(cartProduct);
                                 _this.alertContent.push(content);
@@ -775,42 +811,42 @@
 
                         let request = {
                             accommodationName: _this.accommodationIndex.name,
-                            cartProducts : _this.cartProducts
+                            cartProducts: _this.cartProducts
                         };
 
                         Swal.fire({
-                          title: `你選擇了：${request.accommodationName}
-                          確定將以下客房加入排程嗎?`,
-                          text: `
-『
-    ${_this.alertContent.map(function(c){
-        return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
-    }).join('\n')}
-』`,
-                          icon: 'warning',
-                          showCancelButton: true,
-                          confirmButtonColor: '#3085d6',
-                          cancelButtonColor: '#d33',
-                          confirmButtonText: '好!',
-                          cancelButtonText: '我再考慮一下~'
+                            title: `你選擇了：${request.accommodationName}
+                                          確定將以下客房加入排程嗎?`,
+                            text: `
+                『
+                    ${_this.alertContent.map(function (c) {
+                                return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
+                            }).join('\n')}
+                』`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: '好!',
+                            cancelButtonText: '我再考慮一下~'
                         }).then((result) => {
-                          if (result.isConfirmed) {
-                            window.opener.postMessage(JSON.stringify(request), window.location.origin);
-                            Swal.fire(
-                                '恭喜!',
-                                '已成功加入排程!',
-                                'success'
-                            )
-                            window.close();
-                          }
+                            if (result.isConfirmed) {
+                                window.opener.postMessage(JSON.stringify(request), window.location.origin);
+                                Swal.fire(
+                                    '恭喜!',
+                                    '已成功加入排程!',
+                                    'success'
+                                )
+                                window.close();
+                            }
                         })
-//                        alert(`你選擇了：${request.accommodationName}
-//『
-//    ${_this.alertContent.map(function(c){
-//        return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
-//    }).join('\n')}
-//』`);
-                    } 
+                        //                        alert(`你選擇了：${request.accommodationName}
+                        //『
+                        //    ${_this.alertContent.map(function(c){
+                        //        return `${c.roomName} : ${c.date} , ${c.quantity}間;`;
+                        //    }).join('\n')}
+                        //』`);
+                    }
                     else {
 
                         let selectedDays = $(`#datepicker-dp-${roomId} .datepicker__month-day--selected .rp`).map(function () {
@@ -907,7 +943,7 @@
                                 ptInput.val(total.sum);
 
                                 $(`#ptInput-${id}`).show();
-                                if(addPlanBtn){addPlanBtn.show();}
+                                if (addPlanBtn) { addPlanBtn.show(); }
 
                                 pqInput.off('change');
                                 pqInput.on('change', function () {
@@ -972,24 +1008,23 @@
 
                         let infowindow = new google.maps.InfoWindow({
                             content: `
-                                    <div class="card" style="width: 410px;">
-                                      <div class="row g-0">
-                                        <div class="col-md-5">
-                                            <div class="ratio ratio-4x3">
-                                              <img src="${r.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-7">
-                                          <div class="card-body h-100 pb-0 d-flex flex-column">
-                                            <h5 class="card-title">${r.name}  <i v-for="grade in ${r.grade}" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i></h5>
-                                            <p class="card-text"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2" style="width: 40px; height: 40px; letter-spacing:1px">${r.score}</span>${r.comment}筆評論</p><br>
-                                            <p class="card-text d-flex justify-content-end"><small class="ms-auto text-body-secondary">距離你的位置： ${distanceOutput} </small></p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    ` // 支援html
+                                                    <div class="card" style="width: 410px;">
+                                                      <div class="row g-0">
+                                                        <div class="col-md-6">
+                                                            <div class="ratio ratio-4x3">
+                                                              <img src="${r.image}" class="img-fluid rounded-start h-100 w-100" style="object-fit:cover" alt="...">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="card-body h-100 pb-0 d-flex flex-column justify-content-center">
+                                                            <h5 class="card-title h-33">${r.name}<i v-for="grade in ${r.grade}" class="fa-solid fa-star fa-flip" style="color: #ffc800;"></i></h5>
+                                                            <p class="card-text d-flex align-items-end h-33"><span class="score-div bg-primary text-white d-flex justify-content-center align-items-center rounded-2 me-2" style="width: 40px; height: 40px; letter-spacing:1px">${r.score}</span>${r.comment}筆評論</p>
+                                                            <p class="card-text d-flex justify-content-end align-items-end h-33"><small class="ms-auto text-body-secondary">距離你的位置： ${distanceOutput} </small></p>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                    ` // 支援html
                         });
 
                         marker.addListener('mouseover', e => {
@@ -1006,7 +1041,7 @@
                         });
 
                     });
-                    
+
                     let markerCenter = new google.maps.Marker({
                         position: location,
                         //icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png", // 自定義圖標，google也有提供5個預設的圖標，參考下方*1
@@ -1040,17 +1075,17 @@
                     alert("已幫你挑選10間精選住所")
 
                 },
-                Overview:function(id){
+                Overview: function (id) {
                     this.overview = true;
                     this.showModal(id);
                 },
-                ShowComments:function(id){
-                    this.overview = false; 
+                ShowComments: function (id) {
+                    this.overview = false;
                     console.log(id);
-                    var identity="@account"? "@account":"";
-                    this.$refs.childRef1.commentDisplay(id,identity);
+                    var identity = "@account" ? "@account" : "";
+                    this.$refs.childRef1.commentDisplay(id, identity);
                 },
-                toggleView:function(){
+                toggleView: function () {
                     this.toggle = false;
                     this.loadProducts();
                 },
@@ -1061,7 +1096,7 @@
             }
         }
         var app = Vue.createApp(vueApp).mount("#app");
-        //app.component('brief',childRef2);
-        //app.component('dec', childRef1);
+                        //app.component('brief',childRef2);
+                        //app.component('dec', childRef1);
     </script>
 }
