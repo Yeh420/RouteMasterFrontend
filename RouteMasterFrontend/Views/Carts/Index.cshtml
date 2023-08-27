@@ -61,7 +61,7 @@
         .fixed-row-height thead th {
             font-weight: bold;
             font-size: 1px;
-            color: darkgray;
+            color: #246;
             font-size: 16px;
         }
 
@@ -155,7 +155,7 @@
                                         <span class="quantity">@group.Sum(item => item.Quantity)</span>
                                     </td>
                                     <td class="align-middle text-center">
-                                            <button class="btn btn-danger" @@click="removeItem('@group.First().Id', '@groupPrice')">Delete</button>
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeItem('@group.First().Id', '@groupPrice')"></i></a>
                                     </td>
 
                                 </tr>
@@ -171,7 +171,7 @@
                                 <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@accommodationDTO.Price</td>
                                 <td class="align-middle text-center">@accommodationDTO.Quantity</td>
                                 <td class="align-middle text-center">
-                                            <button class="btn btn-danger" @@click="removeFromAcc('@accommodationDTO.Id, @accommodationDTO.Price')">Delete</button>
+                                    <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeFromAcc(@accommodationDTO.RoomId, @accommodationDTO.Price)"></i></a>
                                 </td>
                             </tr>
                         }
@@ -197,7 +197,7 @@
                                             <span class="quantity">@group.First().Quantity</span>
                                         </td>
                                         <td class="align-middle text-center">
-                                            <button class="btn btn-danger" @@click="removeFromCartAct('@group.First().Id',@groupPrice)">Delete</button>
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeFromCartAct('@group.First().Id',@groupPrice)"></i></a>
                                         </td>
                                 </tr>
                         }
@@ -389,6 +389,7 @@
                                 if (!isNaN(price)) {
                                     _this.totalAmount -= price;
                                 }
+
                                 reloadCartItems();
                             } else {
 
@@ -470,11 +471,13 @@
         //}
 
         function reloadCartItems() {
+            console.log("reload")
             $.ajax({
                 url: '/Carts/RefreshCart',
                 type: 'GET',
                 success: function (data) {
-
+                    console.log(data);
+                    console.log($('#Cart'))
                     $('#Cart').html(data);
                 },
 
