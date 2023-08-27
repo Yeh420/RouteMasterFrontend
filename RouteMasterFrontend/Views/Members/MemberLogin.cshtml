@@ -129,9 +129,16 @@
     .g_id_signin{
         margin-top:10px;
     }
+        .ckeckEye{
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+    }
 
     </style>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
@@ -150,15 +157,16 @@
             <form asp-action="MemberLogin" class="p-3" id="loginForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-floating form-group d-flex align-items-center mb-3">
-                    <span class="far fa-user"></span>
+                    @*<span class="far fa-user"></span>*@
                     <input asp-for="Account" class="form-control" id="Account" placeholder="Account"/><br />
                     <label for="Account">帳號</label>
                     <span asp-validation-for="Account" class="text-danger"></span>
                 </div>
                 <div class="form-floating form-group d-flex align-items-center mb-3">
-                    <span class="fas fa-key"></span>
+                    @*<span class="fas fa-key"></span>*@
                     <input asp-for="Password" class="form-control" id="Password" placeholder="Password" /><br />
                     <label for="Password">密碼</label>
+                    <i id="checkEye" class="fa-solid fa-eye-slash"></i>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <input type="submit" value="登入" id="loginBtn" class="btn"/>
@@ -278,5 +286,20 @@
         });
     });
 
+
+    var checkEye = document.getElementById("checkEye");
+    var floatingPassword = document.getElementById("Password");
+    checkEye.addEventListener("click", function (e) {
+        if (e.target.classList.contains('fa-eye-slash')) {
+            
+            e.target.classList.remove('fa-eye-slash');
+            e.target.classList.add('fa-eye');
+            floatingPassword.setAttribute('type', 'text')
+        } else {
+            floatingPassword.setAttribute('type', 'password');
+            e.target.classList.remove('fa-eye');
+            e.target.classList.add('fa-eye-slash')
+        }
+    });
 </script>
 
