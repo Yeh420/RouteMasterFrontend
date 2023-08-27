@@ -43,7 +43,8 @@ namespace RouteMasterBackend.Controllers
         {
 
             //景點選擇處disabled綁定屬性判斷是否可以點選
-
+            //頁籤內容消失高度保留樣式問題
+            //
         
             var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
             {
