@@ -63,8 +63,9 @@
         indexVM.on("change", ".form-check-input", function () {
             const isChecked = $(this).prop("checked");
             const msgId = $(this).attr("id").replace("switchStatus", "");
+            var isRead = indexVM.find(item => item.id === msgId).isRead;
 
-            if (isChecked) {
+            if (isChecked !== isRead) {
                 console.log("該發送ajax");
                 var uri = `https://localhost:7145/SystemMessage/UpdateNoticeStatus?id=${msgId}`;
                 $.post(uri, function (result) {
@@ -73,8 +74,9 @@
                 }).fail(function (error) {
                     console.error('There was a problem with the fetch operation:', error);
                 });
-            } else {
-                console.log("沒是");
+            } 
+            else {
+                console.log("沒事");
             }
         });
 
@@ -114,7 +116,7 @@
                                     <label class="form-check-label" for="switchStatus${item.id}">${item.isRead ? "已讀" : "未讀"}</label>
                                     ${item.category === '檢舉'
                     ? `<button type="button" class="btn btn-warning btn-sm ms-3 fs-6" data-msgid="${item.id}">前往評論區</button>`
-                    : `<a class="btn btn-warning btn-sm ms-3" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>`
+                    : `<a class="btn btn-warning btn-sm ms-3 fs-6" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>`
                 }
                                 </div>
                             </div>

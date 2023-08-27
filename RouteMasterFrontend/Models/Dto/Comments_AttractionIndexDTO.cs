@@ -11,7 +11,9 @@
         public int Price { get; set; }
         public string CreateDate { get; set; }
         public bool IsHidden { get; set; }
-
         public IEnumerable<string>? ImageList { get; set; }
+        public string Profile { get; set; }
+        public bool? Gender { get; set; }
+        public string? Address { get; set; }
     }
 }
