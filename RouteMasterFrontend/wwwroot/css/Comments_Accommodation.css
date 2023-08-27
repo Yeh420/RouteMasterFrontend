@@ -1,33 +1,4 @@
-﻿.starIndex li {
-    color: #ccc;
-}
-
-.active {
-    color: #f90;
-}
-
-.panel li {
-    cursor: pointer;
-}
-
-    .panel li.blank {
-        color: #ccc;
-    }
-
-    .panel li.hover {
-        color: #ff0;
-    }
-
-    .panel li.active {
-        color: #f90;
-    }
-
-.tip,
-.result {
-    margin-top: 10px;
-    font-size: 1.2rem;
-}
-
+﻿
 .zoomIn {
     cursor: zoom-in;
     width: 80px;
@@ -41,4 +12,47 @@
 
 .input-group input[readonly] {
     background-color: white;
+}
+
+input[type="range"],
+input[type="range"]::-webkit-slider-runnable-track,
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+
+input[type="range"] {
+    height: 30px;
+    width: 200px;
+    cursor: pointer;
+    outline: none;
+    border: 3px solid #28a745;
+    margin-top: 5px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+     height: 6px;
+     width: 200px;
+     border-radius: 4px;
+     background: #FF9797;
+       
+}
+
+input[type="range"]::-webkit-slider-thumb{
+    position: relative;
+    height: 16px;
+    width: 16px;
+    margin-top: -5px;
+    background-color: #4285F4;
+    border-radius: 50%;
+
+}
+
+.number-input {
+    margin-left: 10px;
+    width: 65px;
+}
+
+.warnShow {
+    color: red;
+    font-size: 1.2em;
 }

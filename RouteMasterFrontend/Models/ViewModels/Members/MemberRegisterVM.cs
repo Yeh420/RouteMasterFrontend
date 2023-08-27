@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace RouteMasterFrontend.Models.ViewModels.Members
@@ -8,8 +9,8 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		public int Id { get; set; }
 
 		[Display(Name = "名")]
-		[Required]
-		[StringLength(50)]
+        [Required(ErrorMessage = "請填寫姓名")]
+        [StringLength(50)]
 		public string? FirstName { get; set; }
 
 
@@ -22,6 +23,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[Display(Name = "帳號")]
 		[Required]
 		[StringLength(30)]
+		[Remote(action: "CheckRepeatAccount", controller:"Members", AdditionalFields = nameof(Account))]
 		public string? Account { get; set; }
 
 
@@ -42,7 +44,8 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[Required]
 		//[StringLength(255)]
 		[EmailAddress(ErrorMessage = "Invalid Email Address")]
-		public string? Email { get; set; }
+        [Remote(action: "CheckRepeatEmail", controller: "Members", AdditionalFields = nameof(Email))]
+        public string? Email { get; set; }
 
 
 		[Display(Name = "電話號碼")]
