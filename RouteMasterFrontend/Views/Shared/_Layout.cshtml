@@ -113,6 +113,7 @@
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
+				@*					<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="CreateTravelVuePage">行程規劃</a></li>*@
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="PackageTourList">套裝行程</a></li>	
 									</ul>
 								</li>
@@ -221,10 +222,13 @@
 							<div class="col-lg-6">
 								<div class="menu">
 									<ul>
-										<li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">首頁</a></li>
-										<li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-										<li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
-										<li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
+										
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="Members" asp-action="MyMemberIndex">會員專區</a></li>
+										<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Accommodations" asp-action="Index">住宿</a></li>
+										<li class=""><a class="nav-link text-dark" asp-area="" asp-controller="Attractions" asp-action="Index">景點</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
+										<li><a class="nav-link text-dark" asp-area="" asp-controller="FAQ" asp-action="Index">常見問題</a></li>
+										
 									</ul>
 								</div>
 							</div>

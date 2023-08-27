@@ -12,17 +12,19 @@
     }
 
     body {
-    max-height:100%;
-    max-width:100%;
-    font-family: "Raleway", sans-serif;
-    overflow:hidden;
+        max-height:100%;
+        max-width:100%;
+        font-family: "Raleway", sans-serif;
+        overflow:hidden;
     }
 
     .container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+        top:0;
+        left:auto;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
     }
 
 
@@ -56,12 +58,12 @@
 
     .top:before {
     transform: rotate(45deg);
-    background: #FFCF78;
+    background: #FFBB66;
     }
 
     .top:after {
     transform: rotate(135deg);
-    background: #FFCF78;
+            background: #FFBB66;
     }
 
     .bottom:before {
@@ -71,7 +73,7 @@
 
     .bottom:after {
     transform: rotate(-135deg);
-    background: #00D6D6;
+            background: #A6FFFF;
     }
 
     .center {
@@ -114,12 +116,18 @@
     }
 
   
-    .header{
+    .container .logo img{
     position: absolute;
+    width:200px;
+    height:95px;
     top: 0;
     left: 0;
     z-index: 50;
     }
+
+        .g_id_signin{
+            margin-top:10px;
+        }
     </style>
 
 
@@ -129,7 +137,9 @@
 <body>  
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
-        <h1 class="header">RouteMaster</h1>
+        <div class="logo">
+        <a href="https://localhost:7145"><img src="~/SystemImages/Route-master-logo-black_0.png" /></a>
+        </div>
         <div class="top"></div>
         <div class="bottom"></div>
         <div class="center">
@@ -167,6 +177,10 @@
                  data-text="sign_in_with"
                  data-shape="pill"
                  data-logo_alignment="left">
+            </div>
+
+            <div>
+                <button type="button" id="quickLogin">Demo Account</button>
             </div>
         </div>
     </div>
@@ -212,5 +226,53 @@
                 });
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("loginForm");
+        const quickLogin = document.getElementById("quickLogin");
+
+        quickLogin.addEventListener("click", function () {
+
+            const defaultData = {
+                
+                Account: "LinHua",
+                Password:"12345"
+               
+            };
+
+            //跑過每一個屬性並賦值
+            for (const field in defaultData) {
+                if (defaultData.hasOwnProperty(field)) {
+                    const inputField = form.querySelector(`[name="${field}"]`);
+                    if (inputField) {
+                        inputField.value = defaultData[field];
+                    }
+                }
+            }
+
+            //Gender
+            const radioButtons = document.querySelectorAll('input[type="radio"][name="Gender"]');
+            radioButtons.forEach(radioButton => {
+                if (radioButton.value === "true") {
+                    radioButton.checked = true;
+                }
+            });
+
+            //Address
+            const selectElement = document.getElementById('region');
+            selectElement.value = "臺北市";
+            //for (let i = 0; i < selectElement.options.length; i++) {
+            //    if (selectElement.options[i].value === "臺北市") {
+            //        selectElement.selectedIndex = i;
+
+            //        break;
+            //    }
+            //}
+
+
+        });
+    });
+
 </script>
 
