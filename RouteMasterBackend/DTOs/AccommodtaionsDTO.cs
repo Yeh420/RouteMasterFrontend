@@ -14,8 +14,9 @@ namespace RouteMasterBackend.DTOs
         public TimeSpan? CheckIn { get; set; }
         public TimeSpan? CheckOut { get; set; }
         public string Score { get; set; }
+        public int Comments { get; set; }
+        public string Image { get; set; }
         public IEnumerable<AccommodationImage> Images { get; set; }
-        public IEnumerable<CommentsAccommodation> Comments { get; set; }
         public IEnumerable<Room> Rooms { get; set; }
         public IEnumerable<AccommodationServiceInfo> Services { get; set; }
     }

@@ -14,6 +14,7 @@ namespace RouteMasterBackend.DTOs
         public TimeSpan? CheckOut { get; set; }
         public string Score { get; set; }
         public int Comment { get; set; }
+        public decimal Price { get; set; }
         public IEnumerable<AccommodationServiceInfo> Services { get; set; }
     }
 }
