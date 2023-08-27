@@ -454,6 +454,7 @@ namespace RouteMasterFrontend.Controllers
                 return View("Checkout");
             }
             ProcessCheckout(memberId, note);
+           
             return RedirectToAction("Index", "Ecpay", new { selectedCouponId = couponId });
           
         }
@@ -501,9 +502,9 @@ namespace RouteMasterFrontend.Controllers
                     {
                         MemberId = memberId,
                         PaymentMethodId = 1,
-                        PaymentStatusId = 1,
+                        PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = 2,
+                        CouponsId = 1,
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal
