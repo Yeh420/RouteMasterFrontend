@@ -17,12 +17,14 @@
 	<link href="~/css/owl-carousel.css" rel="stylesheet" />
 	<link href="~/css/tooplate-artxibition.css" rel="stylesheet" />
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
-
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200&display=swap" rel="stylesheet">
 
 	<style>
-		/*html >*{
-			font-family: Iansui-Regular;
-		}*/
+		html{
+			font-family: 'Outfit', sans-serif;
+		}
 		.header-area .main-nav .logo {
 			display: flex;
 			align-items: center;
@@ -111,6 +113,7 @@
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="Activities" asp-action="Index">活動</a></li>
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="ExtraServices" asp-action="Index">服務</a></li>
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="Create">行程規劃</a></li>
+				@*					<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="CreateTravelVuePage">行程規劃</a></li>*@
 									<li><a class="nav-link text-dark" asp-area="" asp-controller="TravelPlans" asp-action="PackageTourList">套裝行程</a></li>	
 									</ul>
 								</li>

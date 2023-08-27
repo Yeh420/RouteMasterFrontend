@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MessagePack.Formatters;
 using Microsoft.AspNetCore.Cors;
@@ -20,10 +21,7 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class TravelPlansController : ControllerBase
     {
-        //放棄
-        //todo  儲存行程表
-        //todo  會員專區行程表呈現
-
+ 
 
 
 
@@ -35,6 +33,46 @@ namespace RouteMasterBackend.Controllers
         }
 
         // GET: api/TravelPlans
+
+
+
+
+        [HttpGet]
+        [Route("Get/AllAttractionsInfo")]
+        public async Task<IEnumerable<SelectAttractionAllInfoDto>> GetAllAttractionsInfo()
+        {
+
+            //景點選擇處disabled綁定屬性判斷是否可以點選
+
+        
+            var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
+            {
+
+
+                AttractionId = x.Id,
+                AttractionName = x.Name,
+                StayHours=(int)Math.Round(_context.CommentsAttractions.Where(c=>c.AttractionId==x.Id&&c.StayHours!=null).Select(c=>c.StayHours.Value).Average()),
+                PositionX=x.PositionX,
+                PositionY=x.PositionY,
+
+                ExtListInAtt=x.ExtraServices.Select(e=>new ExtInAtt
+                {
+                    ExtId=e.Id,
+                    ExtName=e.Name,
+                }).ToList(),
+
+               ActListInAtt=x.Activities.Select(ac=>new ActInAtt
+                {
+                    ActId=ac.Id,
+                    ActName=ac.Name,    
+                }). ToList(),
+            });
+
+
+           return data;
+
+
+        }
 
         //仿造response
         [HttpGet]

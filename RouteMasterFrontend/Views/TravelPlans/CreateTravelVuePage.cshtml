@@ -1,0 +1,277 @@
+﻿@{
+    int cartIdFromCookie = int.Parse(Context.Request.Cookies["CartId"] ?? "0");
+    var memberIdFromCookie = Context.Request.Cookies["Id"] ?? "0";
+}
+
+@section Styles{
+    <style>
+        .item-container button {
+            position: relative; /* 使按钮成为相对定位的容器 */
+        }
+
+            .item-container button:hover i {
+                opacity: 1; /* 鼠标悬停时设置 i 元素的透明度为 1 */
+            }
+
+            .item-container button i {
+                opacity: 0; /* 初始透明度为 0 */
+                transition: opacity 0.3s; /* 添加过渡效果 */
+            }
+    </style>
+}
+
+
+
+<div id="app">    
+
+
+    <div >
+        <button class="btn btn-primary dropdown-toggle" @@click="toggleAllAttractionContainer">顯示/隱藏</button>
+        <template v-if="AllAttractionContainerStatus">
+            <div>
+                <div class="d-flex row max-height-containers"
+                     style="max-height:500px; overflow-y:auto">
+                    <div class="col-3" v-for="attObj in allAttractions" :key="attObj.attractionId">
+                        <div class="item-container m-3">                     
+                            <button  class="btn btn-outline-secondary" @@click="addAttractionToDistanceMatrixArray(attObj)">{{ attObj.attractionName }}<i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+ 
+
+    <br />
+
+
+
+    <div class="d-flex row">
+        <div class="col-6">
+                     
+
+
+        </div>
+        <div class="col-6 d-flex row">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @@click="setRightSidePage(1)">已選擇景點</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @@click="setRightSidePage(2)">計算路徑</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @@click="setRightSidePage(3)">其他</a>
+                </li>
+            </ul>
+
+            
+
+            <template v-if="rightSidePage==1">
+                <div class="d-flex">
+                    <div class="m-1">
+                        <label class="m-1 p-1">選擇交通模式</label>
+                        <select class="m-1 p-1" v-model="selectedTravelMode">
+                            <option v-for="travelObj in travelModes" :key="travelObj.id" :value="travelObj.value">
+                                {{ travelObj.modeName }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="m-1">
+                        <button class="btn btn-outline-secondary" @@click="callDistanceMatrix()"><i class="fa-solid fa-play"></i> 開始進行排程</button>
+                    </div>
+                </div>
+                <div v-for="selectedAttObj in selectedAttractions" :key="selectedAttObj.attId" class="col-5 m-2 p-2 item-container" >
+                    <div>
+                        <button class="btn btn-outline-secondary"
+                                @@click="removeAttractionFromDistanceMatrixArray(selectedAttObj)">
+                            {{ selectedAttObj.attName }} <i class="fa-solid fa-x"></i>
+                        </button>
+                    </div>
+                </div>
+               
+            </template>
+            <template v-else-if="rightSidePage==2">
+                <div >計算結果</div>
+            </template>
+
+
+
+
+            <template v-else>
+                <div >其他內容</div>
+            </template>
+         
+            
+
+
+           
+        </div>    
+    </div>
+
+
+
+    <div>未拜訪{{unvisitedAttraction}}
+        <div v-for="attObj in unvisitedAttraction" :key="attObj.attId">
+            <div>{{attObj.attName}}</div>
+            <button  @@click="AddToVisitedArray(attObj)">加入</button>
+        </div>        
+    </div>
+
+    <div>已拜訪{{visitedAttraction}}</div>
+
+
+</div>
+
+
+@section Scripts{
+    
+@*    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0&callback=initMap"></script>   *@
+    <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script>
+
+        let baseAddress = "https://localhost:7251";
+        let vueApp ={
+            data(){
+                return{
+                    memberId: @cartIdFromCookie,
+                    cartId: @memberIdFromCookie,
+                    allAttractions:[],
+                    AllAttractionContainerStatus:true,
+                    selectedAttractions:[],
+                    dataFromDistanceMatrix:[],
+                    travelModes: [{ id: 1, modeName: "開車", value: "DRIVING" }, { id: 2, modeName: "步行", value: "WALKING" }],
+                    selectedTravelMode:"DRIVING",
+                    rightSidePage: 1,
+                    unvisitedAttraction:[],
+                    visitedAttraction:[],
+                };
+            },
+
+            mounted: async function () {
+                let _this=this;
+                await  _this.getAllAttractions();
+
+            },
+            computed:{
+                sendToGoogleMapsApi:function(){
+                    return this.selectedAttractions.map(attraction=>({
+                        lat: parseFloat(attraction.positionX),
+                        lng: parseFloat(attraction.positionY)
+                    }));
+                }
+            },
+            methods:{
+                getAllAttractions:async function(){
+                   
+                  await  axios.get(`${baseAddress}/api/TravelPlans/Get/AllAttractionsInfo`)
+             
+                    .then(response=>{                       
+                            this.allAttractions=response.data;
+                    })
+                    .catch(err=>{
+                        alert(err)
+                    })
+                },
+                toggleAllAttractionContainer:function(){
+                    this.AllAttractionContainerStatus = !this.AllAttractionContainerStatus;
+                },
+                addAttractionToDistanceMatrixArray:function(attObj){
+
+                    if (this.sendToGoogleMapsApi.length == 10) {
+                       alert("至多選擇十個項目進行排序，請移除其他項目後再加入")
+                    }else{
+                        if (!this.selectedAttractions.some(selAttObj => selAttObj.attId == attObj.attractionId)) {
+                            this.selectedAttractions.push({ attId: attObj.attractionId, attName: attObj.attractionName, positionX: attObj.positionX, positionY: attObj.positionY })
+                        } else {
+                            alert('已存在該景點')
+                        }
+                    }                  
+                },
+                removeAttractionFromDistanceMatrixArray: function (selectedAttObj) {
+                    const index = this.selectedAttractions.findIndex(obj => obj.attId === selectedAttObj.attId);
+                    if (index !== -1) {
+                        this.selectedAttractions.splice(index, 1);
+                    }else{
+                        alert('欲移除之項目不存在')
+                    }
+                },
+                callDistanceMatrix:async function(){
+
+                    if (this.sendToGoogleMapsApi.length<2){
+                        alert("請選擇至少兩個景點")
+                    }else{
+
+                        const service = new google.maps.DistanceMatrixService();
+
+                        await service.getDistanceMatrix(
+                            {
+                                origins: this.sendToGoogleMapsApi,
+                                destinations: this.sendToGoogleMapsApi,
+                                travelMode: this.selectedTravelMode,
+                                unitSystem: google.maps.UnitSystem.METRIC,
+                                avoidHighways: false,
+                                avoidTolls: false,
+                            },
+                            (response, status) => {
+                                if (status === "OK") {
+                                    console.log(response);
+                                    this.dataFromDistanceMatrix = [];
+
+
+                                    for (let i = 0; i < response.rows.length; i++) {
+                                        for (let j = 0; j < response.rows[i].elements.length; j++) {
+                                            this.dataFromDistanceMatrix.push({
+                                                start: this.selectedAttractions[i],
+                                                end: this.selectedAttractions[j],
+                                                distance: response.rows[i].elements[j].distance,
+                                                duration: response.rows[i].elements[j].duration
+                                            })
+                                        }
+                                    }
+                                } else {
+                                    console.error("距離矩陣計算失敗，原因：" + status);
+                                }
+                            }
+                        );
+
+
+
+
+
+                    }
+
+
+                
+                    this.unvisitedAttraction = this.selectedAttractions;
+                    this.visitedAttraction=[];
+                },
+                AddToVisitedArray: function (attObj){
+                    const targetIndex = this.unvisitedAttraction.findIndex(obj => obj.attId === attObj.attId)
+                    this.unvisitedAttraction.splice(targetIndex,1);
+                    this.visitedAttraction.push(attObj);
+                },
+
+                setRightSidePage:function(number){
+                    console.log('設定數字啦')
+                    console.log(number);
+                    this.rightSidePage=number;
+                }
+
+
+            }
+
+        };
+
+        let app = Vue.createApp(vueApp).mount('#app');
+
+
+
+    </script>
+}

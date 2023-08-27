@@ -86,23 +86,25 @@
                 <input asp-for="CellPhoneNumber" class="form-control" placeholder="電話"/>
                 <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                @*<label asp-for="Address" class="control-label"></label>*@
+
+            <div class="form-group">              
                 <label>地區</label>
+
+                <input asp-for="Address" class="form-control" id="combinedAddress" style="display:none" />
                 <select asp-for="Address" id="region" name="Address" class="form-control">
                     <option value="">請選擇</option>
                     @foreach (var region in ViewBag.Regions)
                     {
-                        <option value="@region.Name">@region.Name</option>
+                        <option value="@region.Id">@region.Name</option>
                     }
+            
                 </select>
-                <span asp-validation-for="Address" class="text-danger"></span>
-         
-                @*<select asp-for="Address" id="town" name="Address" class="form-control">
-                    <option value="">請選擇鄉鎮</option>
+                <select asp-for="Address" id="town" name="Address" class="form-control">
+                    <option value="">請先選縣市</option>
                 </select>
-                <span asp-validation-for="Address" class="text-danger"></span>*@
+                <span asp-validation-for="Address" class="text-danger"></span>        
             </div>
+
             <div class="form-group radio-container">
             <label asp-for="Gender" class="control-label"></label>
             <div class="form-group form-check">
@@ -126,6 +128,8 @@
                         
                     </label>
                 </div>
+                
+
                 <div class="form-check">
                     <input type="radio" id="radioB" name="option" value="B" required>推薦大頭貼<br>
                     <label class="form-check-label" for="flexRadioDefault2">
@@ -140,7 +144,7 @@
                 </div>
 
                 <div id="divB" style="display: none;">
-                    <h3>RouteMaster精美大頭貼</h3>
+                    <h3>RouteMaster大頭貼</h3>
                     <ul class="image-list">
                         <li>
                             <label>
@@ -197,13 +201,13 @@
 
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
-            
+            <div id="imagePreview"></div>
 
-            <div class="form-group form-check">
+            @*<div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
                 </label>
-            </div>
+            </div>*@
 
             <div>
                 <button type="button" id="quickRegiter">專題用註冊</button>
@@ -231,6 +235,8 @@
         const radioB = document.getElementById("radioB");
         const divB = document.getElementById("divB");
         const fileInput = document.querySelector('input');
+        const imageInput = document.getElementById('facePhotoInput');
+        const imagePreview = document.getElementById('imagePreview');
 
         radioA.addEventListener("click", function () {
             // 隱藏 Div B 並顯示 Div A
@@ -256,23 +262,17 @@
             
         });
 
+        $('input[name="selectedImage"]').click(function () {
+            // 取得選取的radio圖片的src屬性
+            var src = $(this).siblings('img.default-image').attr('src');
 
+            // 處理檔名
+            var nameAr = src.split('/');
+            var fileName = nameAr[nameAr.length - 1];
 
-
-            // 在所有的radio input中加上點選事件
-            $('input[name="selectedImage"]').click(function () {
-                // 取得選取的radio圖片的src屬性
-                var src = $(this).siblings('img.default-image').attr('src');
-
-                // 處理檔名
-                var nameAr = src.split('/');
-                var fileName = nameAr[nameAr.length - 1];
-
-                //alert(fileName);
-            $('#sysImg').val(fileName);
-            });
-
-
+            //alert(fileName);
+        $('#sysImg').val(fileName);
+        });
 
         document.addEventListener("DOMContentLoaded", function () {
             
@@ -333,7 +333,64 @@
             }     
         })
 
-    </script>
-    
+        imageInput.addEventListener('change', function () {
+            // 清空容器
+            imagePreview.innerHTML = '';
+            
+            //放進預覽
+            
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(imageInput.files[0]); 
+            console.log(img.src);
+            img.classList.add('preview-image');
+            imagePreview.appendChild(img); 
+            
+        });
 
+        document.addEventListener("DOMContentLoaded",function(){
+            document.querySelector("#region").addEventListener("change",function(){
+                var regionId = parseInt(document.querySelector("#region").value);
+                var townDropdown = document.getElementById("town");
+                townDropdown.innerHTML = "";
+
+                console.log(regionId);
+
+                fetch("https://localhost:7145/Members/ShowTownSelect", {
+
+                method:"POST",
+                body: JSON.stringify(regionId),
+                headers: { 'Content-Type': 'application/json' },
+               
+                }).then(response => response.json())
+                .then(data=>{
+                        data.forEach(function (town) {
+                        var option = document.createElement("option");
+                        option.value = town.townId;
+                        option.textContent = town.name;
+                        townDropdown.appendChild(option);
+                        });
+                })
+                .catch(error => {
+                 console.error("An error occurred:", error);
+               });
+
+                
+            });
+        });
+
+        const regionSelect = document.getElementById('region');
+        const townSelect = document.getElementById('town');
+        const combinedAddressInput = document.getElementById('combinedAddress');
+
+        regionSelect.addEventListener('change', updateCombinedAddress);
+        townSelect.addEventListener('change', updateCombinedAddress);
+
+        function updateCombinedAddress() {
+            const selectedRegion = regionSelect.options[regionSelect.selectedIndex].text;
+            const selectedTown = townSelect.options[townSelect.selectedIndex].text;
+
+            const combinedAddress = `${selectedRegion}${selectedTown}`;
+            combinedAddressInput.value = combinedAddress;
+        }
+    </script>
 }
