@@ -9,27 +9,27 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		public int Id { get; set; }
 
 		[Display(Name = "名")]
-        [Required(ErrorMessage = "請填寫姓名")]
+        [Required(ErrorMessage = "必填")]
         [StringLength(50)]
 		public string? FirstName { get; set; }
 
 
 		[Display(Name = "姓")]
-		[Required]
+		[Required(ErrorMessage = "必填")]
 		[StringLength(50)]
 		public string? LastName { get; set; }
 
 
 		[Display(Name = "帳號")]
-		[Required]
+		[Required(ErrorMessage = "必填")]
 		[StringLength(30)]
 		[Remote(action: "CheckRepeatAccount", controller:"Members", AdditionalFields = nameof(Account))]
 		public string? Account { get; set; }
 
 
 		[Display(Name = "密碼")]
-		[Required]
-		[StringLength(20)]
+        [Required(ErrorMessage = "必填")]
+        [StringLength(20)]
 		[DataType(DataType.Password)]
 		public string? Password { get; set; }
 
@@ -41,16 +41,16 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "電子信箱")]
-		[Required]
-		//[StringLength(255)]
-		[EmailAddress(ErrorMessage = "Invalid Email Address")]
+        [Required(ErrorMessage = "必填")]
+        //[StringLength(255)]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         [Remote(action: "CheckRepeatEmail", controller: "Members", AdditionalFields = nameof(Email))]
         public string? Email { get; set; }
 
 
 		[Display(Name = "電話號碼")]
-		[Required]
-		[StringLength(10, MinimumLength = 10, ErrorMessage = "Invalid Phone Number")]
+        [Required(ErrorMessage = "必填")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Invalid Phone Number")]
 		public string? CellPhoneNumber { get; set; }
 
 
@@ -61,8 +61,8 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "性別")]
-		[Required]
-		public bool Gender { get; set; }
+        [Required(ErrorMessage = "必填")]
+        public bool Gender { get; set; }
 
 
 		//[DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]

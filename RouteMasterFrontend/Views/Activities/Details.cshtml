@@ -397,7 +397,7 @@
                                 alert(data.message);
                                 this.reloadCartItems();
                             }else{
-                                alert('加入購物車失敗');
+                                alert(data.message || '商品已售完');
                             }
                         })
                     .catch(error => {
