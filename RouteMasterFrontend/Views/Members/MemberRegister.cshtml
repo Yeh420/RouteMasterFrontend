@@ -228,7 +228,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+ 
     <script>
         const radioA = document.getElementById("radioA");
         const divA = document.getElementById("divA");
@@ -328,7 +329,7 @@
         document.querySelector('#formSubmitBtn').addEventListener('click', function (e) {
    
             if (document.querySelector('#sysImg').value =="" && document.querySelector('#facePhotoInput').value==""){
-                alert('請上傳本地圖片或選擇系統選項');
+                swal("大頭貼尚未選擇!", "可以上傳或是選擇內建大頭貼哦!", "error", { button: "返回" });
                 e.preventDefault();
             }     
         })

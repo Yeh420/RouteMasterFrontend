@@ -371,6 +371,10 @@ namespace RouteMasterFrontend.Controllers
 
             Member myMember = _context.Members.First(m => m.Account == userAccount);
 
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             if (user.Identity.IsAuthenticated)
             {
@@ -445,7 +449,29 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        [AcceptVerbs("GET")]
+        public IActionResult CheckRepeatAccount(string Account)
+        {
+            var isAccountReapeat = _context.Members.FirstOrDefault(m=>m.Account == Account);
 
+            if (isAccountReapeat != null)
+            {
+                return Json($"{Account} 已經被註冊過囉，請換一個.");
+            }
+            return Json($"{Account} 這個帳號可以使用");
+        }
+
+        [AcceptVerbs("GET")]
+        public IActionResult CheckRepeatEmail (string Email)
+        {
+            var isEmailReapeat = _context.Members.FirstOrDefault(m => m.Email == Email);
+
+            if (isEmailReapeat != null)
+            {
+                return Json($"{Email} 已經被註冊過囉，請換一個.");
+            }
+            return Json($"{Email} 這個信箱可以使用");
+        }
 
         //會員登出
         [HttpGet]
@@ -454,6 +480,16 @@ namespace RouteMasterFrontend.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("LogoutSuccess", "Members");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditPasswordLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 返回 JSON 响应
+            return Json(new { message = "登出成功" });
         }
 
         //登出成功畫面
@@ -564,7 +600,12 @@ namespace RouteMasterFrontend.Controllers
             member.Address=dto.address;
             member.Gender=dto.gender;
             member.Birthday=dto.birthday;
-            member.IsSuscribe=dto.isSuscribe;
+            member.IsSuscribe = dto.isSuscribe;
+
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             //_context.Entry(member).State =EntityState.Modified;
             _context.SaveChanges();
@@ -584,6 +625,7 @@ namespace RouteMasterFrontend.Controllers
 			{
 				return NotFound("Member not found");
 			}
+
 			var orders = await _context.Orders
 		    .Where(o => o.MemberId == memberId)
 		    .Include(x => x.OrderExtraServicesDetails)
@@ -618,6 +660,7 @@ namespace RouteMasterFrontend.Controllers
 					ExtraServiceId = es.ExtraServiceId,
 					ExtraServiceName = es.ExtraServiceName,
 					ExtraServiceProductId = es.ExtraServiceProductId,
+                   
 					Date = es.Date,
 					Price = es.Price,
 					Quantity = es.Quantity
@@ -630,6 +673,7 @@ namespace RouteMasterFrontend.Controllers
 					ActivityId = ad.ActivityId,
 					ActivityName = ad.ActivityName,
 					ActivityProductId = ad.ActivityProductId,
+                   
 					Date = ad.Date,
 					StartTime = ad.StartTime,
 					EndTime = ad.EndTime,
@@ -648,7 +692,7 @@ namespace RouteMasterFrontend.Controllers
 					RoomName = ac.RoomName,
 					CheckIn = (DateTime)ac.CheckIn,
 					CheckOut = (DateTime)ac.CheckOut,
-					RoomPrice = (decimal)ac.RoomPrice,
+					RoomPrice = ac.RoomPrice,
 					Quantity = ac.Quantity,
 					Note = ac.Note
 				}).ToList()

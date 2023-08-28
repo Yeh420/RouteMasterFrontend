@@ -3,6 +3,7 @@
     public class Cart_AccommodationDetailDto
     {
         public int Id { get; set; }
+        public int RoomId { get; set; }
         public string RoomName { get; set; }
         public string AccommodationName { get; set; }
         public string RoomTypeName { get; set; }

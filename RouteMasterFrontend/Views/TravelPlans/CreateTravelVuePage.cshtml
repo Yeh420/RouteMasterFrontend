@@ -17,6 +17,39 @@
                 opacity: 0; /* 初始透明度为 0 */
                 transition: opacity 0.3s; /* 添加过渡效果 */
             }
+
+
+        .attraction-dot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+       
+        .vertical-line {
+            width: 4px; /* 线的宽度 */
+            height: 70px; /* 线的高度 */
+            background-color: gray; /* 线的颜色 */
+            
+        }
+
+        .table {
+            width: 100%; /* 让整个表格宽度充满其容器 */
+            table-layout: fixed; /* 使用固定的表格布局 */
+        }
+
+            .table th,
+            .table td {
+                width: 50%; 
+                padding: 4px; /* 添加一些内边距，以确保内容不会紧贴边缘 */
+            }
+
+            .table input[type="datetime-local"] {
+                text-align:center;
+                width: 100%; /* 让输入框宽度充满其父元素（即<td>） */
+                box-sizing: border-box; /* 包含边框在内，以不增加输入框的宽度 */
+            }
     </style>
 }
 
@@ -33,7 +66,7 @@
                      style="max-height:500px; overflow-y:auto">
                     <div class="col-3" v-for="attObj in allAttractions" :key="attObj.attractionId">
                         <div class="item-container m-3">                     
-                            <button  class="btn btn-outline-secondary" @@click="addAttractionToDistanceMatrixArray(attObj)">{{ attObj.attractionName }}<i class="fa-solid fa-plus"></i></button>
+                            <button class="btn btn-outline-secondary" v-bind:disabled="selectedAttractions.some(att=>att.attId==attObj.attractionId)" @@click="addAttractionToDistanceMatrixArray(attObj)">{{ attObj.attractionName }}<i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -47,25 +80,109 @@
 
 
     <div class="d-flex row">
-        <div class="col-6">
-                     
+        <div class="col-8 row">
+            <div class="col-10">
+                <label>設定起始時間</label>
+                <input v-model="formattedTravelBeginTime" type="datetime-local" />
+                <div class="row">                         
+                    <div class="col-3">
+             
+                        <div v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" class="attraction-dot-container">
+                            <div class="vertical-line " v-if="index > 0"></div>
+                            <div><i style="font-size: 35px; " class="fa-solid fa-location-dot "></i></div>
+                        </div>
+                    </div>
+                    <div class="col-9">                       
+                            <br />
+                            <table class="table">
+                                <thead class="w-100">
+                                    <tr>                                                          
+                                        <th>抵達時間</th>
+                                        <th>離開時間</th>
+                                    </tr>
+                                </thead>
+                            <tbody>
+                                <tr v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" style="height: 100px">                                   
+                                    <td>
+                                        <input v-model="attraction.startTime" type="datetime-local" />
+                                        <div style="text-align:center">{{attraction.attName}}</div>
+                                        <ul class="checkbox-list">
+                                            <li v-for="extObj in attraction.extList">
+                                                <label>
+                                                    <input type="checkbox" v-bind:value="extObj.extId"  @@change="setExtProductsInfo(extObj,$event)" /> {{extObj.extName}}
+                                                </label>
+                                                <div style="transform: translateX(20px);" v-if="extObj.extProducts!=''">
+                                                    <ul class="checkbox-list">
+                                                        <li v-for="extProduct in extObj.extProducts">
+                                                            <label>
+                                                                <input type="number" v-model="extProduct.inputQuantity" value="1" :min="1" :max="extProduct.quantity" @@input="handleExtProductInputQuantityChange(extProduct,$event)" />
+                                                                <input type="checkbox" v-bind:value="extProduct.extraServiceProductId" @@change="chooseExtraServiceProductObject(extProduct,$event)" /> {{extProduct.activityName}}
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <input v-model="attraction.endTime" type="datetime-local" />
+                                        <br />
+                                        <ul class="checkbox-list">
+                                            <li v-for="actObj in attraction.actList">
+                                                <label>
+                                                    <input type="checkbox" v-bind:value="actObj.actId"  @@change="setActProductsInfo(actObj,$event)" /> {{actObj.actName}}
+                                                </label>
+                                                <div  style="transform: translateX(20px);" v-if="actObj.actProducts!=''">
+                                                    <ul class="checkbox-list">
+                                                        <li v-for="actProduct in actObj.actProducts">
+                                                      @*      <label v-if="selectedActivityProducts.some(pro=>pro.actProductId==actProduct.activityProductId)">
+                                                                <input type="number" v-model="actProduct.inputQuantity"  :min="1" :max="actProduct.quantity" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
+                                                                <input type="checkbox" checked v-bind:value="actProduct.activityProductId" @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
+                                                            </label>*@
+                                                            <label>
+                                                                <input type="number" v-model="actProduct.inputQuantity" value="1" :min="1" :max="actProduct.quantity" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
+                                                                <input type="checkbox" v-bind:value="actProduct.activityProductId" @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
+                                                            </label>                                                         
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>                                            
+                                        </ul>                                                                                                                                           
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>                                     
+                         </div>                   
+                </div>
 
 
+
+
+
+            </div>
+            <div class="col-2">
+                <div v-for="(visitedAttObj,index) in visitedAttraction "
+                     class="border border-primary rounded-1 m-1 p-2 w-100"
+                     :key="visitedAttObj.attId"
+                     style="width:120px"
+                     @@drop="drop(index,$event)"
+                     @@dragover="allowDrop($event)">
+                    <div style="text-align:center;justify-content:center; cursor: grab;" draggable="true" @@dragstart="drag(visitedAttObj,index,$event)">{{index+1}}. {{visitedAttObj.attName}}</div>
+                </div>
+            </div>
         </div>
-        <div class="col-6 d-flex row">
+        <div class="col-4 d-flex row">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" @@click="setRightSidePage(1)">已選擇景點</a>
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==1 }" href="#" @@click="setRightSidePage(1)">已選擇{{selectedAttractions.length}}景點</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" @@click="setRightSidePage(2)">計算路徑</a>
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==2 }" href="#" @@click="setRightSidePage(2)">計算路徑</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" @@click="setRightSidePage(3)">其他</a>
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==3 }" href="#" @@click="setRightSidePage(3)">未排程景點</a>
                 </li>
-            </ul>
-
-            
+            </ul>           
 
             <template v-if="rightSidePage==1">
                 <div class="d-flex">
@@ -78,7 +195,7 @@
                         </select>
                     </div>
                     <div class="m-1">
-                        <button class="btn btn-outline-secondary" @@click="callDistanceMatrix()"><i class="fa-solid fa-play"></i> 開始進行排程</button>
+                        <button class="btn btn-outline-secondary" @@click="callDistanceMatrix()"><i class="fa-solid fa-play"></i> 取得資料進行排程</button>
                     </div>
                 </div>
                 <div v-for="selectedAttObj in selectedAttractions" :key="selectedAttObj.attId" class="col-5 m-2 p-2 item-container" >
@@ -88,38 +205,30 @@
                             {{ selectedAttObj.attName }} <i class="fa-solid fa-x"></i>
                         </button>
                     </div>
-                </div>
-               
+                </div>               
             </template>
+
             <template v-else-if="rightSidePage==2">
                 <div >計算結果</div>
             </template>
 
 
-
-
             <template v-else>
-                <div >其他內容</div>
-            </template>
-         
-            
-
-
-           
+                <div>         
+                    <div v-for="attObj in unvisitedAttraction" :key="attObj.attId">
+                        <div class="badge bg-secondary text-wrap m-2 p-2" style="width: 15rem;font-size:20px">{{attObj.attName}}</div>
+                        <button class="m-1 p-1 btn btn-outline-secondary" @@click="AddToVisitedArray(attObj);setSortedAttractionsWithTime()">加入</button>
+                    </div>                 
+                </div>
+            </template>                           
         </div>    
     </div>
 
 
 
-    <div>未拜訪{{unvisitedAttraction}}
-        <div v-for="attObj in unvisitedAttraction" :key="attObj.attId">
-            <div>{{attObj.attName}}</div>
-            <button  @@click="AddToVisitedArray(attObj)">加入</button>
-        </div>        
-    </div>
+    <div>{{selectedActivityProducts}}</div>
 
-    <div>已拜訪{{visitedAttraction}}</div>
-
+    <div>{{selectedExtraServiceProducts}}</div>
 
 </div>
 
@@ -142,15 +251,117 @@
                 return{
                     memberId: @cartIdFromCookie,
                     cartId: @memberIdFromCookie,
+                    rightSidePage: 1,
+
+                    AllAttractionContainerStatus:false,
                     allAttractions:[],
-                    AllAttractionContainerStatus:true,
-                    selectedAttractions:[],
-                    dataFromDistanceMatrix:[],
+
                     travelModes: [{ id: 1, modeName: "開車", value: "DRIVING" }, { id: 2, modeName: "步行", value: "WALKING" }],
                     selectedTravelMode:"DRIVING",
-                    rightSidePage: 1,
-                    unvisitedAttraction:[],
+
+                    //選擇景點
+                    selectedAttractions:[],
+                    //從MapsApi取得的資料
+                    dataFromDistanceMatrix: [
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "137 公里", "value": 136574 },
+                        "duration": { "text": "2 小時 48 分鐘", "value": 10092 } },
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "125 公里", "value": 124620 },
+                        "duration": { "text": "2 小時 34 分鐘", "value": 9268 } },                         
+                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "53.6 公里", "value": 53597 },
+                        "duration": { "text": "1 小時 1 分鐘", "value": 3687 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "distance": { "text": "136 公里", "value": 136412 },
+                        "duration": { "text": "2 小時 45 分鐘", "value": 9891 } },
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "56.5 公里", "value": 56480 },
+                        "duration": { "text": "1 小時 25 分鐘", "value": 5121 } },                        
+                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "175 公里", "value": 174979 },
+                        "duration": { "text": "3 小時 18 分鐘", "value": 11903 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                        "distance": { "text": "124 公里", "value": 123932 },
+                        "duration": { "text": "2 小時 32 分鐘", "value": 9126 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                        "distance": { "text": "55.6 公里", "value": 55603 },
+                        "duration": { "text": "1 小時 25 分鐘", "value": 5094 } },                         
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } },                        
+                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "162 公里", "value": 162498 },
+                        "duration": { "text": "3 小時 6 分鐘", "value": 11138 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                        "distance": { "text": "54.8 公里", "value": 54779 }, 
+                        "duration": { "text": "1 小時 3 分鐘", "value": 3771 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                        "distance": { "text": "176 公里", "value": 175540 }, 
+                        "duration": { "text": "3 小時 22 分鐘", "value": 12146 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 }, 
+                        "distance": { "text": "164 公里", "value": 163586 }, 
+                        "duration": { "text": "3 小時 9 分鐘", "value": 11322 } },                         
+                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                        "distance": { "text": "1 公尺", "value": 0 },
+                        "duration": { "text": "1 分鐘", "value": 0 } }],
+
+
+
+
+
+                    //dataFromDistanceMatrix:[],
+
+
+
+
+
+                    travelBeginTime: new Date(),
+
+                    //未拜訪景點
+                    unvisitedAttraction: [{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+                    //visitedAttraction: 
+                    //[
+                    //{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //{ "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                    //{ "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //{ "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+
+
+                    //已拜訪景點
                     visitedAttraction:[],
+
+                    sortedAttractionsWithTime:[],
+
+
+
+                    selectedActivityProducts:[],
+                    selectedExtraServiceProducts:[],
                 };
             },
 
@@ -165,7 +376,79 @@
                         lat: parseFloat(attraction.positionX),
                         lng: parseFloat(attraction.positionY)
                     }));
-                }
+                },
+                sortedAttractions: function () {
+
+                   return  this.visitedAttraction.map(visitedItem=>{
+
+                        const matchingItem = this.allAttractions.find(allAttObj => allAttObj.attractionId == visitedItem.attId)
+
+
+                        if (matchingItem){
+                            return{
+                                attId: visitedItem.attId,
+                                attName: visitedItem.attName,
+                                stayHours: matchingItem.stayHours,
+                                extList: matchingItem.extListInAtt,
+                                actList: matchingItem.actListInAtt,
+                                startTime:"",
+                                endTime:"",
+                            };
+                        }
+                     });
+                },
+
+
+                selectedPathesOrderByAttractions:function(){
+                    const pathes = [];
+
+                    for (let i = 1; i < this.sortedAttractions.length; i++) {
+                        const start = {
+                            attId: this.sortedAttractions[i - 1].attId,
+                            attName: this.sortedAttractions[i - 1].attName,
+                        };
+
+                        const end = {
+                            attId: this.sortedAttractions[i].attId,
+                            attName: this.sortedAttractions[i].attName,
+                        };
+
+                        const matchingData = this.dataFromDistanceMatrix.find(item => {
+                            return item.start.attId === start.attId && item.end.attId === end.attId;
+                        });
+
+                        if (matchingData) {
+                            const path = {
+                                start: start,
+                                end: end,
+                                distance: matchingData.distance,
+                                duration: matchingData.duration,
+                            };
+
+                            pathes.push(path);
+                        }
+                    }
+
+                    return pathes;
+                },
+                formattedTravelBeginTime: {
+                    get() {
+                        // 將日期轉換為 datetime-local 字串格式
+                        const year = this.travelBeginTime.getFullYear();
+                        const month = String(this.travelBeginTime.getMonth() + 1).padStart(2, '0');
+                        const day = String(this.travelBeginTime.getDate()).padStart(2, '0');
+                        const hours = String(this.travelBeginTime.getHours()).padStart(2, '0');
+                        const minutes = String(this.travelBeginTime.getMinutes()).padStart(2, '0');
+
+                        return `${year}-${month}-${day}T${hours}:${minutes}`;
+                    },
+                    set(value) {
+                        // 將 datetime-local 字串轉換為日期
+                        this.travelBeginTime = new Date(value);
+                    },
+                },
+
+                
             },
             methods:{
                 getAllAttractions:async function(){
@@ -240,33 +523,296 @@
                                 }
                             }
                         );
+                    }                
+                    this.unvisitedAttraction = this.selectedAttractions;
+
+                    //清空目前結果??
+                    //不一定要清空
+                    //好像還是得清空，不然行為判斷邏輯要另外判斷是否已經visited
+                    this.visitedAttraction=[];
+                },
 
 
+
+
+               drag: function (visitedAttObj,index, event) {
+                    console.log('drag啦啦啦')
+                    event.dataTransfer.setData('visitedAttObj', JSON.stringify(visitedAttObj));
+                    event.dataTransfer.setData('currentIndex', index);
+               },
+
+               allowDrop:function(e){                 
+                    e.preventDefault();
+               },
+
+
+               drop: function (targetIndex, event) {
+                    event.preventDefault();
+                    const data = JSON.parse(event.dataTransfer.getData('visitedAttObj'));
+                    const currentIndex = event.dataTransfer.getData('currentIndex');
+
+                    const temp = this.visitedAttraction[targetIndex];
+
+                    this.visitedAttraction[targetIndex]=data;
+                    this.visitedAttraction[currentIndex]=temp;
+
+
+                    this.setSortedAttractionsWithTime();
+               },
+
+              
+        
+
+
+
+                AddToVisitedArray: function (attObj){
+                    const targetIndex = this.unvisitedAttraction.findIndex(obj => obj.attId === attObj.attId)
+                    this.unvisitedAttraction.splice(targetIndex,1);
+                    this.visitedAttraction.push(attObj);
+                },
+                setRightSidePage:function(number){   
+                    this.rightSidePage=number;
+                },
+
+
+
+
+                setSortedAttractionsWithTime:async function(){
+
+
+                    this.sortedAttractionsWithTime = this.sortedAttractions;
+
+                    for (let i = 0; i < this.sortedAttractionsWithTime.length;i++){
+
+                        if(i==0){
+                            this.sortedAttractionsWithTime[i].startTime = this.formattedTravelBeginTime
+
+
+
+                           await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                params: {
+                                    startTime: this.sortedAttractionsWithTime[i].startTime,
+                                    stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                }
+                            }).then(response => {
+                                this.sortedAttractionsWithTime[i].endTime=response.data
+                            }).catch(err => {
+                                console.log(err)
+                            })
+                        }else{
+
+
+                            if (i > 0 && this.sortedAttractionsWithTime.length > i) {
+
+                                let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
+
+                                
+                                let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
+
+             
+
+
+                            await    axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
+                                    params: {
+                                        prevEndTime: prevEndTime,
+                                        durationSeconds: durationSeconds,
+                                    }
+                                }).then(response => {
+                          
+                                    this.sortedAttractionsWithTime[i].startTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+
+                             await   axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                    params: {
+                                        startTime: this.sortedAttractionsWithTime[i].startTime,
+                                        stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                    }
+                                }).then(response => {
+                              
+                                    this.sortedAttractionsWithTime[i].endTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+                            } 
+
+
+                   
+
+
+
+
+                        }
 
 
 
                     }
 
 
-                
-                    this.unvisitedAttraction = this.selectedAttractions;
-                    this.visitedAttraction=[];
-                },
-                AddToVisitedArray: function (attObj){
-                    const targetIndex = this.unvisitedAttraction.findIndex(obj => obj.attId === attObj.attId)
-                    this.unvisitedAttraction.splice(targetIndex,1);
-                    this.visitedAttraction.push(attObj);
+
+
+
+                   
+
                 },
 
-                setRightSidePage:function(number){
-                    console.log('設定數字啦')
-                    console.log(number);
-                    this.rightSidePage=number;
-                }
+
+
+                setActProductsInfo: async function (actObj, event) {
+                    const target = event.target;
+                    console.log('有沒有打勾啊??')
+                    if (target.checked) {
+                        console.log('有打勾')
+
+                        try {
+                            const response = await axios.get(`https://localhost:7251/api/TravelPlans/Get/VuePageActProductsInfo`, {
+                                params: {
+                                    activityId: actObj.actId,
+                                    beginDateTime: this.formattedTravelBeginTime
+                                }
+                            });
+                            console.log('actProducts啦');
+                            console.log(response)
+                            actObj.actProducts = response.data;
+                        } catch (err) {
+                            console.log(err)
+                        }
+
+                    } else {
+                        console.log('取消打勾')
+                        actObj.actProducts = "";
+                        target.removeAttribute('checked');
+
+                    }
+                },
+
+
+                setExtProductsInfo: async function (extObj, event) {
+                    const target = event.target;
+                    console.log('有沒有打勾啊??')
+                    if (target.checked) {
+                        console.log('有打勾')
+
+                        try {
+                            const response = await axios.get(`https://localhost:7251/api/TravelPlans/Get/VuePageExtProductsInfo`, {
+                                params: {
+                                    extraServiceId: extObj.extId,
+                                    beginDateTime: this.formattedTravelBeginTime
+                                }
+                            });
+                            console.log('extProducts啦');
+                            console.log(response)
+                            extObj.extProducts = response.data;
+                        } catch (err) {
+                            console.log(err)
+                        }
+
+                    } else {
+                        console.log('取消打勾')
+                        extObj.extProducts = "";
+                        target.removeAttribute('checked');
+
+                    }
+                },
+
+
+
+                chooseActivityProductObject: function (actProduct,event) {
+
+                    console.log(actProduct)
+                    const target = event.target;
+                    console.log('有沒有打勾啊??')
+                    if (target.checked) {
+                        console.log('有打勾')
+                        console.log('加陣列啦')
+
+                        if (actProduct.inputQuantity==undefined){
+                            actProduct.inputQuantity=1
+                        }
+
+
+                        const indexToRemove = this.selectedActivityProducts.findIndex(item => item.actProductId === actProduct.activityProductId);
+                        if (indexToRemove !== -1) {
+                            // 使用 splice() 方法移除目标元素
+                            this.selectedActivityProducts.splice(indexToRemove, 1);
+                        }
+
+
+                        this.selectedActivityProducts.push({ actProductId: actProduct.activityProductId, inputQuantity: actProduct.inputQuantity })
+
+                    } else {
+                        console.log('取消打勾')
+                        console.log('移出陣列啦')
+
+                        const indexToRemove = this.selectedActivityProducts.findIndex(item => item.actProductId === actProduct.activityProductId);
+                        if (indexToRemove !== -1) {
+                            // 使用 splice() 方法移除目标元素
+                            this.selectedActivityProducts.splice(indexToRemove, 1);
+                        }
+
+
+                        target.removeAttribute('checked');
+
+                    }
+
+                 
+              
+                },
+
+                handleActProductInputQuantityChange: function (actProduct, event) {
+                    const checkbox = event.target.nextElementSibling;
+                    const changeEvent = new Event('change', { bubbles: true, cancelable: false });
+                    checkbox.dispatchEvent(changeEvent);
+
+                },
+
+
+                chooseExtraServiceProductObject:function(extProduct,event){
+                  
+                    const target = event.target;
+                    console.log('有沒有打勾啊??')
+                    if (target.checked) {
+                        console.log('有打勾')
+                        console.log('加陣列啦')
+
+                        if (extProduct.inputQuantity == undefined) {
+                            extProduct.inputQuantity = 1
+                        }
+
+
+                        const indexToRemove = this.selectedExtraServiceProducts.findIndex(item => item.extProductId === extProduct.extraServiceProductId);
+                        if (indexToRemove !== -1) {
+                            // 使用 splice() 方法移除目标元素
+                            this.selectedExtraServiceProducts.splice(indexToRemove, 1);
+                        }
+
+
+                        this.selectedExtraServiceProducts.push({ extProductId: extProduct.extraServiceProductId, inputQuantity: extProduct.inputQuantity })
+
+                    } else {
+                        console.log('取消打勾')
+                        console.log('移出陣列啦')
+
+                        const indexToRemove = this.selectedExtraServiceProducts.findIndex(item => item.extProductId === extProduct.extraServiceProductId);
+                        if (indexToRemove !== -1) {
+                            // 使用 splice() 方法移除目标元素
+                            this.selectedExtraServiceProducts.splice(indexToRemove, 1);
+                        }
+
+
+                        target.removeAttribute('checked');
+
+                    }
+
+
+
+                },
 
 
             }
-
         };
 
         let app = Vue.createApp(vueApp).mount('#app');

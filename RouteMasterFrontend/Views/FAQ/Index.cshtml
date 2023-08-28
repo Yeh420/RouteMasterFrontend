@@ -23,7 +23,7 @@
                 <button class="nav-link" id="pills-about-tab" data-bs-toggle="pill" data-bs-target="#pills-about" type="button" role="tab" aria-controls="pills-about" aria-selected="false" @@click="showMe(cate[3])">{{cate[3]}}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <input class="form-control me-auto" placeholder="搜尋關鍵字" aria-label="Search" v-model="filter" @@keyup.enter="getQuestion">
+                <input class="form-control me-auto" placeholder="搜尋關鍵字" aria-label="Search" v-model="filter" @@input="getQuestion">
             </li>
 
         </ul>
