@@ -836,8 +836,8 @@
                                 }
                                 let content = {
                                     roomName: $(`#rp${i} #rn`).text(),
-                                    date: $(`#rp${i} #dp-${i + 1}`).val(),
-                                    quantity: $(`#rp${i} #pq-${i + 1}`).val()
+                                    date: $(`#rp${i} #dp-${roomId}`).val(),
+                                    quantity: $(`#rp${i} #pq-${roomId}`).val()
                                 }
                                 _this.cartProducts.push(cartProduct);
                                 _this.alertContent.push(content);
@@ -848,7 +848,7 @@
                             accommodationName: _this.accommodationIndex.name,
                             cartProducts: _this.cartProducts
                         };
-
+                        console.log(_this.alertContent)
                         Swal.fire({
                             title: `你選擇了：${request.accommodationName}
                                           確定將以下客房加入排程嗎?`,

@@ -980,9 +980,9 @@
                             // 在这里处理从新窗口传回的消息
                             _thisVueObj.roomProducts = JSON.parse(event.data);
                             console.log(_thisVueObj.roomProducts);
-                            _this.innerText = roomProducts.accommodationName;
+                            _this.innerText = _thisVueObj.roomProducts.accommodationName;
 
-                            let tooltipContent = `已加入${roomProducts.cartProducts.length}間房間`;
+                            let tooltipContent = `已加入${_thisVueObj.roomProducts.cartProducts.length}間房間`;
 
                             _this.setAttribute("data-tooltip", tooltipContent);
                             _this.setAttribute("style", "position:relative");
