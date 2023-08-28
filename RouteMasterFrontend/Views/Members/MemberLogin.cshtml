@@ -7,136 +7,145 @@
 <html lang="zh-tw">
 <head>
     <style>
-    *, *:before, *:after {
-    box-sizing: border-box;
-    }
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
 
-    body {
-        max-height:100%;
-        max-width:100%;
-        font-family: "Raleway", sans-serif;
-        overflow:hidden;
-    }
+        body {
+            max-height: 100%;
+            max-width: 100%;
+            font-family: "Raleway", sans-serif;
+            overflow: hidden;
+        }
 
-    .container {
-        top:0;
-        left:0;
-        position: absolute;
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100%;
-        overflow: hidden;
-    }
+        .container {
+            top: 0;
+            left: 0;
+            position: absolute;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100%;
+            overflow: hidden;
+        }
 
 
-    .container:hover .top:before, .container:hover .top:after, .container:hover .bottom:before, .container:hover .bottom:after, .container:active .top:before, .container:active .top:after, .container:active .bottom:before, .container:active .bottom:after {
-    margin-left: 300px;
-    transform-origin: -300px 50%;
-    transition-delay: 0s;
-    }
+            .container:hover .top:before, .container:hover .top:after, .container:hover .bottom:before, .container:hover .bottom:after, .container:active .top:before, .container:active .top:after, .container:active .bottom:before, .container:active .bottom:after {
+                margin-left: 300px;
+                transform-origin: -300px 50%;
+                transition-delay: 0s;
+            }
 
-    .container:hover .center, .container:active .center {
-    opacity: 1;
-    transition-delay: 0.2s;
-    }
+            .container:hover .center, .container:active .center {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
 
-    .top:before, .top:after, .bottom:before, .bottom:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 200vmax;
-    height: 200vmax;
-    top: 50%;
-    left: 50%;
-    margin-top: -100vmax;
-    
-    transform-origin: 0 50%;
-    transition: all 0.5s cubic-bezier(0.445, 0.05, 0, 1);
-    z-index: 10;
-    opacity: 0.65;
-    transition-delay: 0.2s;
-    }
+        .top:before, .top:after, .bottom:before, .bottom:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 200vmax;
+            height: 200vmax;
+            top: 50%;
+            left: 50%;
+            margin-top: -100vmax;
+            transform-origin: 0 50%;
+            transition: all 0.5s cubic-bezier(0.445, 0.05, 0, 1);
+            z-index: 10;
+            opacity: 0.65;
+            transition-delay: 0.2s;
+        }
 
-    .top:before {
-    transform: rotate(45deg);
-    background: #FFBB66;
-    }
-
-    .top:after {
-    transform: rotate(135deg);
+        .top:before {
+            transform: rotate(45deg);
             background: #FFBB66;
-    }
+        }
 
-    .bottom:before {
-    transform: rotate(-45deg);
-    background: #FFBFBF;
-    }
+        .top:after {
+            transform: rotate(135deg);
+            background: #FFBB66;
+        }
 
-    .bottom:after {
-    transform: rotate(-135deg);
+        .bottom:before {
+            transform: rotate(-45deg);
+            background: #FFBFBF;
+        }
+
+        .bottom:after {
+            transform: rotate(-135deg);
             background: #A6FFFF;
-    }
+        }
 
-    .center {
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    top: 50%;
-    left: 50%;
-    margin-left: -200px;
-    margin-top: -200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 30px;
-    opacity: 0;
-    transition: all 0.5s cubic-bezier(0.445, 0.05, 0, 1);
-    transition-delay: 0s;
-    color: #333;
-    }
+        .center {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            margin-left: -200px;
+            margin-top: -200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.445, 0.05, 0, 1);
+            transition-delay: 0s;
+            color: #333;
+        }
 
-    .center input {
-    width: 200px;
-    padding: 15px;
-    margin: 5px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-family: inherit;
-    }
+            .center input {
+                width: 200px;
+                padding: 15px;
+                margin: 5px;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+                font-family: inherit;
+            }
 
-    .container #loginBtn{
-        background: #A6FFFF;
-    }
+        .container #loginBtn {
+            background: #A6FFFF;
+        }
 
-    .container #loginBtn:hover {
-        background: #FFBFBF;
-        color: #FAFAFA;
-        border-radius: 5px;
-        box-shadow:
-        0 0 5px #FFCF78,
-        0 0 25px #FFCF78,
-        /*0 0 40px #30FFFF,
-        0 0 60px #00F5F5;*/
-    }
+            .container #loginBtn:hover {
+                background: #FFBFBF;
+                color: #FAFAFA;
+                border-radius: 5px;
+                box-shadow: 0 0 5px #FFCF78, 0 0 25px #FFCF78,
+                /*0 0 40px #30FFFF,
+                0 0 60px #00F5F5;*/
+            }
 
-  
-    .container .logo img{
-        width:240px;
-        height: 120.786369593709px;
-    }
 
-    .g_id_signin{
-        margin-top:10px;
-    }
+        .container .logo img {
+            width: 240px;
+            height: 120.786369593709px;
+        }
 
+        .g_id_signin {
+            margin-top: 10px;
+        }
+
+        .ckeckEye {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+
+        .btn-outline-secondary{
+            margin-top:10px;
+        }
+
+        }
     </style>
-
-	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 
-<body>  
+<body>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div class="container" onclick="onclick">
         <div class="top"></div>
@@ -144,35 +153,35 @@
         <div class="center">
 
             <div class="logo">
-            <a href="https://localhost:7145"><img src="~/SystemImages/Route-master-logo-black_0.png" /></a>
+                <a href="https://localhost:7145"><img src="~/SystemImages/Route-master-logo-black_0.png" /></a>
             </div>
             <h2>旅程起點</h2>
             <form asp-action="MemberLogin" class="p-3" id="loginForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-floating form-group d-flex align-items-center mb-3">
-                    <span class="far fa-user"></span>
-                    <input asp-for="Account" class="form-control" id="Account" placeholder="Account"/><br />
+                    @*<span class="far fa-user"></span>*@
+                    <input asp-for="Account" class="form-control" id="Account" placeholder="Account" /><br />
                     <label for="Account">帳號</label>
                     <span asp-validation-for="Account" class="text-danger"></span>
                 </div>
                 <div class="form-floating form-group d-flex align-items-center mb-3">
-                    <span class="fas fa-key"></span>
+                    @*<span class="fas fa-key"></span>*@
                     <input asp-for="Password" class="form-control" id="Password" placeholder="Password" /><br />
                     <label for="Password">密碼</label>
+                    <i id="checkEye" class="fa-solid fa-eye-slash"></i>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <input type="submit" value="登入" id="loginBtn" class="btn"/>
+                <input type="submit" value="登入" id="loginBtn" class="btn" />
 
             </form>
             <div class="text-center fs-6">
                 <a asp-action="MemberRegister" class=" btn btn-warning ">註冊會員</a> or
                 <a asp-action="MemberForgetPassword" class="btn btn-success">忘記密碼?</a>
-            </div>           
+            </div>
             <div id="g_id_onload"
                  data-client_id="161026089487-tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com"
                  data-login_uri="https://localhost:7145/Members/GoogleLogin"
                  data-auto_prompt="false">
-                 
             </div>
             <div class="g_id_signin"
                  data-type="icon"
@@ -222,7 +231,7 @@
                         window.location.href = 'https://localhost:7145/Home/Index';
                     } else {
                         //alert('帳密錯誤', '請再試一次', 'error')
-                        swal("帳密錯誤!", "請再試一次!", "error",{button:"返回"});
+                        swal("帳密錯誤!", "請再試一次!", "error", { button: "返回" });
                     }
                 })
                 .catch(error => {
@@ -239,10 +248,10 @@
         quickLogin.addEventListener("click", function () {
 
             const defaultData = {
-                
-                Account: "LinHua",
-                Password:"12345"
-               
+
+                Account: "Huan",
+                Password: "123"
+
             };
 
             //跑過每一個屬性並賦值
@@ -278,5 +287,20 @@
         });
     });
 
+
+    var checkEye = document.getElementById("checkEye");
+    var floatingPassword = document.getElementById("Password");
+    checkEye.addEventListener("click", function (e) {
+        if (e.target.classList.contains('fa-eye-slash')) {
+
+            e.target.classList.remove('fa-eye-slash');
+            e.target.classList.add('fa-eye');
+            floatingPassword.setAttribute('type', 'text')
+        } else {
+            floatingPassword.setAttribute('type', 'password');
+            e.target.classList.remove('fa-eye');
+            e.target.classList.add('fa-eye-slash')
+        }
+    });
 </script>
 

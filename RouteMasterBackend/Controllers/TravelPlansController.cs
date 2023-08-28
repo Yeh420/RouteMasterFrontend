@@ -42,10 +42,26 @@ namespace RouteMasterBackend.Controllers
         public async Task<IEnumerable<SelectAttractionAllInfoDto>> GetAllAttractionsInfo()
         {
 
-            //景點選擇處disabled綁定屬性判斷是否可以點選
-            //頁籤內容消失高度保留樣式問題
-            //
-        
+
+
+
+            //活動依據時間設置限制
+            //系統推薦路徑 /一鍵套用
+            //存行程表
+            //設置起點
+
+
+
+
+
+
+
+
+            //住宿改換陣列重新排(取得新的資訊push到裡面)
+            //拉住宿排
+
+
+
             var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
             {
 
@@ -347,6 +363,62 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+
+
+
+
+
+
+        [HttpGet]
+        [Route("Get/VuePageExtProductsInfo")]
+        public async Task<IEnumerable<ExtraServiceProductTravelCreateVuePageDto>> GetExtVuePageProductsInfo(int extraServiceId, DateTime beginDateTime)
+        {
+            var extProductsInDb = _context.ExtraServiceProducts
+                .Include(x => x.ExtraService)
+                .Where(x => x.ExtraServiceId == extraServiceId)
+                .Where(x => x.Date == beginDateTime.Date).Select(x => new ExtraServiceProductTravelCreateVuePageDto
+                {
+                   ExtraServiceProductId = x.ExtraServiceId,    
+                   ExtraServiceName = x.ExtraService.Name,                   
+                    Quantity = x.Quantity,
+                    Price = x.Price,
+                  
+                });
+            return extProductsInDb;
+
+
+        }
+
+
+
+
+
+
+
+        [HttpGet]
+        [Route("Get/VuePageActProductsInfo")]
+        public async Task<IEnumerable<ActivityProductTravelCreateVuePageDto>> GetActVuePageProductsInfo(int activityId,DateTime beginDateTime)
+        {
+            var actProductsInDb = _context.ActivityProducts
+                .Include(x => x.Activity)
+                .Where(x => x.ActivityId == activityId)
+                .Where(x => x.Date == beginDateTime.Date).Select(x => new ActivityProductTravelCreateVuePageDto
+                {
+                    ActivityProductId=x.Id,
+                    ActivityName=x.Activity.Name,
+                    Quantity=x.Quantity,
+                    Price=x.Price,
+                    StartTime=beginDateTime.Date.Add(x.StartTime),
+                    EndTime=beginDateTime.Date.Add(x.EndTime)                
+                });
+            return actProductsInDb;
+
+
+        }
+
+
+
+
         [HttpGet]
         [Route("Get/CalculateTransportTime")]
         public async Task<ActionResult<TransportTimeTrDto>> GetDateTime(TimeSpan latestEndTime, int timeValue)
@@ -360,6 +432,38 @@ namespace RouteMasterBackend.Controllers
 
 
             return data;
+
+        }
+
+
+
+
+        [HttpGet]
+        [Route("Get/CalculateTransportTime/DurationValue")]
+        public async Task<ActionResult<DateTime>> GetStartTimeByDurationValue(DateTime prevEndTime, int durationSeconds)
+        {
+
+
+            int minuteValue = durationSeconds / 60;
+            var result = prevEndTime.AddMinutes(minuteValue);
+
+
+            return result;
+
+        }
+    
+
+
+
+
+        [HttpGet]
+        [Route("Get/CalculateTransportTime/StayHours")]
+        public async Task<ActionResult<DateTime>> GetEndTimeByStayHours(DateTime startTime, int stayHours)
+        {
+            var result = startTime.AddHours(stayHours);
+
+
+            return result;
 
         }
 
