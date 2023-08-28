@@ -28,6 +28,7 @@ using static Google.Apis.Requests.BatchRequest;
 using RouteMasterFrontend.Models.ViewModels.Carts;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics.Metrics;
+using Microsoft.AspNetCore.Identity;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -37,6 +38,7 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
+        //private readonly SignInManager<IdentityUser> _signInManager;
 
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
@@ -44,7 +46,7 @@ namespace RouteMasterFrontend.Controllers
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
             _configuration = configuration;
-
+            //_signInManager = signInManager;
         }
 
         // GET: Members/Edit/5
@@ -110,6 +112,31 @@ namespace RouteMasterFrontend.Controllers
         public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
         {
             if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
+
+
+            ////鎖定帳號
+            //if (ModelState.IsValid)
+            //{
+            //    var attemptResult = await _signInManager.PasswordSignInAsync(vm.Account, vm.Password, vm.RememberMe, lockoutOnFailure: true);
+
+            //    if (attemptResult.Succeeded)
+            //    {
+            //        // 登入成功的處理
+            //        return RedirectToAction("Index", "Home");
+            //    }
+            //    if (attemptResult.IsLockedOut)
+            //    {
+            //        // 處理使用者被鎖定的情況
+            //        return View("AccountLocked");
+            //    }
+            //    else
+            //    {
+            //        // 登入失敗的處理
+            //        ModelState.AddModelError(string.Empty, "無效的登入嘗試。");
+            //    }
+            //}
+
+
 
             //帳密IsExist
             Result result = ValidLogin(vm);
