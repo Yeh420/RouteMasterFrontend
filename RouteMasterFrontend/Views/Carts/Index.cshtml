@@ -205,8 +205,8 @@
                     
                 </table>
 
-                
 
+                        <input type="hidden" id="selectedCouponId" name="CouponsId" value="" />
                 <div class="d-flex justify-content-end">
                             <button class="btn btn-outline-secondary" @@click="goToCheckout">
                         <i class="fas fa-shopping-cart"></i>前往結帳
@@ -330,12 +330,14 @@
                     this.coupons[index].Selected = !this.coupons[index].Selected;
 
                     const selectedCouponId = this.coupons[index].Id;
-                    this.usingCouponId = this.coupons[index].Id;
+                    //this.usingCouponId = this.coupons[index].Id;
 
                     if (this.coupons[index].Selected) {
                         this.selectedCouponAmount = this.coupons[index].Discount;
                         console.log("Selected Coupon ID:", selectedCouponId);
                         console.log("Selected Coupon Amount:", this.selectedCouponAmount);
+                        this.usingCouponId = selectedCouponId;
+                        console.log(this.usingCouponId);
                         document.getElementById("selectedCouponId").value = selectedCouponId;
                     } else {
                         document.getElementById('selectedCouponId').value = '';
