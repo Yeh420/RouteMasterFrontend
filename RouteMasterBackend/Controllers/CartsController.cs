@@ -84,6 +84,10 @@ namespace RouteMasterBackend.Controllers
                 var extraServiceProduct = _context.ExtraServiceProducts
                 .FirstOrDefault(p => p.Id == dto.extraserviceId);
 
+                if (extraServiceProduct.Quantity <= 0 || extraServiceProduct.Quantity < dto.quantity)
+                {
+                    return BadRequest(new { success = false, message = "此商品已售完" });
+                }
                 var existingCartItem = _context.CartExtraServicesDetails
                 .FirstOrDefault(c => c.CartId == dto.cartId && c.ExtraServiceProductId == dto.extraserviceId);
 
@@ -145,6 +149,11 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var activitiesProduct = _context.ActivityProducts.FirstOrDefault(p => p.Id == dto.activityId);
+
+                if (activitiesProduct.Quantity <= 0 || activitiesProduct.Quantity < dto.quantity)
+                {
+                    return BadRequest(new { success = false, message = "此商品已售完" });
+                }
                 var activitiesCartItems = _context.CartActivitiesDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.ActivityProductId == dto.activityId);
                 if(activitiesCartItems != null)
                 {
@@ -176,6 +185,10 @@ namespace RouteMasterBackend.Controllers
             try
             {
                 var roomProduct = _context.RoomProducts.FirstOrDefault(p => p.Id == dto.roomproductId);
+                if (roomProduct.Quantity <= 0 || roomProduct.Quantity < dto.quantity)
+                {
+                    return BadRequest(new { success = false, message = "此商品已售完" });
+                }
                 var roomProductCartItems = _context.CartAccommodationDetails.FirstOrDefault(c => c.CartId == dto.cartId && c.RoomProductId == dto.roomproductId);
                 if(roomProductCartItems != null)
                 {
