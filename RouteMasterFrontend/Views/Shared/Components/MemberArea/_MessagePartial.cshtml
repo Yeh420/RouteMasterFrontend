@@ -25,6 +25,7 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="readall" @@change="allRead" :disabled="completeRead">
                 <label class="form-check-label" for="readall">全部已讀</label>
             </div>
+            <button type="button" class="btn btn-primary btn-sm rounded-pill">轉未讀</button>
 
         </div>
         <div class="row mt-1 g-2">
@@ -36,16 +37,20 @@
                             <p class="card-text">{{item.id}}</p>
                             <h5 class="card-title">{{item.content}}</h5>
                             <p class="card-text dis">{{item.isRead}}</p>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" :id='"switchStatus" + item.id' :checked="item.isRead" @@change="updateSW(item.id)">
+                            <div class="form-check form-switch form-check-inline">
+                                <input class="form-check-input" type="checkbox" role="switch" :id='"switchStatus" + item.id' :checked="item.isRead" @@change="updateSW(item.id, item.isRead)">
                                 <label class="form-check-label" :for='"switchStatus" + item.id'>{{item.isRead? "已讀":"未讀"}}</label>
                                 <template v-if="item.category=='檢舉'">
                                     <button type="button" class="btn btn-warning btn-sm ms-3 fs-6" @@click="searchSite(item.id)">前往評論區</button>
                                 </template>
                                 <template v-else>
-                                    <a class="btn btn-warning btn-sm ms-3" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>
-                                </template>
+                                    <a class="btn btn-warning btn-sm ms-3 fs-6" href="https://localhost:7145/Accommodations/Index" role="button">前往評論區</a>
+                                </template>                                
                             </div>
+                            @*<div v-if="item.isRead" class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" value="" :id='"restore"+ item.id' @@change="restoreStatus(item.id)">
+                                <label class="form-check-label" :for='"restore"+ item.id' :id='"lb"+ item.id'>回復未讀狀態</label>
+                            </div>*@
                         </div>
                     </div>
                 </div>
@@ -69,6 +74,7 @@
                     indexVM: [],
                     filter: 1,
                     completeRead: false,
+                    //restoreList:[],
                 }
             },
             mounted: function () {
@@ -77,6 +83,18 @@
 
             },
             methods: {
+            //restoreStatus:function(msgId){
+            //    let _this = this;
+            //    const ck = document.getElementById("restore" + msgId);
+            //    const isChosen = ck.checked;
+            //    const lb= document.getElementById("lb" + msgId);
+            //    if(isChosen){
+            //        _this.restoreList.push(msgId);
+            //        lb.textContent="已勾選";
+            //        console.log(_this.restoreList.length);
+            //    }
+
+            //},
                 allRead: function () {
                     let _this = this;
                     const one = document.getElementById("readall");
@@ -97,13 +115,14 @@
 
                     }
                 },
-                updateSW: function (msgId) {
+                updateSW: function (msgId, isRead) {
                     let _this = this;
                     console.log(msgId);
                     const sw = document.getElementById("switchStatus" + msgId);
                     const isChecked = sw.checked;
 
-                    if (isChecked) {
+
+                    if (isChecked !== isRead ) {
                         console.log("該發送ajax");
                         var uri = `https://localhost:7145/SystemMessage/UpdateNoticeStatus?id=${msgId}`;
                         fetch(uri, {
@@ -118,10 +137,9 @@
                                 console.error('There was a problem with the fetch operation:', error);
                             });
 
-
                     }
                     else {
-                        console.log("沒是");
+                    console.log("沒事");
                     }
 
                 },
