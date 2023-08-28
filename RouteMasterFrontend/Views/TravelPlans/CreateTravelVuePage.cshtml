@@ -31,7 +31,50 @@
             width: 4px; /* 线的宽度 */
             height: 70px; /* 线的高度 */
             background-color: gray; /* 线的颜色 */
+            position: relative; /* 让 .vertical-line 成为相对定位的容器 */
             
+        }
+
+            .vertical-line:hover::before {
+                content:  attr(data-distance)"\a"attr(data-duration);
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 5px;
+                border-radius: 5px;
+                top: 0; /* 调整位置以适应您的布局 */
+                right: 100%; /* 悬停效果显示在容器的左侧 */
+                white-space: nowrap;
+                z-index: 999; /* 确保在其他元素之上 */
+                display: none;
+            }
+
+            .vertical-line:hover::before {
+                display: block;
+            }
+
+
+
+
+        .custom-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 0; /* 调整位置以适应您的布局 */
+            right: 100%; /* 悬停效果显示在容器的左侧 */
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.25rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none; /* 避免阻擋事件 */
+            display: none;
+        }
+
+
+        /* 滑鼠懸停時顯示提示內容 */
+        .custom-btn:hover::after {
+            display: block;
         }
 
         .table {
@@ -60,6 +103,7 @@
 
     <div >
         <button class="btn btn-primary dropdown-toggle" @@click="toggleAllAttractionContainer">顯示/隱藏</button>
+        <button class="btn btn-primary dropdown-toggle" @@click="addAllItemsToCart">加入購物車</button>
         <template v-if="AllAttractionContainerStatus">
             <div>
                 <div class="d-flex row max-height-containers"
@@ -86,10 +130,31 @@
                 <input v-model="formattedTravelBeginTime" type="datetime-local" />
                 <div class="row">                         
                     <div class="col-3">
+                        <br />
+                        <br />
+           
              
+
+
                         <div v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" class="attraction-dot-container">
-                            <div class="vertical-line " v-if="index > 0"></div>
-                            <div><i style="font-size: 35px; " class="fa-solid fa-location-dot "></i></div>
+                            <div class="vertical-line" v-if="index > 0" 
+                                v-bind:data-distance="selectedPathesOrderByAttractions[index-1].distance.text"
+                                 v-bind:data-duration="selectedPathesOrderByAttractions[index-1].duration.text"></div>
+
+     
+                            <div>
+                                <div class="badge bg-success text-wrap  p-1 m-1"
+                                     style="width: 8rem;font-size:15px"
+                                     :data-stayHours="attraction.stayHours">
+                                    {{attraction.attName}}
+                                </div>
+                                <button class="btn btn-primary  p-1" v-bind:positionx="attraction.positionx" v-bind:positiony="attraction.positiony"
+                                        @@click="selectAccommodationByGoogleMapsApi(attraction,$event)">
+                                    選擇住宿
+                                </button>
+                            </div>
+         
+                            
                         </div>
                     </div>
                     <div class="col-9">                       
@@ -134,11 +199,7 @@
                                                 </label>
                                                 <div  style="transform: translateX(20px);" v-if="actObj.actProducts!=''">
                                                     <ul class="checkbox-list">
-                                                        <li v-for="actProduct in actObj.actProducts">
-                                                      @*      <label v-if="selectedActivityProducts.some(pro=>pro.actProductId==actProduct.activityProductId)">
-                                                                <input type="number" v-model="actProduct.inputQuantity"  :min="1" :max="actProduct.quantity" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
-                                                                <input type="checkbox" checked v-bind:value="actProduct.activityProductId" @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
-                                                            </label>*@
+                                                        <li v-for="actProduct in actObj.actProducts">                                             
                                                             <label>
                                                                 <input type="number" v-model="actProduct.inputQuantity" value="1" :min="1" :max="actProduct.quantity" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
                                                                 <input type="checkbox" v-bind:value="actProduct.activityProductId" @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
@@ -225,10 +286,11 @@
     </div>
 
 
-
     <div>{{selectedActivityProducts}}</div>
-
     <div>{{selectedExtraServiceProducts}}</div>
+
+
+
 
 </div>
 
@@ -361,7 +423,8 @@
 
 
                     selectedActivityProducts:[],
-                    selectedExtraServiceProducts:[],
+                    selectedExtraServiceProducts:[],                   
+                    roomProducts:{},
                 };
             },
 
@@ -393,6 +456,8 @@
                                 actList: matchingItem.actListInAtt,
                                 startTime:"",
                                 endTime:"",
+                                positionx: matchingItem.positionX,
+                                positiony: matchingItem.positionY,
                             };
                         }
                      });
@@ -741,7 +806,7 @@
                         }
 
 
-                        this.selectedActivityProducts.push({ actProductId: actProduct.activityProductId, inputQuantity: actProduct.inputQuantity })
+                        this.selectedActivityProducts.push({ actProductId: actProduct.activityProductId, quantity: actProduct.inputQuantity })
 
                     } else {
                         console.log('取消打勾')
@@ -790,7 +855,7 @@
                         }
 
 
-                        this.selectedExtraServiceProducts.push({ extProductId: extProduct.extraServiceProductId, inputQuantity: extProduct.inputQuantity })
+                        this.selectedExtraServiceProducts.push({ extProductId: extProduct.extraServiceProductId, quantity: extProduct.inputQuantity })
 
                     } else {
                         console.log('取消打勾')
@@ -810,6 +875,95 @@
 
 
                 },
+
+
+
+                handleExtProductInputQuantityChange: function (extProduct, event) {
+                    const checkbox = event.target.nextElementSibling;
+                    const changeEvent = new Event('change', { bubbles: true, cancelable: false });
+                    checkbox.dispatchEvent(changeEvent);
+
+                },
+
+
+
+                selectAccommodationByGoogleMapsApi: function (attraction,event) {
+                    const y = attraction.positiony
+                    const x = attraction.positionx
+                    const name = attraction.attName
+                    const _this = event.target;
+                    const _thisVueObj = this;
+
+                    var newWindow = window.open("https://localhost:7145/accommodations/index?Recommend=", "_blank");
+
+                    // 监听新窗口的消息事件
+                    window.addEventListener("message", function (event) {
+                        if (event.source === newWindow && event.origin === window.location.origin) {
+                            // 在这里处理从新窗口传回的消息
+                            _thisVueObj.roomProducts = JSON.parse(event.data);
+                            console.log(_thisVueObj.roomProducts);
+                            _this.innerText = roomProducts.accommodationName;
+
+                            let tooltipContent = `已加入${roomProducts.cartProducts.length}間房間`;
+
+                            _this.setAttribute("data-tooltip", tooltipContent);
+                            _this.setAttribute("style", "position:relative");
+                            _this.classList.add("custom-btn");
+                            _this.classList.remove("btn-primary");
+                            _this.classList.add("btn-warning");          
+                        }
+                    });
+
+                    // 在新窗口中执行操作
+                    newWindow.addEventListener("load", function () {
+                        // 调用新窗口中定义的函数，并将结果传回到原始窗口
+                        var result = newWindow.app.RecommendAccommodation(x, y, name);
+                    });
+
+
+
+                },
+
+                addAllItemsToCart:function(){
+                    if (this.selectedActivityProducts.length == 0 && this.selectedExtraServiceProducts.length == 0 && this.roomProducts.cartProducts.length == 0) {
+                       alert('請至少選擇一項商品才可以加入購物車')
+                    } else 
+                    {
+                       
+
+                        //住宿商品放入postData
+                        const postData = {
+                            cartId: this.cartId,
+
+
+                            roomProducts: this.roomProducts.cartProducts,
+
+                            activityProductIds: this.selectedActivityProducts,
+                            extraServiceProductIds: this.selectedExtraServiceProducts,
+                        }
+
+                    
+
+
+                 
+
+                            axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
+                            .then(response => {
+                                alert('已成功加入購物車!');
+                                reloadCartItems();
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
+
+                    }
+
+
+
+
+                },
+
+
 
 
             }
