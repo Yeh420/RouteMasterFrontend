@@ -42,28 +42,23 @@ namespace RouteMasterBackend.Controllers
         public async Task<IEnumerable<SelectAttractionAllInfoDto>> GetAllAttractionsInfo()
         {
 
-            //5:00
-            //地點/路徑 圖標顯示內容
-            //選擇住宿
-            //加入購物車
 
+            //checkboxList行為決定
+    
 
 
             //8:00
             //系統推薦路徑(?)
-            //checkboxList行為決定
-            //無產品disabled
+
+
+            //活動依據時間設置限制
+
 
 
 
 
             //11:00
             //存行程表
-
-
-
-            //活動依據時間設置限制
-
 
 
             //住宿改換陣列重新排(取得新的資訊push到裡面)
