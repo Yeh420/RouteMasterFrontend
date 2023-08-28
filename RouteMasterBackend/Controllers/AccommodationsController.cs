@@ -89,8 +89,9 @@ namespace RouteMasterBackend.Controllers
                 CheckIn = a.CheckIn,
                 CheckOut = a.CheckOut,
                 Score = a.CommentsAccommodations.Average(ca => ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
+                Comments = a.CommentsAccommodations.Count(),
+                Image = a.Image,
                 Images = a.AccommodationImages,
-                Comments = a.CommentsAccommodations,
                 Rooms = a.Rooms,
                 Services = a.AccommodationServiceInfos
             }).FirstAsync();
@@ -110,18 +111,29 @@ namespace RouteMasterBackend.Controllers
                     .Include(a => a.AcommodationCategory)
                     .Include(a => a.CommentsAccommodations)
                     .Include(a => a.AccommodationServiceInfos)
+                    .Include(a => a.Rooms)
+                    .ThenInclude(r => r.RoomProducts)
                     .AsQueryable();
-            
+
+            if(data.MinBudget > 0)
+            {
+                accommodations = accommodations.Where(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) >= data.MinBudget);
+            }
+
+            if(data.MaxBudget < 10000)
+            {
+                accommodations = accommodations.Where(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) <= data.MaxBudget);
+            }
 
             if (data.Keyword != null && data.Keyword.Length != 0)
             {
                 foreach (var keyword in data.Keyword)
                 {
-                    accommodations = accommodations.Where(p =>
-                    p.Name.Contains(keyword) ||
-                    p.Description.Contains(keyword) ||
-                    p.Address.Contains(keyword) ||
-                    p.AccommodationServiceInfos.Where(s => s.Name.Contains(keyword)).Any()
+                    accommodations = accommodations.Where(a =>
+                    a.Name.Contains(keyword) ||
+                    a.Description.Contains(keyword) ||
+                    a.Address.Contains(keyword) ||
+                    a.AccommodationServiceInfos.Where(s => s.Name.Contains(keyword)).Any()
                     );
                 }
             }
@@ -153,6 +165,16 @@ namespace RouteMasterBackend.Controllers
                 accommodations = accommodations.Where(a => data.Regions.Contains(a.Region.Name));
             };
 
+            accommodations = data.SortBy switch
+            {
+                1 => accommodations.OrderByDescending(a => a.Grade),
+                2 => accommodations.OrderBy(a => a.Grade),
+                3 => accommodations.OrderByDescending(a => a.CommentsAccommodations.Average(ca => ca.Score)),
+                4 => accommodations.OrderBy(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice)),
+                5 => accommodations.OrderByDescending(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice)),
+                _ => accommodations,
+            };
+
             #region
             //分頁
             int totalCount = accommodations.Count(); //總共幾筆 ex:10
@@ -176,6 +198,7 @@ namespace RouteMasterBackend.Controllers
                 CheckOut = a.CheckOut,
                 Score = a.CommentsAccommodations.Average(ca=>ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
                 Comment = a.CommentsAccommodations.Count(),
+                Price = a.Rooms.Count() > 0 ? a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) : 0,
                 Services = a.AccommodationServiceInfos
             }).ToListAsync();
             dto.TotalPages = totalPage;

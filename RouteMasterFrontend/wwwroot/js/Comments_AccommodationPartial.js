@@ -182,7 +182,7 @@
         </div>
 
        
-        <div v-for="(item, index) in indexVM" :key="index" class="card mb-4">
+        <div v-for="(item, index) in indexVM" :key="index" class="card mb-4 border-success">
             <div class="row overflow-auto" style="max-height:500px;">
                 <div class="col-md-1 ms-auto">
                     <img :src="getProfile(item.profile)" style="height: 80px; width: 80px;" class="mx-auto" />  
@@ -231,8 +231,8 @@
                             <div class="collapse mt-3" :id='"collapseExample" + index'>
                                 <div class="card card-body">
                                     <h5>來自{{item.hotelName}}的回覆:</h5>
-                                    <p>{{item.replyMessage}}</p>
-                                    <p class="card-text text-end"><small class="text-muted">{{item.replyDate}}</small></p>
+                                    <p class="fs-6">{{item.replyMessage}}</p>
+                                    <p class="card-text text-end">{{item.replyDate}}</p>
                                 </div>
                             </div>
                         </template>
