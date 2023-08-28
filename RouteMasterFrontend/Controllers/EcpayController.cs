@@ -68,7 +68,7 @@ namespace RouteMasterFrontend.Controllers
             return Math.Max(total, 0);
         }
 
-        public async Task<IActionResult> Index(int? selectedCouponId)
+        public async Task<IActionResult> Index(int selectedCouponId)
         {
 
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
@@ -145,16 +145,16 @@ namespace RouteMasterFrontend.Controllers
                 { "TradeDesc", "無" },
                 { "ItemName", $"RouteMaster商品-{formattedItemNames}"}, 
                 { "ExpireDate", "3" },
-                { "ReturnURL", $"{website}/api/Ecpay/AddPayInfo/" },
+                { "ReturnURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
                 { "ClientBackURL", $"{website}Carts/ConfirmPayment" },
-                //{ "OrderResultURL", $"{website}/api/Orders/PayInfo/" },
+                { "OrderResultURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
                 { "EncryptType", "1" }
             };
 
             order["CheckMacValue"] = GetCheckMacValue(order);
-            EmptyCart(memberId);
+            //EmptyCart(memberId);
 
 
             return View(order);
@@ -208,7 +208,7 @@ namespace RouteMasterFrontend.Controllers
             return result.ToString();
         }
         [HttpGet]
-        public IActionResult PayInfo(string orderId)
+        public IActionResult PayInfo(string? orderId)
         {
             // 根據 orderId 取得訂單資訊，例如從記憶體快取或資料庫中取得
             var orderInfo ="OrderResult";

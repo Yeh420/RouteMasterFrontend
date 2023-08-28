@@ -645,6 +645,7 @@ namespace RouteMasterFrontend.Controllers
         [HttpGet("Member/HistoryOrder/{memberid?}")]
         public async Task<IActionResult> HistoryOrder(int? memberid)
         {
+          
 			if (!memberid.HasValue)
 			{
 				return BadRequest("Member ID is required");
@@ -655,8 +656,8 @@ namespace RouteMasterFrontend.Controllers
 			{
 				return NotFound("Member not found");
 			}
-
-			var orders = await _context.Orders
+          
+            var orders = await _context.Orders
 		    .Where(o => o.MemberId == memberId)
 		    .Include(x => x.OrderExtraServicesDetails)
 		    .Include(x => x.OrderActivitiesDetails)
@@ -727,6 +728,7 @@ namespace RouteMasterFrontend.Controllers
 					Note = ac.Note
 				}).ToList()
 			}).ToList();
+           
 			return View(orderDTOs);
 		}
 
