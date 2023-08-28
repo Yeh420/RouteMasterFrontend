@@ -420,10 +420,10 @@
                                                     <div class="collapse" v-bind:id=`collapseDatePicker${index}`>
                                                         <div class="d-flex align-items-center">
                                                             <label v-bind:for=`dp-${room.id}`>日期：</label>
-                                                            <input v-bind:id=`dp-${room.id}` type="text" class="form-control me-2" autocomplete="off" placeholder="請選擇日期" readonly style="background:white;width:236px;box-sizing:border-box" />
+                                                            <input v-bind:id=`dp-${room.id}` type="text" class="form-control dp me-2" autocomplete="off" placeholder="請選擇日期" readonly style="background:white;width:236px;box-sizing:border-box" />
                                                             <div v-bind:id=`ptInput-${room.id}` style="display:none">
                                                                 <div class="d-flex align-items-center">
-                                                                    <label v-bind:for=`pq-${room.id}`>數量：</label>
+                                                                    <label v-bind:for=`pq-${room.id}` >數量：</label>
                                                                     <input v-bind:id=`pq-${room.id}` type="number" min="1" value="1" size="2" class="form-control pq me-2" style="width:63px; box-sizing:border-box" />
                                                                     <label v-bind:for=`tp-${room.id}`>總價：</label>
                                                                     <input v-bind:id=`tp-${room.id}` type="text" value="999999" class="form-control me-3" style="background:white;width:87px; box-sizing:border-box" readonly />
@@ -836,8 +836,8 @@
                                 }
                                 let content = {
                                     roomName: $(`#rp${i} #rn`).text(),
-                                    date: $(`#rp${i} #dp-${roomId}`).val(),
-                                    quantity: $(`#rp${i} #pq-${roomId}`).val()
+                                    date: $(`#rp${i} .dp`).val(),
+                                    quantity: $(`#rp${i} .pq`).val()
                                 }
                                 _this.cartProducts.push(cartProduct);
                                 _this.alertContent.push(content);
