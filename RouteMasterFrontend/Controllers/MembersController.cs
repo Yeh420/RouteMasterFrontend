@@ -37,7 +37,7 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
-        
+
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _context = context;
@@ -112,9 +112,9 @@ namespace RouteMasterFrontend.Controllers
             if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
 
             //帳密IsExist
-            Result result = ValidLogin(vm);           
+            Result result = ValidLogin(vm);
             if (result.IsSuccess != true) return BadRequest(new { success = false, message = "Invalid input" });
-           
+
             //設定使用者登入資訊
             const bool rememberMe = false;
             var member = _context.Members.First(m => m.Account == vm.Account);
@@ -124,11 +124,11 @@ namespace RouteMasterFrontend.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, vm.Account),
-                //new Claim("memberImage", member.Image),
+                new Claim("memberImage", member.Image),
                 new Claim("id",member.Id.ToString())
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //identity.AddClaim(new Claim("memberImage", member.Image));
+            identity.AddClaim(new Claim("memberImage", member.Image));
 
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
@@ -281,7 +281,7 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 MemberImage img = new MemberImage();
-                var member = _context.Members.First((m => m.Email == payload.Email));
+                Member member = new Member();
                 Result result = RegisterGoogleMember(payload, img);
 
                 if (result.IsSuccess)
@@ -364,24 +364,28 @@ namespace RouteMasterFrontend.Controllers
         {
             //抓會員登入資訊
             ClaimsPrincipal user = HttpContext.User;
-            
+
             //列出與登入符合資料
             string userAccount = user.Identity.Name;
             string userID = user.FindFirst("id").Value;
 
             Member myMember = _context.Members.First(m => m.Account == userAccount);
-            
+
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             if (user.Identity.IsAuthenticated)
-            {              
+            {
                 return View(myMember);
             }
             return RedirectToAction("MemberLogin", "Members");
         }
-   
+
         [HttpGet]
         public async Task<IActionResult> MemberRegister()
-        {  
+        {
             List<Region> regions = await _context.Regions.ToListAsync();
             List<Town> towns = await _context.Towns.ToListAsync();
             ViewBag.Regions = regions;
@@ -391,12 +395,13 @@ namespace RouteMasterFrontend.Controllers
 
         //註冊會員
         [HttpPost]
-        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto, string? sysImg)
+        public IActionResult MemberRegister(MemberRegisterVM vm, IFormFile? facePhoto)
 
         {
             MemberImage img = new MemberImage();
             List<Region> regions = _context.Regions.ToList();
             List<Town> towns = _context.Towns.ToList();
+
 
             if (ModelState.IsValid)
             {
@@ -418,16 +423,16 @@ namespace RouteMasterFrontend.Controllers
             }
             else
             {
-             
+
                 ViewBag.Regions = regions;
                 ViewBag.Towns = towns;
                 return View(vm);
             }
-           
+
 
 
             Result result = RegisterMember(vm, img);
-     
+
 
             if (result.IsSuccess)
             {
@@ -436,13 +441,38 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                ViewBag.Regions = regions;
+                ViewBag.Towns = towns;
                 return View(vm);
+
             }
 
         }
 
-        
-    
+        [AcceptVerbs("GET")]
+        public IActionResult CheckRepeatAccount(string Account)
+        {
+            var isAccountReapeat = _context.Members.FirstOrDefault(m=>m.Account == Account);
+
+            if (isAccountReapeat != null)
+            {
+                return Json($"{Account} 已經被註冊過囉，請換一個.");
+            }
+            return Json($"{Account} 這個帳號可以使用");
+        }
+
+        [AcceptVerbs("GET")]
+        public IActionResult CheckRepeatEmail (string Email)
+        {
+            var isEmailReapeat = _context.Members.FirstOrDefault(m => m.Email == Email);
+
+            if (isEmailReapeat != null)
+            {
+                return Json($"{Email} 已經被註冊過囉，請換一個.");
+            }
+            return Json($"{Email} 這個信箱可以使用");
+        }
+
         //會員登出
         [HttpGet]
         public async Task<IActionResult> Logout()
@@ -450,6 +480,16 @@ namespace RouteMasterFrontend.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("LogoutSuccess", "Members");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditPasswordLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 返回 JSON 响应
+            return Json(new { message = "登出成功" });
         }
 
         //登出成功畫面
@@ -470,11 +510,10 @@ namespace RouteMasterFrontend.Controllers
         {
             if (ModelState.IsValid == false) return View(vm);
 
-            //var myAccount = _context.Members.FirstOrDefault(m=>m.Account == vm.Account);
 
             //// 生成email裡的連結
             //var urlTemplate = $"{Request.Scheme}://{Request.Host.Value}/Members/MemberResetPassword?Account={myAccount}&confirmCode={0}";
-            
+
 
             Result result = ProcessResetPassword(vm.Account, vm.Email);
 
@@ -484,21 +523,34 @@ namespace RouteMasterFrontend.Controllers
                 return View(vm);
             }
 
-            return View("MemberLogin");
+
+            //先跳一個成功更改密碼的畫面
+            return View("GetNewPasswordSuccess");
+            //return View("MemberLogin");
         }
+
+        [HttpGet]
+        public IActionResult GetNewPasswordSuccess()
+        {
+            return View();
+        }
+
+
+
+
 
         //忘記密碼/更改密碼       
         public IActionResult MemberResetPassword()
         {
             return View();
         }
-        
+
         //忘記密碼/更改密碼 
         [HttpPost]
         public IActionResult MemberResetPassword(MemberResetPasswordVM vm, string account, string confirmCode)
         {
             if (ModelState.IsValid == false) return View(vm);
-            
+
             Result result = ProcessChangePassword(account, confirmCode, vm.Password);
 
             //if (result.IsSuccess == false) { }
@@ -518,11 +570,11 @@ namespace RouteMasterFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditPassword([FromBody]MemberEditPasswordVM vm)
+        public IActionResult EditPassword([FromBody] MemberEditPasswordVM vm)
         {
-           
-                //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
-            
+
+            //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
+
             var currentUserAccount = User.Identity.Name;
             Result result = ChangePassword(currentUserAccount, vm);
 
@@ -533,44 +585,117 @@ namespace RouteMasterFrontend.Controllers
             }
 
             return ViewComponent("MemberArea");
-            
+
         }
 
-        public IActionResult MemEdit([FromBody]MemberEditDTO dto)
+        [HttpPut]
+        public IActionResult MemEdit(MemberEditDTO dto)
         {
             var currentUserAccount = User.Identity.Name;
             Member member = _context.Members.FirstOrDefault(m => m.Account == currentUserAccount);
 
-            member.FirstName=dto.FirstName;
-            member.LastName=dto.LastName;           
-            member.CellPhoneNumber=dto.CellPhoneNumber;
-            member.Address=dto.Address;
-            member.Gender=dto.Gender;
-            member.Birthday=dto.Birthday;
-            member.IsSuscribe=dto.IsSuscribe;
+            member.FirstName=dto.firstName;
+            member.LastName=dto.lastName;           
+            member.CellPhoneNumber=dto.cellPhoneNumber;
+            member.Address=dto.address;
+            member.Gender=dto.gender;
+            member.Birthday=dto.birthday;
+            member.IsSuscribe = dto.isSuscribe;
+
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             //_context.Entry(member).State =EntityState.Modified;
             _context.SaveChanges();
             return ViewComponent("MemberArea");
         }
 
-        [HttpGet] 
-        public async Task<IActionResult> HistoryOrder(int? id)
+        [HttpGet("Member/HistoryOrder/{memberid?}")]
+        public async Task<IActionResult> HistoryOrder(int? memberid)
         {
-            var historyOrders = _context.Orders
-                .Include(x => x.OrderExtraServicesDetails)
-                .Include(x => x.OrderActivitiesDetails)
-                .Include(x => x.OrderAccommodationDetails)
-                .Include(x => x.Coupons)
-                .Include(x => x.OrderHandleStatus)
-                .Include(x => x.PaymentStatus)
-                .Include(x => x.PaymentMethod);
+			if (!memberid.HasValue)
+			{
+				return BadRequest("Member ID is required");
+			}
+			var memberId = await _context.Members.Where(m => m.Id == memberid.Value).Select(m => m.Id).FirstOrDefaultAsync();
 
-           var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
-           var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
+			if (memberId == 0)
+			{
+				return NotFound("Member not found");
+			}
+			var orders = await _context.Orders
+		    .Where(o => o.MemberId == memberId)
+		    .Include(x => x.OrderExtraServicesDetails)
+		    .Include(x => x.OrderActivitiesDetails)
+		    .Include(x => x.OrderAccommodationDetails)
+		    .Include(x => x.Coupons)
+		    .Include(x => x.OrderHandleStatus)
+		    .Include(x => x.PaymentStatus)
+		    .Include(x => x.PaymentMethod)
+		    .ToListAsync();
 
-            return View(historyOrders);
-        }
+            if (!orders.Any())
+            {
+                return NotFound("Member not found or no orders for this member");
+            }
+            var orderDTOs = orders.Select(o => new OrderDto
+			{
+				Id = o.Id,
+				MemberId = o.MemberId,
+                PaymentMethodName = o.PaymentMethod.Name,   
+                PaymentStatusName = o.PaymentStatus.Name,
+				OrderHandleStatusId = o.OrderHandleStatusId,
+				CouponsId = o.CouponsId,
+				CreateDate = o.CreateDate,
+				ModifiedDate = o.ModifiedDate,  
+				Total = o.Total,
+
+				ExtraServiceDetails = o.OrderExtraServicesDetails.Select(es => new OrderExtraServiceDetailDTO
+				{
+					Id = es.Id,
+					OrderId = es.OrderId,
+					ExtraServiceId = es.ExtraServiceId,
+					ExtraServiceName = es.ExtraServiceName,
+					ExtraServiceProductId = es.ExtraServiceProductId,
+					Date = es.Date,
+					Price = es.Price,
+					Quantity = es.Quantity
+				}).ToList(),
+
+				ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
+				{
+					Id = ad.Id,
+					OrderId = ad.OrderId,
+					ActivityId = ad.ActivityId,
+					ActivityName = ad.ActivityName,
+					ActivityProductId = ad.ActivityProductId,
+					Date = ad.Date,
+					StartTime = ad.StartTime,
+					EndTime = ad.EndTime,
+					Price = ad.Price,
+					Quantity = ad.Quantity
+				}).ToList(),
+
+				AccommodationDetails = o.OrderAccommodationDetails.Select(ac => new OrderAccommodationDetailDTO
+				{
+					Id = ac.Id,
+					OrderId = ac.OrderId,
+					AccommodationId = ac.AccommodationId,
+					AccommodationName = ac.AccommodationName,
+					RoomProductId = ac.RoomProductId,
+					RoomType = ac.RoomType,
+					RoomName = ac.RoomName,
+					CheckIn = (DateTime)ac.CheckIn,
+					CheckOut = (DateTime)ac.CheckOut,
+					RoomPrice = (decimal)ac.RoomPrice,
+					Quantity = ac.Quantity,
+					Note = ac.Note
+				}).ToList()
+			}).ToList();
+			return View(orderDTOs);
+		}
 
         ////使用dapper做資料庫存取歷史訂單    
         //[HttpGet]
@@ -689,13 +814,27 @@ namespace RouteMasterFrontend.Controllers
                 myMember.Image = newFileName;
 
             }
-            
+
             _context.SaveChanges();
             img.MemberId = myMember.Id;
             _context.MemberImages.Add(img);
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult ShowTownSelect([FromBody]int regionId)
+        {
+            IEnumerable<Town> townList = _context.Towns.Where(t=>t.RegionId == regionId);
+
+            var townData = townList.Select(t=>new
+            {
+                townId = t.Id,
+                name= t.Name
+            }).ToList();
+
+            return Json(townData);
         }
 
         private Result ChangePassword(string account, MemberEditPasswordVM vm)
@@ -766,8 +905,8 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
                 IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -783,7 +922,6 @@ namespace RouteMasterFrontend.Controllers
             var member = db.Members.FirstOrDefault(m => m.Account == vm.Account);
             var salt = _hashUtility.GetSalt();
             var hashPassword = HashUtility.ToSHA256(vm.Password, salt);
-
 
 
             //帳號先，後密碼
@@ -917,9 +1055,9 @@ namespace RouteMasterFrontend.Controllers
                 Gender = vm.Gender,
                 Image = vm.Image,
                 ConfirmCode = Guid.NewGuid().ToString("N"),
-                IsConfirmed = false,
-                IsSuspended = false,
-                IsSuscribe = vm.IsSuscribe
+                IsConfirmed = true,
+                IsSuspended = false
+                //IsSuscribe = vm.IsSuscribe
             };
 
             // 將它存到db
@@ -961,7 +1099,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name+DateTime.Now.ToString("FFFFFFF"),
+                Account = payload.Name,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
@@ -971,7 +1109,6 @@ namespace RouteMasterFrontend.Controllers
                 IsConfirmed = false,
                 IsSuspended = false,
                 IsSuscribe = false,
-
             };
 
             //將它存到db
@@ -979,7 +1116,6 @@ namespace RouteMasterFrontend.Controllers
             _context.SaveChanges();
             img.MemberId = member.Id;
            
-
             return Result.Success();
         }
 
@@ -989,11 +1125,12 @@ namespace RouteMasterFrontend.Controllers
 
             // 檢查account,email正確性
             var memberInDb = _context.Members.FirstOrDefault(m => m.Account == account);
-            var myAccount = memberInDb.Account;
 
-            if (memberInDb == null) return Result.Failure("帳號或 Email 錯誤"); // 故意不告知確切錯誤原因
+            if (memberInDb == null) return Result.Failure("帳號或註冊信箱錯誤"); // 故意不告知確切錯誤原因
 
-            if (string.Compare(email, memberInDb.Email, StringComparison.CurrentCultureIgnoreCase) != 0) return Result.Failure("帳號或 Email 錯誤");
+            var myAccount = memberInDb.Account;        
+
+            if (string.Compare(email, memberInDb.Email, StringComparison.CurrentCultureIgnoreCase) != 0) return Result.Failure("帳號或註冊信箱錯誤");
 
             // 檢查 IsConfirmed必需是true, 因為只有已啟用的帳號才能重設密碼
             if (memberInDb.IsConfirmed == false) return Result.Failure("您還沒有啟用本帳號, 請先完成才能重設密碼");

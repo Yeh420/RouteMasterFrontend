@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MessagePack.Formatters;
 using Microsoft.AspNetCore.Cors;
@@ -20,10 +21,7 @@ namespace RouteMasterBackend.Controllers
     [ApiController]
     public class TravelPlansController : ControllerBase
     {
-        //放棄
-        //todo  儲存行程表
-        //todo  會員專區行程表呈現
-
+ 
 
 
 
@@ -35,6 +33,67 @@ namespace RouteMasterBackend.Controllers
         }
 
         // GET: api/TravelPlans
+
+
+
+
+        [HttpGet]
+        [Route("Get/AllAttractionsInfo")]
+        public async Task<IEnumerable<SelectAttractionAllInfoDto>> GetAllAttractionsInfo()
+        {
+
+
+            //checkboxList行為決定
+    
+
+
+            //8:00
+            //系統推薦路徑(?)
+
+
+            //活動依據時間設置限制
+
+
+
+
+
+            //11:00
+            //存行程表
+
+
+            //住宿改換陣列重新排(取得新的資訊push到裡面)
+            //拉住宿排
+            //設置起點
+
+
+            var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
+            {
+
+
+                AttractionId = x.Id,
+                AttractionName = x.Name,
+                StayHours=(int)Math.Round(_context.CommentsAttractions.Where(c=>c.AttractionId==x.Id&&c.StayHours!=null).Select(c=>c.StayHours.Value).Average()),
+                PositionX=x.PositionX,
+                PositionY=x.PositionY,
+
+                ExtListInAtt=x.ExtraServices.Select(e=>new ExtInAtt
+                {
+                    ExtId=e.Id,
+                    ExtName=e.Name,
+                }).ToList(),
+
+               ActListInAtt=x.Activities.Select(ac=>new ActInAtt
+                {
+                    ActId=ac.Id,
+                    ActName=ac.Name,    
+                }). ToList(),
+            });
+
+
+           return data;
+
+
+        }
 
         //仿造response
         [HttpGet]
@@ -308,6 +367,62 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+
+
+
+
+
+
+        [HttpGet]
+        [Route("Get/VuePageExtProductsInfo")]
+        public async Task<IEnumerable<ExtraServiceProductTravelCreateVuePageDto>> GetExtVuePageProductsInfo(int extraServiceId, DateTime beginDateTime)
+        {
+            var extProductsInDb = _context.ExtraServiceProducts
+                .Include(x => x.ExtraService)
+                .Where(x => x.ExtraServiceId == extraServiceId)
+                .Where(x => x.Date == beginDateTime.Date).Select(x => new ExtraServiceProductTravelCreateVuePageDto
+                {
+                   ExtraServiceProductId = x.ExtraServiceId,    
+                   ExtraServiceName = x.ExtraService.Name,                   
+                    Quantity = x.Quantity,
+                    Price = x.Price,
+                  
+                });
+            return extProductsInDb;
+
+
+        }
+
+
+
+
+
+
+
+        [HttpGet]
+        [Route("Get/VuePageActProductsInfo")]
+        public async Task<IEnumerable<ActivityProductTravelCreateVuePageDto>> GetActVuePageProductsInfo(int activityId,DateTime beginDateTime)
+        {
+            var actProductsInDb = _context.ActivityProducts
+                .Include(x => x.Activity)
+                .Where(x => x.ActivityId == activityId)
+                .Where(x => x.Date == beginDateTime.Date).Select(x => new ActivityProductTravelCreateVuePageDto
+                {
+                    ActivityProductId=x.Id,
+                    ActivityName=x.Activity.Name,
+                    Quantity=x.Quantity,
+                    Price=x.Price,
+                    StartTime=beginDateTime.Date.Add(x.StartTime),
+                    EndTime=beginDateTime.Date.Add(x.EndTime)                
+                });
+            return actProductsInDb;
+
+
+        }
+
+
+
+
         [HttpGet]
         [Route("Get/CalculateTransportTime")]
         public async Task<ActionResult<TransportTimeTrDto>> GetDateTime(TimeSpan latestEndTime, int timeValue)
@@ -321,6 +436,38 @@ namespace RouteMasterBackend.Controllers
 
 
             return data;
+
+        }
+
+
+
+
+        [HttpGet]
+        [Route("Get/CalculateTransportTime/DurationValue")]
+        public async Task<ActionResult<DateTime>> GetStartTimeByDurationValue(DateTime prevEndTime, int durationSeconds)
+        {
+
+
+            int minuteValue = durationSeconds / 60;
+            var result = prevEndTime.AddMinutes(minuteValue);
+
+
+            return result;
+
+        }
+    
+
+
+
+
+        [HttpGet]
+        [Route("Get/CalculateTransportTime/StayHours")]
+        public async Task<ActionResult<DateTime>> GetEndTimeByStayHours(DateTime startTime, int stayHours)
+        {
+            var result = startTime.AddHours(stayHours);
+
+
+            return result;
 
         }
 

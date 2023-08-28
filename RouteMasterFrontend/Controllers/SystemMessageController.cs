@@ -60,13 +60,25 @@ namespace RouteMasterFrontend.Controllers
             SystemMessage msg= await _context.SystemMessages
                 .Where (m=>m.Id == id).FirstAsync();
 
-            msg.IsRead = true;
-            _context.SystemMessages.Update(msg);
-            _context.SaveChanges();
 
-            string result = $"通知編號:{id}已被列為已讀";
+            if (!msg.IsRead)
+            {
+                msg.IsRead = true;
+                _context.SystemMessages.Update(msg);
+                _context.SaveChanges();
 
-            return result;
+                string result = $"通知編號:{id}已被列為已讀";
+                return result;
+
+            }
+            else
+            {
+                msg.IsRead= false;
+                _context.SystemMessages.Update(msg);
+                _context.SaveChanges();
+
+                return $"通知編號:{id}已回復成未讀狀態";
+            }
             
         }
 

@@ -33,23 +33,27 @@ namespace RouteMasterFrontend.Controllers
             switch (input.Manner)
             {
                 case 0:
-                    commentDb = commentDb.OrderBy(c => c.Id);
-                    break;
-                case 1:
                     commentDb = commentDb.OrderByDescending(c => c.CreateDate);
                     break;
-                case 2:
+                case 1:
                     commentDb = commentDb.OrderByDescending(c => c.Score);
                     break;
-                case 3:
+                case 2:
                     commentDb = commentDb.OrderBy(c => c.Score);
                     break;
-                case 4:
+                case 3:
                     commentDb = commentDb.OrderByDescending(c => c.StayHours);
+                    break;
+                case 4:
+                    commentDb = commentDb.OrderBy(c => c.StayHours);
                     break;
                 case 5:
                     commentDb = commentDb.OrderByDescending(c => c.Price);
                     break;
+                case 6:
+                    commentDb = commentDb.OrderBy(c => c.Price);
+                    break;
+
             }
 
             var proImg = _context.Comments_AttractionImages;
@@ -64,14 +68,59 @@ namespace RouteMasterFrontend.Controllers
                 Content= c.Content,
                 StayHours= (int)c.StayHours,
                 Price= (int)c.Price,
-                CreateDate= (c.CreateDate).ToString("yyyy/MM/dd"),
+                CreateDate= TransCommentCreate(c.CreateDate),
                 IsHidden = c.IsHidden,
                 ImageList=proImg.Where(p=>p.Comments_AttractionId==c.Id)
                 .Select(p=>p.Image).ToList(),
+                Profile=c.Member.Image,
+                Gender=c.Member.Gender,
+                Address= c.Member.Address.Length >= 3 ? c.Member.Address.Substring(0, 3) : c.Member.Address,
 
             }).ToListAsync();
 
             return Json(records);
+        }
+
+        private static string TransCommentCreate(DateTime createDate)
+        {
+            TimeSpan sinceCreation = DateTime.Now - createDate;
+            try
+            {
+                if (sinceCreation.TotalDays > 365)
+                {
+                    int years = (int)(sinceCreation.TotalDays / 365);
+                    return $"{years} 年前";
+                }
+                else if (sinceCreation.TotalDays > 60)
+                {
+                    return "多個月前";
+                }
+                else if (sinceCreation.TotalDays > 3)
+                {
+                    return "多天前";
+                }
+                else if (sinceCreation.TotalHours >= 24)
+                {
+                    return $"{(int)sinceCreation.TotalDays} 天前";
+                }
+                else if (sinceCreation.TotalHours >= 1)
+                {
+                    return $"{(int)sinceCreation.TotalHours} 小時前";
+                }
+                else if (sinceCreation.TotalMinutes >= 1)
+                {
+                    return $"{(int)sinceCreation.TotalMinutes} 分鐘前";
+                }
+                else
+                {
+                    return "剛剛";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return $"錯誤: {ex.Message}";
+            }
         }
 
         [HttpPost]

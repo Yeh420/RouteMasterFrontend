@@ -1084,8 +1084,9 @@
 
             if (checkbox.checked) {
 
-
+                targetInputNumber.value = 1;
                 targetInputNumber.classList.remove('hide');
+
                 let newTr = document.createElement('tr');
                 newTr.id = trId;
                 let tdEventName = document.createElement('td');
@@ -1385,6 +1386,7 @@
 
         }
 
+        //有用到??
         function CheckRoomProducts(rp){
            
             // 检查是否存在具有相同 id 的物件

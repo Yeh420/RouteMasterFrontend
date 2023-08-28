@@ -23,8 +23,10 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
         {
             ClaimsPrincipal user = HttpContext.User;
             var id = user.FindFirst("id").Value;
+            var memberAccount = user.Identity.Name;
             int memberid = int.Parse(id);
-            Member myMember = _context.Members.First(m => m.Id == memberid);
+            Member myMember = _context.Members.First(m => m.Account == memberAccount);
+
             var modelPasword = new MemberEditPasswordVM();
             modelPasword.id =memberid;
 
