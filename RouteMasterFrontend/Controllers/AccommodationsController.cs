@@ -28,7 +28,9 @@ namespace RouteMasterFrontend.Controllers
         {
             FilterDTO dto = new FilterDTO
             {
-                Grades = new List<double?>() { 1, 2, 3, 4, 5 },
+                MinBudget = 0,
+                MaxBudget = 10000,
+                Grades = new List<double?>() { 1, 2, 3, 4, 5, 6},
                 AcommodationCategories = await _context.AcommodationCategories.Select(ac => ac.Name).ToListAsync(),
                 CommentSorce = new List<int>() { 9, 8, 7 },
                 ServiceInfoes = new List<ServiceDTO>(),

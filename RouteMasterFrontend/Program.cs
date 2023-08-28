@@ -21,10 +21,15 @@ builder.Services.AddDbContext<RouteMasterContext>(options =>
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
-	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
 	options.Lockout.MaxFailedAccessAttempts = 2;
-
+	options.Lockout.AllowedForNewUsers = false;
 });
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+//	.AddSignInManager<SignInManager<IdentityUser>>();
+    
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddGoogle(options =>
 {
 	options.ClientId = "161026089487 - tl7dobkpg2r05cnahqrho3af1vdjn33q.apps.googleusercontent.com";

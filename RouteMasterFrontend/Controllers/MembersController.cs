@@ -28,6 +28,7 @@ using static Google.Apis.Requests.BatchRequest;
 using RouteMasterFrontend.Models.ViewModels.Carts;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics.Metrics;
+using Microsoft.AspNetCore.Identity;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -37,6 +38,7 @@ namespace RouteMasterFrontend.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly HashUtility _hashUtility;
         private readonly IConfiguration _configuration;
+        //private readonly SignInManager<IdentityUser> _signInManager;
 
         public MembersController(RouteMasterContext context, IWebHostEnvironment environment, IConfiguration configuration)
         {
@@ -44,7 +46,7 @@ namespace RouteMasterFrontend.Controllers
             _environment = environment;
             _hashUtility = new HashUtility(configuration);
             _configuration = configuration;
-
+            //_signInManager = signInManager;
         }
 
         // GET: Members/Edit/5
@@ -106,10 +108,37 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
+
+        [HttpPost]
         //會員普通登入
         public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
         {
             if (ModelState.IsValid == false) return BadRequest(new { success = false, message = "Invalid input" });
+
+
+            ////鎖定帳號
+            //if (ModelState.IsValid)
+            //{
+            //    var attemptResult = await _signInManager.PasswordSignInAsync(vm.Account, vm.Password, vm.RememberMe, lockoutOnFailure: true);
+
+            //    if (attemptResult.Succeeded)
+            //    {
+            //        // 登入成功的處理
+            //        return RedirectToAction("Index", "Home");
+            //    }
+            //    if (attemptResult.IsLockedOut)
+            //    {
+            //        // 處理使用者被鎖定的情況
+            //        return View("AccountLocked");
+            //    }
+            //    else
+            //    {
+            //        // 登入失敗的處理
+            //        ModelState.AddModelError(string.Empty, "無效的登入嘗試。");
+            //    }
+            //}
+
+
 
             //帳密IsExist
             Result result = ValidLogin(vm);
@@ -371,6 +400,10 @@ namespace RouteMasterFrontend.Controllers
 
             Member myMember = _context.Members.First(m => m.Account == userAccount);
 
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             if (user.Identity.IsAuthenticated)
             {
@@ -445,7 +478,30 @@ namespace RouteMasterFrontend.Controllers
 
         }
 
+        [AcceptVerbs("GET")]
+        public IActionResult CheckRepeatAccount(string Account)
+        {
+            var isAccountReapeat = _context.Members.FirstOrDefault(m=>m.Account == Account);
 
+            if (isAccountReapeat != null)
+            {
+                return Json($"{Account} 已經被註冊過囉，請換一個.");
+            }
+
+            return Json(true);
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckRepeatEmail (string Email)
+        {
+            var isEmailReapeat = _context.Members.FirstOrDefault(m => m.Email == Email);
+
+            if (isEmailReapeat != null)
+            {
+                return Json($"{Email} 已經被註冊過囉，請換一個.");
+            }
+            return Json(true);
+        }
 
         //會員登出
         [HttpGet]
@@ -454,6 +510,16 @@ namespace RouteMasterFrontend.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("LogoutSuccess", "Members");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditPasswordLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 返回 JSON 响应
+            return Json(new { message = "登出成功" });
         }
 
         //登出成功畫面
@@ -564,30 +630,105 @@ namespace RouteMasterFrontend.Controllers
             member.Address=dto.address;
             member.Gender=dto.gender;
             member.Birthday=dto.birthday;
-            member.IsSuscribe=dto.isSuscribe;
+            member.IsSuscribe = dto.isSuscribe;
+
+            List<Region> regions = _context.Regions.ToList();
+            List<Town> towns = _context.Towns.ToList();
+            ViewBag.Regions = regions;
+            ViewBag.Towns = towns;
 
             //_context.Entry(member).State =EntityState.Modified;
             _context.SaveChanges();
             return ViewComponent("MemberArea");
         }
 
-        [HttpGet] 
-        public async Task<IActionResult> HistoryOrder(int? id)
+        [HttpGet("Member/HistoryOrder/{memberid?}")]
+        public async Task<IActionResult> HistoryOrder(int? memberid)
         {
-            var historyOrders = _context.Orders
-                .Include(x => x.OrderExtraServicesDetails)
-                .Include(x => x.OrderActivitiesDetails)
-                .Include(x => x.OrderAccommodationDetails)
-                .Include(x => x.Coupons)
-                .Include(x => x.OrderHandleStatus)
-                .Include(x => x.PaymentStatus)
-                .Include(x => x.PaymentMethod);
+			if (!memberid.HasValue)
+			{
+				return BadRequest("Member ID is required");
+			}
+			var memberId = await _context.Members.Where(m => m.Id == memberid.Value).Select(m => m.Id).FirstOrDefaultAsync();
 
-           var orderInDb= _context.Orders.Where(x => x.MemberId == id).First();
-           var actDetail = _context.OrderActivitiesDetails.Where(x => x.OrderId == orderInDb.Id).First().ActivityName;
+			if (memberId == 0)
+			{
+				return NotFound("Member not found");
+			}
 
-            return View(historyOrders);
-        }
+			var orders = await _context.Orders
+		    .Where(o => o.MemberId == memberId)
+		    .Include(x => x.OrderExtraServicesDetails)
+		    .Include(x => x.OrderActivitiesDetails)
+		    .Include(x => x.OrderAccommodationDetails)
+		    .Include(x => x.Coupons)
+		    .Include(x => x.OrderHandleStatus)
+		    .Include(x => x.PaymentStatus)
+		    .Include(x => x.PaymentMethod)
+		    .ToListAsync();
+
+            if (!orders.Any())
+            {
+                return NotFound("Member not found or no orders for this member");
+            }
+            var orderDTOs = orders.Select(o => new OrderDto
+			{
+				Id = o.Id,
+				MemberId = o.MemberId,
+                PaymentMethodName = o.PaymentMethod.Name,   
+                PaymentStatusName = o.PaymentStatus.Name,
+				OrderHandleStatusId = o.OrderHandleStatusId,
+				CouponsId = o.CouponsId,
+				CreateDate = o.CreateDate,
+				ModifiedDate = o.ModifiedDate,  
+				Total = o.Total,
+
+				ExtraServiceDetails = o.OrderExtraServicesDetails.Select(es => new OrderExtraServiceDetailDTO
+				{
+					Id = es.Id,
+					OrderId = es.OrderId,
+					ExtraServiceId = es.ExtraServiceId,
+					ExtraServiceName = es.ExtraServiceName,
+					ExtraServiceProductId = es.ExtraServiceProductId,
+                   
+					Date = es.Date,
+					Price = es.Price,
+					Quantity = es.Quantity
+				}).ToList(),
+
+				ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
+				{
+					Id = ad.Id,
+					OrderId = ad.OrderId,
+					ActivityId = ad.ActivityId,
+					ActivityName = ad.ActivityName,
+					ActivityProductId = ad.ActivityProductId,
+                   
+					Date = ad.Date,
+					StartTime = ad.StartTime,
+					EndTime = ad.EndTime,
+					Price = ad.Price,
+					Quantity = ad.Quantity
+				}).ToList(),
+
+				AccommodationDetails = o.OrderAccommodationDetails.Select(ac => new OrderAccommodationDetailDTO
+				{
+					Id = ac.Id,
+					OrderId = ac.OrderId,
+					AccommodationId = ac.AccommodationId,
+					AccommodationName = ac.AccommodationName,
+					RoomProductId = ac.RoomProductId,
+					RoomType = ac.RoomType,
+					RoomName = ac.RoomName,
+					CheckIn = (DateTime)ac.CheckIn,
+					CheckOut = (DateTime)ac.CheckOut,
+					RoomPrice = ac.RoomPrice,
+					Quantity = ac.Quantity,
+					Note = ac.Note
+				}).ToList()
+			}).ToList();
+			return View(orderDTOs);
+		}
 
         ////使用dapper做資料庫存取歷史訂單    
         //[HttpGet]

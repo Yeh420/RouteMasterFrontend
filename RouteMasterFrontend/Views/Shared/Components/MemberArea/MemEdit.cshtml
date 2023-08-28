@@ -19,6 +19,18 @@
         width:300px;
     }
 
+    .container #editInfo {
+        background: #A6FFFF;
+    }
+
+        .container #editInfo:hover {
+            background: #FFBFBF;
+            color: #FAFAFA;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #FFCF78, 0 0 25px #FFCF78,
+            /*0 0 40px #30FFFF,
+            0 0 60px #00F5F5;*/
+        }
 </style>
 
 <div class="container">
@@ -56,7 +68,7 @@
                     <label>住址：</label>
                     <input asp-for="Address" id="Address" class="form-control" />
                     <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
+                </div>                
                 <div >
                     <label>性別：</label>
                     <input asp-for="Gender" id="Gender" class="form-control" value="@((Model.Gender == false) ? "男性" : "女性")" />
@@ -73,7 +85,7 @@
                     </label>
                 </div>
                 <div >
-                <input type="button" value="更改資料" class="btn btn-secondary" id="editInfo" />
+                <input type="button"  value="更改資料" class="btn" id="editInfo" />
                 @*<button type="button" class="btn btn-danger" id="editInfo">更改資料</button>*@
                 </div>           
         </div>
@@ -89,6 +101,14 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var addressInput = document.querySelector('#Address');
+        if (addressInput) {
+            var originalValue = addressInput.value;
+            var truncatedValue = originalValue.substring(0, 3); // 截取前三个字
+            addressInput.value = truncatedValue;
+        }
+    });
         document.querySelector('#editInfo').addEventListener('click',function(){
           
             var dto =  {
@@ -97,12 +117,12 @@
                 lastName: document.querySelector('#LastName').value,
                 email: document.querySelector('#Email').value,
                 cellPhoneNumber: document.querySelector('#CellPhoneNumber').value,
-                address: document.querySelector('#Address').value,
+            address: document.querySelector('#Address').value,
                 gender: document.querySelector('#Gender').value === "男性" ? false : true,
                 birthday: document.querySelector('#Birthday').value,
                 isSuscribe: document.querySelector('#IsSuscribe').checked
             }
-            alert(dto);
+            
             console.log(dto);
             $.ajax({
                  type:"PUT",
@@ -123,5 +143,9 @@
             });
 
         });
+
+
+        
+    
     </script>
 
