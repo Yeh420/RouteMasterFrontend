@@ -23,7 +23,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[Display(Name = "帳號")]
 		[Required(ErrorMessage = "必填")]
 		[StringLength(30)]
-		//[Remote(action: "CheckRepeatAccount", controller:"Members", AdditionalFields = nameof(Account))]
+		[Remote(action: "CheckRepeatAccount", controller:"Members", AdditionalFields = nameof(Account))]
 		public string? Account { get; set; }
 
 
@@ -44,7 +44,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
         [Required(ErrorMessage = "必填")]
         //[StringLength(255)]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        //[Remote(action: "CheckRepeatEmail", controller: "Members", AdditionalFields = nameof(Email))]
+        [Remote(action: "CheckRepeatEmail", controller: "Members", AdditionalFields = nameof(Email))]
         public string? Email { get; set; }
 
 

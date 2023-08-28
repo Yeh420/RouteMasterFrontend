@@ -458,10 +458,11 @@ namespace RouteMasterFrontend.Controllers
             {
                 return Json($"{Account} 已經被註冊過囉，請換一個.");
             }
-            return Json($"{Account} 這個帳號可以使用");
+
+            return Json(true);
         }
 
-        [AcceptVerbs("GET")]
+        [AcceptVerbs("GET", "POST")]
         public IActionResult CheckRepeatEmail (string Email)
         {
             var isEmailReapeat = _context.Members.FirstOrDefault(m => m.Email == Email);
@@ -470,7 +471,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 return Json($"{Email} 已經被註冊過囉，請換一個.");
             }
-            return Json($"{Email} 這個信箱可以使用");
+            return Json(true);
         }
 
         //會員登出
