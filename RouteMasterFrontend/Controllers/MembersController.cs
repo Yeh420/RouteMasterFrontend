@@ -108,6 +108,8 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
+
+        [HttpPost]
         //會員普通登入
         public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
         {
