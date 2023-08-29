@@ -54,7 +54,11 @@
             }
 
 
+            .timeWarn{
 
+
+                background-color:#FFC107
+            }
 
         .custom-btn::after {
             content: attr(data-tooltip);
@@ -242,12 +246,11 @@
         <div class="col-8 row">
             <div class="col-12">
                 <label>設定起始時間</label>
-                <input v-model="formattedTravelBeginTime" type="datetime-local" @@input="setSortedAttractionsWithTime" />
+                <input v-model="formattedTravelBeginTime" type="datetime-local" @@change="setSortedAttractionsWithTime" />
                 <div class="row">                         
                     <div class="col-3">
                         <br />
-                        <br />
-           
+                        <br />         
              
 
 
@@ -285,7 +288,7 @@
                             <tbody>
                                 <tr v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" style="height: 100px">                                   
                                     <td>
-                                        <input v-model="attraction.startTime" type="datetime-local" @@input="userInputStartTime(attraction,index)" />
+                                        <input v-model="attraction.startTime" type="datetime-local" @@change="userInputStartTime(attraction,index)" />
                                         <div style="text-align:center">{{attraction.attName}}</div>
                                         <ul class="checkbox-list">
                                             <li v-for="extObj in attraction.extList">
@@ -295,7 +298,7 @@
                                                 <div style="transform: translateX(20px);" v-if="extObj.extProducts!=''">
                                                     <ul class="checkbox-list">
                                                         <li v-for="extProduct in extObj.extProducts">
-                                                            <label>
+                                                            <label >
                                                                 
                                                                 <input type="checkbox" name="extProductCheckBox"
                                                                        v-bind:value="extProduct.extraServiceProductId"
@@ -312,7 +315,7 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        <input v-model="attraction.endTime" type="datetime-local" @@input="userInputEndTime(attraction,index)" />
+                                        <input v-model="attraction.endTime" type="datetime-local" @@change="userInputEndTime(attraction,index)" />
                                         <br />
                                         <ul class="checkbox-list">
                                             <li v-for="actObj in attraction.actList">
@@ -322,7 +325,7 @@
                                                 <div  style="transform: translateX(20px);" v-if="actObj.actProducts!=''">
                                                     <ul class="checkbox-list">
                                                         <li v-for="actProduct in actObj.actProducts">                                             
-                                                            <label>                                   
+                                                            <label v-bind:class="{'timeWarn':attraction.endTime<actProduct.endTime||attraction.startTime>actProduct.startTime}">                                   
                                                                 
                                                                 <input type="checkbox" name="actProductCheckBox"
                                                                        v-bind:data-startTime="actProduct.startTime"
@@ -409,7 +412,6 @@
 
 
 
-    <div>{{sortedAttractions}}</div>
 
 
 </div>
@@ -764,7 +766,7 @@
 
 
 
-
+                //排程方法
                 setSortedAttractionsWithTime:async function(){
                     this.sortedAttractionsWithTime = this.sortedAttractions;
                     for (let i = 0; i < this.sortedAttractionsWithTime.length;i++){
@@ -809,10 +811,12 @@
                             } 
                         }
                     }
+
+                    this.$forceUpdate()
                 },
 
 
-
+                //輸入抵達時間
                 userInputStartTime: async function (attraction, index) {
                     console.log("使用者改抵達時間啦")
                     console.log(attraction)
@@ -820,9 +824,13 @@
 
                     //this.sortedAttractionsWithTime[index].startTime已改，之後也要完成
                     if(index==0){
-                        this.setSortedAttractionsWithTime();
+                        this.formattedTravelBeginTime = attraction.startTime;
+                   
+                     await   this.setSortedAttractionsWithTime();
 
                     }else{
+
+                        console.log("index==0沒錯啦，但是我進來摟!")
                         for (let i = index; i < this.sortedAttractionsWithTime.length; i++) {
 
 
@@ -878,51 +886,104 @@
                             }
 
 
-                    }               
+                    }
+
+                    this.$forceUpdate()
                 },
 
-
+                //輸入離開時間
                 userInputEndTime: async function (attraction, index) {
                     console.log("使用者改離開時間啦")
                     console.log(attraction)
                     console.log(index)
 
 
-                    for (let i = index; i < this.sortedAttractionsWithTime.length;i++){
+                   
 
-                        if(i==0){
 
-                            console.log('donothing');
+                    if(index==0){
+                        for (let i = index; i < this.sortedAttractionsWithTime.length; i++) {
 
-                        }else{
 
-                            let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
-                            let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
-                            await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
-                                params: {
-                                    prevEndTime: prevEndTime,
-                                    durationSeconds: durationSeconds,
-                                }
-                            }).then(response => {
 
-                                this.sortedAttractionsWithTime[i].startTime = response.data
-                            }).catch(err => {
-                                console.log(err)
-                            })
+                            if (i == 0) {
 
-                            await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
-                                params: {
-                                    startTime: this.sortedAttractionsWithTime[i].startTime,
-                                    stayHours: this.sortedAttractionsWithTime[i].stayHours
-                                }
-                            }).then(response => {
+                                console.log('donothing');
 
-                                this.sortedAttractionsWithTime[i].endTime = response.data
-                            }).catch(err => {
-                                console.log(err)
-                            })
+                            } else {
+
+                                let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
+                                console.log(prevEndTime)
+
+
+                                let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
+                                    params: {
+                                        prevEndTime: prevEndTime,
+                                        durationSeconds: durationSeconds,
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].startTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                    params: {
+                                        startTime: this.sortedAttractionsWithTime[i].startTime,
+                                        stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].endTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+                            }
                         }
-                    }               
+
+                    }else{
+                        for (let i = index; i < this.sortedAttractionsWithTime.length; i++){
+                            if(i==index){
+                                console.log('donothingAgain')
+                            }else{
+                                let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
+                                console.log(prevEndTime)
+
+
+                                let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
+                                    params: {
+                                        prevEndTime: prevEndTime,
+                                        durationSeconds: durationSeconds,
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].startTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                    params: {
+                                        startTime: this.sortedAttractionsWithTime[i].startTime,
+                                        stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].endTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+                            }
+                        }
+                    }
+
+                   
+
+
+                    this.$forceUpdate()
                 },
 
 
@@ -1212,7 +1273,6 @@
 
 
                 saveSchedule:function(){
-                    console.log('存行程表啦!')
 
 
 
