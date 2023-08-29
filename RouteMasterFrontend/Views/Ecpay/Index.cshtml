@@ -23,12 +23,6 @@
     <!-- 分隔線 -->
     <hr />
 
-    <!-- 取得訂單資訊、虛擬帳號的部分 -->
-    @foreach (var key in @Model.Keys.ToList())
-    {
-        @(key)
-        <input type="text" name="@key" value="@Model[key]" disabled />
-        <br />
-    }
+  
 </body>
 </html>

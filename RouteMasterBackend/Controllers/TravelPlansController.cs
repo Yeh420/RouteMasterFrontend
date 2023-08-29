@@ -44,6 +44,9 @@ namespace RouteMasterBackend.Controllers
 
 
 
+            //景點加入排程之後 容器高度沒有回復
+
+
 
             //活動依據時間設置限制
             //系統推薦路徑 /一鍵套用
@@ -378,7 +381,7 @@ namespace RouteMasterBackend.Controllers
                 .Where(x => x.ExtraServiceId == extraServiceId)
                 .Where(x => x.Date == beginDateTime.Date).Select(x => new ExtraServiceProductTravelCreateVuePageDto
                 {
-                   ExtraServiceProductId = x.ExtraServiceId,    
+                   ExtraServiceProductId = x.Id,    
                    ExtraServiceName = x.ExtraService.Name,                   
                     Quantity = x.Quantity,
                     Price = x.Price,

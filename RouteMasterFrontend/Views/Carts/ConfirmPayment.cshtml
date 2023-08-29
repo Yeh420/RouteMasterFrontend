@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "結帳完成";
+    var memberId = ViewBag.MemberId;
 }
 <style>
     .step-container {
@@ -76,8 +77,11 @@
                     <p>我們將儘快處理您的訂單，您可以在會員專區的「我的訂單」中查看您的訂單。</p>
 
                     <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-4">返回首頁</a>
+                  @*  <a href="@Url.Action("HistoryOrder", "Members", new {memberid = ViewBag.MemberId })" class="btn btn-primary mt-4">前往訂單</a>*@
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+              

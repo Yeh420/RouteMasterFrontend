@@ -163,7 +163,7 @@
                         @foreach (var accommodationDTO in Model.Accommodations)
                         {
                                 totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
-                           <tr data-roomProductId="@accommodationDTO.Id">
+                                <tr data-roomProductId="@accommodationDTO.RoomId">
                                 <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
                                 <td class="align-middle text-center">@accommodationDTO.RoomName @accommodationDTO.RoomTypeName</td>
@@ -414,7 +414,9 @@
                         success: function (result) {
                             if (result.success) {
                                 alert(result.message);
-                                $(`tr[data-roomProductId=${roomProductId}]`).remove();
+
+                                console.log(roomProductId)
+                                $(`tr[data-roomproductid=${roomProductId}]`).remove();
                                 const price = parseFloat(itemPrice);
                                 if (!isNaN(price)) {
                                     _this.totalAmount -= price;
