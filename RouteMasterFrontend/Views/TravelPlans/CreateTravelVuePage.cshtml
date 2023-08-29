@@ -93,6 +93,104 @@
                 width: 100%; /* 让输入框宽度充满其父元素（即<td>） */
                 box-sizing: border-box; /* 包含边框在内，以不增加输入框的宽度 */
             }
+
+
+
+
+        input[type="checkbox"][name="actProductCheckBox"]:hover::before {
+            content: "開始時間: \A" attr(data-startTime) "\A結束時間: \A" attr(data-endTime) "\A 可購買數量: " attr(data-quantity) "\A價格: " attr(data-price);
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            left: 110%; /* 调整tooltip的位置，根据需要 */
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: pre-line; /* 使换行符生效 */
+            z-index: 999;
+            display: none; /* 初始状态下隐藏tooltip */
+            width: 200px; /* 你可以根据需要调整宽度 */
+        }
+
+        input[type="checkbox"][name="actProductCheckBox"]:hover::before {
+            display: block; 
+        }
+
+
+        input[type="checkbox"][name="extProductCheckBox"]:hover::before {
+            content:"可購買數量: " attr(data-quantity) "\A價格: " attr(data-price);
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            left: 110%; /* 调整tooltip的位置，根据需要 */
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: pre-line; /* 使换行符生效 */
+            z-index: 999;
+            display: none; /* 初始状态下隐藏tooltip */
+            width: 200px; /* 你可以根据需要调整宽度 */
+        }
+
+        input[type="checkbox"][name="extProductCheckBox"]:hover::before {
+            display: block;
+        }
+
+
+
+        .disabled-checkbox {
+            opacity: 0.5; /* 降低不可用 checkbox 的不透明度，使其看起来灰色 */
+            pointer-events: none; /* 禁止用户与不可用 checkbox 进行交互 */
+        }
+
+        .fixed-container {
+            position: fixed;
+            bottom: 200px;
+            right: 50px;
+            width: 250px;
+            height: auto; /* 高度设置为自动，容器会根据内容增长 */
+            background-color: #fff;
+            border: 1px solid transparent; /* 初始状态下边框透明 */
+            padding: 10px;
+            /* 其他样式属性，根据需要添加 */
+
+            transition: border-color 0.3s ease; /* 添加过渡效果，使边框的变化平滑 */
+        }
+
+
+            .fixed-container:hover {
+                border-color: #ccc; /* hover 时显示边框颜色 */
+            }
+
+
+        div[name="stayHoursContainer"] {
+            position: relative; /* 让容器成为定位的基准点 */
+        }
+
+        div[name="stayHoursContainer"]:hover::before {
+            content: "平均停留时间: " attr(data-stayHours) " 小时";
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            left: 100%; /* 相对于容器右侧 */
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: pre-line; /* 使换行符生效 */
+            z-index: 999;
+            display: none; /* 初始状态下隐藏tooltip */
+            width: 200px; /* 你可以根据需要调整宽度 */
+        }
+
+        div[name="stayHoursContainer"]:hover::before {
+            display: block;
+        }
+
+        
+       
     </style>
 }
 
@@ -102,8 +200,9 @@
 
 
     <div >
-        <button class="btn btn-primary dropdown-toggle" @@click="toggleAllAttractionContainer">顯示/隱藏</button>
-        <button class="btn btn-primary dropdown-toggle" @@click="addAllItemsToCart">加入購物車</button>
+        <button class="btn btn-outline-info dropdown-toggle m-1" @@click="toggleAllAttractionContainer">顯示/隱藏</button>
+        <button class="btn btn-outline-success  m-1" @@click="saveSchedule">儲存行程表</button>
+        <button class="btn btn-outline-secondary m-1" @@click="addAllItemsToCart"><i class="fas fa-shopping-cart"></i></button>
         <template v-if="AllAttractionContainerStatus">
             <div>
                 <div class="d-flex row max-height-containers"
@@ -122,12 +221,28 @@
     <br />
 
 
+    <div class="fixed-container">
+        <div v-for="(visitedAttObj,index) in visitedAttraction "
+             class="w-100"
+             :key="visitedAttObj.attId"
+             style="width:120px;text-align:center;justify-content:center;"
+             @@drop="drop(index,$event)"
+             @@dragover="allowDrop($event)">
+
+            <div class="badge bg-success text-wrap m-2 p-2" style="text-align:center;justify-content:center; cursor: grab; font-size:10px;width:12rem" draggable="true" @@dragstart="drag(visitedAttObj,index,$event)">{{index+1}}. {{visitedAttObj.attName}}</div>
+        </div>
+    </div>
+
+
+
+
+
 
     <div class="d-flex row">
         <div class="col-8 row">
-            <div class="col-10">
+            <div class="col-12">
                 <label>設定起始時間</label>
-                <input v-model="formattedTravelBeginTime" type="datetime-local" />
+                <input v-model="formattedTravelBeginTime" type="datetime-local" @@input="setSortedAttractionsWithTime" />
                 <div class="row">                         
                     <div class="col-3">
                         <br />
@@ -145,6 +260,7 @@
                             <div>
                                 <div class="badge bg-success text-wrap  p-1 m-1"
                                      style="width: 8rem;font-size:15px"
+                                     name="stayHoursContainer"
                                      :data-stayHours="attraction.stayHours">
                                     {{attraction.attName}}
                                 </div>
@@ -169,7 +285,7 @@
                             <tbody>
                                 <tr v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" style="height: 100px">                                   
                                     <td>
-                                        <input v-model="attraction.startTime" type="datetime-local" />
+                                        <input v-model="attraction.startTime" type="datetime-local" @@input="userInputStartTime(attraction,index)" />
                                         <div style="text-align:center">{{attraction.attName}}</div>
                                         <ul class="checkbox-list">
                                             <li v-for="extObj in attraction.extList">
@@ -180,8 +296,14 @@
                                                     <ul class="checkbox-list">
                                                         <li v-for="extProduct in extObj.extProducts">
                                                             <label>
-                                                                <input type="number" v-model="extProduct.inputQuantity" value="1" :min="1" :max="extProduct.quantity" @@input="handleExtProductInputQuantityChange(extProduct,$event)" />
-                                                                <input type="checkbox" v-bind:value="extProduct.extraServiceProductId" @@change="chooseExtraServiceProductObject(extProduct,$event)" /> {{extProduct.activityName}}
+                                                                
+                                                                <input type="checkbox" name="extProductCheckBox"
+                                                                       v-bind:value="extProduct.extraServiceProductId"
+                                                                       v-bind:data-quantity="extProduct.quantity"
+                                                                       v-bind:data-price="extProduct.price"
+                                                                    @@change="chooseExtraServiceProductObject(extProduct,$event)" /> {{extProduct.extraServiceName}}
+
+                                                                <input type="number" v-model="extProduct.inputQuantity" value="1" :min="1" :max="extProduct.quantity" class="m-1" style="width:50px" @@input="handleExtProductInputQuantityChange(extProduct,$event)" />
                                                             </label>
                                                         </li>
                                                     </ul>
@@ -190,7 +312,7 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        <input v-model="attraction.endTime" type="datetime-local" />
+                                        <input v-model="attraction.endTime" type="datetime-local" @@input="userInputEndTime(attraction,index)" />
                                         <br />
                                         <ul class="checkbox-list">
                                             <li v-for="actObj in attraction.actList">
@@ -200,9 +322,16 @@
                                                 <div  style="transform: translateX(20px);" v-if="actObj.actProducts!=''">
                                                     <ul class="checkbox-list">
                                                         <li v-for="actProduct in actObj.actProducts">                                             
-                                                            <label>
-                                                                <input type="number" v-model="actProduct.inputQuantity" value="1" :min="1" :max="actProduct.quantity" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
-                                                                <input type="checkbox" v-bind:value="actProduct.activityProductId" @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
+                                                            <label>                                   
+                                                                
+                                                                <input type="checkbox" name="actProductCheckBox"
+                                                                       v-bind:data-startTime="actProduct.startTime"
+                                                                       v-bind:data-endTime="actProduct.endTime"
+                                                                       v-bind:data-quantity="actProduct.quantity"
+                                                                       v-bind:data-price="actProduct.price"
+                                                                    v-bind:value="actProduct.activityProductId"
+                                                                @@change="chooseActivityProductObject(actProduct,$event)" /> {{actProduct.activityName}}
+                                                                <input type="number" v-model="actProduct.inputQuantity" value="1" :min="1" :max="actProduct.quantity" class="m-1" style="width:50px" @@input="handleActProductInputQuantityChange(actProduct,$event)" />
                                                             </label>                                                         
                                                         </li>
                                                     </ul>
@@ -221,16 +350,7 @@
 
 
             </div>
-            <div class="col-2">
-                <div v-for="(visitedAttObj,index) in visitedAttraction "
-                     class="border border-primary rounded-1 m-1 p-2 w-100"
-                     :key="visitedAttObj.attId"
-                     style="width:120px"
-                     @@drop="drop(index,$event)"
-                     @@dragover="allowDrop($event)">
-                    <div style="text-align:center;justify-content:center; cursor: grab;" draggable="true" @@dragstart="drag(visitedAttObj,index,$event)">{{index+1}}. {{visitedAttObj.attName}}</div>
-                </div>
-            </div>
+            
         </div>
         <div class="col-4 d-flex row">
             <ul class="nav nav-tabs">
@@ -242,7 +362,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" v-bind:class="{'active':rightSidePage ==3 }" href="#" @@click="setRightSidePage(3)">未排程景點</a>
-                </li>
+                </li>       
             </ul>           
 
             <template v-if="rightSidePage==1">
@@ -274,22 +394,22 @@
             </template>
 
 
-            <template v-else>
+            <template v-else="rightSidePage==3">
                 <div>         
                     <div v-for="attObj in unvisitedAttraction" :key="attObj.attId">
                         <div class="badge bg-secondary text-wrap m-2 p-2" style="width: 15rem;font-size:20px">{{attObj.attName}}</div>
                         <button class="m-1 p-1 btn btn-outline-secondary" @@click="AddToVisitedArray(attObj);setSortedAttractionsWithTime()">加入</button>
                     </div>                 
                 </div>
-            </template>                           
+            </template>
+
+  
         </div>    
     </div>
 
 
-    <div>{{selectedActivityProducts}}</div>
-    <div>{{selectedExtraServiceProducts}}</div>
 
-
+    <div>{{sortedAttractions}}</div>
 
 
 </div>
@@ -297,7 +417,9 @@
 
 @section Scripts{
     
-@*    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0&callback=initMap"></script>   *@
+
+    @*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0&callback=initMap"></script>   *@
+
     <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
@@ -407,6 +529,8 @@
                     { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
                     { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
                     { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+
+                    //unvisitedAttraction:[],
                     //visitedAttraction: 
                     //[
                     //{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
@@ -600,8 +724,7 @@
 
 
 
-               drag: function (visitedAttObj,index, event) {
-                    console.log('drag啦啦啦')
+               drag: function (visitedAttObj,index, event) {            
                     event.dataTransfer.setData('visitedAttObj', JSON.stringify(visitedAttObj));
                     event.dataTransfer.setData('currentIndex', index);
                },
@@ -643,17 +766,10 @@
 
 
                 setSortedAttractionsWithTime:async function(){
-
-
                     this.sortedAttractionsWithTime = this.sortedAttractions;
-
                     for (let i = 0; i < this.sortedAttractionsWithTime.length;i++){
-
                         if(i==0){
                             this.sortedAttractionsWithTime[i].startTime = this.formattedTravelBeginTime
-
-
-
                            await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
                                 params: {
                                     startTime: this.sortedAttractionsWithTime[i].startTime,
@@ -665,18 +781,9 @@
                                 console.log(err)
                             })
                         }else{
-
-
                             if (i > 0 && this.sortedAttractionsWithTime.length > i) {
-
                                 let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
-
-                                
                                 let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
-
-             
-
-
                             await    axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
                                     params: {
                                         prevEndTime: prevEndTime,
@@ -688,8 +795,6 @@
                                 }).catch(err => {
                                     console.log(err)
                                 })
-
-
                              await   axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
                                     params: {
                                         startTime: this.sortedAttractionsWithTime[i].startTime,
@@ -701,36 +806,133 @@
                                 }).catch(err => {
                                     console.log(err)
                                 })
-
                             } 
-
-
-                   
-
-
-
-
                         }
-
-
-
                     }
-
-
-
-
-
-                   
-
                 },
+
+
+
+                userInputStartTime: async function (attraction, index) {
+                    console.log("使用者改抵達時間啦")
+                    console.log(attraction)
+                    console.log(index)
+
+                    //this.sortedAttractionsWithTime[index].startTime已改，之後也要完成
+                    if(index==0){
+                        this.setSortedAttractionsWithTime();
+
+                    }else{
+                        for (let i = index; i < this.sortedAttractionsWithTime.length; i++) {
+
+
+                            if(i==index){
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                    params: {
+                                        startTime: this.sortedAttractionsWithTime[i].startTime,
+                                        stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                    }
+                                }).then(response => {
+                                    this.sortedAttractionsWithTime[i].endTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })                              
+
+                            }else{
+                                let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
+                                let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
+                                    params: {
+                                        prevEndTime: prevEndTime,
+                                        durationSeconds: durationSeconds,
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].startTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+                                await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                    params: {
+                                        startTime: this.sortedAttractionsWithTime[i].startTime,
+                                        stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                    }
+                                }).then(response => {
+
+                                    this.sortedAttractionsWithTime[i].endTime = response.data
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+
+
+
+                            }
+
+
+
+
+                            
+
+
+                            }
+
+
+                    }               
+                },
+
+
+                userInputEndTime: async function (attraction, index) {
+                    console.log("使用者改離開時間啦")
+                    console.log(attraction)
+                    console.log(index)
+
+
+                    for (let i = index; i < this.sortedAttractionsWithTime.length;i++){
+
+                        if(i==0){
+
+                            console.log('donothing');
+
+                        }else{
+
+                            let prevEndTime = this.sortedAttractionsWithTime[i - 1].endTime;
+                            let durationSeconds = this.selectedPathesOrderByAttractions[i - 1].duration.value
+                            await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/DurationValue`, {
+                                params: {
+                                    prevEndTime: prevEndTime,
+                                    durationSeconds: durationSeconds,
+                                }
+                            }).then(response => {
+
+                                this.sortedAttractionsWithTime[i].startTime = response.data
+                            }).catch(err => {
+                                console.log(err)
+                            })
+
+                            await axios.get(`https://localhost:7251/api/TravelPlans/Get/CalculateTransportTime/StayHours`, {
+                                params: {
+                                    startTime: this.sortedAttractionsWithTime[i].startTime,
+                                    stayHours: this.sortedAttractionsWithTime[i].stayHours
+                                }
+                            }).then(response => {
+
+                                this.sortedAttractionsWithTime[i].endTime = response.data
+                            }).catch(err => {
+                                console.log(err)
+                            })
+                        }
+                    }               
+                },
+
 
 
 
                 setActProductsInfo: async function (actObj, event) {
                     const target = event.target;
-                    console.log('有沒有打勾啊??')
+       
                     if (target.checked) {
-                        console.log('有打勾')
+                  
 
                         try {
                             const response = await axios.get(`https://localhost:7251/api/TravelPlans/Get/VuePageActProductsInfo`, {
@@ -739,16 +941,45 @@
                                     beginDateTime: this.formattedTravelBeginTime
                                 }
                             });
-                            console.log('actProducts啦');
-                            console.log(response)
+                
+                            console.log(actObj)
                             actObj.actProducts = response.data;
+
+                            if(actObj.actProducts.length==0){
+                                target.classList.add("disabled-checkbox")
+                            }
                         } catch (err) {
                             console.log(err)
                         }
 
                     } else {
-                        console.log('取消打勾')
+
+
+                        let temp = actObj.actProducts;
+
                         actObj.actProducts = "";
+
+                        
+                        for(let i=0;i<temp.length;i++){
+      
+
+                            //let targetIndex = this.selectedActivityProducts.findIndex(obj => obj.activityProductId == temp[i].activityProductId);
+                            const indexToRemove = this.selectedActivityProducts.findIndex(item => item.actProductId === temp[i].activityProductId);
+
+
+
+                            if (indexToRemove != -1) {
+                                this.selectedActivityProducts.splice(indexToRemove, 1);
+                            }else{
+                                console.log('刪不掉根本刪不掉')
+                            }
+                          
+                        }
+                      
+
+
+
+
                         target.removeAttribute('checked');
 
                     }
@@ -757,9 +988,9 @@
 
                 setExtProductsInfo: async function (extObj, event) {
                     const target = event.target;
-                    console.log('有沒有打勾啊??')
+ 
                     if (target.checked) {
-                        console.log('有打勾')
+              
 
                         try {
                             const response = await axios.get(`https://localhost:7251/api/TravelPlans/Get/VuePageExtProductsInfo`, {
@@ -768,18 +999,46 @@
                                     beginDateTime: this.formattedTravelBeginTime
                                 }
                             });
-                            console.log('extProducts啦');
-                            console.log(response)
+       
+
                             extObj.extProducts = response.data;
+
+
+                            if (extObj.extProducts.length == 0) {
+                                target.classList.add("disabled-checkbox")
+                            }
                         } catch (err) {
                             console.log(err)
                         }
 
                     } else {
-                        console.log('取消打勾')
-                        extObj.extProducts = "";
-                        target.removeAttribute('checked');
+               
 
+
+                        let temp = extObj.extProducts
+
+
+                        extObj.extProducts = "";
+
+
+
+
+                        for (let i = 0; i < temp.length; i++) {
+                    
+
+                            //let targetIndex = this.selectedActivityProducts.findIndex(obj => obj.activityProductId == temp[i].activityProductId);
+                            const indexToRemove = this.selectedExtraServiceProducts.findIndex(item => item.extProductId === temp[i].extraServiceProductId);
+
+
+
+                            if (indexToRemove != -1) {
+                                this.selectedExtraServiceProducts.splice(indexToRemove, 1);
+                            } else {
+                                console.log('刪不掉根本刪不掉')
+                            }
+
+                        }
+                        target.removeAttribute('checked');
                     }
                 },
 
@@ -789,10 +1048,9 @@
 
                     console.log(actProduct)
                     const target = event.target;
-                    console.log('有沒有打勾啊??')
+
                     if (target.checked) {
-                        console.log('有打勾')
-                        console.log('加陣列啦')
+           
 
                         if (actProduct.inputQuantity==undefined){
                             actProduct.inputQuantity=1
@@ -805,19 +1063,15 @@
                             this.selectedActivityProducts.splice(indexToRemove, 1);
                         }
 
-
                         this.selectedActivityProducts.push({ actProductId: actProduct.activityProductId, quantity: actProduct.inputQuantity })
 
-                    } else {
-                        console.log('取消打勾')
-                        console.log('移出陣列啦')
+                    } else {             
 
                         const indexToRemove = this.selectedActivityProducts.findIndex(item => item.actProductId === actProduct.activityProductId);
                         if (indexToRemove !== -1) {
                             // 使用 splice() 方法移除目标元素
                             this.selectedActivityProducts.splice(indexToRemove, 1);
                         }
-
 
                         target.removeAttribute('checked');
 
@@ -838,15 +1092,12 @@
                 chooseExtraServiceProductObject:function(extProduct,event){
                   
                     const target = event.target;
-                    console.log('有沒有打勾啊??')
-                    if (target.checked) {
-                        console.log('有打勾')
-                        console.log('加陣列啦')
+
+                    if (target.checked) {         
 
                         if (extProduct.inputQuantity == undefined) {
                             extProduct.inputQuantity = 1
                         }
-
 
                         const indexToRemove = this.selectedExtraServiceProducts.findIndex(item => item.extProductId === extProduct.extraServiceProductId);
                         if (indexToRemove !== -1) {
@@ -858,8 +1109,7 @@
                         this.selectedExtraServiceProducts.push({ extProductId: extProduct.extraServiceProductId, quantity: extProduct.inputQuantity })
 
                     } else {
-                        console.log('取消打勾')
-                        console.log('移出陣列啦')
+              
 
                         const indexToRemove = this.selectedExtraServiceProducts.findIndex(item => item.extProductId === extProduct.extraServiceProductId);
                         if (indexToRemove !== -1) {
@@ -888,8 +1138,8 @@
 
 
                 selectAccommodationByGoogleMapsApi: function (attraction,event) {
-                    const y = attraction.positiony
-                    const x = attraction.positionx
+                    const y =Number(attraction.positionx)
+                    const x =Number(attraction.positiony)
                     const name = attraction.attName
                     const _this = event.target;
                     const _thisVueObj = this;
@@ -902,9 +1152,9 @@
                             // 在这里处理从新窗口传回的消息
                             _thisVueObj.roomProducts = JSON.parse(event.data);
                             console.log(_thisVueObj.roomProducts);
-                            _this.innerText = roomProducts.accommodationName;
+                            _this.innerText = _thisVueObj.roomProducts.accommodationName;
 
-                            let tooltipContent = `已加入${roomProducts.cartProducts.length}間房間`;
+                            let tooltipContent = `已加入${_thisVueObj.roomProducts.cartProducts.length}間房間`;
 
                             _this.setAttribute("data-tooltip", tooltipContent);
                             _this.setAttribute("style", "position:relative");
@@ -942,11 +1192,6 @@
                             extraServiceProductIds: this.selectedExtraServiceProducts,
                         }
 
-                    
-
-
-                 
-
                             axios.post(`https://localhost:7251/api/Carts/Post/Travel`, postData)
                             .then(response => {
                                 alert('已成功加入購物車!');
@@ -962,6 +1207,16 @@
 
 
                 },
+
+
+
+
+                saveSchedule:function(){
+                    console.log('存行程表啦!')
+
+
+
+                }
 
 
 

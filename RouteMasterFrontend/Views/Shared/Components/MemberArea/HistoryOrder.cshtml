@@ -1,0 +1,170 @@
+﻿@model IEnumerable<RouteMasterFrontend.Models.Dto.OrderDto>
+
+@{
+    ViewData["Title"] = "HistoryOrder";
+}
+@{
+    var memberIdCookie = Context.Request.Cookies["Id"];
+
+}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<h1>HistoryOrder</h1>
+
+<style>
+    .main-table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+    }
+
+    .main-table thead tr {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .main-table tbody tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    .details-table {
+        margin: 0.5rem 0;
+        box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    .details-table th {
+        background-color: #e9ecef;
+    }
+
+    .details-table tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+</style>
+
+<table class="table main-table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <div class="card">
+                        <div class="card-header">
+                            Order for @Html.DisplayFor(modelItem => item.MemberId)
+                        </div>
+                        <div class="card-body">
+
+                            <!-- 額外服務資料 -->
+                            @foreach (var service in item.ExtraServiceDetails)
+                            {
+                                <h5 class="card-title">@service.ExtraServiceName</h5>
+                                <p class="card-text">
+                                 @*   Product ID: @service.ExtraServiceProductId<br />*@
+                                    Date: @service.Date<br />
+                                    Price: @service.Price<br />
+                                    Quantity: @service.Quantity
+                                </p>
+                            }
+
+                            <!-- 活動資料 -->
+                            @foreach (var activity in item.ActivityDetails)
+                            {
+                                <h5 class="card-title">@activity.ActivityName</h5>
+                                <p class="card-text">
+                                   @* Product ID: @activity.ActivityProductId<br />*@
+                                    Date: @activity.Date<br />
+                                    Time: @activity.StartTime - @activity.EndTime<br />
+                                    Price: @activity.Price
+                                </p>
+                            }
+
+                            <!-- 住宿資料 -->
+                            @foreach (var accommodation in item.AccommodationDetails)
+                            {
+                                <h5 class="card-title">@accommodation.AccommodationName</h5>
+                                <p class="card-text">
+                                   @* Room Product ID: @accommodation.RoomProductId<br />*@
+                                    Room Type: @accommodation.RoomType<br />
+                                    Room Name: @accommodation.RoomName<br />
+                                    Check-In: @accommodation.CheckIn<br />
+                                    Check-Out: @accommodation.CheckOut
+                                </p>
+                            }
+
+                        </div>
+                        <div class="card-footer">
+                            Payment Status: @Html.DisplayFor(modelItem => item.PaymentStatusName)<br />
+                            Order Created: @Html.DisplayFor(modelItem => item.CreateDate)
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+   @* <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.MemberId)</th>
+            <th>@Html.DisplayNameFor(model => model.PaymentMethodName)</th>
+            <th>@Html.DisplayNameFor(model => model.PaymentStatusName)</th>
+            <th>@Html.DisplayNameFor(model => model.OrderHandleStatusId)</th>
+            <th>@Html.DisplayNameFor(model => model.CreateDate)</th>
+            <th>@Html.DisplayNameFor(model => model.ModifiedDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Total)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <!-- 主要訂單資料 -->
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.MemberId)</td>
+                <td>@Html.DisplayFor(modelItem => item.PaymentMethodName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PaymentStatusName)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrderHandleStatusId)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreateDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.ModifiedDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.Total)</td>
+            </tr>
+
+            <!-- 額外服務資料 -->
+            @foreach (var service in item.ExtraServiceDetails)
+            {
+                <tr>
+                    <td></td> 
+                    <td>@service.ExtraServiceName</td>
+                    <td>@service.ExtraServiceProductId</td>
+                    <td>@service.Date</td>
+                    <td>@service.Price</td>
+                    <td>@service.Quantity</td>
+                    <td></td> 
+                </tr>
+            }
+
+            <!-- 活動資料 -->
+            @foreach (var activity in item.ActivityDetails)
+            {
+                <tr>
+                    <td></td> 
+                    <td>@activity.ActivityName</td>
+                    <td>@activity.ActivityProductId</td>
+                    <td>@activity.Date</td>
+                    <td>@activity.StartTime</td>
+                    <td>@activity.EndTime</td>
+                    <td>@activity.Price</td>
+                </tr>
+            }
+
+            <!-- 住宿資料 -->
+            @foreach (var accommodation in item.AccommodationDetails)
+            {
+                <tr>
+                    <td></td>
+                    <td>@accommodation.AccommodationName</td>
+                    <td>@accommodation.RoomProductId</td>
+                    <td>@accommodation.RoomType</td>
+                    <td>@accommodation.RoomName</td>
+                    <td>@accommodation.CheckIn</td>
+                    <td>@accommodation.CheckOut</td>
+                </tr>
+            }
+        }
+    </tbody>*@
+</table>

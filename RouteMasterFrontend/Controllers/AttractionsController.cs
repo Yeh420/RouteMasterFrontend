@@ -97,6 +97,15 @@ namespace RouteMasterFrontend.Controllers
             return View(attractions);
         }
 
+        public async Task<IActionResult> Map()
+        {
+            var repo = new AttractionEFRepository();
+
+            var atts = await repo.GetAtts();
+
+            return View(atts);
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             AddClick(id);

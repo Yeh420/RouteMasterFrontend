@@ -163,7 +163,7 @@
                         @foreach (var accommodationDTO in Model.Accommodations)
                         {
                                 totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
-                           <tr data-roomProductId="@accommodationDTO.Id">
+                                <tr data-roomProductId="@accommodationDTO.RoomId">
                                 <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
                                 <td class="align-middle text-center">@accommodationDTO.RoomName @accommodationDTO.RoomTypeName</td>
@@ -205,8 +205,8 @@
                     
                 </table>
 
-                
 
+                        <input type="hidden" id="selectedCouponId" name="CouponsId" value="" />
                 <div class="d-flex justify-content-end">
                             <button class="btn btn-outline-secondary" @@click="goToCheckout">
                         <i class="fas fa-shopping-cart"></i>前往結帳
@@ -330,12 +330,14 @@
                     this.coupons[index].Selected = !this.coupons[index].Selected;
 
                     const selectedCouponId = this.coupons[index].Id;
-                    this.usingCouponId = this.coupons[index].Id;
+                    //this.usingCouponId = this.coupons[index].Id;
 
                     if (this.coupons[index].Selected) {
                         this.selectedCouponAmount = this.coupons[index].Discount;
                         console.log("Selected Coupon ID:", selectedCouponId);
                         console.log("Selected Coupon Amount:", this.selectedCouponAmount);
+                        this.usingCouponId = selectedCouponId;
+                        console.log(this.usingCouponId);
                         document.getElementById("selectedCouponId").value = selectedCouponId;
                     } else {
                         document.getElementById('selectedCouponId').value = '';
@@ -412,7 +414,9 @@
                         success: function (result) {
                             if (result.success) {
                                 alert(result.message);
-                                $(`tr[data-roomProductId=${roomProductId}]`).remove();
+
+                                console.log(roomProductId)
+                                $(`tr[data-roomproductid=${roomProductId}]`).remove();
                                 const price = parseFloat(itemPrice);
                                 if (!isNaN(price)) {
                                     _this.totalAmount -= price;

@@ -1,7 +1,70 @@
 ﻿@{
     ViewData["Title"] = "結帳完成";
+    var memberId = ViewBag.MemberId;
 }
+<style>
+    .step-container {
+        display: flex;
+        justify-content: space-between;
+        list-style-type: none;
+        padding: 0;
+    }
 
+    .step {
+        width: 32%;
+        text-align: center;
+    }
+
+    .step .circle {
+        background-color: #ccc;
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        line-height: 30px;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .step.active .circle {
+        background-color: #007bff;
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+    }
+
+    .step-divider {
+        flex-grow: 1;
+        height: 2px;
+        background-color: #ccc;
+        position: relative;
+        top: 15px;
+    }
+
+    .step-divider.active {
+        background-color: #007bff;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="step-container">
+        <div class="step">
+            <div class="circle">1</div>
+            <span>購物車</span>
+        </div>
+        <div class="step-divider active"></div>
+        <div class="step">
+            <div class="circle">2</div>
+            <span>付款訊息</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step active">
+            <div class="circle">3</div>
+            <span>確認訂單</span>
+        </div>
+    </div>
+</div>
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -11,11 +74,14 @@
                 </div>
                 <div class="card-body">
                     <p class="lead">感謝您的購買！您的訂單已成功提交。</p>
-                    <p>我們將儘快處理您的訂單，您可以在「我的訂單」中查看訂單狀態。</p>
+                    <p>我們將儘快處理您的訂單，您可以在會員專區的「我的訂單」中查看您的訂單。</p>
 
                     <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-4">返回首頁</a>
+                  @*  <a href="@Url.Action("HistoryOrder", "Members", new {memberid = ViewBag.MemberId })" class="btn btn-primary mt-4">前往訂單</a>*@
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+              

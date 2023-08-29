@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart>
 
 @{
-    var couponId = ViewBag.CouponId;
+    var couponsId = ViewBag.CouponsId;
 
 
    
@@ -81,7 +81,7 @@
         @foreach (var item in Model)
         {
             <div class="card" style="margin-top:50px";>
-                <div class="card-header" id="heading-@item.Member.Id">
+                <div class="card-header" id="heading-@item.Id">
                     <h5 class="mb-0">
                         <button class="btn " type="button" data-toggle="collapse" data-target="#collapse-@item.Member.Id" aria-expanded="true" aria-controls="collapse-@item.Member.Id">
                             訂購人資料
@@ -159,7 +159,7 @@
                  </div>
             </div>
 
-            <input type="hidden" name="couponId" value="@couponId">
+            <input type="hidden" name="couponsId" value="@couponsId">
      
         }
     </div>

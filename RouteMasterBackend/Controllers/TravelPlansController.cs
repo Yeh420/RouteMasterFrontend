@@ -43,27 +43,26 @@ namespace RouteMasterBackend.Controllers
         {
 
 
-            //checkboxList行為決定
-    
 
+            //景點加入排程之後 容器高度沒有回復
 
-            //8:00
-            //系統推薦路徑(?)
 
 
             //活動依據時間設置限制
-
-
-
-
-
-            //11:00
+            //系統推薦路徑 /一鍵套用
             //存行程表
+            //設置起點
+
+
+
+
+
+
 
 
             //住宿改換陣列重新排(取得新的資訊push到裡面)
             //拉住宿排
-            //設置起點
+
 
 
             var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
