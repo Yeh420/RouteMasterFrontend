@@ -117,12 +117,12 @@ namespace RouteMasterBackend.Controllers
 
             if(data.MinBudget > 0)
             {
-                accommodations = accommodations.Where(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) >= data.MinBudget);
+                accommodations = accommodations.Where(a => a.Rooms.Min(r =>r.Price)>= data.MinBudget);
             }
 
             if(data.MaxBudget < 10000)
             {
-                accommodations = accommodations.Where(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) <= data.MaxBudget);
+                accommodations = accommodations.Where(a => a.Rooms.Min(r => r.Price) <= data.MaxBudget);
             }
 
             if (data.Keyword != null && data.Keyword.Length != 0)
@@ -170,8 +170,8 @@ namespace RouteMasterBackend.Controllers
                 1 => accommodations.OrderByDescending(a => a.Grade),
                 2 => accommodations.OrderBy(a => a.Grade),
                 3 => accommodations.OrderByDescending(a => a.CommentsAccommodations.Average(ca => ca.Score)),
-                4 => accommodations.OrderBy(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice)),
-                5 => accommodations.OrderByDescending(a => a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice)),
+                4 => accommodations.OrderBy(a => a.Rooms.Min(r => r.Price)),
+                5 => accommodations.OrderByDescending(a => a.Rooms.Min(r => r.Price)),
                 _ => accommodations,
             };
 
@@ -198,7 +198,7 @@ namespace RouteMasterBackend.Controllers
                 CheckOut = a.CheckOut,
                 Score = a.CommentsAccommodations.Average(ca=>ca.Score) > 0 ? a.CommentsAccommodations.Average(ca => ca.Score).ToString("0.0") : "0",
                 Comment = a.CommentsAccommodations.Count(),
-                Price = a.Rooms.Count() > 0 ? a.Rooms.SelectMany(r => r.RoomProducts).Min(rp => rp.NewPrice) : 0,
+                Price = a.Rooms.Count() > 0 ? a.Rooms.Min(r => r.Price) : 0,
                 Services = a.AccommodationServiceInfos
             }).ToListAsync();
             dto.TotalPages = totalPage;
