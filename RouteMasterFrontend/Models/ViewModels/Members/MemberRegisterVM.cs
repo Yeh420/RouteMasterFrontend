@@ -36,6 +36,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 		[Display(Name = "密碼確認")]
 		[Compare("Password", ErrorMessage = "必需與您輸入的'密碼'相同")]
 		[DataType(DataType.Password)]
+		[StringLength(10,MinimumLength =6)]
 		public string? ConfirmPassword { get; set; }
 
 
