@@ -5,7 +5,9 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 {
 	public class MemberLoginVM
 	{
-		[Key]
+        internal readonly bool RememberMe;
+
+        [Key]
 		public int Id { get; set; }
 
         [Required(ErrorMessage ="您尚未填寫帳號")]
