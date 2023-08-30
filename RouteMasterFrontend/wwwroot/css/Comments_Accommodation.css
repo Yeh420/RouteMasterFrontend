@@ -29,13 +29,13 @@ input[type="range"] {
     margin-top: 5px;
 }
 
-input[type="range"]::-webkit-slider-runnable-track {
-     height: 6px;
-     width: 200px;
-     border-radius: 4px;
-     background: #FF9797;
-       
-}
+    input[type="range"]::-webkit-slider-runnable-track {
+        height: 6px;
+        width: 200px;
+        border-radius: 4px;
+        background: linear-gradient(to right, #FF9797 0%, #FF9797 calc(var(--percentage) * 100%), #d3d3d3 calc(var(--percentage) * 100%), #d3d3d3 100%);
+        position: relative;
+    }
 
 input[type="range"]::-webkit-slider-thumb{
     position: relative;
@@ -44,13 +44,13 @@ input[type="range"]::-webkit-slider-thumb{
     margin-top: -5px;
     background-color: #4285F4;
     border-radius: 50%;
+    z-index: 2;
 
 }
-
-.number-input {
-    margin-left: 10px;
-    width: 65px;
-}
+    .number-input {
+        margin-left: 10px;
+        width: 65px;
+    }
 
 .warnShow {
     color: red;
