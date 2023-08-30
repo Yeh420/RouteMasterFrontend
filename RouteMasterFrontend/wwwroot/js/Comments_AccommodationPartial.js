@@ -165,6 +165,11 @@
             console.log(_this.fileName);
 
         },
+        scrollGrey: function(){
+            const rangeInput = document.querySelector('#target');
+            var percentage = 0;
+            rangeInput.style.setProperty('--percentage', percentage);
+        },
         colorShift: function () {
             let _this = this;
             const rangeInput = document.querySelector('#target');
@@ -187,7 +192,7 @@
             </div>
 
             <div class="col-3 ms-auto text-end">
-                <button v-if="userAccount" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <button v-if="userAccount" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @click="scrollGrey">
                     撰寫評論
                 </button>
             </div>

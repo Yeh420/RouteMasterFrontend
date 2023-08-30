@@ -462,9 +462,11 @@ namespace RouteMasterFrontend.Controllers
           
         }
 
-        public void PayInfo(int Id, int selectedCouponId)
+        public ActionResult PayInfo(int Id, int selectedCouponId)
         {
             ProcessCheckout(Id, selectedCouponId, null);
+            return RedirectToAction("ConfirmPayment", "Carts");
+
         }
 
         private void ProcessCheckout(int memberId, int?CouponsId, string?note)
@@ -511,7 +513,7 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = CouponsId == 0 ? null : CouponsId,
+                        CouponsId = (int)(CouponsId == 0 ? null : CouponsId),
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal
