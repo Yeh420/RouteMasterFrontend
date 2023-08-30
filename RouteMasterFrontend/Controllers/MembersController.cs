@@ -691,8 +691,7 @@ namespace RouteMasterFrontend.Controllers
 					ExtraServiceId = es.ExtraServiceId,
 					ExtraServiceName = es.ExtraServiceName,
 					ExtraServiceProductId = es.ExtraServiceProductId,
-                   
-					Date = es.Date,
+                     Date = es.Date,
 					Price = es.Price,
 					Quantity = es.Quantity
 				}).ToList(),

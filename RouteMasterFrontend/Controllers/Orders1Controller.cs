@@ -6,44 +6,39 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
-using RouteMasterFrontend.Models.Dto;
 
 namespace RouteMasterFrontend.Controllers
 {
-    public class OrdersController : Controller
+    public class Orders1Controller : Controller
     {
         private readonly RouteMasterContext _context;
 
-        public OrdersController(RouteMasterContext context)
+        public Orders1Controller(RouteMasterContext context)
         {
             _context = context;
         }
 
-        // GET: Orders
-        public async Task<IActionResult> Index()
+        // GET: Orders1
+        [HttpGet("Orders/Index/{memberid?}")]
+        public async Task<IActionResult> Index(int memberId)
         {
-            var routeMasterContext = _context.Orders.Include(o => o.Coupons).Include(o => o.Member).Include(o => o.OrderHandleStatus).Include(o => o.PaymentMethod).Include(o => o.PaymentStatus);
-            return View(await routeMasterContext.ToListAsync());
+          
+            var routeMasterContext = _context.Orders
+                 .Where(o => o.MemberId == memberId)
+                .Include(o => o.Coupons)
+                .Include(o => o.Member)
+                .Include(o => o.OrderHandleStatus)
+                .Include(o => o.PaymentMethod)
+                .Include(o => o.PaymentStatus)
+                .Include(o => o.OrderAccommodationDetails)
+                .Include(o => o.OrderActivitiesDetails)
+               .Include(o => o.OrderExtraServicesDetails)
+               .ToListAsync();
+            ViewBag.MemberId = memberId;
+            return View(await routeMasterContext);
         }
 
-
-        public string PayInfo(string? orderId)
-        {
-            //Order order = GetOrderDetailsById(orderId);
-            //if(order == null)
-            //{
-            //    return View("Error");
-            //}
-            //return RedirectToAction("Index", "Orders");
-            return "12";
-        }
-
-        private Order GetOrderDetailsById(int orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        // GET: Orders/Details/5
+        // GET: Orders1/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -52,12 +47,13 @@ namespace RouteMasterFrontend.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.Coupons)
-                .Include(o => o.Member)
-                .Include(o => o.OrderHandleStatus)
-                .Include(o => o.PaymentMethod)
-                .Include(o => o.PaymentStatus)
-
+                .Include(x => x.OrderExtraServicesDetails)
+                .Include(x => x.OrderActivitiesDetails)
+                .Include(x => x.OrderAccommodationDetails)
+                .Include(x => x.Coupons)
+                .Include(x => x.OrderHandleStatus)
+                .Include(x => x.PaymentStatus)
+                .Include(x => x.PaymentMethod)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -67,7 +63,7 @@ namespace RouteMasterFrontend.Controllers
             return View(order);
         }
 
-        // GET: Orders/Create
+        // GET: Orders1/Create
         public IActionResult Create()
         {
             ViewData["CouponsId"] = new SelectList(_context.Coupons, "Id", "Id");
@@ -75,16 +71,15 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name");
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description");
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name");
-            ViewData["TravelPlanId"] = new SelectList(_context.TravelPlans, "Id", "Id");
             return View();
         }
 
-        // POST: Orders/Create
+        // POST: Orders1/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MemberId,TravelPlanId,PaymentMethodId,PaymentStatusId,OrderHandleStatusId,CouponsId,CreateDate,ModifiedDate,Total")] Order order)
+        public async Task<IActionResult> Create([Bind("Id,MemberId,PaymentMethodId,PaymentStatusId,OrderHandleStatusId,CouponsId,CreateDate,ModifiedDate,Total")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -97,99 +92,10 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-
             return View(order);
         }
-        public async Task<IActionResult> HistoryOrder(int? memberid)
-        {
 
-            if (!memberid.HasValue)
-            {
-                return BadRequest("Member ID is required");
-            }
-            var memberId = await _context.Members.Where(m => m.Id == memberid.Value).Select(m => m.Id).FirstOrDefaultAsync();
-
-            if (memberId == 0)
-            {
-                return NotFound("Member not found");
-            }
-
-            var orders = await _context.Orders
-            .Where(o => o.MemberId == memberId)
-            .Include(x => x.OrderExtraServicesDetails)
-            .Include(x => x.OrderActivitiesDetails)
-            .Include(x => x.OrderAccommodationDetails)
-            .Include(x => x.Coupons)
-            .Include(x => x.OrderHandleStatus)
-            .Include(x => x.PaymentStatus)
-            .Include(x => x.PaymentMethod)
-            .ToListAsync();
-
-            if (!orders.Any())
-            {
-                return NotFound("Member not found or no orders for this member");
-            }
-            var orderDTOs = orders.Select(o => new OrderDto
-            {
-                Id = o.Id,
-                MemberId = o.MemberId,
-                PaymentMethodName = o.PaymentMethod.Name,
-                PaymentStatusName = o.PaymentStatus.Name,
-                OrderHandleStatusId = o.OrderHandleStatusId,
-                CouponsId = o.CouponsId,
-                CreateDate = o.CreateDate,
-                ModifiedDate = o.ModifiedDate,
-                Total = o.Total,
-
-                ExtraServiceDetails = o.OrderExtraServicesDetails.Select(es => new OrderExtraServiceDetailDTO
-                {
-                    Id = es.Id,
-                    OrderId = es.OrderId,
-                    ExtraServiceId = es.ExtraServiceId,
-                    ExtraServiceName = es.ExtraServiceName,
-                    ExtraServiceProductId = es.ExtraServiceProductId,
-
-                    Date = es.Date,
-                    Price = es.Price,
-                    Quantity = es.Quantity
-                }).ToList(),
-
-                ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
-                {
-                    Id = ad.Id,
-                    OrderId = ad.OrderId,
-                    ActivityId = ad.ActivityId,
-                    ActivityName = ad.ActivityName,
-                    ActivityProductId = ad.ActivityProductId,
-
-                    Date = ad.Date,
-                    StartTime = ad.StartTime,
-                    EndTime = ad.EndTime,
-                    Price = ad.Price,
-                    Quantity = ad.Quantity
-                }).ToList(),
-
-                AccommodationDetails = o.OrderAccommodationDetails.Select(ac => new OrderAccommodationDetailDTO
-                {
-                    Id = ac.Id,
-                    OrderId = ac.OrderId,
-                    AccommodationId = ac.AccommodationId,
-                    AccommodationName = ac.AccommodationName,
-                    RoomProductId = ac.RoomProductId,
-                    RoomType = ac.RoomType,
-                    RoomName = ac.RoomName,
-                    CheckIn = (DateTime)ac.CheckIn,
-                    CheckOut = (DateTime)ac.CheckOut,
-                    RoomPrice = ac.RoomPrice,
-                    Quantity = ac.Quantity,
-                    Note = ac.Note
-                }).ToList()
-            }).ToList();
-
-            return View(orderDTOs);
-        }
-
-        // GET: Orders/Edit/5
+        // GET: Orders1/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -207,16 +113,15 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-
             return View(order);
         }
 
-        // POST: Orders/Edit/5
+        // POST: Orders1/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MemberId,TravelPlanId,PaymentMethodId,PaymentStatusId,OrderHandleStatusId,CouponsId,CreateDate,ModifiedDate,Total")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MemberId,PaymentMethodId,PaymentStatusId,OrderHandleStatusId,CouponsId,CreateDate,ModifiedDate,Total")] Order order)
         {
             if (id != order.Id)
             {
@@ -248,11 +153,10 @@ namespace RouteMasterFrontend.Controllers
             ViewData["OrderHandleStatusId"] = new SelectList(_context.OrderHandleStatuses, "Id", "Name", order.OrderHandleStatusId);
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Description", order.PaymentMethodId);
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
-
             return View(order);
         }
 
-        // GET: Orders/Delete/5
+        // GET: Orders1/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -266,7 +170,6 @@ namespace RouteMasterFrontend.Controllers
                 .Include(o => o.OrderHandleStatus)
                 .Include(o => o.PaymentMethod)
                 .Include(o => o.PaymentStatus)
-
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -276,7 +179,7 @@ namespace RouteMasterFrontend.Controllers
             return View(order);
         }
 
-        // POST: Orders/Delete/5
+        // POST: Orders1/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
