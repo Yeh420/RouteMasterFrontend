@@ -365,7 +365,7 @@
                     <a class="nav-link" v-bind:class="{'active':rightSidePage ==1 }" href="#" @@click="setRightSidePage(1)">已選擇{{selectedAttractions.length}}景點</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==2 }" href="#" @@click="setRightSidePage(2)">計算路徑</a>
+                    <a class="nav-link" v-bind:class="{'active':rightSidePage ==2 }" href="#" @@click="setRightSidePage(2);initMap()">計算路徑</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" v-bind:class="{'active':rightSidePage ==3 }" href="#" @@click="setRightSidePage(3)">未排程景點</a>
@@ -397,7 +397,7 @@
             </template>
 
             <template v-else-if="rightSidePage==2">
-                <div >計算結果</div>
+                <div id="map" style="height:600px"></div>
             </template>
 
 
@@ -424,7 +424,7 @@
 @section Scripts{
     
 
-    @*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0&callback=initMap"></script>   *@
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhc4J9Zj4NRy3M1BsZqd35aowfo-qhxo0"></script>   
 
     <script src="https://kit.fontawesome.com/f9e3b12327.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
@@ -561,6 +561,7 @@
             mounted: async function () {
                 let _this=this;
                 await  _this.getAllAttractions();
+                await _this.initMap();
 
             },
             computed:{
@@ -685,6 +686,15 @@
                 
             },
             methods:{
+                initMap:function() {
+                    const center = { lat: 23.6978, lng: 120.9605 }; // 台湾的中心位置坐标
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        center: center,
+                        zoom: 8, // 设置地图缩放级别
+                    });
+                },
+
+
                 getAllAttractions:async function(){
                    
                   await  axios.get(`${baseAddress}/api/TravelPlans/Get/AllAttractionsInfo`)
