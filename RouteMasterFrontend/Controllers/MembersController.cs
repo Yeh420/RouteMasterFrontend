@@ -1135,7 +1135,7 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name+DateTime.Now,
+                Account = payload.Name,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
