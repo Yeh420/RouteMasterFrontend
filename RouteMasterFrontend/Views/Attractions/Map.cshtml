@@ -9,6 +9,31 @@
 @section Scripts{
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKQwH7ce2rHJCZRoComIh3v7rgxCs0Yfw&callback=initMap"></script>
     <script>
+
+        function redirectToDetails(attractionId) {
+            console.log(attractionId)
+            var url = '@Url.Action("Details", "Attractions")' + '?id=' + attractionId;
+            window.location.href = url;
+        }
+
+        function generateStarRatingHtml(score) {
+            var fullStars = Math.floor(score);
+            var halfStar = score - fullStars >= 0.5;
+            var starHtml = '';
+
+            for (var i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    starHtml += '<i class="fa fa-star" style="color:#f90"></i>';
+                } else if (i === fullStars + 1 && halfStar) {
+                    starHtml += '<i class="fa fa-star-half-o" style="color:#f90"></i>';
+                } else {
+                    starHtml += '<i class="fa fa-star" style="color:#ccc"></i>';
+                }
+            }
+
+            return starHtml;
+        }
+
         function initMap() {
             var mapOptions = {
                 center: { lat: 25.03, lng: 121.56 }, // 地圖中心的座標
@@ -45,6 +70,12 @@
                     <div style="width:250px">
                         <h5>${attraction.name} <span class="badge bg-info text-white">${attraction.attractionCategory}</span></h5>
                         <img src="../AttractionImages/${attraction.image}" style="object-fit: cover;width:100%; margin-top:4px">
+                                
+                <p>
+                            ${attraction.score}${generateStarRatingHtml(attraction.score)}(${attraction.scoreCount}) |
+                    平均停留${attraction.hours}小時 (${attraction.hoursCount}) |
+                    平均花費${attraction.price}元 (${attraction.priceCount})
+                </p>
                         <button class="btn btn-link" onclick="redirectToDetails(${attraction.id})">詳細資料</button>
                     </div>
                 `;
@@ -57,10 +88,9 @@
                 }
             });
 
-            function redirectToDetails(attractionId) {
-                var url = '@Url.Action("Details", "Attractions")' + '?id=' + attractionId;
-                window.location.href = url;
-            }
+            
+
+            
         }
 
 
