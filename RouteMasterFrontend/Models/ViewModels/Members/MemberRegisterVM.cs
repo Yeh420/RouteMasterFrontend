@@ -28,15 +28,15 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 
 		[Display(Name = "密碼")]
-        [Required(ErrorMessage = "必填")]
-        [StringLength(20)]
+        [Required(ErrorMessage = "必填")]       
 		[DataType(DataType.Password)]
-		public string? Password { get; set; }
+        [StringLength(10, MinimumLength = 6, ErrorMessage = "密碼必須介於6~10個數字或是字母")]
+        public string? Password { get; set; }
 
 		[Display(Name = "密碼確認")]
-		[Compare("Password", ErrorMessage = "必需與您輸入的'密碼'相同")]
+		[Compare("Password", ErrorMessage = "必需與您輸入的'密碼'相同")]		
 		[DataType(DataType.Password)]
-		[StringLength(10,MinimumLength =6)]
+		
 		public string? ConfirmPassword { get; set; }
 
 
@@ -51,7 +51,7 @@ namespace RouteMasterFrontend.Models.ViewModels.Members
 
 		[Display(Name = "電話號碼")]
         [Required(ErrorMessage = "必填")]
-        [StringLength(10, MinimumLength = 10, ErrorMessage = "Invalid Phone Number")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "無效電話號碼")]
 		public string? CellPhoneNumber { get; set; }
 
 
