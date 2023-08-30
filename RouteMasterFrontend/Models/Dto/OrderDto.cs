@@ -16,6 +16,6 @@
 		public List<OrderExtraServiceDetailDTO>? ExtraServiceDetails { get; set; }
 		public List<OrderActivityDetailDTO>? ActivityDetails { get; set; }
 		public List<OrderAccommodationDetailDTO>? AccommodationDetails { get; set; }
-
+     
 	}
 }
