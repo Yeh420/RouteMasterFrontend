@@ -42,33 +42,27 @@ namespace RouteMasterBackend.Controllers
         public async Task<IEnumerable<SelectAttractionAllInfoDto>> GetAllAttractionsInfo()
         {
 
-            //5:00
-            //地點/路徑 圖標顯示內容
-            //選擇住宿
-            //加入購物車
 
 
-
-            //8:00
-            //系統推薦路徑(?)
-            //checkboxList行為決定
-            //無產品disabled
-
-
-
-
-            //11:00
-            //存行程表
+            //景點加入排程之後 容器高度沒有回復
 
 
 
             //活動依據時間設置限制
+            //系統推薦路徑 /一鍵套用
+            //存行程表
+            //設置起點
+
+
+
+
+
 
 
 
             //住宿改換陣列重新排(取得新的資訊push到裡面)
             //拉住宿排
-            //設置起點
+
 
 
             var data = _context.Attractions.Select(x => new SelectAttractionAllInfoDto
@@ -387,7 +381,7 @@ namespace RouteMasterBackend.Controllers
                 .Where(x => x.ExtraServiceId == extraServiceId)
                 .Where(x => x.Date == beginDateTime.Date).Select(x => new ExtraServiceProductTravelCreateVuePageDto
                 {
-                   ExtraServiceProductId = x.ExtraServiceId,    
+                   ExtraServiceProductId = x.Id,    
                    ExtraServiceName = x.ExtraService.Name,                   
                     Quantity = x.Quantity,
                     Price = x.Price,

@@ -108,6 +108,8 @@ namespace RouteMasterFrontend.Controllers
             return View();
         }
 
+
+        [HttpPost]
         //會員普通登入
         public async Task<object> MemberLogin([FromBody] MemberLoginVM vm)
         {
@@ -152,11 +154,12 @@ namespace RouteMasterFrontend.Controllers
             {
                 new Claim(ClaimTypes.Name, vm.Account),
                 new Claim("memberImage", member.Image),
-                new Claim("id",member.Id.ToString())
+                new Claim("id",member.Id.ToString()),
+                new Claim("Email",member.Email)
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             identity.AddClaim(new Claim("memberImage", member.Image));
-
+            
             //設定驗證資訊
             var authProperties = new AuthenticationProperties
             {
@@ -245,11 +248,15 @@ namespace RouteMasterFrontend.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, payload.Name),
-                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識
-                    new Claim("id",member.Id.ToString())
+                    //new Claim(ClaimTypes.Email, payload.Email) // 使用 payload 中的郵件地址作為身份標識 
+                    new Claim("id",member.Id.ToString()),
+                    new Claim("memberImage", member.Image),
+                    new Claim("Email",member.Email)
+
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim("memberImage", member.Image));
                 //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要可以加其他資料
 
                 var authProperties = new AuthenticationProperties
@@ -308,8 +315,10 @@ namespace RouteMasterFrontend.Controllers
             else
             {
                 MemberImage img = new MemberImage();
-                Member member = new Member();
+                
                 Result result = RegisterGoogleMember(payload, img);
+                Member member = _context.Members.FirstOrDefault(m => m.Email == payload.Email);
+
 
                 if (result.IsSuccess)
                 {
@@ -317,12 +326,14 @@ namespace RouteMasterFrontend.Controllers
                     var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, payload.Name),
-                    new Claim("id",member.Id.ToString())
-                    //
-                    //new Claim(ClaimTypes.Email, payload.Email)
+                    new Claim("id",member.Id.ToString()),
+                    new Claim("memberImage", member.Image),
+                    new Claim("Email",member.Email)
+
                 };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim("memberImage", member.Image));
                     //identity.AddClaim(new Claim(ClaimTypes.Name, payload.Name)); 如果需要有Name再加
 
                     var authProperties = new AuthenticationProperties
@@ -393,10 +404,10 @@ namespace RouteMasterFrontend.Controllers
             ClaimsPrincipal user = HttpContext.User;
 
             //列出與登入符合資料
-            string userAccount = user.Identity.Name;
+            string userEmail = user.FindFirst("Email").Value;
             string userID = user.FindFirst("id").Value;
 
-            Member myMember = _context.Members.First(m => m.Account == userAccount);
+            Member myMember = _context.Members.First(m => m.Email == userEmail);
 
             List<Region> regions = _context.Regions.ToList();
             List<Town> towns = _context.Towns.ToList();
@@ -643,6 +654,7 @@ namespace RouteMasterFrontend.Controllers
         [HttpGet("Member/HistoryOrder/{memberid?}")]
         public async Task<IActionResult> HistoryOrder(int? memberid)
         {
+          
 			if (!memberid.HasValue)
 			{
 				return BadRequest("Member ID is required");
@@ -653,7 +665,8 @@ namespace RouteMasterFrontend.Controllers
 			{
 				return NotFound("Member not found");
 			}
-			var orders = await _context.Orders
+          
+            var orders = await _context.Orders
 		    .Where(o => o.MemberId == memberId)
 		    .Include(x => x.OrderExtraServicesDetails)
 		    .Include(x => x.OrderActivitiesDetails)
@@ -687,6 +700,7 @@ namespace RouteMasterFrontend.Controllers
 					ExtraServiceId = es.ExtraServiceId,
 					ExtraServiceName = es.ExtraServiceName,
 					ExtraServiceProductId = es.ExtraServiceProductId,
+                   
 					Date = es.Date,
 					Price = es.Price,
 					Quantity = es.Quantity
@@ -699,6 +713,7 @@ namespace RouteMasterFrontend.Controllers
 					ActivityId = ad.ActivityId,
 					ActivityName = ad.ActivityName,
 					ActivityProductId = ad.ActivityProductId,
+                   
 					Date = ad.Date,
 					StartTime = ad.StartTime,
 					EndTime = ad.EndTime,
@@ -717,11 +732,12 @@ namespace RouteMasterFrontend.Controllers
 					RoomName = ac.RoomName,
 					CheckIn = (DateTime)ac.CheckIn,
 					CheckOut = (DateTime)ac.CheckOut,
-					RoomPrice = (decimal)ac.RoomPrice,
+					RoomPrice = ac.RoomPrice,
 					Quantity = ac.Quantity,
 					Note = ac.Note
 				}).ToList()
 			}).ToList();
+           
 			return View(orderDTOs);
 		}
 
@@ -1051,15 +1067,12 @@ namespace RouteMasterFrontend.Controllers
                 // 丟出異常,或者傳回 Result
                 return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
             }
-            Regex PasswordRegex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
-            string[] CommonPasswords = new string[]
-            {
-        "password",
-        "123456",
-        "qwerty",
-                // 添加其他常見密碼
-            };
 
+            bool securityPassword = Regex.IsMatch(vm.Password, @"^[^a-d]$");
+            if (!securityPassword)
+            {
+                return Result.Failure($"密碼安全性有疑慮，請加強密碼");
+            }
             // 將密碼進行雜湊
 
             var salt = _hashUtility.GetSalt();
@@ -1102,9 +1115,10 @@ namespace RouteMasterFrontend.Controllers
         {
             if (_context.Members.Any(m => m.Email == payload.Email))
             {
-                // 丟出異常,或者傳回 Result
                 return Result.Failure($"帳號 {payload.Email} 已被註冊過, 請更換後再試一次");
             }
+
+
 
             Regex PasswordRegex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
             string[] CommonPasswords = new string[]
@@ -1115,19 +1129,13 @@ namespace RouteMasterFrontend.Controllers
                 // 添加其他常見密碼
             };
 
-            string imageFile = "6f495c61bbda42d8a053bd934045b593.png";
-            //string imagePath = Path.Combine(_environment.WebRootPath, imageFile);
-            //byte[] imageData = File.ReadAllBytes(imagePath);
-
-            //填入 isConfirmed, ConfirmCode
-            //vm.IsConfirmed = false;
-            //vm.ConfirmCode = Guid.NewGuid().ToString("N");
-
+            string imageFile = "56b080c68be248628a3f4fa4f0a1d9c7.png";
+         
             Member member = new Member
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name,
+                Account = payload.Name+DateTime.Now,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",

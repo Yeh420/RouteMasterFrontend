@@ -7,6 +7,7 @@
 		public int ActivityId { get; set; }
 		public string ActivityName { get; set; }
 		public int ActivityProductId { get; set; }
+		
 		public DateTime Date { get; set; }
 		public TimeSpan StartTime { get; set; } 
 		public TimeSpan EndTime { get; set; }  
