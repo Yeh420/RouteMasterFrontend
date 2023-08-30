@@ -23,9 +23,9 @@ namespace RouteMasterFrontend.Views.Shared.Components.MemberPartial
         {
             ClaimsPrincipal user = HttpContext.User;
             var id = user.FindFirst("id").Value;
-            var memberAccount = user.Identity.Name;
+            var memberEmail = user.FindFirst("Email").Value;
             int memberid = int.Parse(id);
-            Member myMember = _context.Members.First(m => m.Account == memberAccount);
+            Member myMember = _context.Members.First(m => m.Email == memberEmail);
 
             var modelPasword = new MemberEditPasswordVM();
             modelPasword.id =memberid;
