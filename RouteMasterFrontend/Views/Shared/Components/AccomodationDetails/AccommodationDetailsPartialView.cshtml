@@ -92,11 +92,12 @@
                                                     數量：@group.Sum(item =>item.Quantity)
                                                 </div>
                                                 <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
-                                                    TWD：@Html.DisplayFor(modelItem => price)
+                                                   @String.Format("{0:C0}",price)
+                                              
                                                 </div>
                                             </div>
                                             <div class="room-remove col-md-1 p-0" style="text-align: left;">
-                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" onclick="removeFromAcc(@firstItem.Id)"></i></a>
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" onclick="removeFromAcc(@firstItem.RoomProductId)"></i></a>
                                                 
                                             </div>
                                         </div>

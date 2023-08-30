@@ -304,6 +304,8 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "Failed to add to cart."+ex });
             }
         }
+
+        [HttpPost]
         public IActionResult RemoveAccommodationFromCart(int roomProductId)
         {
             try
@@ -454,13 +456,19 @@ namespace RouteMasterFrontend.Controllers
                 ModelState.AddModelError(string.Empty, "購物車是空的，無法進行結帳");
                 return View("Checkout");
             }
-            ProcessCheckout(memberId, CouponsId, note);
+            //ProcessCheckout(memberId, CouponsId, note);
            
             return RedirectToAction("Index", "Ecpay", new { selectedCouponId = CouponsId });
           
         }
 
-      
+        public ActionResult PayInfo(int Id, int selectedCouponId)
+        {
+            ProcessCheckout(Id, selectedCouponId, null);
+            return RedirectToAction("ConfirmPayment", "Carts");
+
+        }
+
         private void ProcessCheckout(int memberId, int?CouponsId, string?note)
         {
             var cart = GetCartInfo(memberId);
@@ -473,8 +481,8 @@ namespace RouteMasterFrontend.Controllers
             {
                 return;
             }
-
             CreateOrder(memberId, CouponsId, note);
+            EmptyCart(memberId);
 
             TempData["MemberIdForEmptyCart"] = memberId;
         }
@@ -505,7 +513,7 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = CouponsId,
+                        CouponsId = (int)(CouponsId == 0 ? null : CouponsId),
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal
@@ -594,7 +602,7 @@ namespace RouteMasterFrontend.Controllers
                             var activitiesDetails = new OrderActivitiesDetail
                             {
                                 OrderId = order.Id,
-                                ActivityId = activitiesproductsId,
+                                ActivityId = activityId,
                                 ActivityName = activitiesName,
                                 ActivityProductId = activitiesDetail.ActivityProductId,
                                 Date = date,
@@ -719,11 +727,11 @@ namespace RouteMasterFrontend.Controllers
             foreach (var accommodationItem in cart.Cart_AccommodationDetails)
             {
                 var roomId = accommodationItem.RoomProductId;
-                var room = _context.Rooms.FirstOrDefault(x => x.Id == roomId);
+                var rp = _context.RoomProducts.FirstOrDefault(x => x.Id == roomId);
 
-                if (room != null)
+                if (rp != null)
                 {
-                    int roomTotal = room.Price * accommodationItem.Quantity;
+                    int roomTotal = (int)rp.NewPrice * accommodationItem.Quantity;
                     total += roomTotal;
                 }
             }
