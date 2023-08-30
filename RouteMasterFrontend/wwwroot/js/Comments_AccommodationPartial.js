@@ -6,7 +6,7 @@
             selected: 0,         
             thumbicon: [],
             hotelId: 0,
-            starpoint:"",
+            starpoint:0,
             title: "",
             pros: "",
             cons: "",
@@ -14,6 +14,8 @@
             carouselList: [],
             userAccount:"",
             fileName: "",
+            sliderMin: 1,
+            sliderMax:10,
            
 
 
@@ -132,7 +134,7 @@
         },       
         clearWords: function () {
             let _this = this;  
-            _this.starpoint = "",
+            _this.starpoint =0,
             _this.title = "";
             _this.pros = "";
             _this.cons = "";
@@ -162,6 +164,16 @@
             _this.fileName = `${totalFiles}個檔案`
             console.log(_this.fileName);
 
+        },
+        colorShift: function () {
+            let _this = this;
+            const rangeInput = document.querySelector('#target');
+            
+                    
+            const percentage = (_this.starpoint - _this.sliderMin) / (_this.sliderMax - _this.sliderMin);
+            console.log(percentage);
+            rangeInput.style.setProperty('--percentage', percentage);
+           
         },
 
     },
@@ -259,7 +271,7 @@
                             </div>
                              <div class="mb-2 d-flex align-items-start">
                                 <div class="position-relative">
-                                    <input v-model="starpoint" type="range" min="1" max="10" step="1" list="tickmarks"/>
+                                    <input v-model="starpoint" id="target" type="range" :min="sliderMin" :max="sliderMax" step="1" list="tickmarks" @input="colorShift"/>
                                 <datalist id="tickmarks" class="d-flex justify-content-between" style="width:200px;">
                                     <option value="1" label="1" class="ps-2"></option>
                                     <option value="5" label="5" class="pe-2"></option>

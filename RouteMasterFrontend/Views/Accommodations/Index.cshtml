@@ -176,7 +176,7 @@
                             <div id="budget-values" class="mb-2">
                                 <span id="min-budget">TWD：{{ minBudget }}</span> ～ <span id="max-budget">{{ maxBudget }}</span><span v-if="maxBudget == 10000">+</span>
                             </div>
-                            <div id="budget-slider" class="mb-2"></div>
+                            <div id="budget-slider" class="mb-2" style="text-align:center; width:98%"></div>
                         </li>
                     </ul>
                 </div><hr />
@@ -233,7 +233,7 @@
                 </div>
                 <div>
                     <hr />
-                    <h5>直轄縣市</h5>
+                    <h5>縣市</h5>
                     <ul>
                         <li v-for="(region, index) in filterDto.regions">
                             <div class="form-check">
@@ -246,11 +246,11 @@
             </aside>
             <div class="main-right ms-auto">
                 <nav class="d-flex row position-sticky bg-white w-100 ms-0" style=" top:80px; z-index:10; padding-bottom:12px">
-                    <div class="col-4 ps-0">
+                    <div class="col-3 ps-0">
                         <input type="search" v-model="keyword" class="form-control" placeholder="搜尋關鍵字" @@change="showPages">
                     </div>
-
-                    <div class="d-flex col-5 justify-content-end p-0 ms-auto">
+                    <div class="col-2"><button class="form-control" @@click="clearFilter">清除篩選</button></div>
+                    <div class="d-flex col-3 p-0 justify-content-end">
                         <label for="sort" class="form-label mb-0 me-2 d-flex align-items-center">排序：</label>
                         <select class="form-select w-50" v-model="sort" aria-label="Small select example" @@change="showPages">
                             <option value="0">請選擇</option>
@@ -261,7 +261,7 @@
                             <option value="5">依房價高到低</option>
                         </select>
                     </div>
-                    <div class="d-flex col-3 justify-content-end p-0">
+                    <div class="d-flex col-4 p-0 justify-content-end">
                         <label for="page" class="form-label mb-0 me-2 d-flex align-items-center">每頁顯示</label>
                         <select class="form-select w-33" v-model="pageSize" aria-label="Small select example" @@change="showPages">
                             <option value="10">10</option>
@@ -307,7 +307,7 @@
                                                             </small>
                                                         </h5>
                                                         <div class="mt-auto d-flex">
-                                                            <h4 class="mt-auto me-auto">房價最低(每晚)： {{product.price}} NTD 起</h4>
+                                                            <h4 class="mt-auto me-auto">房價最低(每晚)： {{product.price}} TWD 起</h4>
                                                             <input type="button" class="btn btn-outline-primary" v-bind:data-id="index" v-bind:id=`${product.id}` data-bs-toggle="modal" data-bs-target="#exampleModal" value="住所資訊" @@click="showModal(product.id)" />
                                                         </div>
                                                     </div>
@@ -1126,6 +1126,7 @@
                 toggleView: function () {
                     this.toggle = false;
                     this.loadProducts();
+                    this.initBudgetSlider();
                 },
                 initBudgetSlider: function () {
                     let _this = this;
@@ -1150,6 +1151,16 @@
                         _this.maxBudget = values[1];
                         _this.showPages();
                     });
+                },
+                clearFilter:function(){
+                    this.minBudget = @Html.Raw(Json.Serialize(Model.MinBudget));
+                    this.maxBudget = @Html.Raw(Json.Serialize(Model.MaxBudget));
+                    this.selectedGrades = [];
+                    this.selectedaCategories = [];
+                    this.selectedScore = 0;
+                    this.selectedsCategories = [];
+                    this.selectedaRegions = [];
+                    this.showPages();
                 },
             },
             components: {

@@ -145,9 +145,11 @@ namespace RouteMasterFrontend.Controllers
                 { "TradeDesc", "無" },
                 { "ItemName", $"RouteMaster商品-{formattedItemNames}"}, 
                 { "ExpireDate", "3" },
-                { "ReturnURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
+                //{ "ReturnURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
+                { "ReturnURL", $"{website}Carts/HandleReturnURL" },
                 { "ClientBackURL", $"{website}Carts/ConfirmPayment" },
-                { "OrderResultURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
+                //{ "OrderResultURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
+                //{ "OrderResultURL", $"{website}Carts/ShowPaymentResult" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
                 { "EncryptType", "1" }

@@ -20,6 +20,73 @@ namespace RouteMasterFrontend.Models.Infra.EFRepositories
 
         }
 
+        public async Task<List<AttractionMapVM>> GetAtts()
+        {
+            
+
+            var query = await _db.Attractions
+                .AsNoTracking()
+                .Include(a => a.AttractionCategory)
+                .Include(a => a.Region)
+                .Include(a => a.Town)
+                .Include(a => a.AttractionImages)
+                .Include(a => a.Comments_Attractions)
+                .Include(a => a.Tags)
+                .Include(a => a.AttractionClicks)
+                .ToListAsync();
+
+
+
+            var result = query//.OrderByDescending(q => q.Id)
+                .Select(q => new AttractionMapVM
+                {
+                    Id = q.Id,
+                    AttractionCategory = q.AttractionCategory.Name,
+                    Name = q.Name,
+                    Region = q.Region.Name,
+                    Town = q.Town.Name,
+                    Image = q.AttractionImages
+                        .Where(i => i.AttractionId == q.Id)
+                        .Select(i => i.Image)
+                        .FirstOrDefault() ?? string.Empty,
+                    
+                    Tags = q.Tags
+                        .Select(t => t.Name)
+                        .ToList(),
+                    Score = Math.Round(_db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id)
+                        .Select(c => c.Score)
+                        .DefaultIfEmpty()
+                        .Average(), 1),
+                    ScoreCount = _db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id)
+                        .Count(),
+                    Hours = Math.Round(_db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id && c.StayHours != null)
+                        .Select(c => c.StayHours.Value)
+                        .DefaultIfEmpty()
+                        .Average(), 1),
+                    HoursCount = _db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id && c.StayHours != null)
+                        .Count(),
+                    Price = (int)Math.Round(_db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id && c.Price != null)
+                        .Select(c => c.Price.Value)
+                        .DefaultIfEmpty()
+                        .Average(), 0),
+                    PriceCount = _db.Comments_Attractions
+                        .Where(c => c.AttractionId == q.Id && c.Price != null)
+                        .Count(),
+                    Clicks = q.AttractionClicks
+                        .Where(a => a.AttractionId == q.Id)
+                        .Count(),
+                    PositionX = q.PositionX,
+                    PositionY = q.PositionY,
+                }).ToList();
+
+            return result;
+        }
+
         public IEnumerable<AttractionForDistsnceVM> GetAllWithXY()
         {
             var query = _db.Attractions
