@@ -5,22 +5,7 @@
 
 
 <style>
-	table {
-		border-collapse: collapse;
-		width: 100%;
-	}
 
-	th, td {
-		text-align: center;
-		padding: 8px;
-		border: 1px solid rgba(0, 0, 0, 0.2); /* 淡色边框 */
-		background-color: rgba(255, 255, 255, 0.7); /* 背景颜色透明度较高 */
-		transition: border 0.3s ease-in-out; /* 边框过渡效果 */
-	}
-
-		td:hover {
-			background-color:lightcyan;
-		}
 
 	.hide{
 		display:none;
@@ -30,78 +15,129 @@
 </style>
 
 
+<div class="d-flex">
+	<button class="btn btn-outline-success m-2" id="createCalendar">
+		更新行事曆
+	</button>
+</div>
 
-
-
-<table class="hide" id="theSmallTableToShowData">
-	<thead>
-		<tr>
-			<th>事項</th>
-			<th>開始時間</th>
-			<th>結束時間</th>
-		</tr>
-	</thead>
-	<tbody id="ajaxTargetTBody">
-	
-	</tbody>
-</table>
+<div  id="calendar" ></div>
 
 
 
 <script>
 
-	function formatDateTime(dateTimeString) {
-		const dateTime = new Date(dateTimeString);
-		const datePart = dateTime.toLocaleDateString();
-		const timePart = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-		return `${datePart} ${timePart}`;
-	}
-
-
-
-
-	function initialData(){
-		let targetTable = document.querySelector('#theSmallTableToShowData');
-		let targetTbody = document.querySelector('#ajaxTargetTBody');
-		var memberId = @memberIdFromCookie;
-
-
-		fetch(`https://localhost:7251/api/TravelPlans/Get/SchduleData?memberId=${memberId}`)
-		.then(response=>response.json()
-		)
-		.then(data => {
-			console.log(data.length)
-			if(data.length>0){
-					targetTable.classList.remove('hide');
-
-					for(let i=0;i<data.length;i++){
-
-						let newTr = document.createElement('tr');
-
-						let newTd1 = document.createElement('td');
-						let newTd2 = document.createElement('td');
-						let newTd3 = document.createElement('td');
-						newTd1.textContent = data[i].content;
-						newTd2.textContent = formatDateTime(data[i].startTime);
-						newTd3.textContent = formatDateTime(data[i].endTime);
-
-						newTr.appendChild(newTd1);
-						newTr.appendChild(newTd2);
-						newTr.appendChild(newTd3);
-
-						targetTbody.appendChild(newTr);					
+	function initialData (){
+		var calendarEl = document.getElementById('calendar');
+		var calendar = new FullCalendar.Calendar(calendarEl, {
+			initialView: 'timeGridFourDay',
+			views: {
+				timeGridFourDay: {
+					type: 'timeGrid',
+					duration: { days: 4 }
+				}
+			},
+			headerToolbar: {
+				left: 'prev,next',
+				center: 'title',
+				right: 'customPrevButton,customNextButton'
+			},
+			customButtons: {
+				customPrevButton: {
+					text: '前四天',
+					click: function () {
+						// 切換到前四天視圖
+						calendar.changeView('timeGridFourDay');
 					}
-			}
+				},
+				customNextButton: {
+					text: '單日',
+					click: function () {
+						// 切換到單日視圖
+						calendar.changeView('timeGridDay');
+					}
+				}
+			},
+			events: [
+			],
+			eventSources: [
+				function () {
+					return fetch(`https://localhost:7251/api/TravelPlans/Get/SchduleData?memberId=${@memberIdFromCookie}`, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					})
+						.then(function (response) {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							console.log("response啦")
+							console.log(response)
+							return response.json();
+						})
+						.then(function (data) {
+							// 直接将数据赋值给FullCalendar的事件数组
+							console.log("data啦")
+							console.log(data)
 
-				// 在这里处理 data，它是一个 JavaScript 对象或数组
-				console.log(data);
-		})
-		.catch((err)=>{
-			console.log(err)
-		})
+
+							return data;
+						})
+						.catch(function (error) {
+							// 处理获取数据失败的情况
+							console.error(error);
+							return [];
+						});
+				}
+			],
+
+
+			// 你可以在這裡添加其他配置選項
+		});
+		calendar.render();
 	}
+
+
+	document.querySelector("#createCalendar").addEventListener('click',function(){
+		
+
+		var calendarEl = document.getElementById('calendar');
+		var calendar = new FullCalendar.Calendar(calendarEl, {
+			initialView: 'timeGridFourDay',
+			views: {
+				timeGridFourDay: {
+					type: 'timeGrid',
+					duration: { days: 4 }
+				}
+			},
+			headerToolbar: {
+				left: 'prev,next',
+				center: 'title',
+				right: 'timeGridFourDay,timeGridDay' // user can switch between the two
+			},
+			events: [
+				// 在這裡添加事件
+				{
+					title: '我的事件1',
+					start: '2023-08-30T08:00:00', // 開始日期和時間
+					end: '2023-08-30T10:00:00'    // 結束日期和時間
+				},
+				{
+					title: '我的事件2',
+					start: '2023-08-30T14:00:00',
+					end: '2023-08-30T16:00:00'
+				}
+			],
+			// 你可以在這裡添加其他配置選項
+		});
+		calendar.render();
+
+	});
+
 
 
 	initialData();
+	
+
 </script>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Humanizer;
 using MessagePack.Formatters;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -518,17 +519,68 @@ namespace RouteMasterBackend.Controllers
         }
 
 
+		[HttpPost]
+		[Route("Post/SaveVuePageSchduleData")]
+
+        public async void SaveVuePageSchduleData(VuePageSchduleItemListDto dto)
+        {
+            //清空原有資料
 
 
-        [HttpGet("Get/SchduleData")]
+
+            if (dto.VuePageSchduleObjs != null)
+            {
+                for(int i=0;i<dto.VuePageSchduleObjs.Length;i++)
+                {
+					var newSchedule = new Schedule();
+					newSchedule.MemberId = dto.memberId;
+					newSchedule.CreateDate = dto.createDate;
+                    newSchedule.Content = dto.VuePageSchduleObjs[i].title;
+
+
+
+					if (!string.IsNullOrEmpty(dto.VuePageSchduleObjs[i].start))
+					{
+						newSchedule.StartTime = DateTime.Parse( dto.VuePageSchduleObjs[i].start);
+					}
+					else
+					{
+						newSchedule.StartTime = null;
+					}
+
+
+					if (!string.IsNullOrEmpty(dto.VuePageSchduleObjs[i].end))
+					{
+						newSchedule.EndTime = DateTime.Parse( dto.VuePageSchduleObjs[i].end);
+					}
+					else
+					{
+						newSchedule.StartTime = null;
+					}
+
+					_context.Schedules.Add(newSchedule);
+					_context.SaveChanges();
+
+				}
+
+            }
+        }
+
+
+
+
+
+
+
+		[HttpGet("Get/SchduleData")]
         public async Task<IEnumerable<SchduleFromDbDto>> GetSchduleData(int memberId)
         {
           
             var data = _context.Schedules.Where(x => x.MemberId == memberId).Select(x => new SchduleFromDbDto
             {
-                Content = x.Content,    
-                StartTime=x.StartTime,
-                EndTime=x.EndTime
+                Title = x.Content,    
+                Start=x.StartTime,
+                End=x.EndTime
             });
 
 
