@@ -147,9 +147,9 @@ namespace RouteMasterFrontend.Controllers
                 { "ExpireDate", "3" },
                 //{ "ReturnURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
                 { "ReturnURL", $"{website}Carts/HandleReturnURL" },
-                { "ClientBackURL", $"{website}Carts/ConfirmPayment" },
+                //{ "ClientBackURL", $"{website}Carts/ConfirmPayment" },
                 //{ "OrderResultURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
-                //{ "OrderResultURL", $"{website}Carts/ShowPaymentResult" },
+                { "OrderResultURL", $"{website}Carts/ShowPaymentResult?Id={memberId}&selectedCouponId={selectedCouponId}" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
                 { "EncryptType", "1" }

@@ -893,7 +893,7 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
             }
         }
-        public ActionResult ShowPaymentResult()
+        public ActionResult ShowPaymentResult(int memberId,int selectedCouponId)
         {
             var postData = Request.Form;
 
@@ -904,7 +904,7 @@ namespace RouteMasterFrontend.Controllers
 
                 if (resultStatus == "1")
                 {
-
+                    ProcessCheckout(memberId, selectedCouponId, null);
                     return Redirect("https://localhost:7145/Carts/ConfirmPayment");
                 }
                 else
