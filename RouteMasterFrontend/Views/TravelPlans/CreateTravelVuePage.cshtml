@@ -416,8 +416,9 @@
 
 
 
+    <div>{{sendToGoogleMapsDirectionsApi}}</div>
 
-
+    <div>{{shortestPathAttractionsByGreedySolution}}</div>
 </div>
 
 
@@ -446,83 +447,83 @@
                     AllAttractionContainerStatus:false,
                     allAttractions:[],
 
-                    travelModes: [{ id: 1, modeName: "開車", value: "DRIVING" }, { id: 2, modeName: "步行", value: "WALKING" }],
+                    travelModes: [{ id: 1, modeName: "開車", value: "DRIVING" }, { id: 2, modeName: "步行", value: "WALKING" }, { id: 3, modeName: "骑自行车", value: "BICYCLING" }],
                     selectedTravelMode:"DRIVING",
 
                     //選擇景點
                     selectedAttractions:[],
                     //從MapsApi取得的資料
-                    dataFromDistanceMatrix: [
-                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
-                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
-                        "distance": { "text": "1 公尺", "value": 0 },
-                        "duration": { "text": "1 分鐘", "value": 0 } },                        
-                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
-                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "distance": { "text": "137 公里", "value": 136574 },
-                        "duration": { "text": "2 小時 48 分鐘", "value": 10092 } },
-                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
-                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "distance": { "text": "125 公里", "value": 124620 },
-                        "duration": { "text": "2 小時 34 分鐘", "value": 9268 } },                         
-                        { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
-                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "distance": { "text": "53.6 公里", "value": 53597 },
-                        "duration": { "text": "1 小時 1 分鐘", "value": 3687 } },                        
-                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
-                        "distance": { "text": "136 公里", "value": 136412 },
-                        "duration": { "text": "2 小時 45 分鐘", "value": 9891 } },
-                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "distance": { "text": "1 公尺", "value": 0 },
-                        "duration": { "text": "1 分鐘", "value": 0 } },                        
-                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
-                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "distance": { "text": "56.5 公里", "value": 56480 },
-                        "duration": { "text": "1 小時 25 分鐘", "value": 5121 } },                        
-                        { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "distance": { "text": "175 公里", "value": 174979 },
-                        "duration": { "text": "3 小時 18 分鐘", "value": 11903 } },                        
-                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
-                        "distance": { "text": "124 公里", "value": 123932 },
-                        "duration": { "text": "2 小時 32 分鐘", "value": 9126 } },                        
-                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                        "distance": { "text": "55.6 公里", "value": 55603 },
-                        "duration": { "text": "1 小時 25 分鐘", "value": 5094 } },                         
-                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "distance": { "text": "1 公尺", "value": 0 },
-                        "duration": { "text": "1 分鐘", "value": 0 } },                        
-                        { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "distance": { "text": "162 公里", "value": 162498 },
-                        "duration": { "text": "3 小時 6 分鐘", "value": 11138 } },                         
-                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
-                        "distance": { "text": "54.8 公里", "value": 54779 }, 
-                        "duration": { "text": "1 小時 3 分鐘", "value": 3771 } },                         
-                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
-                        "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
-                        "distance": { "text": "176 公里", "value": 175540 }, 
-                        "duration": { "text": "3 小時 22 分鐘", "value": 12146 } },                         
-                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
-                        "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 }, 
-                        "distance": { "text": "164 公里", "value": 163586 }, 
-                        "duration": { "text": "3 小時 9 分鐘", "value": 11322 } },                         
-                        { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
-                        "distance": { "text": "1 公尺", "value": 0 },
-                        "duration": { "text": "1 分鐘", "value": 0 } }],
+                    //dataFromDistanceMatrix: [
+                    //    { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    //    "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //    "distance": { "text": "1 公尺", "value": 0 },
+                    //    "duration": { "text": "1 分鐘", "value": 0 } },                        
+                    //    { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //    "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "distance": { "text": "137 公里", "value": 136574 },
+                    //    "duration": { "text": "2 小時 48 分鐘", "value": 10092 } },
+                    //    { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //    "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "distance": { "text": "125 公里", "value": 124620 },
+                    //    "duration": { "text": "2 小時 34 分鐘", "value": 9268 } },                         
+                    //    { "start": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    //    "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "distance": { "text": "53.6 公里", "value": 53597 },
+                    //    "duration": { "text": "1 小時 1 分鐘", "value": 3687 } },                        
+                    //    { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    //    "distance": { "text": "136 公里", "value": 136412 },
+                    //    "duration": { "text": "2 小時 45 分鐘", "value": 9891 } },
+                    //    { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "distance": { "text": "1 公尺", "value": 0 },
+                    //    "duration": { "text": "1 分鐘", "value": 0 } },                        
+                    //    { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                    //    "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "distance": { "text": "56.5 公里", "value": 56480 },
+                    //    "duration": { "text": "1 小時 25 分鐘", "value": 5121 } },                        
+                    //    { "start": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "distance": { "text": "175 公里", "value": 174979 },
+                    //    "duration": { "text": "3 小時 18 分鐘", "value": 11903 } },                        
+                    //    { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    //    "distance": { "text": "124 公里", "value": 123932 },
+                    //    "duration": { "text": "2 小時 32 分鐘", "value": 9126 } },                        
+                    //    { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //    "distance": { "text": "55.6 公里", "value": 55603 },
+                    //    "duration": { "text": "1 小時 25 分鐘", "value": 5094 } },                         
+                    //    { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "distance": { "text": "1 公尺", "value": 0 },
+                    //    "duration": { "text": "1 分鐘", "value": 0 } },                        
+                    //    { "start": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //    "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "distance": { "text": "162 公里", "value": 162498 },
+                    //    "duration": { "text": "3 小時 6 分鐘", "value": 11138 } },                         
+                    //    { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "end": { "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
+                    //    "distance": { "text": "54.8 公里", "value": 54779 }, 
+                    //    "duration": { "text": "1 小時 3 分鐘", "value": 3771 } },                         
+                    //    { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                    //    "end": { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 }, 
+                    //    "distance": { "text": "176 公里", "value": 175540 }, 
+                    //    "duration": { "text": "3 小時 22 分鐘", "value": 12146 } },                         
+                    //    { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }, 
+                    //    "end": { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 }, 
+                    //    "distance": { "text": "164 公里", "value": 163586 }, 
+                    //    "duration": { "text": "3 小時 9 分鐘", "value": 11322 } },                         
+                    //    { "start": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "end": { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 },
+                    //    "distance": { "text": "1 公尺", "value": 0 },
+                    //    "duration": { "text": "1 分鐘", "value": 0 } }],
 
 
 
 
 
-                    //dataFromDistanceMatrix:[],
+                    dataFromDistanceMatrix:[],
 
 
 
@@ -531,12 +532,12 @@
                     travelBeginTime: new Date(),
 
                     //未拜訪景點
-                    unvisitedAttraction: [{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
-                    { "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
-                    { "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
-                    { "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
+                    //unvisitedAttraction: [{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 },
+                    //{ "attId": 2, "attName": "遠雄海洋公園", "positionX": 23.90143611670319, "positionY": 121.60346120096153 },
+                    //{ "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
+                    //{ "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
 
-                    //unvisitedAttraction:[],
+                    unvisitedAttraction:[],
                     //visitedAttraction: 
                     //[
                     //{ "attId": 1, "attName": "龜山島", "positionX": 24.869758560174205, "positionY": 121.83715820454869 }, 
@@ -544,9 +545,13 @@
                     //{ "attId": 3, "attName": "太魯閣", "positionX": 24.202965312309352, "positionY": 121.49545761286139 },
                     //{ "attId": 4, "attName": "故宮博物院", "positionX": 25.102452509288742, "positionY": 121.54857833277863 }],
 
-
                     //已拜訪景點
                     visitedAttraction:[],
+
+
+                    map: null,
+                    directionsService: null,
+                    directionsRenderer: null,
 
                     sortedAttractionsWithTime:[],
 
@@ -593,6 +598,8 @@
                         }
                      });
                 },
+
+
 
 
                 selectedPathesOrderByAttractions:function(){
@@ -681,6 +688,43 @@
 
 
                     return result;
+                },
+
+
+                sendToGoogleMapsDirectionsApi: function () {
+                    let newArray = this.shortestPathAttractionsByGreedySolution;
+
+                    if (newArray && newArray.length > 0) {
+                        return newArray.map(attraction => ({
+                            lat: parseFloat(attraction.positionX),
+                            lng: parseFloat(attraction.positionY)
+                        }));
+                    } else {
+                        return [];
+                    }
+
+                 
+                },
+
+
+
+                shortestPathAttractionsByGreedySolution: function () {
+
+                    let copyArray = this.selectedAttractions.slice()
+                    if (copyArray.length>0) {
+                        return this.greedyTSP(copyArray);
+
+                    }else{
+
+                        return [];
+
+                    }
+                    
+               
+
+                   
+
+
                 },
 
                 
@@ -1347,6 +1391,73 @@
                             console.log(error)
                         });
 
+                },
+
+                greedyTSP: function (copyArray) {
+                    if (this.dataFromDistanceMatrix.length > 0) {
+                        let shortestOrderArray = [];
+                        let selectedPath = [];
+                        let unvisitedArrayInGreedyTsp = copyArray.slice();
+                        let distanceToEach = this.dataFromDistanceMatrix.filter(x => x.distance.value !== 0);
+                        let newStart;
+
+                        while (unvisitedArrayInGreedyTsp.length > 0) {
+
+                            if (unvisitedArrayInGreedyTsp.length == copyArray.length) {
+                                let shortestObj = this.getShortestDistanceObject(distanceToEach);
+                                selectedPath.push(shortestObj);
+
+
+                                let startIndex = unvisitedArrayInGreedyTsp.indexOf(shortestObj.start);
+                                if (startIndex !== -1) {
+                                    unvisitedArrayInGreedyTsp.splice(startIndex, 1);
+                                    shortestOrderArray.push(shortestObj.start);
+
+                                }
+
+                                let endIndex = unvisitedArrayInGreedyTsp.indexOf(shortestObj.end);
+                                if (endIndex !== -1) {
+                                    unvisitedArrayInGreedyTsp.splice(endIndex, 1);
+                                    shortestOrderArray.push(shortestObj.end);
+                                }
+
+
+
+                                newStart = shortestObj.end;
+
+                            } else {
+                                let shortestObj = this.getNextDistanceObject(distanceToEach, newStart, shortestOrderArray)
+                                selectedPath.push(shortestObj);
+                                let startIndex = unvisitedArrayInGreedyTsp.indexOf(shortestObj.start);
+                                if (startIndex !== -1) {
+                                    unvisitedArrayInGreedyTsp.splice(startIndex, 1);
+                                    shortestOrderArray.push(shortestObj.start);
+                                }
+
+                                let endIndex = unvisitedArrayInGreedyTsp.indexOf(shortestObj.end);
+                                if (endIndex !== -1) {
+                                    unvisitedArrayInGreedyTsp.splice(endIndex, 1);
+                                    shortestOrderArray.push(shortestObj.end);
+                                }
+
+                                newStart = shortestObj.end;
+
+
+
+
+
+
+                            }
+                            if (unvisitedArrayInGreedyTsp.length === 0) {
+                                break;
+                            }
+
+
+
+
+
+
+                        }
 
 
 
@@ -1356,6 +1467,62 @@
 
 
 
+
+
+
+
+
+                        return shortestOrderArray;
+                    } else {
+                        return null;
+                    }
+
+                },
+                getShortestDistanceObject: function (distanceToEach) {
+                    if (distanceToEach.length === 0) {
+                        return undefined;
+                    }
+                    let shortestDistanceObject = distanceToEach[0];
+                    let shortestDistance = shortestDistanceObject.distance.value;
+
+                    for (let i = 1; i < distanceToEach.length; i++) {
+                        const currentObject = distanceToEach[i];
+                        const currentDistance = currentObject.distance.value;
+
+                        if (currentDistance < shortestDistance) {
+                            shortestDistanceObject = currentObject;
+                            shortestDistance = currentDistance;
+                        }
+                    }
+                    return shortestDistanceObject;
+
+                },
+                getNextDistanceObject: function (distanceToEach, startPoint, visited) {
+
+                    if (distanceToEach.length === 0) {
+                        return undefined;
+                    }
+                    const objectsWithStartingPoint = distanceToEach.filter(obj => obj.start == startPoint);
+                    if (objectsWithStartingPoint.length == 0) {
+                        return undefined;
+                    }
+                    // Filter out objects whose destinations are already in "visited" array
+                    const unvisitedObjects = objectsWithStartingPoint.filter(obj => !visited.includes(obj.end));
+                    if (unvisitedObjects.length === 0) {
+                        return undefined;
+                    }
+                    let shortestDistanceObject = unvisitedObjects[0];
+                    let shortestDistance = shortestDistanceObject.distance.value;
+                    for (let i = 1; i < unvisitedObjects.length; i++) {
+                        const currentObject = unvisitedObjects[i];
+                        const currentDistance = currentObject.distance.value;
+
+                        if (currentDistance < shortestDistance) {
+                            shortestDistanceObject = currentObject;
+                            shortestDistance = currentDistance;
+                        }
+                    }
+                    return shortestDistanceObject;
 
 
 
