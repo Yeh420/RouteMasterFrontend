@@ -166,8 +166,7 @@
                                 decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
                                 totalAmount += groupPrice;
                                 <tr data-extraservice-id="@group.First().Id">
-                                    <td>
-                                        </td>
+                                     <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
 
                                     <td class="align-middle text-center">@group.First().Name</td>
                                         <td class="align-middle text-center">@(group.First().Description.Length > 10 ? group.First().Description.Substring(0, 10) + "..." : group.First().Description)</td>
@@ -188,7 +187,7 @@
                         {
                                 totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
                                 <tr data-roomProductId="@accommodationDTO.RoomId">
-                                <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                <td><img src="../AccommodationImages/@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
                                         <td class="align-middle text-center">@accommodationDTO.RoomName <br />@accommodationDTO.RoomTypeName</td>
                                 <td class="align-middle text-center">@accommodationDTO.Date</td>
@@ -531,8 +530,9 @@
             });
         </script>
     }
+}
      
 
        
 
-                }
+                

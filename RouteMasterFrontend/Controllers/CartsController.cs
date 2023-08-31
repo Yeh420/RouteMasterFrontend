@@ -77,6 +77,7 @@ namespace RouteMasterFrontend.Controllers
                     .Include(c => c.RoomProduct.Room)
                     .Include(c => c.RoomProduct.Room.Accommodation)
                     .Include(c => c.RoomProduct.Room.RoomType)
+                    .Include(c => c.RoomProduct.Room.RoomImages)
                     .Select(cartDetail => new Cart_AccommodationDetailDto
                            {
                            Id = cartDetail.Id,
@@ -87,7 +88,7 @@ namespace RouteMasterFrontend.Controllers
                            Price = cartDetail.RoomProduct.NewPrice,
                            Date = cartDetail.RoomProduct.Date,
                            Quantity = cartDetail.Quantity,
-                           ImageUrl = "123" 
+                           ImageUrl = cartDetail.RoomProduct.Room.RoomImages.First().Image
                        })
                         .ToList(),
 
@@ -515,9 +516,9 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = (int)(CouponsId == 0 ? null : CouponsId),
+                        CouponsId = (int)(CouponsId == 0 ? 1 : CouponsId),
                         CreateDate = DateTime.Now,
-                        ModifiedDate = null,
+                        ModifiedDate = DateTime.Now,
                         Total = cartTotal
                     };
 
