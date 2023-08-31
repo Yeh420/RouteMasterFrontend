@@ -54,7 +54,7 @@
                 <button class="nav-link" id="pills-about-tab" data-bs-toggle="pill" data-bs-target="#pills-about" type="button" role="tab" aria-controls="pills-about" aria-selected="false" @@click="showMe(cate[3])">{{cate[3]}}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <input class="form-control me-auto" placeholder="搜尋關鍵字" aria-label="Search" v-model="filter" @@input="getQuestion">
+                <input class="form-control me-auto" placeholder="搜尋關鍵字" aria-label="Search" v-model="filter" @@keyup="getQuestion">
             </li>
 
         </ul>
@@ -129,7 +129,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" @@click="updatethumbs(qnumber,thumbsUp)"></button>
                     </div>
                     <div class="modal-body">
-                       <p class="fs-5 fw-normal">{{answer}}</p>
+                       <p class="fs-5 fw-normal mb-2">{{answer}}</p>
                         <img v-if="img" :src=`../MemberUploads/${img}` class="img-fluid">
                     </div>
                     <div class="modal-footer justify-content-start">
