@@ -516,9 +516,9 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = (int)(CouponsId == 0 ? null : CouponsId),
+                        CouponsId = (int)(CouponsId == 0 ? 1 : CouponsId),
                         CreateDate = DateTime.Now,
-                        ModifiedDate = null,
+                        ModifiedDate = DateTime.Now,
                         Total = cartTotal
                     };
 
