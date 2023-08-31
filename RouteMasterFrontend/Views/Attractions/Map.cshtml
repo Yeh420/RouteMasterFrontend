@@ -1,5 +1,13 @@
 ﻿@model List<RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionMapVM>
 
+@section Styles{
+    <style>
+        .gm-ui-hover-effect {
+            display: none;
+        }
+    </style>
+}
+
 <div>
     <h1>地圖</h1>
     <div id="map" style="height: 800px"></div>
@@ -42,15 +50,11 @@
 
             var map = new google.maps.Map(document.getElementById('map'), mapOptions);
             
-            //var marker = new google.maps.Marker({
-            //    position: { lat: 25.03, lng: 121.56 },
-            //    map: map,
-            //    title: "123"
-            //});
+            
 
             var attractions = @Html.Raw(Json.Serialize(Model));
 
-            console.log(attractions);
+            //console.log(attractions);
 
             attractions.forEach(function (attraction) {
                 //console.log(attraction.positionX)
