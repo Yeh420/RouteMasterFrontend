@@ -68,7 +68,7 @@ namespace RouteMasterFrontend.Controllers
             return Math.Max(total, 0);
         }
 
-        public async Task<IActionResult> Index(int selectedCouponId)
+        public async Task<IActionResult> Index(int memberId, int? selectedCouponId)
         {
 
             int cartIdFromCookie = Convert.ToInt32(Request.Cookies["CartId"] ?? "0");
@@ -82,7 +82,7 @@ namespace RouteMasterFrontend.Controllers
             var orderId = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 20);
             var website = "https://localhost:7145/";
 
-            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name)?.Id;
+           
 
             var accommodationNameArray = new List<string>();
             var extraServiceNameArray = new List<string>();
@@ -147,9 +147,9 @@ namespace RouteMasterFrontend.Controllers
                 { "ExpireDate", "3" },
                 //{ "ReturnURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
                 { "ReturnURL", $"{website}Carts/HandleReturnURL" },
-                { "ClientBackURL", $"{website}Carts/ConfirmPayment" },
+                //{ "ClientBackURL", $"{website}Carts/ConfirmPayment" },
                 //{ "OrderResultURL", $"{website}Carts/PayInfo?Id={memberId}&selectedCouponId={selectedCouponId}" },
-                //{ "OrderResultURL", $"{website}Carts/ShowPaymentResult" },
+                { "OrderResultURL", $"{website}Carts/ShowPaymentResult?memberId={memberId}&selectedCouponId={selectedCouponId}" },
                 { "PaymentType", "aio" },
                 { "ChoosePayment", "ALL" },
                 { "EncryptType", "1" }

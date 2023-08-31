@@ -1067,7 +1067,7 @@ namespace RouteMasterFrontend.Controllers
                 return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
             }
 
-            bool securityPassword = Regex.IsMatch(vm.Password, @"^[^a-d]$");
+            bool securityPassword = Regex.IsMatch(vm.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)");
             if (!securityPassword)
             {
                 return Result.Failure($"密碼安全性有疑慮，請加強密碼");
@@ -1134,14 +1134,14 @@ namespace RouteMasterFrontend.Controllers
             {
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
-                Account = payload.Name+DateTime.Now,
+                Account = payload.Name,
                 Email = payload.Email,
                 CellPhoneNumber="尚未新增電話",
                 Address="尚未新增地址",
                 Birthday= DateTime.Today,
                 Gender= false,
                 Image= imageFile,
-                IsConfirmed = false,
+                IsConfirmed = true,
                 IsSuspended = false,
                 IsSuscribe = false,
             };

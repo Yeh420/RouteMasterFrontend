@@ -39,21 +39,26 @@
             display: inline-block;
             margin-right: 10px; 
         }
+
+        .imagePreview{
+            display:flex;
+            height:100px;
+            width:100px;
+        }
     </style>
 }
 <div class="h1Container">
     <h1>會員註冊</h1>
 </div>
 
-
-<hr />
+<body>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="MemberRegister" class="form" id="registrationForm" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">               
                
-                <input asp-for="FirstName" class="form-control" placeholder="名字"/>
+                <input asp-for="FirstName" class="form-control" placeholder="名字" required/>
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -140,7 +145,8 @@
                 <div class="form-group" id="divA" style="display: none;">
                     <label asp-for="Image" class="control-label"></label>
                     <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*" />
-                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />                   
+                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />
+                        <div class="imagePreview" id="imagePreview"></div>
                 </div>
 
                 <div id="divB" style="display: none;">
@@ -201,25 +207,19 @@
 
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
-            <div id="imagePreview"></div>
-
-            @*<div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSuscribe" /> @Html.DisplayNameFor(model => model.IsSuscribe)
-                </label>
-            </div>*@
-
-            <div>
-                <button type="button" id="quickRegiter">專題用註冊</button>
-            </div>
+           
 
             <div class="form-group">
                 <input type="submit" id="formSubmitBtn" value="註冊" class="btn btn-primary" />
             </div>
+
+            <div>
+                <button type="button" id="quickRegiter">Demo</button>
+            </div>
         </form>
     </div>
 </div>
-
+</body>
 @*<div>
     <a asp-action="Index">Back to List</a>
 </div>*@
@@ -283,12 +283,12 @@
             quickRegiter.addEventListener("click", function () {
                 
                 const defaultData = {
-                    FirstName: "曉華",
-                    LastName: "林",
-                    Account: "LinHua",
-                    Password: "12345",
-                    ConfirmPassword: "12345",
-                    Email: "johndoe@example.com",
+                    FirstName: "MasterDemo",
+                    LastName: "Route",
+                    Account: "RouteMasterDemo",
+                    Password: "Aa0000",
+                    ConfirmPassword: "Aa0000",
+                    Email: "routemasterdemo@gmail.com",
                     CellPhoneNumber: "0800123456", 
                     Gender:"false",
                 };

@@ -11,6 +11,7 @@ using RouteMasterFrontend.EFModels;
 using ECPay.Payment.Integration;
 using Microsoft.AspNetCore.Session;
 using RouteMasterFrontend.Models.Dto;
+using System.Diagnostics.Metrics;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -443,11 +444,12 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public ActionResult CheckoutPost(string? paymentmethod, string? name, string? telephone, string? address, string?note,int? CouponsId)
         {
-            var memberId = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name).Id;
-            if (memberId == null)
+            var member = _context.Members.FirstOrDefault(m => m.Account == User.Identity.Name);
+            if (member == null)
             {
                 return RedirectToAction("Index", "Home");
             }
+            int memberId = member.Id;
             var cart = GetCartInfo(memberId);
             bool allowCheckout = cart.Cart_ExtraServicesDetails.Any() || cart.Cart_ActivitiesDetails.Any() || cart.Cart_AccommodationDetails.Any();
 
@@ -458,13 +460,13 @@ namespace RouteMasterFrontend.Controllers
             }
             //ProcessCheckout(memberId, CouponsId, note);
            
-            return RedirectToAction("Index", "Ecpay", new { selectedCouponId = CouponsId });
+            return RedirectToAction("Index", "Ecpay", new { memberId = memberId, selectedCouponId = CouponsId });
           
         }
 
-        public ActionResult PayInfo(int Id, int selectedCouponId)
+        public ActionResult PayInfo(int memberId, int selectedCouponId)
         {
-            ProcessCheckout(Id, selectedCouponId, null);
+            ProcessCheckout(memberId, selectedCouponId, null);
             return RedirectToAction("ConfirmPayment", "Carts");
 
         }
@@ -893,7 +895,7 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
             }
         }
-        public ActionResult ShowPaymentResult()
+        public ActionResult ShowPaymentResult(int memberId,int selectedCouponId)
         {
             var postData = Request.Form;
 
@@ -904,7 +906,7 @@ namespace RouteMasterFrontend.Controllers
 
                 if (resultStatus == "1")
                 {
-
+                    ProcessCheckout(memberId, selectedCouponId, null);
                     return Redirect("https://localhost:7145/Carts/ConfirmPayment");
                 }
                 else
