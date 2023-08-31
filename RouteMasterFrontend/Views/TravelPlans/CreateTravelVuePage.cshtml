@@ -736,7 +736,8 @@
 
                     this.directionsService = new google.maps.DirectionsService;
                     this.directionsRenderer = new google.maps.DirectionsRenderer({
-                        map: this.map
+                        map: this.map,
+                        suppressMarkers: false
                     });
                     const routeCoordinates = this.sendToGoogleMapsDirectionsApi;
 
@@ -756,20 +757,13 @@
                         if (status === google.maps.DirectionsStatus.OK) {
                             this.directionsRenderer.setDirections(response);
                             console.log("畫路線啦")
+
                         } else {
                             window.alert('路线请求失败：' + status);
                         }
                     });
 
 
-
-
-
-                    //const center = { lat: 23.6978, lng: 120.9605 }; // 台湾的中心位置坐标
-                    //const map = new google.maps.Map(document.getElementById('map'), {
-                    //    center: center,
-                    //    zoom: 8, // 设置地图缩放级别
-                    //});
                 },
 
 
