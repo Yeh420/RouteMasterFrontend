@@ -1141,7 +1141,7 @@ namespace RouteMasterFrontend.Controllers
                 Birthday= DateTime.Today,
                 Gender= false,
                 Image= imageFile,
-                IsConfirmed = false,
+                IsConfirmed = true,
                 IsSuspended = false,
                 IsSuscribe = false,
             };
