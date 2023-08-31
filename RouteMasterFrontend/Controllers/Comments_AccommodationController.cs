@@ -41,7 +41,7 @@ namespace RouteMasterFrontend.Controllers
                       Id = c.Id,
                       Account = c.Member.Account,
                       Score = c.Score,
-                      Title = c.Title.Length > 12 ? c.Title.Substring(0, 12) + "..." : c.Title,
+                      Title = c.Title.Length > 10 ? c.Title.Substring(0, 10) + "..." : c.Title,
                       Pros = c.Pros,
                       Cons = c.Cons,
                       CreateDate = TransCommentCreate(c.CreateDate),

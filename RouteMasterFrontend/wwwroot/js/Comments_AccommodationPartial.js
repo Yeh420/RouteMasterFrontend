@@ -202,7 +202,7 @@
         <div v-for="(item, index) in indexVM" :key="index" class="card mb-4 border-success">
             <div class="row overflow-auto" style="max-height:500px;">
                 <div class="col-md-1 ms-auto">
-                    <img :src="getProfile(item.profile)" style="height: 80px; width: 80px;" class="mx-auto" />  
+                    <img :src="getProfile(item.profile)" style="height: 78px; width: 78px;" class="mx-auto" />  
                 </div>
                 <div class="col-md-11">
                     <div class="card-header bg-transparent border-success">
@@ -218,8 +218,8 @@
                             <p class="ms-auto fs-6" style="color:lightseagreen;">{{item.createDate}}</p>
                         </div>
                         <p class="fs-5" v-if="item.pros">{{"優點: " + item.pros}}</p>
-                        <p class="mb-3 fs-5" v-if="item.cons">{{"缺點: " +  item.cons}}</p>
-                        <ul v-if="item.imageList.length" class="d-flex list-unstyled mb-3">
+                        <p class="fs-5" v-if="item.cons">{{"缺點: " +  item.cons}}</p>
+                        <ul v-if="item.imageList.length" class="d-flex list-unstyled mt-2 mb-3">
                             <li v-for="(photo,num) in item.imageList" :key="num" class="me-3">
                                 <img :src="getImgPath(photo)" class="zoomIn" @click="openImageModal(item.imageList, num)" />
                             </li>
