@@ -700,8 +700,7 @@ namespace RouteMasterFrontend.Controllers
 					ExtraServiceId = es.ExtraServiceId,
 					ExtraServiceName = es.ExtraServiceName,
 					ExtraServiceProductId = es.ExtraServiceProductId,
-                   
-					Date = es.Date,
+                     Date = es.Date,
 					Price = es.Price,
 					Quantity = es.Quantity
 				}).ToList(),
@@ -1068,7 +1067,7 @@ namespace RouteMasterFrontend.Controllers
                 return Result.Failure($"帳號 {vm.Email} 已存在, 請更換後再試一次");
             }
 
-            bool securityPassword = Regex.IsMatch(vm.Password, @"^[^a-d]$");
+            bool securityPassword = Regex.IsMatch(vm.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)");
             if (!securityPassword)
             {
                 return Result.Failure($"密碼安全性有疑慮，請加強密碼");

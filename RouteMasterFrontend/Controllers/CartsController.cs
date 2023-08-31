@@ -462,9 +462,11 @@ namespace RouteMasterFrontend.Controllers
           
         }
 
-        public void PayInfo(int Id, int selectedCouponId)
+        public ActionResult PayInfo(int Id, int selectedCouponId)
         {
             ProcessCheckout(Id, selectedCouponId, null);
+            return RedirectToAction("ConfirmPayment", "Carts");
+
         }
 
         private void ProcessCheckout(int memberId, int?CouponsId, string?note)
@@ -511,7 +513,7 @@ namespace RouteMasterFrontend.Controllers
                         PaymentMethodId = 1,
                         PaymentStatusId = 2,
                         OrderHandleStatusId = 1,
-                        CouponsId = CouponsId == 0 ? null : CouponsId,
+                        CouponsId = (int)(CouponsId == 0 ? null : CouponsId),
                         CreateDate = DateTime.Now,
                         ModifiedDate = null,
                         Total = cartTotal
@@ -628,97 +630,7 @@ namespace RouteMasterFrontend.Controllers
             }
         }
 
-        //[HttpPost]
-        //public IActionResult ReturnUrl([FromForm] Dictionary<string, string> formData)
-        //{
-        //    string merchantTradeNo = Guid.NewGuid().ToString("N").Substring(0, 20);
-        //    string tradeDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-        //    string paymentType = "aio";
-        //    string tradeDesc = "Sample Transaction";
-        //    string itemNames = "Item1#Item2";
-        //    string returnURL = "https://yourwebsite.com/payment/callback";
-        //    string choosePayment = "All";
-
-        //    string checkMacValue = $"HashKey={HashKey}&MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&PaymentDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={HashIV}";
-
-        //    using (SHA256 sha256 = SHA256.Create())
-        //    {
-        //        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(checkMacValue));
-        //        string checkMac = BitConverter.ToString(hashBytes).Replace("-", "").ToUpper();
-
-        //        string queryString = HttpUtility.UrlEncode($"MerchantID={MerchantID}&MerchantTradeNo={merchantTradeNo}&MerchantTradeDate={tradeDate}&PaymentType={paymentType}&TotalAmount={cartTotal}&TradeDesc={tradeDesc}&ItemName={itemNames}&ReturnURL={returnURL}&ChoosePayment={choosePayment}&CheckMacValue={checkMac}&EncryptType=1");
-
-        //        var redirectUrl = $"{PaymentApiUrl}?{queryString}";
-
-        //        // 使用 JsonResult 返回 JSON 數據
-        //        return new JsonResult(new { redirectUrl });
-        //    }
-        //}
-
       
-
-
-        //    private void PrepareAndExecutePayment(Order order)
-        //    {
-        //        var paymentParameters = new Dictionary<string, string>
-        //{
-        //            { "MerchantID", "3002607" },
-        //            { "MerchantTradeNo", order.Id.ToString() },
-        //            { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
-        //            { "PaymentType", "aio" },
-        //            { "TotalAmount", order.Total.ToString() },
-
-        //        };
-        //        var checkMacValue = BuildCheckMacValue(paymentParameters);
-        //        paymentParameters.Add("CheckMacValue", checkMacValue);
-
-        //        var content = new FormUrlEncodedContent(paymentParameters);
-        //        using (var client = new HttpClient())
-        //        {
-        //            var response = client.PostAsync(PaymentApiUrl, content).Result;
-        //            if (response.IsSuccessStatusCode)
-        //            {
-        //                Console.WriteLine("Payment successful");
-        //            }
-        //            else
-        //            {
-        //                Console.WriteLine("Payment failed");
-        //            }
-        //        }
-
-        //    }
-
-        //    private string BuildCheckMacValue(Dictionary<string, string> parameters)
-        //    {
-        //        string szCheckMacValue = String.Format("HashKey={0}{1}&HashIV={2}",
-        //            HashKey, string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}")), HashIV);
-        //        szCheckMacValue = HttpUtility.UrlEncode(szCheckMacValue).ToLower();
-
-        //        using (SHA256 sha256 = SHA256Managed.Create())
-        //        {
-        //            byte[] bytes = Encoding.UTF8.GetBytes(szCheckMacValue);
-        //            byte[] hashBytes = sha256.ComputeHash(bytes);
-        //            szCheckMacValue = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-        //        }
-
-        //        return szCheckMacValue;
-        //    }
-
-        //    private string GetPaymentRedirectUrl(Order order)
-        //    {
-        //        string PaymentBaseUrl = "https://localhost:7145/Carts/CheckoutPost";
-        //        var paymentUrl = PaymentBaseUrl + "?orderId=" + order.Id +
-        //            "&totalAmount=" + order.Total +
-        //            "&memberId=" + order.MemberId +
-        //            "&paymentMethodId=" + order.PaymentMethodId +
-        //            "&paymentStatusId=" + order.PaymentStatusId +
-        //            "&orderHandleStatusId=" + order.OrderHandleStatusId +
-        //            "&couponsId=" + order.CouponsId +
-        //            "&createDate=" + order.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") +
-        //            "&modifiedDate=" + (order.ModifiedDate.HasValue ? order.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "");
-        //        return paymentUrl;
-        //    }
-
         private int CalculateCartTotal(Cart cart)
         {
             int total = 0;
@@ -762,90 +674,7 @@ namespace RouteMasterFrontend.Controllers
 
    
 
-        //public void CreateOrder(int memberId, int travelPlanId, int paymentMethodId, int couponsId, List<ord> accommodationItems, List<ActivityOrderItem> activityItems, List<ExtraServiceOrderItem> extraServiceItems)
-        //{
-
-        //        var order = new Order
-        //        {
-        //            MemberId = memberId,
-        //            TravelPlanId = travelPlanId,
-        //            PaymentMethodId = paymentMethodId,
-        //            PaymentStatusId = initialPaymentStatusId, // Set the initial payment status ID
-        //            OrderHandleStatusId = initialHandleStatusId, // Set the initial handle status ID
-        //            CouponsId = couponsId,
-        //            CreateDate = DateTime.Now,
-        //            ModifiedDate = null, // Set this as needed
-        //            Total = CalculateTotal(accommodationItems, activityItems, extraServiceItems)
-        //        };
-
-        //        _context.Orders.Add(order);
-        //        _context.SaveChanges();
-
-        //        int orderId = order.Id;
-
-        //        foreach (var accommodationItem in accommodationItems)
-        //        {
-        //            var accommodationDetail = new OrderAccommodationDetail
-        //            {
-        //                OrderId = orderId,
-        //                AccommodationId = accommodationItem.AccommodationId,
-        //                AccommodationName = accommodationItem.AccommodationName,
-        //                RoomProductId = accommodationItem.RoomProductId,
-        //                RoomType = accommodationItem.RoomType,
-        //                RoomName = accommodationItem.RoomName,
-        //                CheckIn = accommodationItem.CheckIn,
-        //                CheckOut = accommodationItem.CheckOut,
-        //                RoomPrice = accommodationItem.RoomPrice,
-        //                Quantity = accommodationItem.Quantity,
-        //                Note = accommodationItem.Note
-        //            };
-
-        //           _context.OrderAccommodationDetails.Add(accommodationDetail);
-        //        }
-
-        //        foreach (var activityItem in activityItems)
-        //        {
-        //            var activityDetail = new OrderActivitiesDetail
-        //            {
-        //                OrderId = orderId,
-        //                ActivityId = activityItem.ActivityId,
-        //                ActivityName = activityItem.ActivityName,
-        //                ActivityProductId = activityItem.ActivityProductId,
-        //                Date = activityItem.Date,
-        //                StartTime = activityItem.StartTime,
-        //                EndTime = activityItem.EndTime,
-        //                Price = activityItem.Price,
-        //                Quantity = activityItem.Quantity
-        //            };
-
-        //        _context.OrderActivitiesDetails.Add(activityDetail);
-        //        }
-
-        //        foreach (var extraServiceItem in extraServiceItems)
-        //        {
-        //            var extraServiceDetail = new OrderExtraServicesDetail
-        //            {
-        //                OrderId = orderId,
-        //                ExtraServiceId = extraServiceItem.ExtraServiceId,
-        //                ExtraServiceName = extraServiceItem.ExtraServiceName,
-        //                ExtraServiceProductId = extraServiceItem.ExtraServiceProductId,
-        //                Date = extraServiceItem.Date,
-        //                Price = extraServiceItem.Price,
-        //                Quantity = extraServiceItem.Quantity
-        //            };
-
-        //        _context.OrderExtraServicesDetails.Add(extraServiceDetail);
-        //        }
-
-        //        _context.SaveChanges();
-
-        //}
-
-        //private int CalculateTotal(List<AccommodationOrderItem> accommodationItems, List<ActivityOrderItem> activityItems, List<ExtraServiceOrderItem> extraServiceItems)
-        //{
-        //    // Calculate and return the total amount based on the items in the order
-        //    // You need to implement the logic for calculating the total based on your requirements
-        //}
+        
 
 
         private void EmptyCart(int memberId)
@@ -1027,43 +856,7 @@ namespace RouteMasterFrontend.Controllers
             return View(cart);
         }
 
-        //// GET: Carts/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null || _context.Carts == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var cart = await _context.Carts
-        //        .Include(c => c.Member)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (cart == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(cart);
-        //}
-
-        //// POST: Carts/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    if (_context.Carts == null)
-        //    {
-        //        return Problem("Entity set 'RouteMasterContext.Carts'  is null.");
-        //    }
-        //    var cart = await _context.Carts.FindAsync(id);
-        //    if (cart != null)
-        //    {
-        //        _context.Carts.Remove(cart);
-        //    }
-            
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+      
 
         private bool CartExists(int id)
         {
@@ -1100,7 +893,59 @@ namespace RouteMasterFrontend.Controllers
                 return Json(new { success = false, message = "更新數量時出現錯誤：" + ex.Message });
             }
         }
+        public ActionResult ShowPaymentResult(int memberId,int selectedCouponId)
+        {
+            var postData = Request.Form;
 
+            if (postData.Count > 0)
+            {
+                var resultStatus = postData["RtnCode"];
+                var resultMessage = postData["RtnMsg"];
+
+                if (resultStatus == "1")
+                {
+                    ProcessCheckout(memberId, selectedCouponId, null);
+                    return Redirect("https://localhost:7145/Carts/ConfirmPayment");
+                }
+                else
+                {
+
+                    TempData["ErrorMessage"] = resultMessage;
+                    return Redirect("https://localhost:7145/Carts/Index");
+                }
+            }
+
+
+            return Redirect("https://localhost:7145/Carts/Index");
+        }
+        [HttpPost]
+        public ActionResult HandleReturnURL()
+        {
+
+            var postData = Request.Form;
+
+
+            if (postData.Count > 0)
+            {
+
+                var resultStatus = postData["RtnCode"];
+                var resultMessage = postData["RtnMsg"];
+
+                if (resultStatus == "1")
+                {
+
+                    return Content("1|OK");
+                }
+                else
+                {
+
+                    return Content(resultStatus + "|" + resultMessage);
+                }
+            }
+
+
+            return Content("0|Error");
+        }
 
         public IActionResult ReloadCartItemsWithoutCondition()
         {

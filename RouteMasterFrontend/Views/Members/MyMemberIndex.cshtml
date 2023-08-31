@@ -194,7 +194,7 @@
                 </span>
             </button>
         </nav>
-        @*<nav class="navbar bg-body-tertiary">
+        <nav class="navbar bg-body-tertiary">
             <button class="cta" data-number="5">
                 <span>我的行程</span>
                 <span>
@@ -207,7 +207,7 @@
                     </svg>
                 </span>
             </button>
-        </nav>*@
+        </nav>
 
     </div>
 
@@ -223,9 +223,16 @@
 
 @section Scripts{
 
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
     <script>
+
+
+
+
+
  
         var buttons = document.getElementsByTagName("button");
 
@@ -270,6 +277,8 @@
                     
                     var memberArea = $("#memberNavbar");
                     memberArea.html(response);
+
+            
                 }).fail(function (err) {
                     console.log('err')
                 });

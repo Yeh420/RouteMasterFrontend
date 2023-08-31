@@ -80,9 +80,10 @@
                                                 @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Name)
                                             </div>
                                             <div>
-                                                @Html.DisplayFor(modelItem => firstItem.ActivityProduct.Activity.Description)
+                                               日期：<span class="item-date"> @firstItem.ActivityProduct.Date.ToShortDateString()</span>
                                             </div>
                                             <div class="extraservice-roomtype" style="font-size:16px;margin-bottom: 5px;">
+                                               時間:
                                                 <span class="item-datetime">
                                                     @Html.DisplayFor(modelItem => firstItem.ActivityProduct.StartTime) ~
                                                     @Html.DisplayFor(modelItem => firstItem.ActivityProduct.EndTime)
@@ -93,7 +94,7 @@
                                                 <span class="quantity">@group.Sum(item => item.Quantity)</span>
                                             </div>
                                             <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
-                                                TWD:  <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ActivityProduct.Price)</span>
+                                                 @String.Format("{0:C0}", group.Sum(item => item.Quantity * firstItem.ActivityProduct.Price))
                                             </div>
                                         </div>
                                         <div class="room-remove col-md-1 p-0" style="text-align: left;">

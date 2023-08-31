@@ -143,13 +143,13 @@
                                 totalAmount += groupPrice;
                                 <tr data-extraservice-id="@group.First().Id">
                                     <td>
-                                        <img src="@Url.Content(group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
-                                    </td>
+                                        </td>
+
                                     <td class="align-middle text-center">@group.First().Name</td>
-                                    <td class="align-middle text-center">@group.First().Description</td>
+                                        <td class="align-middle text-center">@(group.First().Description.Length > 10 ? group.First().Description.Substring(0, 10) + "..." : group.First().Description)</td>
                                     <td class="align-middle text-center">@group.First().Date</td>
                                     <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
-                                        $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                     @String.Format("{0:C0}",group.Sum(item=>item.Quantity * item.Price))
                                     </td>
                                     <td class="align-middle text-center">
                                         <span class="quantity">@group.Sum(item => item.Quantity)</span>
@@ -166,9 +166,10 @@
                                 <tr data-roomProductId="@accommodationDTO.RoomId">
                                 <td><img src="@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                 <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
-                                <td class="align-middle text-center">@accommodationDTO.RoomName @accommodationDTO.RoomTypeName</td>
+                                        <td class="align-middle text-center">@accommodationDTO.RoomName <br />@accommodationDTO.RoomTypeName</td>
                                 <td class="align-middle text-center">@accommodationDTO.Date</td>
-                                <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">$@accommodationDTO.Price</td>
+                                        <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">NT$@String.Format("{0:N0}", accommodationDTO.Price)</td>
+
                                 <td class="align-middle text-center">@accommodationDTO.Quantity</td>
                                 <td class="align-middle text-center">
                                     <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeFromAcc(@accommodationDTO.RoomId, @accommodationDTO.Price)"></i></a>
@@ -187,10 +188,10 @@
                                 <tr data-activity-id="@group.First().Id">
                                         <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
                                         <td class="align-middle text-center">@group.First().ActivityName</td>
-                                        <td class="align-middle text-center">@group.First().Description</td>
+                                        <td class="align-middle text-center">@(group.First().Description.Length > 14 ? group.First().Description.Substring(0, 10) + "..." : group.First().Description)</td>
                                         <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
                                         <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
-                                            $<span class="price">@group.Sum(item => item.Quantity * item.Price)</span>
+                                            @String.Format("{0:C0}",group.Sum(item=>item.Quantity * item.Price))
                                             </td>
                                    
                                         <td class="align-middle text-center">
@@ -256,12 +257,12 @@
        
         </div>
         <div style="width:38%; border:none; text-align:center; align-items:flex-end; justify-content: center; display: flex; flex-direction: column; background-color: #f9f9f9; border-radius: 10px; padding: 20px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);" class="container me-0">
-            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: {{Math.round(totalAmount)}} 元</h5>
+            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: NT ${{Math.round(totalAmount).toLocaleString()}} 元</h5>
             <div style="border-top: 2px dashed #ddd; padding-top: 20px; width:300px; text-align: right;">
                 <h3 style="font-size: 18px; color: #888; margin-bottom: 10px;">優惠券折扣：{{ selectedCouponAmount}}%</h3>
-                <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：{{ (totalAmount * (selectedCouponAmount / 100)) }} 元</h3>
+                <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：NT ${{ Math.round(totalAmount * (selectedCouponAmount / 100)).toLocaleString() }} 元</h3>
             </div>
-            <h5 style="color: lightseagreen; font-size: 26px; font-weight: bold;">總金額: {{ discountedTotal }} 元</h5>
+            <h5 style="color: lightseagreen; font-size: 26px; font-weight: bold;">總金額: NT$ {{ Math.round(discountedTotal).toLocaleString() }} 元</h5>
         </div>
 </div>
 </div>

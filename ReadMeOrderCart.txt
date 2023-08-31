@@ -19,7 +19,7 @@ CheckOut page
 8/8 
 [v] cart finish
 
-23
+231
 
 
 
