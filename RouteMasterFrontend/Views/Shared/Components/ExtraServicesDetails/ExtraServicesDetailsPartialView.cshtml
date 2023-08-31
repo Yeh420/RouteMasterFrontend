@@ -75,17 +75,18 @@
                                         <div class="room-name" style=" font-weight:bold; font-size:18px;">
                                             @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Name)
                                         </div>
-                                        <div>
+                                       @* <div>
                                             @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Description)
-                                        </div>
+                                        </div>*@
                                         <div class="extraservice-date" style="font-size:14px;margin-bottom: 5px;">
-                                            @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)
+                                            日期：<span class="date">@Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)</span>
                                         </div>
                                         <div class="extraservice-quantity" style="font-size:14px;color:dimgrey;margin-bottom: 5px;">
                                             數量:<span class="quantity">@group.Sum(item => item.Quantity)</span>
                                         </div>
                                         <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
-                                            TWD: <span class="price-display">@group.Sum(item => item.Quantity * firstItem.ExtraServiceProduct.Price)</span>
+                                            @String.Format("{0:C0}",group.Sum(item=>item.Quantity * firstItem.ExtraServiceProduct.Price))
+                                           
                                         </div>
                                     </div>
                                     <div class="room-remove col-md-1 p-0" style="text-align: left;">

@@ -2,6 +2,37 @@
 @{
     ViewData["Title"] = "Index";
 }
+@section Styles{
+    <style>
+       .card-body button{
+           background-color:lightseagreen;
+            border-color: lightseagreen;
+            color:white;
+       }
+
+        #pills-hot-tab:focus,
+        #pills-home-tab:focus,
+        #pills-profile-tab:focus,
+        #pills-contact-tab:focus,
+        #pills-about-tab:focus,
+        .modal-header,
+        .nav-pills .nav-link.active {
+            background-color: lightseagreen;
+            color:white !important;
+        }
+
+        #pills-hot-tab,
+        #pills-home-tab,
+        #pills-profile-tab,
+        #pills-contact-tab,
+        #pills-about-tab
+        {
+            color: lightseagreen;
+        }
+
+    </style>
+    
+}
 
 
 <div id="app">
@@ -29,60 +60,60 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-hot" role="tabpanel" aria-labelledby="pills-hot-tab">
-                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
-                    <h5 class="card-header">{{item.categoryName}}</h5>
+                <div class="card mb-3 border-danger" v-for="(item,index) in qList" :key="item.id" style="width:1100px;">
+                    <h5 class="card-header border-danger">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>                     
-                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                        <p class="card-text mb-2"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
                             快告訴我
                         </button>
                     </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
-                    <h5 class="card-header">{{item.categoryName}}</h5>
+                <div class="card mb-3 border-danger" v-for="(item,index) in qList" :key="item.id" style="width:1100px;">
+                    <h5 class="card-header border-danger">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>                      
-                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>                       
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                        <p class="card-text mb-2"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>                       
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
                             快告訴我
                         </button>
                     </div>                   
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
-                    <h5 class="card-header">{{item.categoryName}}</h5>
+                <div class="card mb-3 border-danger" v-for="(item,index) in qList" :key="item.id" style="width:1100px;">
+                    <h5 class="card-header border-danger">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                        <p class="card-text mb-2"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
                             快告訴我
                         </button>
                     </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
-                    <h5 class="card-header">{{item.categoryName}}</h5>
+                <div class="card mb-3 border-danger" v-for="(item,index) in qList" :key="item.id" style="width:1100px;">
+                    <h5 class="card-header border-danger">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                        <p class="card-text mb-2"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
                             快告訴我
                         </button>
                     </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-about" role="tabpanel" aria-labelledby="pills-about-tab">
-                <div class="card mb-3" v-for="(item,index) in qList" :key="item.id">
-                    <h5 class="card-header">{{item.categoryName}}</h5>
+                <div class="card mb-3 border-danger" v-for="(item,index) in qList" :key="item.id" style="width:1100px;">
+                    <h5 class="card-header border-danger">{{item.categoryName}}</h5>
                     <div class="card-body">
                         <h5 class="card-title">{{item.question}}</h5>
-                        <p class="card-text"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
+                        <p class="card-text mb-2"><i class="fa-solid fa-thumbs-up fa-lg"></i> {{item.helpful}}</p>
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modaltarget" @@click="showModal(item.id)">
                             快告訴我
                         </button>
                     </div>
@@ -94,11 +125,11 @@
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modaltargetLabel">{{question}}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @@click="updatethumbs(qnumber,thumbsUp)"></button>
+                        <h5 class="modal-title fw-bold" id="modaltargetLabel">{{question}}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" @@click="updatethumbs(qnumber,thumbsUp)"></button>
                     </div>
                     <div class="modal-body">
-                       <p>{{answer}}</p>
+                       <p class="fs-5 fw-normal">{{answer}}</p>
                         <img v-if="img" :src=`../MemberUploads/${img}` class="img-fluid">
                     </div>
                     <div class="modal-footer justify-content-start">
@@ -119,6 +150,7 @@
 @section Scripts{
     <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
     <script src="https://kit.fontawesome.com/ad2e9fef09.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         var vueApp = {
@@ -134,14 +166,16 @@
                     img:"",
                     thumbsUp:false,
                     origScore:0,
-                    thumbicon:""
+                    thumbicon:"",
+                   
+                    
                 }
             },
             mounted: function () {
                 let _this = this;
                 _this.getQuestion();
-            },
-            methods: {
+            },          
+            methods: {             
                 getQuestion: async function () {
                     let _this = this;
                     var data = {};
@@ -158,10 +192,11 @@
 
                     if (response.ok) {
                         let _this = this;
+                        
                         _this.qList = await response.json();
 
                         console.log(_this.qList);
-
+                        
                     }
 
                     else {
@@ -176,11 +211,13 @@
                 },
                 showMe: function (msg) {
                     let _this = this;
+                    
                     _this.cateInput = msg;
                     _this.getQuestion();
+                   
                 },
                 showModal:function(id){
-
+                    console.log(id);
                     let _this=this;
                     _this.thumbsUp=false;
                     _this.thumbicon = '<i class="fa-regular fa-thumbs-up fa-lg"></i>';
@@ -213,6 +250,14 @@
                     }
                     _this.thumbsUp = true;
                     _this.thumbicon = '<i class="fa-solid fa-thumbs-up fa-lg"></i>';
+
+                    Swal.fire({
+                        position: 'top',
+                        icon: 'success',
+                        title: '感謝您的意見回饋',
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
                     
                     console.log(id);
                 },

@@ -288,7 +288,9 @@
                             <tbody>
                                 <tr v-for="(attraction, index) in sortedAttractions" :key="attraction.attId" style="height: 100px">                                   
                                     <td>
-                                        <input v-model="attraction.startTime" type="datetime-local" @@change="userInputStartTime(attraction,index)" />
+                                        <input v-model="attraction.startTime" type="datetime-local"
+                                               :min="index > 0 ? sortedAttractions[index - 1].endTime : null"                
+                                        @@change="userInputStartTime(attraction,index)" />
                                         <div style="text-align:center">{{attraction.attName}}</div>
                                         <ul class="checkbox-list">
                                             <li v-for="extObj in attraction.extList">
@@ -315,7 +317,9 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        <input v-model="attraction.endTime" type="datetime-local" @@change="userInputEndTime(attraction,index)" />
+                                        <input v-model="attraction.endTime" type="datetime-local"
+                                               :min="index > 0 ? sortedAttractions[index].startTime: null"
+                                               @@change="userInputEndTime(attraction,index)" />
                                         <br />
                                         <ul class="checkbox-list">
                                             <li v-for="actObj in attraction.actList">
@@ -412,7 +416,7 @@
 
 
 
-    <div>{{selectedExtraServiceProducts}}</div>
+
 
 </div>
 
@@ -546,7 +550,7 @@
 
                     sortedAttractionsWithTime:[],
 
-
+                    selectedActProductScheduleObjsInfo:[],
 
                     selectedActivityProducts:[],
                     selectedExtraServiceProducts:[],                   
@@ -637,6 +641,45 @@
                         // 將 datetime-local 字串轉換為日期
                         this.travelBeginTime = new Date(value);
                     },
+                },
+                vuePageSchduleObjs: function () {
+                    // 初始化一个空数组来存储结果
+                    let result = [];
+
+                    // 遍历sortedAttractionsWithTime数组
+                    for (let i = 0; i < this.sortedAttractionsWithTime.length; i++) {
+                        const currentAttraction = this.sortedAttractionsWithTime[i];
+
+                        // 创建一个对象来表示当前景点的停留时间
+                        const attractionObj = {
+                            title: currentAttraction.attName + "停留",
+                            start: currentAttraction.startTime,
+                            end: currentAttraction.endTime
+                        };
+
+                        // 将当前景点的停留时间对象添加到结果数组中
+                        result.push(attractionObj);
+
+                        // 如果不是最后一个景点
+                        if (i < this.sortedAttractionsWithTime.length - 1) {
+                            // 创建一个对象来表示交通时间
+                            const transportationObj = {
+                                title: "交通时间",
+                                start: currentAttraction.endTime,
+                                end: this.sortedAttractionsWithTime[i + 1].startTime
+                            };
+
+                            // 将交通时间对象添加到结果数组中
+                            result.push(transportationObj);
+                        }
+                    }
+
+                    if (this.selectedActProductScheduleObjsInfo) {
+                        result = result.concat(this.selectedActProductScheduleObjsInfo);
+                    }
+
+
+                    return result;
                 },
 
                 
@@ -1125,6 +1168,10 @@
                         }
 
                         this.selectedActivityProducts.push({ actProductId: actProduct.activityProductId, quantity: actProduct.inputQuantity })
+                        this.selectedActProductScheduleObjsInfo.push({ title: actProduct.activityName, start: actProduct.startTime, end: actProduct.endTime })
+
+
+
 
                     } else {             
 
@@ -1132,6 +1179,7 @@
                         if (indexToRemove !== -1) {
                             // 使用 splice() 方法移除目标元素
                             this.selectedActivityProducts.splice(indexToRemove, 1);
+                            this.selectedActProductScheduleObjsInfo.splice(indexToRemove,1);
                         }
 
                         target.removeAttribute('checked');
@@ -1273,10 +1321,36 @@
 
 
                 saveSchedule:function(){
+                    console.log("存行程表")
+
+                    const postData = {
+                        memberId: this.memberId,
+                        vuePageSchduleObjs: this.vuePageSchduleObjs,
+                        createDate: this.formattedTravelBeginTime,
+                    };
+
+                    axios.post(`https://localhost:7251/api/TravelPlans/Post/SaveVuePageSchduleData`, postData)
+                        .then(response => {
+                            alert('已成功儲存!');
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
 
 
 
-                }
+
+
+
+
+
+
+
+
+
+
+
+                },
 
 
 
