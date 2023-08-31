@@ -71,7 +71,7 @@
                     });
 
                     var infowindowContent = `
-                            <div style="width:250px" onclick="redirectToDetails(${attraction.id})">
+                                    <div style="width:250px;cursor:pointer" onclick="redirectToDetails(${attraction.id})">
                         <h5>${attraction.name} <span class="badge bg-info text-white">${attraction.attractionCategory}</span></h5>
                         <img src="../AttractionImages/${attraction.image}" style="object-fit: cover;width:100%; margin-top:4px">
                                 
@@ -80,7 +80,7 @@
                     平均停留${attraction.hours}小時 (${attraction.hoursCount}) |
                     平均花費${attraction.price}元 (${attraction.priceCount})
                 </p>
-                        
+                                
                     </div>
                 `;
 
@@ -89,18 +89,11 @@
                     });
 
                     // 添加 mouseover 事件監聽器
-                    marker.addListener('mouseover', function () {
-                        infowindow.open(map, marker);
-                    });
-
-                    // 添加 mouseout 事件監聽器
-                    marker.addListener('mouseout', function () {
-                        infowindow.close();
-                    });
-
                     marker.addListener('click', function () {
-                        redirectToDetails(attraction.id);
+                        infowindow.open(map, marker);
+                        
                     });
+
 
                     marker.setAnimation(google.maps.Animation.BOUNCE);
 
@@ -113,12 +106,9 @@
                 }
             });
 
-            
-
-            
         }
 
-
+        
          
     </script>
 }
