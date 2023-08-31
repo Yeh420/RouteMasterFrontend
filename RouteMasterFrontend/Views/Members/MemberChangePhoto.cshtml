@@ -1,16 +1,36 @@
-﻿<form id="uploadForm" asp-action="MemberChangePhoto" enctype="multipart/form-data">
-    <p>上傳圖片</p>
-    <input type="file" id="imageInput" name="facePhoto" multiple="multiple" accept="image/*" />
-    <br />
-    <br />
-    <br />
-    <div class="form-group">
-        <input type="submit" value="更換大頭貼" class="btn btn-primary" />
-    </div>
-</form>
+﻿<style>
+    .center-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh; /* 使用视口高度使容器占据整个屏幕高度 */
+    }
+    #imagePreview {
+        
+        display: flex;
+        justify-content: center;
+        
+        height: 400px;
+        width: 400px;
+       
+    }
+</style>
 
-<div id="imagePreview"></div>
+<div class="center-container">
+    <form id="uploadForm" asp-action="MemberChangePhoto" enctype="multipart/form-data">
+        <input type="file" id="imageInput" name="facePhoto" multiple="multiple" accept="image/*" />
+        <br />
+        <br />
+        <br />
+        <div class="form-group">
+            <input type="submit" value="更換大頭貼" class="btn btn-primary" />
+        </div>
+        <div id="imagePreview"></div>
+    </form>
 
+    
+</div>
 <script>
     // 获取图片输入元素和预览容器元素
     const imageInput = document.getElementById('imageInput');
