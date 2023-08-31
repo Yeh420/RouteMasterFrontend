@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RouteMasterFrontend.EFModels;
+using RouteMasterFrontend.Models.Dto;
 
 namespace RouteMasterFrontend.Controllers
 {
@@ -98,6 +99,94 @@ namespace RouteMasterFrontend.Controllers
             ViewData["PaymentStatusId"] = new SelectList(_context.PaymentStatuses, "Id", "Name", order.PaymentStatusId);
 
             return View(order);
+        }
+        public async Task<IActionResult> HistoryOrder(int? memberid)
+        {
+
+            if (!memberid.HasValue)
+            {
+                return BadRequest("Member ID is required");
+            }
+            var memberId = await _context.Members.Where(m => m.Id == memberid.Value).Select(m => m.Id).FirstOrDefaultAsync();
+
+            if (memberId == 0)
+            {
+                return NotFound("Member not found");
+            }
+
+            var orders = await _context.Orders
+            .Where(o => o.MemberId == memberId)
+            .Include(x => x.OrderExtraServicesDetails)
+            .Include(x => x.OrderActivitiesDetails)
+            .Include(x => x.OrderAccommodationDetails)
+            .Include(x => x.Coupons)
+            .Include(x => x.OrderHandleStatus)
+            .Include(x => x.PaymentStatus)
+            .Include(x => x.PaymentMethod)
+            .ToListAsync();
+
+            if (!orders.Any())
+            {
+                return NotFound("Member not found or no orders for this member");
+            }
+            var orderDTOs = orders.Select(o => new OrderDto
+            {
+                Id = o.Id,
+                MemberId = o.MemberId,
+                PaymentMethodName = o.PaymentMethod.Name,
+                PaymentStatusName = o.PaymentStatus.Name,
+                OrderHandleStatusId = o.OrderHandleStatusId,
+                CouponsId = o.CouponsId,
+                CreateDate = o.CreateDate,
+                ModifiedDate = o.ModifiedDate,
+                Total = o.Total,
+
+                ExtraServiceDetails = o.OrderExtraServicesDetails.Select(es => new OrderExtraServiceDetailDTO
+                {
+                    Id = es.Id,
+                    OrderId = es.OrderId,
+                    ExtraServiceId = es.ExtraServiceId,
+                    ExtraServiceName = es.ExtraServiceName,
+                    ExtraServiceProductId = es.ExtraServiceProductId,
+
+                    Date = es.Date,
+                    Price = es.Price,
+                    Quantity = es.Quantity
+                }).ToList(),
+
+                ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
+                {
+                    Id = ad.Id,
+                    OrderId = ad.OrderId,
+                    ActivityId = ad.ActivityId,
+                    ActivityName = ad.ActivityName,
+                    ActivityProductId = ad.ActivityProductId,
+
+                    Date = ad.Date,
+                    StartTime = ad.StartTime,
+                    EndTime = ad.EndTime,
+                    Price = ad.Price,
+                    Quantity = ad.Quantity
+                }).ToList(),
+
+                AccommodationDetails = o.OrderAccommodationDetails.Select(ac => new OrderAccommodationDetailDTO
+                {
+                    Id = ac.Id,
+                    OrderId = ac.OrderId,
+                    AccommodationId = ac.AccommodationId,
+                    AccommodationName = ac.AccommodationName,
+                    RoomProductId = ac.RoomProductId,
+                    RoomType = ac.RoomType,
+                    RoomName = ac.RoomName,
+                    CheckIn = (DateTime)ac.CheckIn,
+                    CheckOut = (DateTime)ac.CheckOut,
+                    RoomPrice = ac.RoomPrice,
+                    Quantity = ac.Quantity,
+                    Note = ac.Note
+                }).ToList()
+            }).ToList();
+
+            return View(orderDTOs);
         }
 
         // GET: Orders/Edit/5
