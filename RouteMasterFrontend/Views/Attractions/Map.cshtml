@@ -1,5 +1,13 @@
 ﻿@model List<RouteMasterFrontend.Models.ViewModels.AttractionVMs.AttractionMapVM>
 
+@section Styles{
+    <style>
+        .gm-ui-hover-effect {
+            display: none;
+        }
+    </style>
+}
+
 <div>
     <h1>地圖</h1>
     <div id="map" style="height: 800px"></div>
@@ -42,15 +50,11 @@
 
             var map = new google.maps.Map(document.getElementById('map'), mapOptions);
             
-            //var marker = new google.maps.Marker({
-            //    position: { lat: 25.03, lng: 121.56 },
-            //    map: map,
-            //    title: "123"
-            //});
+            
 
             var attractions = @Html.Raw(Json.Serialize(Model));
 
-            console.log(attractions);
+            //console.log(attractions);
 
             attractions.forEach(function (attraction) {
                 //console.log(attraction.positionX)
@@ -67,7 +71,7 @@
                     });
 
                     var infowindowContent = `
-                    <div style="width:250px">
+                                    <div style="width:250px;cursor:pointer" onclick="redirectToDetails(${attraction.id})">
                         <h5>${attraction.name} <span class="badge bg-info text-white">${attraction.attractionCategory}</span></h5>
                         <img src="../AttractionImages/${attraction.image}" style="object-fit: cover;width:100%; margin-top:4px">
                                 
@@ -76,7 +80,7 @@
                     平均停留${attraction.hours}小時 (${attraction.hoursCount}) |
                     平均花費${attraction.price}元 (${attraction.priceCount})
                 </p>
-                        <button class="btn btn-link" onclick="redirectToDetails(${attraction.id})">詳細資料</button>
+                                
                     </div>
                 `;
 
@@ -84,16 +88,27 @@
                         content: infowindowContent
                     });
 
-                    infowindow.open(map, marker);
+                    // 添加 mouseover 事件監聽器
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                        
+                    });
+
+
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+
+                    // 設置彈跳效果時間（例如，2秒後停止彈跳）
+                    setTimeout(function () {
+                        marker.setAnimation(null);
+                    }, 2000);
+
+                    //infowindow.open(map, marker);
                 }
             });
 
-            
-
-            
         }
 
-
+        
          
     </script>
 }

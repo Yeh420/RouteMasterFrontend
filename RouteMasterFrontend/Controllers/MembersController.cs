@@ -611,6 +611,7 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public IActionResult EditPassword([FromBody] MemberEditPasswordVM vm)
         {
+            
 
             //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
 
@@ -669,8 +670,13 @@ namespace RouteMasterFrontend.Controllers
             var orders = await _context.Orders
 		    .Where(o => o.MemberId == memberId)
 		    .Include(x => x.OrderExtraServicesDetails)
+            .ThenInclude(x => x.ExtraService)
 		    .Include(x => x.OrderActivitiesDetails)
+            .ThenInclude(x => x.Activity)
 		    .Include(x => x.OrderAccommodationDetails)
+            .ThenInclude(x => x.RoomProduct)
+            .ThenInclude(x => x.Room)
+            .ThenInclude(x => x.RoomImages)
 		    .Include(x => x.Coupons)
 		    .Include(x => x.OrderHandleStatus)
 		    .Include(x => x.PaymentStatus)
@@ -700,9 +706,11 @@ namespace RouteMasterFrontend.Controllers
 					ExtraServiceId = es.ExtraServiceId,
 					ExtraServiceName = es.ExtraServiceName,
 					ExtraServiceProductId = es.ExtraServiceProductId,
-                     Date = es.Date,
+                    Date = es.Date,
 					Price = es.Price,
-					Quantity = es.Quantity
+                    ImageUrl = "/ExtraServiceImages/" + es.ExtraService.Image,
+                    Quantity = es.Quantity
+                    
 				}).ToList(),
 
 				ActivityDetails = o.OrderActivitiesDetails.Select(ad => new OrderActivityDetailDTO
@@ -712,9 +720,9 @@ namespace RouteMasterFrontend.Controllers
 					ActivityId = ad.ActivityId,
 					ActivityName = ad.ActivityName,
 					ActivityProductId = ad.ActivityProductId,
-                   
+                   ImageUrl = "/ActivityImages/"+ad.Activity.Image,
 					Date = ad.Date,
-					StartTime = ad.StartTime,
+					StartTime = ad.StartTime, 
 					EndTime = ad.EndTime,
 					Price = ad.Price,
 					Quantity = ad.Quantity
@@ -732,6 +740,7 @@ namespace RouteMasterFrontend.Controllers
 					CheckIn = (DateTime)ac.CheckIn,
 					CheckOut = (DateTime)ac.CheckOut,
 					RoomPrice = ac.RoomPrice,
+                    ImageUrl = "/AccommodationImages/" + ac.RoomProduct.Room.RoomImages.First().Image,
 					Quantity = ac.Quantity,
 					Note = ac.Note
 				}).ToList()

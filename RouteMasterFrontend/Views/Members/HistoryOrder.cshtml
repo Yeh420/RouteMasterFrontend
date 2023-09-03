@@ -45,60 +45,78 @@
         {
             <tr>
                 <td>
-                    <div class="card">
+                    <div class="card mb-3">
                         <div class="card-header">
                             Order for @Html.DisplayFor(modelItem => item.MemberId)
                         </div>
                         <div class="card-body">
 
-                          
                             @foreach (var service in item.ExtraServiceDetails)
                             {
-                                <h5 class="card-title">@service.ExtraServiceName</h5>
-                                <p class="card-text">
-                                 @*   Product ID: @service.ExtraServiceProductId<br />*@
-                                    <img src="@Url.Content(service.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" />
-                                    日期: @service.Date<br />
-                                    價格: @service.Price<br />
-                                    數量: @service.Quantity
-                                </p>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(service.ImageUrl)" alt="圖片" class="img-fluid" style="height:auto;";  />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@service.ExtraServiceName</h5>
+                                        <p class="card-text">
+                                            日期: @service.Date<br />
+                                            價格: @service.Price<br />
+                                            數量: @service.Quantity
+                                        </p>
+                                    </div>
+                                </div>
                             }
 
                             <!-- 活動資料 -->
                             @foreach (var activity in item.ActivityDetails)
                             {
-
-                                <h5 class="card-title">@activity.ActivityName</h5>
-                                <p class="card-text">
-                                   @* Product ID: @activity.ActivityProductId<br />*@
-                                    日期: @activity.Date<br />
-                                    時間: @activity.StartTime - @activity.EndTime<br />
-                                    數量: @activity.Price
-                                </p>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(activity.ImageUrl)" alt="圖片" class="img-fluid" style="height: auto;" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@activity.ActivityName</h5>
+                                        <p class="card-text">
+                                            日期: @activity.Date<br />
+                                            時間: @activity.StartTime - @activity.EndTime<br />
+                                            數量: @activity.Price
+                                        </p>
+                                    </div>
+                                </div>
                             }
 
                             <!-- 住宿資料 -->
                             @foreach (var accommodation in item.AccommodationDetails)
                             {
-                                <h5 class="card-title">@accommodation.AccommodationName</h5>
-                                <p class="card-text">
-                                   @* Room Product ID: @accommodation.RoomProductId<br />*@
-                                    房型: @accommodation.RoomName<br />
-                                    Check-In: @accommodation.CheckIn<br />
-                                    Check-Out: @accommodation.CheckOut
-                                </p>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(accommodation.ImageUrl)" alt="圖片" class="img-fluid" style="height: auto;" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@accommodation.AccommodationName</h5>
+                                        <p class="card-text">
+                                            房型: @accommodation.RoomName<br />
+                                            Check-In: @accommodation.CheckIn<br />
+                                            Check-Out: @accommodation.CheckOut
+                                        </p>
+                                    </div>
+                                </div>
                             }
 
                         </div>
                         <div class="card-footer">
-                            Payment Status: @Html.DisplayFor(modelItem => item.PaymentStatusName)<br />
-                            Order Created: @Html.DisplayFor(modelItem => item.CreateDate)
-                            <button class="pdf-button" onclick="generatePDF(this)">生成PDF</button>
+                            <div class="d-flex justify-content-between">
+                                <span>Payment Status: @Html.DisplayFor(modelItem => item.PaymentStatusName)</span>
+                                <span>Order Created: @Html.DisplayFor(modelItem => item.CreateDate)</span>
+                                <button class="btn btn-primary" onclick="generatePDF(this)">生成PDF</button>
+                            </div>
                         </div>
                     </div>
                 </td>
             </tr>
         }
+
     </tbody>
 
 </table>
