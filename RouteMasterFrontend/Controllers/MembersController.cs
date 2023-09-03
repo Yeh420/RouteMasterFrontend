@@ -611,6 +611,7 @@ namespace RouteMasterFrontend.Controllers
         [HttpPost]
         public IActionResult EditPassword([FromBody] MemberEditPasswordVM vm)
         {
+            
 
             //return Json(new { success = false, message = "帳密錯誤，請重新輸入" });
 
