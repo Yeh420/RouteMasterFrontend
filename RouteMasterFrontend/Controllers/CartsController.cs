@@ -224,7 +224,7 @@ namespace RouteMasterFrontend.Controllers
                     _context.Cart_ExtraServicesDetails.Remove(cartItem);
                     _context.SaveChanges();
 
-                    return Json(new { success = true, message = "Successfully removed from cart.", extraserviceId = extraserviceId });
+                    return Json(new { success = true, message = "已成功刪除!", extraserviceId = extraserviceId });
                 }
                 else
                 {
@@ -318,7 +318,7 @@ namespace RouteMasterFrontend.Controllers
                 {
                     _context.Cart_AccommodationDetails.Remove(cartItem);
                     _context.SaveChanges();
-                    return Json(new {success=true, message="Successfully removed from cart.", roomProductId = roomProductId });
+                    return Json(new {success=true, message="已成功刪除!", roomProductId = roomProductId });
                 }
                 else
                 {
@@ -375,7 +375,7 @@ namespace RouteMasterFrontend.Controllers
                     _context.Cart_ActivitiesDetails.Remove(cartItem);
                     _context.SaveChanges();
 
-                    return Json(new {success=true, message="Successfully  removed from cart.", activitiesId=activitiesId});
+                    return Json(new {success=true, message="已成功刪除!", activitiesId=activitiesId});
                 }
                 else
                 {
